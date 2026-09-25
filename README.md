@@ -52,6 +52,13 @@ La firma por defecto usa `ascode.keystore` (alias `ascode`). Para firmar con otr
 
 Created by **Andrés Mag**.
 
+## Contribuir
+
+Este repositorio tiene **un único mantenedor** y **toda contribución externa necesita su
+aprobación (Andrés Mag) antes de fusionarse**. `main` está protegida: los cambios entran por
+*pull request* y el PR necesita la revisión del mantenedor. Detalles en
+[CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## License
 
 Ver [LICENSE.md](LICENSE.md). Este proyecto deriva de una base de código abierta; se conservan

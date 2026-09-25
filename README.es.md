@@ -37,6 +37,13 @@ entorno `RELEASE_STORE_FILE`, `RELEASE_STORE_PASSWORD`, `RELEASE_KEY_ALIAS` y
 
 Creado por **Andrés Mag**.
 
+## Contribuir
+
+Este repositorio tiene **un único mantenedor** y **toda contribución externa necesita su
+aprobación (Andrés Mag) antes de fusionarse**. `main` está protegida: los cambios entran por
+*pull request* y el PR necesita la revisión del mantenedor. Detalles en
+[CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Licencia
 
 Ver [LICENSE.md](LICENSE.md). Se conservan los avisos y atribuciones exigidos por la licencia de la

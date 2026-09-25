@@ -42,12 +42,28 @@ public class LocalAiBridge implements AutoCloseable {
             }
         }
         if (loadError != null) {
-            String detail = loadError instanceof UnsatisfiedLinkError
-                    ? "The installed native engine does not match this version of Android SCode "
-                    + "(JNI symbol mismatch). Reinstall the app from the official APK."
-                    : "Missing llama.cpp native engine. Add lib" + LocalAiConfig.NATIVE_LIBRARY_NAME
-                    + ".so for this device ABI, then rebuild/install Android SCode.";
+            String raw = loadError.getMessage() == null ? loadError.toString() : loadError.getMessage();
+            String detail;
+            if (raw.contains("No implementation found")) {
+                detail = "The installed native engine does not match this version of Android SCode "
+                        + "(JNI symbol mismatch). ABI " + firstAbi()
+                        + ". Uninstall and reinstall from the official APK.";
+            } else if (loadError instanceof UnsatisfiedLinkError) {
+                detail = "The native engine could not be loaded. ABI " + firstAbi() + ": " + raw;
+            } else {
+                detail = "Missing llama.cpp native engine. Add lib" + LocalAiConfig.NATIVE_LIBRARY_NAME
+                        + ".so for this device ABI, then rebuild/install Android SCode.";
+            }
             throw new LocalAiException(detail, loadError);
+        }
+    }
+
+    private static String firstAbi() {
+        try {
+            String[] abis = android.os.Build.SUPPORTED_ABIS;
+            return abis != null && abis.length > 0 ? abis[0] : "unknown";
+        } catch (Throwable ignored) {
+            return "unknown";
         }
     }
 

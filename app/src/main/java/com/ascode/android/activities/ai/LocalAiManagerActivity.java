@@ -261,6 +261,7 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
         binding.engineResetButton.setOnClickListener(v -> applyEnginePreset(false));
         binding.checkConnectionButton.setOnClickListener(v -> runConnectivityCheck());
         binding.testButton.setOnClickListener(v -> runTestPrompt());
+        binding.copyResultButton.setOnClickListener(v -> copyResultToClipboard());
         binding.cancelButton.setOnClickListener(v -> {
             LocalAiService.getInstance().cancel();
             CloudAiService.getInstance().cancel();
@@ -806,6 +807,23 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
         binding.topPLabel.setText(Helper.getResString(R.string.ai_label_top_p, binding.topPSlider.getValue()));
         binding.topKLabel.setText(Helper.getResString(R.string.ai_label_top_k, (int) binding.topKSlider.getValue()));
         binding.presencePenaltyLabel.setText(Helper.getResString(R.string.ai_label_presence_penalty, binding.presencePenaltySlider.getValue()));
+    }
+
+    /** Copia el resultado del test prompt al portapapeles (util para respuestas largas). */
+    private void copyResultToClipboard() {
+        CharSequence value = binding.resultText.getText();
+        String text = value == null ? "" : value.toString().trim();
+        if (text.isEmpty()) {
+            AscodeUtil.toast(Helper.getResString(R.string.ai_copy_result_empty));
+            return;
+        }
+        Object service = getSystemService(CLIPBOARD_SERVICE);
+        if (service instanceof android.content.ClipboardManager) {
+            ((android.content.ClipboardManager) service)
+                    .setPrimaryClip(android.content.ClipData.newPlainText(
+                            Helper.getResString(R.string.ai_copy_prompt), text));
+        }
+        AscodeUtil.toast(Helper.getResString(R.string.ai_copied));
     }
 
     private void refreshUi() {

@@ -449,6 +449,16 @@
                             android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="14sp"
                             tools:text="Model response" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/copy_result_button"
+                            style="@style/Widget.Material3.Button.TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="@string/ai_copy_result"
+                            android:textAllCaps="false"
+                            android:textSize="12sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>

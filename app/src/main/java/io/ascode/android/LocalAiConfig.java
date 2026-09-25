@@ -99,7 +99,7 @@ public class LocalAiConfig {
         config.providerId = sanitizeProviderId(prefs.getString(KEY_PROVIDER_ID, PROVIDER_LOCAL));
         config.cloudEndpoint = trimOrEmpty(prefs.getString(KEY_CLOUD_ENDPOINT, getDefaultEndpointForProvider(PROVIDER_DEEPSEEK)));
         config.cloudModel = trimOrEmpty(prefs.getString(KEY_CLOUD_MODEL, getDefaultModelForProvider(PROVIDER_DEEPSEEK)));
-        config.thinkMode = prefs.getBoolean(KEY_THINK_MODE, true);
+        config.thinkMode = prefs.getBoolean(KEY_THINK_MODE, false);
         String legacyCloudApiKey = trimOrEmpty(prefs.getString(KEY_CLOUD_API_KEY, ""));
         config.cloudApiKey = AiSecretStore.readCloudApiKey(context.getApplicationContext());
         if (!legacyCloudApiKey.isEmpty()) {

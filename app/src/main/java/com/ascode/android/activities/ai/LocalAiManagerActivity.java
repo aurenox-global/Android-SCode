@@ -293,8 +293,8 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
             current.setTopP(0.95f);
             binding.thinkModeSummary.setText(Helper.getResString(R.string.ai_think_mode_visible));
         } else {
-            current.setTemperature(0.5f);
-            current.setTopP(0.85f);
+            current.setTemperature(0.7f);
+            current.setTopP(0.8f);
             binding.thinkModeSummary.setText(Helper.getResString(R.string.ai_think_mode_hidden));
         }
         current.save(getApplicationContext());

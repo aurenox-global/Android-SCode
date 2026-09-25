@@ -94,7 +94,7 @@ public class tq {
         a.add(new QuizBean("New component blocks are added when you add a component.", QuizBean.QUIZ_TRUE));
         a.add(new QuizBean("MoreBlock is a purple block you can create for repetitive tasks.", QuizBean.QUIZ_TRUE));
         a.add(new QuizBean("You can programmatically change the font style.", QuizBean.QUIZ_TRUE));
-        a.add(new QuizBean("There is a Discord community that can help you.", QuizBean.QUIZ_TRUE));
+        a.add(new QuizBean("You can find the project's source code on GitHub.", QuizBean.QUIZ_TRUE));
         a.add(new QuizBean("You can add onClick event on Widgets other than the Button.", QuizBean.QUIZ_TRUE));
         a.add(new QuizBean("You can also add events inside the \"Component\" tab.", QuizBean.QUIZ_TRUE));
         a.add(new QuizBean("You can change the language settings for Android SCode.", QuizBean.QUIZ_TRUE));

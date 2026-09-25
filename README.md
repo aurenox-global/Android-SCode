@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/Android-SCode.png" width="160" alt="Android SCode">
+</p>
+
 # Android SCode
 
 **Android SCode** es un IDE para crear aplicaciones Android directamente desde el móvil, sin ordenador y sin escribir todo el código a mano: interfaz por bloques y por XML, editor de diseño, editor de lógica, recursos (imágenes, sonidos, fuentes), librerías, compilación a APK/AAB y firma, todo dentro del teléfono.

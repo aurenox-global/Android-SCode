@@ -108,7 +108,7 @@ public class ProjectSettings {
     }
 
     public String getPath() {
-        return new File(Environment.getExternalStorageDirectory(), ".ascode/data/" + sc_id + "/project_config").getAbsolutePath();
+        return new File(Environment.getExternalStorageDirectory(), ".AndroidSCode/data/" + sc_id + "/project_config").getAbsolutePath();
     }
 
     public String getValue(String key, String defaultValue) {

@@ -162,7 +162,7 @@ public class CodeViewerActivity extends BaseAppCompatActivity {
         if (scId == null || scId.isEmpty() || sourceFile == null || sourceFile.isEmpty()) {
             return null;
         }
-        String basePath = FileUtil.getExternalStorageDir() + "/.ascode/data/" + scId + "/files/";
+        String basePath = FileUtil.getExternalStorageDir() + "/.AndroidSCode/data/" + scId + "/files/";
         if (sourceFile.endsWith(".java")) {
             return basePath + "java/" + sourceFile;
         }

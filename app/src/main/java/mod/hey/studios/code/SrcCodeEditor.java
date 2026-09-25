@@ -340,7 +340,7 @@ public class SrcCodeEditor extends BaseAppCompatActivity {
         binding.editor.setTextSize(16);
 
         if (fromAndroidManifest) {
-            String filePath = FileUtil.getExternalStorageDir() + "/.ascode/data/" + scId + "/Injection/androidmanifest/activities_components.json";
+            String filePath = FileUtil.getExternalStorageDir() + "/.AndroidSCode/data/" + scId + "/Injection/androidmanifest/activities_components.json";
             if (FileUtil.isExistFile(filePath)) {
                 ArrayList<HashMap<String, Object>> arrayList = getGson()
                         .fromJson(FileUtil.readFile(filePath), Helper.TYPE_MAP_LIST);
@@ -403,7 +403,7 @@ public class SrcCodeEditor extends BaseAppCompatActivity {
         beforeContent = binding.editor.getText().toString();
 
         if (fromAndroidManifest) {
-            String filePath = FileUtil.getExternalStorageDir() + "/.ascode/data/" + scId + "/Injection/androidmanifest/activities_components.json";
+            String filePath = FileUtil.getExternalStorageDir() + "/.AndroidSCode/data/" + scId + "/Injection/androidmanifest/activities_components.json";
             if (FileUtil.isExistFile(filePath)) {
                 ArrayList<HashMap<String, Object>> activitiesComponents = getGson()
                         .fromJson(FileUtil.readFile(filePath), Helper.TYPE_MAP_LIST);

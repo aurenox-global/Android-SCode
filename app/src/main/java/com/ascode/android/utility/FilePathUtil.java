@@ -6,8 +6,8 @@ import java.io.File;
 
 public class FilePathUtil {
 
-    private static final File ASCODE_DATA = new File(Environment.getExternalStorageDirectory(), ".ascode/data/");
-    private static final File ASCODE_LOCAL_LIBS = new File(Environment.getExternalStorageDirectory(), ".ascode/libs/local_libs");
+    private static final File ASCODE_DATA = new File(Environment.getExternalStorageDirectory(), ".AndroidSCode/data/");
+    private static final File ASCODE_LOCAL_LIBS = new File(Environment.getExternalStorageDirectory(), ".AndroidSCode/libs/local_libs");
 
     public static String getLastCompileLogPath(String sc_id) {
         return new File(ASCODE_DATA, sc_id + "/compile_log").getAbsolutePath();

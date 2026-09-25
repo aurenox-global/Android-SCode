@@ -33,6 +33,6 @@ public class BuildSettings extends ProjectSettings implements Serializable {
 
     @Override
     public String getPath() {
-        return FileUtil.getExternalStorageDir() + "/.ascode/data/" + sc_id + "/build_config";
+        return FileUtil.getExternalStorageDir() + "/.AndroidSCode/data/" + sc_id + "/build_config";
     }
 }

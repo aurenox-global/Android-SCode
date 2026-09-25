@@ -99,7 +99,7 @@ public class LogicHandler {
                     newStr = newStr.concat("\n").concat(arr2.get(i));
                 }
             }
-            FileUtil.writeFile(FileUtil.getExternalStorageDir().concat("/.ascode/data/system/temp/").concat(javaName), newStr);
+            FileUtil.writeFile(FileUtil.getExternalStorageDir().concat("/.AndroidSCode/data/system/temp/").concat(javaName), newStr);
         } catch (Exception ignored) {
             android.util.Log.d("Ascode", "LogicHandler: failed to write system temp file", ignored);
         }

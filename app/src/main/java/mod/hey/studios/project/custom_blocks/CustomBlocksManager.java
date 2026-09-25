@@ -106,7 +106,7 @@ public class CustomBlocksManager {
         }
 
         File customBlocksConfig = new File(Environment.getExternalStorageDirectory(),
-                ".ascode/data/" + sc_id + "/custom_blocks");
+                ".AndroidSCode/data/" + sc_id + "/custom_blocks");
         if (customBlocksConfig.exists()) {
             try {
                 custom_blocks = new Gson().fromJson(
@@ -150,7 +150,7 @@ public class CustomBlocksManager {
     /*public String getCustomBlocksJsonPath() {
         return new File(
             Environment.getExternalStorageDirectory(),
-            ".ascode/data/" + sc_id + "/custom_blocks")
+            ".AndroidSCode/data/" + sc_id + "/custom_blocks")
             .getAbsolutePath();
     }
 
@@ -239,7 +239,7 @@ public class CustomBlocksManager {
     
     
     public String getCustomBlocksJsonPath() {
-        return new File(Environment.getExternalStorageDirectory(), ".ascode/data/"+sc_id+"/custom_blocks").getAbsolutePath();
+        return new File(Environment.getExternalStorageDirectory(), ".AndroidSCode/data/"+sc_id+"/custom_blocks").getAbsolutePath();
     }
     
     

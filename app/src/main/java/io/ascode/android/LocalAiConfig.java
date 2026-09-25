@@ -261,7 +261,7 @@ public class LocalAiConfig {
     }
 
     public static File getModelsDirectory() {
-        return new File(Environment.getExternalStorageDirectory(), ".ascode/ai/models");
+        return new File(Environment.getExternalStorageDirectory(), ".AndroidSCode/ai/models");
     }
 
     public static File copyModelToModelsDirectory(File source) throws IOException {

@@ -278,7 +278,7 @@
                             android:layout_marginTop="8dp"
                             android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="13sp"
-                            tools:text="/storage/emulated/0/.ascode/ai/models/model-q4.gguf" />
+                            tools:text="/storage/emulated/0/.AndroidSCode/ai/models/model-q4.gguf" />
 
                         <TextView
                             android:id="@+id/model_info_text"

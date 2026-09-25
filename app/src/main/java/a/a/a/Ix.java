@@ -744,7 +744,7 @@ public class Ix {
     }
 
     private ArrayList<HashMap<String, Object>> getActivityAttrs() {
-        String activityAttributesPath = FileUtil.getExternalStorageDir().concat("/.ascode/data/").concat(c.sc_id).concat("/Injection/androidmanifest/attributes.json");
+        String activityAttributesPath = FileUtil.getExternalStorageDir().concat("/.AndroidSCode/data/").concat(c.sc_id).concat("/Injection/androidmanifest/attributes.json");
         if (FileUtil.isExistFile(activityAttributesPath)) {
             try {
                 return new Gson().fromJson(FileUtil.readFile(activityAttributesPath), Helper.TYPE_MAP_LIST);

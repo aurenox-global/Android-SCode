@@ -55,7 +55,7 @@ public class BlockLoader {
 
     public static ExtraBlockInfo getBlockFromProject(String sc_id, String block_name) {
         File customBlocksConfig = new File(Environment.getExternalStorageDirectory(),
-                ".ascode/data/" + sc_id + "/custom_blocks");
+                ".AndroidSCode/data/" + sc_id + "/custom_blocks");
         if (customBlocksConfig.exists()) {
             try {
                 ArrayList<ExtraBlockInfo> extraBlocks = new Gson().fromJson(

@@ -51,7 +51,7 @@ import com.ascode.android.utility.AscodeUtil;
 
 public class WidgetsCreatorManager {
 
-    private final String widgetResourcesDirectoryPath = "/storage/emulated/0/.ascode/resources/widgets/";
+    private final String widgetResourcesDirectoryPath = "/storage/emulated/0/.AndroidSCode/resources/widgets/";
     private final String widgetsJsonFilePath = widgetResourcesDirectoryPath + "widgets.json";
     private final String widgetExportDirectoryPath = widgetResourcesDirectoryPath + "export/";
     private final ArrayList<String> allCategories = new ArrayList<>();

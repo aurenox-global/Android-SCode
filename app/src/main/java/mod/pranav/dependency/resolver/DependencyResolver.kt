@@ -48,11 +48,11 @@ class DependencyResolver(
     }
 
     private val downloadPath: String =
-        FileUtil.getExternalStorageDir() + "/.ascode/libs/local_libs"
+        FileUtil.getExternalStorageDir() + "/.AndroidSCode/libs/local_libs"
 
     private val repositoriesJson = Paths.get(
         Environment.getExternalStorageDirectory().absolutePath,
-        ".ascode",
+        ".AndroidSCode",
         "libs",
         "repositories.json"
     )

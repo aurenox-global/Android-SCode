@@ -52,7 +52,7 @@ public final class LocalAiProjectSemanticIndexer {
     }
 
     private void indexProjectFiles(String projectId) {
-        File filesDir = new File(FileUtil.getExternalStorageDir(), ".ascode/data/" + projectId + "/files");
+        File filesDir = new File(FileUtil.getExternalStorageDir(), ".AndroidSCode/data/" + projectId + "/files");
         if (!filesDir.exists() || !filesDir.isDirectory()) {
             return;
         }
@@ -200,7 +200,7 @@ public final class LocalAiProjectSemanticIndexer {
             return "";
         }
 
-        File projectRoot = new File(FileUtil.getExternalStorageDir(), ".ascode/data/" + projectId + "/files");
+        File projectRoot = new File(FileUtil.getExternalStorageDir(), ".AndroidSCode/data/" + projectId + "/files");
         return toRelativePath(projectRoot, new File(absolutePath));
     }
 

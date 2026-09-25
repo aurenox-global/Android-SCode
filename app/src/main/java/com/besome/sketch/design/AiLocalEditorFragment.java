@@ -651,7 +651,7 @@ public class AiLocalEditorFragment extends Fragment {
                         Toast.makeText(getContext(), "Copied to clipboard", Toast.LENGTH_SHORT).show();
                     } else {
                         try {
-                            File dir = new File(Environment.getExternalStorageDirectory(), ".ascode/ai/exports");
+                            File dir = new File(Environment.getExternalStorageDirectory(), ".AndroidSCode/ai/exports");
                             dir.mkdirs();
                             File file = new File(dir, "chat_" + System.currentTimeMillis() + ".md");
                             try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {

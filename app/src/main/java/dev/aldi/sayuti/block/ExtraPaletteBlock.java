@@ -395,7 +395,7 @@ public class ExtraPaletteBlock {
 
         switch (paletteId) {
             case -1:
-                String filePath = FileUtil.getExternalStorageDir().concat("/.ascode/data/").concat(sc_id.concat("/files/resource/values/strings.xml"));
+                String filePath = FileUtil.getExternalStorageDir().concat("/.AndroidSCode/data/").concat(sc_id.concat("/files/resource/values/strings.xml"));
                 ArrayList<HashMap<String, Object>> StringsListMap = new ArrayList<>();
                 StringsEditorManager stringsEditorManager = new StringsEditorManager();
                 stringsEditorManager.convertXmlStringsToListMap(FileUtil.readFileIfExist(filePath), StringsListMap);

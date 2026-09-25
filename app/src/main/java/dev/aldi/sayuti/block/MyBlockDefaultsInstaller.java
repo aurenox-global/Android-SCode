@@ -19,7 +19,7 @@ public final class MyBlockDefaultsInstaller {
     private static final String ASSET_BASE_PATH_V2 = "default-my-block-2";
     private static final File MENU_FILE = new File(
             Environment.getExternalStorageDirectory(),
-            ".ascode/resources/block/My Block/menu.json"
+            ".AndroidSCode/resources/block/My Block/menu.json"
     );
 
     private MyBlockDefaultsInstaller() {

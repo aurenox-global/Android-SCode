@@ -16,7 +16,7 @@ public class ProjectTracker {
         /*FileUtil.writeFile(
             new File(
                 Environment.getExternalStorageDirectory(),
-                ".ascode/debug.txt"
+                ".AndroidSCode/debug.txt"
             ).getAbsolutePath(),
             SC_ID
         );*/

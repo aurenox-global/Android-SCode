@@ -5,7 +5,7 @@ import android.os.Environment;
 import java.io.File;
 
 public class BlockSelectorConsts {
-    public static final File BLOCK_SELECTORS_FILE = new File(Environment.getExternalStorageDirectory(), ".ascode/resources/block/My Block/menu.json");
-    public static final File EXPORT_FILE = new File(Environment.getExternalStorageDirectory(), "/.ascode/resources/block/export/menu/All_Menus.json");
+    public static final File BLOCK_SELECTORS_FILE = new File(Environment.getExternalStorageDirectory(), ".AndroidSCode/resources/block/My Block/menu.json");
+    public static final File EXPORT_FILE = new File(Environment.getExternalStorageDirectory(), "/.AndroidSCode/resources/block/export/menu/All_Menus.json");
     public static final String TAG = "BlockSelectorManager";
 }

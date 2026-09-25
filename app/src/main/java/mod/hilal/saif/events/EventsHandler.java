@@ -18,8 +18,8 @@ import com.ascode.android.utility.AscodeUtil;
 
 public class EventsHandler {
 
-    public static final String CUSTOM_EVENTS_FILE_PATH = FileUtil.getExternalStorageDir() + "/.ascode/data/system/events.json";
-    public static final String CUSTOM_LISTENERE_FILE_PATH = FileUtil.getExternalStorageDir() + "/.ascode/data/system/listeners.json";
+    public static final String CUSTOM_EVENTS_FILE_PATH = FileUtil.getExternalStorageDir() + "/.AndroidSCode/data/system/events.json";
+    public static final String CUSTOM_LISTENERE_FILE_PATH = FileUtil.getExternalStorageDir() + "/.AndroidSCode/data/system/listeners.json";
     private static ArrayList<HashMap<String, Object>> cachedCustomEvents = readCustomEvents();
     private static ArrayList<HashMap<String, Object>> cachedCustomListeners = readCustomListeners();
 
@@ -34,7 +34,7 @@ public class EventsHandler {
      *
      * @return Array of Activity Events.
      * @apiNote Custom Activity Events can be added by writing to the file
-     * /Internal storage/.ascode/data/system/events.json and specifying an empty string for "var"
+     * /Internal storage/.AndroidSCode/data/system/events.json and specifying an empty string for "var"
      */
     public static String[] getActivityEvents() {
         ArrayList<String> array = new ArrayList<>();

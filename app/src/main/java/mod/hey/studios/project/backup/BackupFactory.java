@@ -54,7 +54,7 @@ import com.ascode.android.utility.AscodeUtil;
 
 public class BackupFactory {
     public static final String EXTENSION = "swb";
-    public static final String DEF_PATH = ".ascode/backups/";
+    public static final String DEF_PATH = ".AndroidSCode/backups/";
     private static final String TAG = "BackupFactory";
 
     private static final byte[] ENCRYPTION_MAGIC = new byte[]{'S', 'W', 'B', '2'};
@@ -88,7 +88,7 @@ public class BackupFactory {
 
     private static File getAllLocalLibsDir() {
         return new File(Environment.getExternalStorageDirectory(),
-                ".ascode/libs/local_libs");
+                ".AndroidSCode/libs/local_libs");
     }
 
     private static HashMap<String, Object> getProject(File file) {
@@ -181,7 +181,7 @@ public class BackupFactory {
 
     public static String getNewScId() {
         File myscList = new File(Environment.getExternalStorageDirectory(),
-                ".ascode/mysc/list/");
+                ".AndroidSCode/mysc/list/");
 
         ArrayList<String> list = new ArrayList<>();
         FileUtil.listDir(myscList.getAbsolutePath(), list);
@@ -701,21 +701,21 @@ public class BackupFactory {
 
     private File getDataDir() {
         return new File(Environment.getExternalStorageDirectory(),
-                ".ascode/data/" + sc_id);
+                ".AndroidSCode/data/" + sc_id);
     }
 
     private File getResDir(String subfolder) {
         return new File(Environment.getExternalStorageDirectory(),
-                ".ascode/resources/" + subfolder + "/" + sc_id);
+                ".AndroidSCode/resources/" + subfolder + "/" + sc_id);
     }
 
     private File getProjectPath() {
         return new File(Environment.getExternalStorageDirectory(),
-                ".ascode/mysc/list/" + sc_id + "/project");
+                ".AndroidSCode/mysc/list/" + sc_id + "/project");
     }
 
     private File getLocalLibsPath() {
         return new File(Environment.getExternalStorageDirectory(),
-                ".ascode/data/" + sc_id + "/local_library");
+                ".AndroidSCode/data/" + sc_id + "/local_library");
     }
 }

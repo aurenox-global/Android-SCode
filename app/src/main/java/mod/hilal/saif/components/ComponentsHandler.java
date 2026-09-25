@@ -546,7 +546,7 @@ public class ComponentsHandler {
     }
 
     public static String getPath() {
-        return FileUtil.getExternalStorageDir().concat("/.ascode/data/system/component.json");
+        return FileUtil.getExternalStorageDir().concat("/.AndroidSCode/data/system/component.json");
     }
 
     /**

@@ -69,7 +69,7 @@ public class ExcludeBuiltInLibrariesActivity extends BaseAppCompatActivity {
 
     private static File getConfigPath(String sc_id) {
         return new File(Environment.getExternalStorageDirectory(),
-                ".ascode" + File.separator + "data" + File.separator + sc_id + File.separator + "excluded_library");
+                ".AndroidSCode" + File.separator + "data" + File.separator + sc_id + File.separator + "excluded_library");
     }
 
     private static void saveConfig(String sc_id, boolean isExcludingEnabled, List<BuiltInLibraries.BuiltInLibrary> excludedLibraries) {

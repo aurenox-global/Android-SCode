@@ -433,7 +433,7 @@ public class DesignActivity extends BaseAppCompatActivity implements View.OnClic
                             }
                         } else {
                             String sharedErrorMessage = "Failed to install package, result code: " + result.getCode() + ". ";
-                            AscodeUtil.toastError(sharedErrorMessage + "Logs are available in /Internal storage/.ascode/debug.txt", Toast.LENGTH_LONG);
+                            AscodeUtil.toastError(sharedErrorMessage + "Logs are available in /Internal storage/.AndroidSCode/debug.txt", Toast.LENGTH_LONG);
                             LogUtil.e("DesignActivity", sharedErrorMessage + "stdout: " + stdout + ", stderr: " + stderr);
                         }
                     });

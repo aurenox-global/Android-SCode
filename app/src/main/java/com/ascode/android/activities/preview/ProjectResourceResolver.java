@@ -1227,7 +1227,7 @@ public class ProjectResourceResolver {
     }
 
     private static File localLibsRoot() {
-        return new File(android.os.Environment.getExternalStorageDirectory(), ".ascode/libs/local_libs");
+        return new File(android.os.Environment.getExternalStorageDirectory(), ".AndroidSCode/libs/local_libs");
     }
 
     private static void addIfDirectory(List<File> dirs, String path) {

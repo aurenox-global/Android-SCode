@@ -81,7 +81,7 @@ public class ManageAppCompatActivity extends BaseAppCompatActivity {
 
         path =
                 FileUtil.getExternalStorageDir()
-                        + "/.ascode/data/"
+                        + "/.AndroidSCode/data/"
                         + sc_id
                         + "/injection/appcompat/"
                         + filename.replaceAll(".xml", "");

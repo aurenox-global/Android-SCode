@@ -44,7 +44,7 @@ public class ComponentExtraCode {
         }
 
         // Hilal's components
-        String path = FileUtil.getExternalStorageDir().concat("/.ascode/data/system/listeners.json");
+        String path = FileUtil.getExternalStorageDir().concat("/.AndroidSCode/data/system/listeners.json");
         try {
             if (FileUtil.isExistFile(path) && !FileUtil.readFile(path).isEmpty() && !FileUtil.readFile(path).equals("[]")) {
                 JSONArray arr = new JSONArray(FileUtil.readFile(path));

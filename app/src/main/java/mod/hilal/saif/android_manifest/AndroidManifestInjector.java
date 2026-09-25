@@ -20,25 +20,25 @@ public class AndroidManifestInjector {
 
     public static File getPathAndroidManifestAttributeInjection(String sc_id) {
         return new File(Environment.getExternalStorageDirectory(),
-                ".ascode" + File.separator + "data" + File.separator + sc_id + File.separator +
+                ".AndroidSCode" + File.separator + "data" + File.separator + sc_id + File.separator +
                         "Injection" + File.separator + "androidmanifest" + File.separator + "attributes.json");
     }
 
     public static File getPathAndroidManifestLauncherActivity(String sc_id) {
         return new File(Environment.getExternalStorageDirectory(),
-                ".ascode" + File.separator + "data" + File.separator + sc_id + File.separator +
+                ".AndroidSCode" + File.separator + "data" + File.separator + sc_id + File.separator +
                         "Injection" + File.separator + "androidmanifest" + File.separator + "activity_launcher.txt");
     }
 
     public static File getPathAndroidManifestActivitiesComponents(String sc_id) {
         return new File(Environment.getExternalStorageDirectory(),
-                ".ascode" + File.separator + "data" + File.separator + sc_id + File.separator +
+                ".AndroidSCode" + File.separator + "data" + File.separator + sc_id + File.separator +
                         "Injection" + File.separator + "androidmanifest" + File.separator + "activities_components.json");
     }
 
     public static File getPathAndroidManifestAppComponents(String sc_id) {
         return new File(Environment.getExternalStorageDirectory(),
-                ".ascode" + File.separator + "data" + File.separator + sc_id + File.separator +
+                ".AndroidSCode" + File.separator + "data" + File.separator + sc_id + File.separator +
                         "Injection" + File.separator + "androidmanifest" + File.separator + "app_components.txt");
     }
 

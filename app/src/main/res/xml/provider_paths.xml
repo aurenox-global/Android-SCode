@@ -1,10 +1,10 @@
 <paths>
     <external-path
         name="ascode_data"
-        path=".ascode/" />
+        path=".AndroidSCode/" />
     <external-path
         name="ascode_backups"
-        path=".ascode/backups/" />
+        path=".AndroidSCode/backups/" />
     <!-- Signed APKs built by the unified compile dialog, so its "Install" button can hand the
          file to the package installer ("ascode/signed_apk"). -->
     <external-path

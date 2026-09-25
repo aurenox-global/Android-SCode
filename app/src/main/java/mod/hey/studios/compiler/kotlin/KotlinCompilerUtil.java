@@ -61,7 +61,7 @@ public class KotlinCompilerUtil {
 
     /**
      * Returns a list of available kotlin compiler plugins (.jar)
-     * found in `/.ascode/data/xxx/files/kt_plugins` dir.
+     * found in `/.AndroidSCode/data/xxx/files/kt_plugins` dir.
      */
     static List<File> getCompilerPlugins(yq workspace) {
         String scId = workspace.sc_id;

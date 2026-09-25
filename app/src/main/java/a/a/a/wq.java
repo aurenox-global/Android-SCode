@@ -14,7 +14,7 @@ public class wq {
     public static final String C = "ascode" + File.separator + "keystore";
     public static final String D = "ascode" + File.separator + "keystore" + File.separator + "release_key.jks";
     public static final String E = "ascode" + File.separator + "service_account";
-    public static final String F = ".ascode" + File.separator + "upload";
+    public static final String F = ".AndroidSCode" + File.separator + "upload";
     public static final String[] G = {"subs_year_01", "subs_50_year_01", "subs_30_year_01", "subs_20_year_01", "subs_month_06", "subs_month_03", "subs_month_01", "subs_50_month_01", "subs_30_month_01", "subs_20_month_01"};
     public static final long[] H = {32140800000L, 32140800000L, 32140800000L, 32140800000L, 16070400000L, 8035200000L, 2678400000L, 2678400000L, 2678400000L, 2678400000L};
     public static final String[] I = {"subs_month_01", "subs_year_01"};
@@ -22,32 +22,32 @@ public class wq {
     public static final String[] M = {"F83085529A75E7A8CEDD64013B1A374B", "90C443DFAB7F23424DE7E079787466CD", "F83085529A75E7A8CEDD64013B1A374B", "C99E5B3F179203AE2749F8F9B5A7493A", "100EFD7391FF1BEE4A1E2F960A1B8AF2"};
     public static final String[] N = {"1486507718310013_1788685811425534", "1486507718310013_1804931006467681", "1486507718310013_1805009746459807", "1486507718310013_1805001526460629", "1486507718310013_1805273579766757", "1486507718310013_1805397669754348", "1486507718310013_1805436593083789", "1486507718310013_1805666736394108", "1486507718310013_1805724186388363", "1486507718310013_1809233042704144"};
     public static final String[] O = {"255022168522663_266931247331755", "255022168522663_268282677196612", "255022168522663_268283823863164", "255022168522663_266575314034015", "255022168522663_279474749410738"};
-    public static final String a = ".ascode" + File.separator + "libs";
-    public static final String b = ".ascode" + File.separator + "mysc";
-    public static final String c = ".ascode" + File.separator + "mysc" + File.separator + "list";
-    public static final String d = ".ascode" + File.separator + "data";
-    public static final String e = ".ascode" + File.separator + "bak";
-    public static final String f = ".ascode" + File.separator + "temp" + File.separator + "images";
-    public static final String g = ".ascode" + File.separator + "temp" + File.separator + "sounds";
-    public static final String h = ".ascode" + File.separator + "temp" + File.separator + "fonts";
-    public static final String i = ".ascode" + File.separator + "temp" + File.separator + "proj";
-    public static final String j = ".ascode" + File.separator + "temp" + File.separator + "data";
-    public static final String l = ".ascode" + File.separator + "resources";
-    public static final String m = ".ascode" + File.separator + "resources" + File.separator + "icons";
-    public static final String n = ".ascode" + File.separator + "resources" + File.separator + "images";
-    public static final String o = ".ascode" + File.separator + "resources" + File.separator + "sounds";
-    public static final String p = ".ascode" + File.separator + "resources" + File.separator + "fonts";
-    public static final String r = ".ascode" + File.separator + "download" + File.separator + "apk";
-    public static final String s = ".ascode" + File.separator + "download" + File.separator + "data";
-    public static final String t = ".ascode" + File.separator + "tutorial" + File.separator + "images";
-    public static final String u = ".ascode" + File.separator + "tutorial" + File.separator + "sounds";
-    public static final String v = ".ascode" + File.separator + "tutorial" + File.separator + "fonts";
-    public static final String w = ".ascode" + File.separator + "tutorial" + File.separator + "proj";
-    public static final String x = ".ascode" + File.separator + "collection";
+    public static final String a = ".AndroidSCode" + File.separator + "libs";
+    public static final String b = ".AndroidSCode" + File.separator + "mysc";
+    public static final String c = ".AndroidSCode" + File.separator + "mysc" + File.separator + "list";
+    public static final String d = ".AndroidSCode" + File.separator + "data";
+    public static final String e = ".AndroidSCode" + File.separator + "bak";
+    public static final String f = ".AndroidSCode" + File.separator + "temp" + File.separator + "images";
+    public static final String g = ".AndroidSCode" + File.separator + "temp" + File.separator + "sounds";
+    public static final String h = ".AndroidSCode" + File.separator + "temp" + File.separator + "fonts";
+    public static final String i = ".AndroidSCode" + File.separator + "temp" + File.separator + "proj";
+    public static final String j = ".AndroidSCode" + File.separator + "temp" + File.separator + "data";
+    public static final String l = ".AndroidSCode" + File.separator + "resources";
+    public static final String m = ".AndroidSCode" + File.separator + "resources" + File.separator + "icons";
+    public static final String n = ".AndroidSCode" + File.separator + "resources" + File.separator + "images";
+    public static final String o = ".AndroidSCode" + File.separator + "resources" + File.separator + "sounds";
+    public static final String p = ".AndroidSCode" + File.separator + "resources" + File.separator + "fonts";
+    public static final String r = ".AndroidSCode" + File.separator + "download" + File.separator + "apk";
+    public static final String s = ".AndroidSCode" + File.separator + "download" + File.separator + "data";
+    public static final String t = ".AndroidSCode" + File.separator + "tutorial" + File.separator + "images";
+    public static final String u = ".AndroidSCode" + File.separator + "tutorial" + File.separator + "sounds";
+    public static final String v = ".AndroidSCode" + File.separator + "tutorial" + File.separator + "fonts";
+    public static final String w = ".AndroidSCode" + File.separator + "tutorial" + File.separator + "proj";
+    public static final String x = ".AndroidSCode" + File.separator + "collection";
     public static final String y = "ascode" + File.separator + "localization";
     public static final String z = "ascode" + File.separator + "localization" + File.separator + "strings.xml";
 
-    public static final String EXTRA_SYSTEM_DATA = ".ascode" + File.separator + "data" + File.separator + "system";
+    public static final String EXTRA_SYSTEM_DATA = ".AndroidSCode" + File.separator + "data" + File.separator + "system";
     public static final String CUSTOM_COMPONENT_FILE = EXTRA_SYSTEM_DATA + File.separator + "component.json";
     public static final String EXTRA_DATA_EXPORT = EXTRA_SYSTEM_DATA + File.separator + "export";
 
@@ -156,7 +156,7 @@ public class wq {
     }
 
     public static String c() {
-        return getAbsolutePathOf(".ascode" + File.separator + "download");
+        return getAbsolutePathOf(".AndroidSCode" + File.separator + "download");
     }
 
     public static String c(String sc_id) {
@@ -225,7 +225,7 @@ public class wq {
     }
 
     public static String q() {
-        return getAbsolutePathOf(".ascode" + File.separator);
+        return getAbsolutePathOf(".AndroidSCode" + File.separator);
     }
 
     public static String r() {

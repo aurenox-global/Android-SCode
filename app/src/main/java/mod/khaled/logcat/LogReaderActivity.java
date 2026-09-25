@@ -159,7 +159,7 @@ public class LogReaderActivity extends BaseAppCompatActivity {
         }
         try {
             String fileName = Calendar.getInstance(Locale.ENGLISH).getTimeInMillis() + ".txt";
-            String filePath = Environment.getExternalStorageDirectory() + "/.ascode/logcat/" + packageName + "/" + fileName;
+            String filePath = Environment.getExternalStorageDirectory() + "/.AndroidSCode/logcat/" + packageName + "/" + fileName;
             String stars = "*".repeat(95);
             String blank = " ".repeat(87);
             createNewFileIfNotPresent(filePath);

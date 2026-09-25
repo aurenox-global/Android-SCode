@@ -14,7 +14,7 @@ public class StringfogHandler {
     private final String config_path;
 
     public StringfogHandler(String sc_id) {
-        config_path = FileUtil.getExternalStorageDir().concat("/.ascode/data/" + sc_id + "/stringfog");
+        config_path = FileUtil.getExternalStorageDir().concat("/.AndroidSCode/data/" + sc_id + "/stringfog");
 
         if (!FileUtil.isExistFile(config_path)) FileUtil.writeFile(config_path, getDefaultConfig());
     }

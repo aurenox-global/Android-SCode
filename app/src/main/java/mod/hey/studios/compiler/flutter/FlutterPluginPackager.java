@@ -164,7 +164,7 @@ public final class FlutterPluginPackager {
      * fork y los registra como <i>local libraries</i> del proyecto.
      *
      * <p>El resolvedor baja el AAR (y sus transitivas) a
-     * <code>&lt;external&gt;/.ascode/libs/local_libs/&lt;artifactId&gt;-v&lt;version&gt;/</code>,
+     * <code>&lt;external&gt;/.AndroidSCode/libs/local_libs/&lt;artifactId&gt;-v&lt;version&gt;/</code>,
      * lo descomprime (<code>classes.jar</code>, <code>res/</code>…) y lo dexa (<code>classes.dex</code>),
      * que es exactamente el contrato de {@code ManageLocalLibrary}: con esos datos el jar entra al
      * classpath, la res al merge de recursos y el dex al APK.
@@ -193,7 +193,7 @@ public final class FlutterPluginPackager {
             return jars;
         }
 
-        File localLibsDir = new File(FileUtil.getExternalStorageDir() + "/.ascode/libs/local_libs");
+        File localLibsDir = new File(FileUtil.getExternalStorageDir() + "/.AndroidSCode/libs/local_libs");
         for (String coordinate : coordinates) {
             String[] parts = coordinate.split(":");
             if (parts.length < 3) {

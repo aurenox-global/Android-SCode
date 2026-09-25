@@ -39,7 +39,7 @@ public class AppCompatInjection {
         String toParse;
 
         File injectionFile = new File(Environment.getExternalStorageDirectory(),
-                ".ascode/data/" + sc_id + "/injection/appcompat/" + activityFilename);
+                ".AndroidSCode/data/" + sc_id + "/injection/appcompat/" + activityFilename);
         String fileContent;
         if (injectionFile.exists() && !(fileContent = FileUtil.readFile(injectionFile.getAbsolutePath())).isEmpty()) {
             toParse = fileContent;

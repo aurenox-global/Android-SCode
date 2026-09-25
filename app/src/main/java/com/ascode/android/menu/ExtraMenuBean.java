@@ -66,8 +66,8 @@ public class ExtraMenuBean {
     public static final String[] patternFlags = {"CANON_EQ", "CASE_INSENSITIVE", "COMMENTS", "DOTALL", "LITERAL", "MULTILINE", "UNICODE_CASE", "UNIX_LINES"};
     public static final String[] permission = {"CAMERA", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE", "ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION", "RECORD_AUDIO", "READ_CONTACTS", "WRITE_CONTACTS", "READ_SMS", "SEND_SMS", "READ_PHONE_STATE", "CALL_PHONE", "READ_CALENDAR", "WRITE_CALENDAR", "BLUETOOTH", "BLUETOOTH_ADMIN"};
 
-    private final String ASSETS_PATH = FileUtil.getExternalStorageDir() + "/.ascode/data/%s/files/assets/";
-    private final String NATIVE_PATH = FileUtil.getExternalStorageDir() + "/.ascode/data/%s/files/native_libs/";
+    private final String ASSETS_PATH = FileUtil.getExternalStorageDir() + "/.AndroidSCode/data/%s/files/assets/";
+    private final String NATIVE_PATH = FileUtil.getExternalStorageDir() + "/.AndroidSCode/data/%s/files/native_libs/";
     private final DefaultExtraMenuBean defaultExtraMenu;
     private final FilePathUtil fpu;
     private final FileResConfig frc;
@@ -582,7 +582,7 @@ public class ExtraMenuBean {
             case "ResString":
                 title = "Select a ResString";
 
-                String filePath = FileUtil.getExternalStorageDir().concat("/.ascode/data/").concat(sc_id.concat("/files/resource/values/strings.xml"));
+                String filePath = FileUtil.getExternalStorageDir().concat("/.AndroidSCode/data/").concat(sc_id.concat("/files/resource/values/strings.xml"));
                 ArrayList<HashMap<String, Object>> StringsListMap = new ArrayList<>();
                 StringsEditorManager stringsEditorManager = new StringsEditorManager();
                 stringsEditorManager.convertXmlStringsToListMap(FileUtil.readFileIfExist(filePath), StringsListMap);

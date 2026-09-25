@@ -1,26 +1,33 @@
 package com.besome.sketch.lib.ui;
 
+import android.animation.ObjectAnimator;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.Window;
+import android.view.animation.LinearInterpolator;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.core.view.WindowCompat;
-
-import com.airbnb.lottie.LottieAnimationView;
 
 import mod.hey.studios.util.Helper;
 import com.ascode.android.R;
 
 public class LoadingDialog extends Dialog {
 
-    private final LottieAnimationView animationView;
+    private final ImageView animationView;
+    private final ObjectAnimator rotationAnimator;
 
     public LoadingDialog(Context context) {
         super(context, R.style.progress);
         setContentView(R.layout.progress);
         animationView = findViewById(R.id.anim_ascode);
+        rotationAnimator = ObjectAnimator.ofFloat(animationView, "rotation", 0f, 360f);
+        rotationAnimator.setDuration(1300);
+        rotationAnimator.setRepeatCount(ObjectAnimator.INFINITE);
+        rotationAnimator.setInterpolator(new LinearInterpolator());
+        rotationAnimator.start();
         TextView tvProgress = findViewById(R.id.tv_progress);
         tvProgress.setText(Helper.getResString(R.string.common_message_loading));
         super.setCancelable(false);
@@ -34,20 +41,20 @@ public class LoadingDialog extends Dialog {
     }
 
     public void cancelAnimation() {
-        if (animationView != null && animationView.isAnimating()) {
-            animationView.cancelAnimation();
+        if (rotationAnimator != null && rotationAnimator.isRunning()) {
+            rotationAnimator.cancel();
         }
     }
 
     public void pauseAnimation() {
-        if (animationView != null && animationView.isAnimating()) {
-            animationView.pauseAnimation();
+        if (rotationAnimator != null && rotationAnimator.isRunning()) {
+            rotationAnimator.pause();
         }
     }
 
     public void resumeAnimation() {
-        if (animationView != null && !animationView.isAnimating()) {
-            animationView.resumeAnimation();
+        if (rotationAnimator != null && rotationAnimator.isPaused()) {
+            rotationAnimator.resume();
         }
     }
 

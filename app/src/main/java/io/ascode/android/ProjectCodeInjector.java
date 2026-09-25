@@ -79,7 +79,7 @@ public final class ProjectCodeInjector {
         try {
             java.io.File filesDir = new java.io.File(
                     com.ascode.android.utility.FileUtil.getExternalStorageDir(),
-                    ".ascode/data/" + scId + "/files");
+                    ".AndroidSCode/data/" + scId + "/files");
             if (!filesDir.isDirectory()) {
                 return "";
             }

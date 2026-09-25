@@ -70,9 +70,9 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
 
     private void setupTabs() {
         if (binding.managerTabs.getTabCount() == 0) {
-            binding.managerTabs.addTab(binding.managerTabs.newTab().setText("Local Model"));
-            binding.managerTabs.addTab(binding.managerTabs.newTab().setText("Model Catalog"));
-            binding.managerTabs.addTab(binding.managerTabs.newTab().setText("Engine"));
+            binding.managerTabs.addTab(binding.managerTabs.newTab().setText(Helper.getResString(R.string.ai_tab_local_model)));
+            binding.managerTabs.addTab(binding.managerTabs.newTab().setText(Helper.getResString(R.string.ai_tab_model_catalog)));
+            binding.managerTabs.addTab(binding.managerTabs.newTab().setText(Helper.getResString(R.string.ai_tab_engine)));
         }
         binding.managerTabs.addOnTabSelectedListener(new com.google.android.material.tabs.TabLayout.OnTabSelectedListener() {
             @Override
@@ -100,25 +100,25 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
 
     private void setupEngineSliders() {
         binding.contextSizeSlider.addOnChangeListener((slider, value, fromUser) -> {
-            binding.contextSizeLabel.setText("Context: " + (int) value + " / max " + (int) slider.getValueTo());
+            binding.contextSizeLabel.setText(Helper.getResString(R.string.ai_label_context, (int) value, (int) slider.getValueTo()));
         });
         binding.threadsSlider.addOnChangeListener((slider, value, fromUser) -> {
-            binding.threadsLabel.setText("Threads: " + (int) value);
+            binding.threadsLabel.setText(Helper.getResString(R.string.ai_label_threads, (int) value));
         });
         binding.maxTokensSlider.addOnChangeListener((slider, value, fromUser) -> {
-            binding.maxTokensLabel.setText("Max tokens: " + (int) value);
+            binding.maxTokensLabel.setText(Helper.getResString(R.string.ai_label_max_tokens, (int) value));
         });
         binding.temperatureSlider.addOnChangeListener((slider, value, fromUser) -> {
-            binding.temperatureLabel.setText("Temperature: " + String.format(Locale.US, "%.2f", value));
+            binding.temperatureLabel.setText(Helper.getResString(R.string.ai_label_temperature, value));
         });
         binding.topPSlider.addOnChangeListener((slider, value, fromUser) -> {
-            binding.topPLabel.setText("Top P: " + String.format(Locale.US, "%.2f", value));
+            binding.topPLabel.setText(Helper.getResString(R.string.ai_label_top_p, value));
         });
         binding.topKSlider.addOnChangeListener((slider, value, fromUser) -> {
-            binding.topKLabel.setText("Top K: " + (int) value);
+            binding.topKLabel.setText(Helper.getResString(R.string.ai_label_top_k, (int) value));
         });
         binding.presencePenaltySlider.addOnChangeListener((slider, value, fromUser) -> {
-            binding.presencePenaltyLabel.setText("Presence penalty: " + String.format(Locale.US, "%.2f", value));
+            binding.presencePenaltyLabel.setText(Helper.getResString(R.string.ai_label_presence_penalty, value));
         });
     }
 
@@ -136,7 +136,7 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
         maxContext = Math.max(128, Math.min(LocalAiConfig.MAX_CONTEXT_SIZE, maxContext));
         binding.contextSizeSlider.setValueTo(maxContext);
         binding.maxTokensSlider.setValueTo(maxContext);
-        binding.contextSizeLabel.setText("Context: " + (int) binding.contextSizeSlider.getValue() + " / max " + maxContext);
+        binding.contextSizeLabel.setText(Helper.getResString(R.string.ai_label_context, (int) binding.contextSizeSlider.getValue(), maxContext));
     }
 
     private long getDeviceBudgetBytes() {
@@ -218,6 +218,21 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
         });
 
         binding.sourceCloudButton.setOnClickListener(v -> {
+            if (!isCloudNoticeAccepted()) {
+                new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                        .setTitle(R.string.ai_cloud_privacy_title)
+                        .setMessage(R.string.ai_cloud_privacy_message)
+                        .setPositiveButton(R.string.ai_cloud_privacy_accept, (dialog, which) -> {
+                            getSharedPreferences("ascode_prefs", MODE_PRIVATE).edit()
+                                    .putBoolean(PREF_CLOUD_NOTICE, true).apply();
+                            binding.sourceToggleGroup.check(binding.sourceCloudButton.getId());
+                            updateSourceUiFromSelection();
+                            updateSourceSummaryText();
+                        })
+                        .setNegativeButton(R.string.ai_cloud_privacy_cancel, null)
+                        .show();
+                return;
+            }
             binding.sourceToggleGroup.check(binding.sourceCloudButton.getId());
             updateSourceUiFromSelection();
             updateSourceSummaryText();
@@ -242,12 +257,14 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
         binding.importModelButton.setOnClickListener(v -> openModelPicker());
         binding.useModelButton.setOnClickListener(v -> useSelectedModel());
         binding.saveButton.setOnClickListener(v -> saveConfig(true));
+        binding.engineRecommendedButton.setOnClickListener(v -> applyEnginePreset(true));
+        binding.engineResetButton.setOnClickListener(v -> applyEnginePreset(false));
         binding.checkConnectionButton.setOnClickListener(v -> runConnectivityCheck());
         binding.testButton.setOnClickListener(v -> runTestPrompt());
         binding.cancelButton.setOnClickListener(v -> {
             LocalAiService.getInstance().cancel();
             CloudAiService.getInstance().cancel();
-            AscodeUtil.toast("Cancelling AI request...");
+            AscodeUtil.toast(Helper.getResString(R.string.ai_cancelling));
         });
     }
 
@@ -273,11 +290,11 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
         if (thinking) {
             current.setTemperature(1.0f);
             current.setTopP(0.95f);
-            binding.thinkModeSummary.setText("Razonamiento visible (Qwen3.5: temp 1.0, top_p 0.95)");
+            binding.thinkModeSummary.setText(Helper.getResString(R.string.ai_think_mode_visible));
         } else {
             current.setTemperature(0.5f);
             current.setTopP(0.85f);
-            binding.thinkModeSummary.setText("Razonamiento oculto (Qwen3.5: temp 0.5, top_p 0.85)");
+            binding.thinkModeSummary.setText(Helper.getResString(R.string.ai_think_mode_hidden));
         }
         current.save(getApplicationContext());
     }
@@ -294,7 +311,7 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
             CatalogRow row = new CatalogRow(family, rowView);
             row.familyNameText.setText(family.name);
             row.badgeText.setText("GGUF");
-            row.familyDescText.setText(family.description + "  ·  ctx máx "
+            row.familyDescText.setText(family.description + Helper.getResString(R.string.ai_ctx_max_suffix)
                     + formatContext(family.contextLength));
             if (family.quants.size() <= 1) {
                 row.quantChipsRow.setVisibility(View.GONE);
@@ -400,7 +417,7 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
 
     private void onCatalogDownload(CatalogRow row) {
         if (activeDownloader != null) {
-            AscodeUtil.toast("A download is already in progress.");
+            AscodeUtil.toast(Helper.getResString(R.string.ai_download_in_progress));
             return;
         }
         if (runningTest || row.selectedQuant == null) {
@@ -423,7 +440,7 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
         activeDownloadFamilyId = family.id;
         activeDownloader = new LocalAiModelDownloader();
         binding.catalogCancelButton.setEnabled(true);
-        setCatalogRowDownloading(row, true, "Preparing download... 0%");
+        setCatalogRowDownloading(row, true, Helper.getResString(R.string.ai_download_preparing));
 
         ioExecutor.execute(() -> {
             File modelFile = new File(LocalAiConfig.getModelsDirectory(), quant.fileName);
@@ -438,7 +455,7 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
                     try {
                         LocalAiModelInfo.fromPath(downloadedFile.getAbsolutePath());
                     } catch (LocalAiException e) {
-                        runOnUiThread(() -> finishCatalogDownload(row, false, "Invalid GGUF downloaded: " + e.getMessage()));
+                        runOnUiThread(() -> finishCatalogDownload(row, false, Helper.getResString(R.string.ai_download_invalid, e.getMessage())));
                         return;
                     }
                     runOnUiThread(() -> finishCatalogDownload(row, true, null));
@@ -461,7 +478,7 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
             AscodeUtil.toast(row.selectedQuant.fileName + " descargado");
             activateCatalogModel(row);
         } else {
-            AscodeUtil.showAnErrorOccurredDialog(this, errorMessage == null ? "Download failed." : errorMessage);
+            AscodeUtil.showAnErrorOccurredDialog(this, errorMessage == null ? Helper.getResString(R.string.ai_download_failed) : errorMessage);
             updateCatalogRowState(row);
         }
     }
@@ -474,9 +491,10 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
         if (progress >= 0) {
             row.progress.setProgressCompat(progress, true);
         }
-        String text = "Downloading... " + (progress >= 0
-                ? progress + "% (" + com.ascode.android.utility.FileUtil.formatFileSize(downloadedBytes) + ")"
-                : com.ascode.android.utility.FileUtil.formatFileSize(downloadedBytes));
+        String sizeText = com.ascode.android.utility.FileUtil.formatFileSize(downloadedBytes);
+        String text = progress >= 0
+                ? Helper.getResString(R.string.ai_downloading_progress, progress) + " (" + sizeText + ")"
+                : Helper.getResString(R.string.ai_downloading, sizeText);
         row.statusText.setText(text);
     }
 
@@ -502,7 +520,7 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
         boolean canDownload = activeDownloader == null && !runningTest;
 
         row.downloadButton.setIconResource(downloaded ? R.drawable.ic_mtrl_loaded : R.drawable.ic_mtrl_download);
-        row.downloadButton.setText(downloaded ? "Descargado" : "Descargar");
+        row.downloadButton.setText(downloaded ? Helper.getResString(R.string.ai_catalog_downloaded) : Helper.getResString(R.string.ai_catalog_download));
         row.downloadButton.setEnabled(canDownload && !downloaded);
 
         applyingCatalogStates = true;
@@ -529,7 +547,7 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
             setCatalogRowDownloading(row, false, null);
             updateCatalogRowState(row);
         }
-        AscodeUtil.toast("Download cancelled");
+        AscodeUtil.toast(Helper.getResString(R.string.ai_download_cancelled));
     }
 
     private void activateCatalogModel(CatalogRow row) {
@@ -539,7 +557,7 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
         LocalAiConfig config = LocalAiConfig.load(this);
         config.setModelPath(catalogModelFile(row).getAbsolutePath());
         config.save(getApplicationContext());
-        AscodeUtil.toast("Modelo activado: " + row.selectedQuant.fileName);
+        AscodeUtil.toast(Helper.getResString(R.string.ai_model_activated, row.selectedQuant.fileName));
         refreshUi();
     }
 
@@ -550,16 +568,16 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
             config.setModelPath("");
         }
         config.save(getApplicationContext());
-        AscodeUtil.toast("Modelo desactivado: " + row.family.name);
+        AscodeUtil.toast(Helper.getResString(R.string.ai_model_deactivated, row.family.name));
         refreshUi();
     }
 
     private void confirmDeleteCatalogModel(CatalogRow row) {
         new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Eliminar modelo")
-                .setMessage("Se eliminarán los archivos de " + row.family.name + " de la tarjeta. ¿Continuar?")
-                .setPositiveButton("Eliminar", (dialog, which) -> deleteCatalogModel(row))
-                .setNegativeButton("Cancelar", null)
+                .setTitle(Helper.getResString(R.string.ai_delete_model_title))
+                .setMessage(Helper.getResString(R.string.ai_delete_model_message, row.family.name))
+                .setPositiveButton(Helper.getResString(R.string.ai_catalog_delete), (dialog, which) -> deleteCatalogModel(row))
+                .setNegativeButton(Helper.getResString(R.string.ai_action_cancel), null)
                 .show();
     }
 
@@ -617,9 +635,9 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
         try {
-            startActivityForResult(Intent.createChooser(intent, "Select a GGUF model"), REQUEST_PICK_GGUF_MODEL);
+            startActivityForResult(Intent.createChooser(intent, Helper.getResString(R.string.ai_select_gguf)), REQUEST_PICK_GGUF_MODEL);
         } catch (ActivityNotFoundException e) {
-            AscodeUtil.showAnErrorOccurredDialog(this, "No file picker app is available on this device.");
+            AscodeUtil.showAnErrorOccurredDialog(this, Helper.getResString(R.string.ai_no_file_picker));
         }
     }
 
@@ -660,19 +678,19 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
     }
 
     private void importModelFiles(ArrayList<Uri> uris) {
-        setImportProgress(0, "Importing model... 0%");
+        setImportProgress(0, Helper.getResString(R.string.ai_importing_progress, 0));
         ioExecutor.execute(() -> {
             final File[] importedModelHolder = {null};
             try {
                 for (Uri uri : uris) {
                     if (importedModelHolder[0] == null) {
-                        importedModelHolder[0] = copyUriToModels(uri, "Importing model...");
+                        importedModelHolder[0] = copyUriToModels(uri, Helper.getResString(R.string.ai_importing));
                         LocalAiModelInfo.fromPath(importedModelHolder[0].getAbsolutePath());
                     }
                 }
 
                 if (importedModelHolder[0] == null) {
-                    throw new LocalAiException("No GGUF model file found in the selection.");
+                    throw new LocalAiException(Helper.getResString(R.string.ai_no_gguf_found));
                 }
 
                 File importedModel = importedModelHolder[0];
@@ -680,9 +698,9 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
                 config.setModelPath(importedModel.getAbsolutePath());
                 config.save(getApplicationContext());
                 runOnUiThread(() -> {
-                    AscodeUtil.toast("Model imported and selected");
+                    AscodeUtil.toast(Helper.getResString(R.string.ai_model_imported));
                     refreshUi();
-                    binding.resultText.setText("Model selected. Tap Use to load it in RAM.\n"
+                    binding.resultText.setText(Helper.getResString(R.string.ai_model_selected_hint) + "\n"
                             + importedModel.getAbsolutePath());
                 });
             } catch (LocalAiException | RuntimeException e) {
@@ -734,28 +752,84 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
         return separator >= 0 ? path.substring(separator + 1) : path;
     }
 
+    private static final String PREF_CLOUD_NOTICE = "ai_cloud_notice_ok";
+
+    private boolean isCloudNoticeAccepted() {
+        return getSharedPreferences("ascode_prefs", MODE_PRIVATE).getBoolean(PREF_CLOUD_NOTICE, false);
+    }
+
+    /**
+     * Ajusta los parametros del motor local: valores recomendados para este dispositivo
+     * (hilos segun nucleos) o los valores de fabrica.
+     */
+    private void applyEnginePreset(boolean recommended) {
+        try {
+            int cores = Runtime.getRuntime().availableProcessors();
+            int context = recommended ? Math.min(4096, (int) binding.contextSizeSlider.getValueTo())
+                                      : LocalAiConfig.DEFAULT_CONTEXT_SIZE;
+            int threads = recommended ? Math.max(2, Math.min(cores - 1, 8))
+                                      : Math.max(2, Math.min(cores / 2, 8));
+            binding.contextSizeSlider.setValue(clamp(context,
+                    (int) binding.contextSizeSlider.getValueFrom(), (int) binding.contextSizeSlider.getValueTo()));
+            binding.threadsSlider.setValue(clamp(threads,
+                    (int) binding.threadsSlider.getValueFrom(), (int) binding.threadsSlider.getValueTo()));
+            binding.maxTokensSlider.setValue(clamp(LocalAiConfig.DEFAULT_MAX_TOKENS,
+                    (int) binding.maxTokensSlider.getValueFrom(), (int) binding.maxTokensSlider.getValueTo()));
+            binding.temperatureSlider.setValue(clampFloat(LocalAiConfig.DEFAULT_TEMPERATURE,
+                    binding.temperatureSlider.getValueFrom(), binding.temperatureSlider.getValueTo()));
+            binding.topPSlider.setValue(clampFloat(LocalAiConfig.DEFAULT_TOP_P,
+                    binding.topPSlider.getValueFrom(), binding.topPSlider.getValueTo()));
+            binding.topKSlider.setValue(clamp(LocalAiConfig.DEFAULT_TOP_K,
+                    (int) binding.topKSlider.getValueFrom(), (int) binding.topKSlider.getValueTo()));
+            binding.presencePenaltySlider.setValue(clampFloat(LocalAiConfig.DEFAULT_PRESENCE_PENALTY,
+                    binding.presencePenaltySlider.getValueFrom(), binding.presencePenaltySlider.getValueTo()));
+            refreshEngineLabels();
+
+            LocalAiConfig config = readConfigFromFields();
+            config.save(this);
+            AscodeUtil.toast(Helper.getResString(R.string.ai_settings_saved));
+        } catch (RuntimeException e) {
+            AscodeUtil.toastError(String.valueOf(e.getMessage()), Toast.LENGTH_SHORT);
+        }
+    }
+
+    private static float clampFloat(float value, float min, float max) {
+        return Math.max(min, Math.min(value, max));
+    }
+
+    private void refreshEngineLabels() {
+        binding.contextSizeLabel.setText(Helper.getResString(R.string.ai_label_context,
+                (int) binding.contextSizeSlider.getValue(), (int) binding.contextSizeSlider.getValueTo()));
+        binding.threadsLabel.setText(Helper.getResString(R.string.ai_label_threads, (int) binding.threadsSlider.getValue()));
+        binding.maxTokensLabel.setText(Helper.getResString(R.string.ai_label_max_tokens, (int) binding.maxTokensSlider.getValue()));
+        binding.temperatureLabel.setText(Helper.getResString(R.string.ai_label_temperature, binding.temperatureSlider.getValue()));
+        binding.topPLabel.setText(Helper.getResString(R.string.ai_label_top_p, binding.topPSlider.getValue()));
+        binding.topKLabel.setText(Helper.getResString(R.string.ai_label_top_k, (int) binding.topKSlider.getValue()));
+        binding.presencePenaltyLabel.setText(Helper.getResString(R.string.ai_label_presence_penalty, binding.presencePenaltySlider.getValue()));
+    }
+
     private void refreshUi() {
         LocalAiConfig config = LocalAiConfig.load(this);
 
-        binding.modelPathText.setText(config.getModelPath().isEmpty() ? "No model selected" : config.getModelPath());
+        binding.modelPathText.setText(config.getModelPath().isEmpty() ? Helper.getResString(R.string.ai_no_model_selected) : config.getModelPath());
         updateSliderRanges();
         binding.contextSizeSlider.setValue(clamp(config.getContextSize(), 128, (int) binding.contextSizeSlider.getValueTo()));
         binding.threadsSlider.setValue(clamp(config.getThreads(), 1, LocalAiConfig.MAX_THREADS));
-        binding.threadsLabel.setText("Threads: " + (int) binding.threadsSlider.getValue());
+        binding.threadsLabel.setText(Helper.getResString(R.string.ai_label_threads, (int) binding.threadsSlider.getValue()));
         binding.maxTokensSlider.setValue(clamp(config.getMaxTokens(), 1, (int) binding.maxTokensSlider.getValueTo()));
-        binding.maxTokensLabel.setText("Max tokens: " + (int) binding.maxTokensSlider.getValue());
+        binding.maxTokensLabel.setText(Helper.getResString(R.string.ai_label_max_tokens, (int) binding.maxTokensSlider.getValue()));
         binding.temperatureSlider.setValue(clamp(config.getTemperature(), 0f, LocalAiConfig.MAX_TEMPERATURE));
-        binding.temperatureLabel.setText("Temperature: " + String.format(Locale.US, "%.2f", binding.temperatureSlider.getValue()));
+        binding.temperatureLabel.setText(Helper.getResString(R.string.ai_label_temperature, binding.temperatureSlider.getValue()));
         binding.topPSlider.setValue(clamp(config.getTopP(), 0.01f, 1f));
-        binding.topPLabel.setText("Top P: " + String.format(Locale.US, "%.2f", binding.topPSlider.getValue()));
+        binding.topPLabel.setText(Helper.getResString(R.string.ai_label_top_p, binding.topPSlider.getValue()));
         binding.topKSlider.setValue(clamp(config.getTopK(), 1, 100));
-        binding.topKLabel.setText("Top K: " + (int) binding.topKSlider.getValue());
+        binding.topKLabel.setText(Helper.getResString(R.string.ai_label_top_k, (int) binding.topKSlider.getValue()));
         binding.presencePenaltySlider.setValue(clamp(config.getPresencePenalty(), 0f, 2f));
-        binding.presencePenaltyLabel.setText("Presence penalty: " + String.format(Locale.US, "%.2f", binding.presencePenaltySlider.getValue()));
+        binding.presencePenaltyLabel.setText(Helper.getResString(R.string.ai_label_presence_penalty, binding.presencePenaltySlider.getValue()));
         binding.thinkModeSwitch.setChecked(config.isThinkMode());
         binding.thinkModeSummary.setText(config.isThinkMode()
-                ? "Razonamiento visible (Qwen3.5: temp 1.0, top_p 0.95)"
-                : "Razonamiento oculto (Qwen3.5: temp 0.5, top_p 0.85)");
+                ? Helper.getResString(R.string.ai_think_mode_visible)
+                : Helper.getResString(R.string.ai_think_mode_hidden));
 
         String cloudProvider = config.isCloudProvider() ? config.getProviderId() : LocalAiConfig.PROVIDER_DEEPSEEK;
         String cloudProviderLabel = AiProviderCatalog.getProviderLabel(cloudProvider);
@@ -776,11 +850,9 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
 
         if (config.isCloudProvider()) {
             String providerName = LocalAiConfig.getProviderDisplayName(config.getProviderId());
-            binding.modelInfoText.setText("Cloud provider: " + providerName
-                    + "\nModel: " + config.resolveCloudModel()
-                    + "\nEndpoint: " + config.resolveCloudEndpoint()
-                    + "\nAPI key: " + config.getMaskedCloudApiKey());
-            binding.nativeStatusText.setText("Cloud mode active. Local native runtime is not required for this source.");
+            binding.modelInfoText.setText(Helper.getResString(R.string.ai_cloud_summary,
+                    providerName, config.resolveCloudModel(), config.resolveCloudEndpoint(), config.getMaskedCloudApiKey()));
+            binding.nativeStatusText.setText(Helper.getResString(R.string.ai_cloud_mode_active));
         } else {
             binding.nativeStatusText.setText(LocalAiBridge.getNativeStatus());
             try {
@@ -788,7 +860,7 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
                 binding.modelInfoText.setText(modelInfo.getDisplaySummary()
                         + "\n" + LocalAiService.getInstance().getLoadedModelStatus(this));
             } catch (LocalAiException e) {
-                binding.modelInfoText.setText("Select a valid Q4/Q5/Q8 .gguf model. Q4 models are recommended for phones.");
+                binding.modelInfoText.setText(Helper.getResString(R.string.ai_model_help));
             }
         }
 
@@ -817,9 +889,9 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
     private void updateSourceSummaryText() {
         if (isCloudSelected()) {
             String providerId = readSelectedCloudProviderId();
-            binding.sourceSummaryText.setText("Cloud mode: " + LocalAiConfig.getProviderDisplayName(providerId));
+            binding.sourceSummaryText.setText(Helper.getResString(R.string.ai_source_cloud_desc, LocalAiConfig.getProviderDisplayName(providerId)));
         } else {
-            binding.sourceSummaryText.setText("Local mode: GGUF model + on-device llama runtime.");
+            binding.sourceSummaryText.setText(Helper.getResString(R.string.ai_source_local_desc));
         }
     }
 
@@ -849,7 +921,7 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
             config.save(this);
             refreshUi();
             if (showToast) {
-                AscodeUtil.toast("AI settings saved");
+                AscodeUtil.toast(Helper.getResString(R.string.ai_settings_saved));
             }
             return true;
         } catch (IllegalArgumentException e) {
@@ -904,7 +976,7 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
             }
             return parsed;
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(label + " must be at least " + minValue + ".");
+            throw new IllegalArgumentException(Helper.getResString(R.string.ai_error_min, label, minValue));
         }
     }
 
@@ -916,7 +988,7 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
             }
             return parsed;
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(label + " must be between " + minValue + " and " + maxValue + ".");
+            throw new IllegalArgumentException(Helper.getResString(R.string.ai_error_between, label, minValue, maxValue));
         }
     }
 
@@ -938,8 +1010,8 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
                 String providerLabel = config.isCloudProvider()
                         ? LocalAiConfig.getProviderDisplayName(config.getProviderId())
                         : "Local AI";
-                setBusy(true, "Starting " + providerLabel + "...");
-                binding.resultText.setText("Starting " + providerLabel + "...");
+                setBusy(true, Helper.getResString(R.string.ai_starting_connectivity, providerLabel));
+                binding.resultText.setText(Helper.getResString(R.string.ai_starting_connectivity, providerLabel));
             }
 
             @Override
@@ -950,7 +1022,7 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
 
             @Override
             public void onSuccess(String response) {
-                binding.resultText.setText(response.isEmpty() ? "The model returned an empty response." : response);
+                binding.resultText.setText(response.isEmpty() ? Helper.getResString(R.string.ai_empty_response) : response);
             }
 
             @Override
@@ -981,29 +1053,29 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
         LocalAiConfig config = LocalAiConfig.load(this);
         if (config.isCloudProvider()) {
             if (config.getCloudApiKey().isEmpty() && !LocalAiConfig.isCustomProvider(config.getProviderId())) {
-                AscodeUtil.toastError("Cloud API key is missing. Save it first.");
+                AscodeUtil.toastError(Helper.getResString(R.string.ai_missing_api_key));
                 String reason = "Cloud connectivity check failed: missing API key.";
                 binding.resultText.setText(reason);
                 markConnectivityCheck(CHECK_STATUS_ERROR, LocalAiConfig.getProviderDisplayName(config.getProviderId()), reason);
                 return;
             }
             if (config.resolveCloudModel().isEmpty()) {
-                AscodeUtil.toastError("Cloud model is missing. Save it first.");
+                AscodeUtil.toastError(Helper.getResString(R.string.ai_missing_model));
                 String reason = "Cloud connectivity check failed: missing model.";
                 binding.resultText.setText(reason);
                 markConnectivityCheck(CHECK_STATUS_ERROR, LocalAiConfig.getProviderDisplayName(config.getProviderId()), reason);
                 return;
             }
             if (config.resolveCloudEndpoint().isEmpty()) {
-                AscodeUtil.toastError("Cloud endpoint is missing. Save it first.");
+                AscodeUtil.toastError(Helper.getResString(R.string.ai_missing_endpoint));
                 String reason = "Cloud connectivity check failed: missing endpoint.";
                 binding.resultText.setText(reason);
                 markConnectivityCheck(CHECK_STATUS_ERROR, LocalAiConfig.getProviderDisplayName(config.getProviderId()), reason);
                 return;
             }
         } else if (!config.hasModel()) {
-            AscodeUtil.toastError("Import/select a local .gguf model first.");
-            String reason = "Local readiness check failed: no model selected.";
+            AscodeUtil.toastError(Helper.getResString(R.string.ai_need_local_model));
+            String reason = Helper.getResString(R.string.ai_check_local_no_model);
             binding.resultText.setText(reason);
             markConnectivityCheck(CHECK_STATUS_ERROR, "Local AI", reason);
             return;
@@ -1018,8 +1090,8 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
             @Override
             public void onStarted() {
                 runningTest = true;
-                setBusy(true, "Checking " + providerLabel + " connectivity...");
-                binding.resultText.setText("Checking " + providerLabel + " connectivity...");
+                setBusy(true, Helper.getResString(R.string.ai_checking, providerLabel));
+                binding.resultText.setText(Helper.getResString(R.string.ai_checking, providerLabel));
             }
 
             @Override
@@ -1052,7 +1124,7 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
 
             @Override
             public void onError(Throwable throwable) {
-                String message = providerLabel + " connectivity failed: " + throwable.getMessage();
+                String message = Helper.getResString(R.string.ai_connectivity_failed_reason, providerLabel, throwable.getMessage());
                 binding.resultText.setText(message);
                 markConnectivityCheck(CHECK_STATUS_ERROR, providerLabel, throwable.getMessage());
             }
@@ -1111,17 +1183,17 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
             containerColor = 0xFF2E7D32;
             textColor = 0xFFFFFFFF;
             iconColor = 0xFF4CAF50;
-            badgeText = "Connectivity OK";
+            badgeText = Helper.getResString(R.string.ai_connectivity_ok);
         } else if (CHECK_STATUS_ERROR.equals(normalizedStatus)) {
             containerColor = 0xFFC62828;
             textColor = 0xFFFFFFFF;
             iconColor = 0xFFEF5350;
-            badgeText = "Connectivity Failed";
+            badgeText = Helper.getResString(R.string.ai_connectivity_failed);
         } else {
             containerColor = MaterialColors.getColor(binding.getRoot(), com.google.android.material.R.attr.colorSurfaceVariant);
             textColor = MaterialColors.getColor(binding.getRoot(), com.google.android.material.R.attr.colorOnSurfaceVariant);
             iconColor = MaterialColors.getColor(binding.getRoot(), com.google.android.material.R.attr.colorOutlineVariant);
-            badgeText = "Not checked";
+            badgeText = Helper.getResString(R.string.ai_status_not_checked);
         }
 
         GradientDrawable badgeDrawable = new GradientDrawable();
@@ -1136,11 +1208,11 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
         binding.connectionIcon.setImageTintList(ColorStateList.valueOf(iconColor));
 
         if (checkedAtMs <= 0L) {
-            binding.connectionTimeText.setText("Last check: never");
+            binding.connectionTimeText.setText(Helper.getResString(R.string.ai_last_check_never));
             return;
         }
 
-        String providerLabel = provider == null || provider.trim().isEmpty() ? "Unknown source" : provider.trim();
+        String providerLabel = provider == null || provider.trim().isEmpty() ? Helper.getResString(R.string.ai_unknown_source) : provider.trim();
         String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date(checkedAtMs));
         String suffix = message == null || message.trim().isEmpty() ? "" : " | " + message.trim();
         binding.connectionTimeText.setText("Last check: " + timestamp + " | " + providerLabel + suffix);
@@ -1156,13 +1228,13 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
         }
 
         if (isCloudSelected()) {
-            AscodeUtil.toastError("Switch to Local source to load a GGUF model into RAM.");
+            AscodeUtil.toastError(Helper.getResString(R.string.ai_switch_local));
             return;
         }
 
         LocalAiConfig config = LocalAiConfig.load(this);
         if (config.getModelPath().isEmpty()) {
-            AscodeUtil.toastError("Import a .gguf model first.");
+            AscodeUtil.toastError(Helper.getResString(R.string.ai_import_first));
             return;
         }
 
@@ -1170,8 +1242,8 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
             @Override
             public void onStarted() {
                 runningTest = true;
-                setBusy(true, "Loading selected model into RAM...");
-                binding.resultText.setText("Loading selected model into RAM...");
+                setBusy(true, Helper.getResString(R.string.ai_model_loading));
+                binding.resultText.setText(Helper.getResString(R.string.ai_model_loading));
             }
 
             @Override
@@ -1183,7 +1255,7 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
             @Override
             public void onSuccess(String response) {
                 binding.resultText.setText(response);
-                AscodeUtil.toast("Model loaded in RAM");
+                AscodeUtil.toast(Helper.getResString(R.string.ai_model_loaded));
             }
 
             @Override
@@ -1203,7 +1275,7 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
     private void setBusy(boolean busy, @Nullable String status) {
         binding.progressIndicator.setIndeterminate(true);
         binding.progressIndicator.setVisibility(busy ? View.VISIBLE : View.GONE);
-        binding.statusText.setText(status == null ? "Ready" : status);
+        binding.statusText.setText(status == null ? Helper.getResString(R.string.ai_status_ready) : status);
         binding.sourceLocalButton.setEnabled(!busy);
         binding.sourceCloudButton.setEnabled(!busy);
         binding.saveButton.setEnabled(!busy);

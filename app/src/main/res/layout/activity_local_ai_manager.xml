@@ -63,22 +63,13 @@
                     android:id="@+id/status_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Ready"
+                    android:text="@string/ai_status_ready"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="14sp" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:baselineAligned="false"
-                    android:orientation="horizontal">
-
                     <com.google.android.material.card.MaterialCardView
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
-                        android:layout_weight="1.75"
                         app:cardBackgroundColor="?attr/colorSurfaceContainer"
                         app:cardElevation="0dp">
 
@@ -91,7 +82,7 @@
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="AI Source"
+                                android:text="@string/ai_source_title"
                                 android:textColor="?attr/colorOnSurface"
                                 android:textSize="18sp" />
 
@@ -128,7 +119,7 @@
                                     android:paddingTop="4dp"
                                     android:paddingEnd="10dp"
                                     android:paddingBottom="4dp"
-                                    android:text="Not checked"
+                                    android:text="@string/ai_status_not_checked"
                                     android:textSize="12sp"
                                     android:textStyle="bold"
                                     tools:text="Connectivity OK" />
@@ -142,6 +133,15 @@
                                 android:textColor="?attr/colorOnSurfaceVariant"
                                 android:textSize="12sp"
                                 tools:text="Last check: 2026-05-10 14:20" />
+
+                            <TextView
+                                android:id="@+id/connection_help_text"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="@string/ai_state_help"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="11sp" />
 
                             <com.google.android.material.button.MaterialButtonToggleGroup
                                 android:id="@+id/source_toggle_group"
@@ -158,7 +158,7 @@
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="1"
-                                    android:text="Local" />
+                                    android:text="@string/ai_source_local" />
 
                                 <com.google.android.material.button.MaterialButton
                                     android:id="@+id/source_cloud_button"
@@ -166,16 +166,15 @@
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="1"
-                                    android:text="Cloud" />
+                                    android:text="@string/ai_source_cloud" />
                             </com.google.android.material.button.MaterialButtonToggleGroup>
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
                     <com.google.android.material.card.MaterialCardView
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_weight="1"
+                        android:layout_marginTop="12dp"
                         app:cardBackgroundColor="?attr/colorSecondaryContainer"
                         app:cardElevation="0dp">
 
@@ -188,7 +187,7 @@
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="Quick actions"
+                                android:text="@string/ai_quick_actions"
                                 android:textColor="?attr/colorOnSecondaryContainer"
                                 android:textSize="12sp"
                                 android:textStyle="bold" />
@@ -201,7 +200,7 @@
                                 android:layout_marginTop="8dp"
                                 android:ellipsize="end"
                                 android:singleLine="true"
-                                android:text="Save"
+                                android:text="@string/ai_action_save"
                                 android:textAllCaps="false"
                                 android:textSize="11sp" />
 
@@ -213,7 +212,7 @@
                                 android:layout_marginTop="8dp"
                                 android:ellipsize="end"
                                 android:singleLine="true"
-                                android:text="Check"
+                                android:text="@string/ai_action_check"
                                 android:textAllCaps="false"
                                 android:textSize="11sp" />
 
@@ -224,7 +223,7 @@
                                 android:layout_marginTop="8dp"
                                 android:ellipsize="end"
                                 android:singleLine="true"
-                                android:text="Test"
+                                android:text="@string/ai_action_test"
                                 android:textAllCaps="false"
                                 android:textSize="11sp" />
 
@@ -237,12 +236,11 @@
                                 android:enabled="false"
                                 android:ellipsize="end"
                                 android:singleLine="true"
-                                android:text="Cancel"
+                                android:text="@string/ai_action_cancel"
                                 android:textAllCaps="false"
                                 android:textSize="11sp" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
-                </LinearLayout>
 
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
@@ -267,7 +265,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Local Model"
+                            android:text="@string/ai_local_model_title"
                             android:textColor="?attr/colorOnSurface"
                             android:textSize="18sp" />
 
@@ -299,7 +297,7 @@
                                 android:id="@+id/import_model_button"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="Import GGUF"
+                                android:text="@string/ai_import_gguf"
                                 app:icon="@drawable/ic_mtrl_download" />
                         </LinearLayout>
 
@@ -308,7 +306,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:text="Use selected model"
+                            android:text="@string/ai_use_selected_model"
                             app:icon="@drawable/ic_mtrl_loaded" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -336,7 +334,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Cloud Provider"
+                            android:text="@string/ai_cloud_provider"
                             android:textColor="?attr/colorOnTertiaryContainer"
                             android:textSize="18sp" />
 
@@ -345,7 +343,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
-                            android:hint="Provider"
+                            android:hint="@string/ai_cloud_provider_label"
                             app:endIconMode="dropdown_menu">
 
                             <com.google.android.material.textfield.MaterialAutoCompleteTextView
@@ -360,7 +358,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
-                            android:hint="API key">
+                            android:hint="@string/ai_cloud_api_key">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/cloud_api_key_input"
@@ -375,7 +373,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
-                            android:hint="Model">
+                            android:hint="@string/ai_cloud_model">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/cloud_model_input"
@@ -390,7 +388,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
-                            android:hint="Endpoint">
+                            android:hint="@string/ai_cloud_endpoint">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/cloud_endpoint_input"
@@ -424,7 +422,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Test Prompt"
+                            android:text="@string/ai_test_prompt_title"
                             android:textColor="?attr/colorOnSurface"
                             android:textSize="18sp" />
 
@@ -432,7 +430,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="12dp"
-                            android:hint="Prompt">
+                            android:hint="@string/ai_test_prompt_hint">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/prompt_input"
@@ -466,7 +464,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Model Catalog"
+                    android:text="@string/ai_catalog_title"
                     android:textColor="?attr/colorOnSurface"
                     android:textSize="18sp" />
 
@@ -474,7 +472,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="Select a quantization and download it, or import a GGUF from your device."
+                    android:text="@string/ai_catalog_desc"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="13sp" />
 
@@ -492,7 +490,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:enabled="false"
-                    android:text="Cancel download"
+                    android:text="@string/ai_catalog_cancel_download"
                     android:textAllCaps="false" />
             </LinearLayout>
 
@@ -507,7 +505,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Engine"
+                    android:text="@string/ai_tab_engine"
                     android:textColor="?attr/colorOnSurface"
                     android:textSize="18sp" />
 
@@ -515,7 +513,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="Generation settings for the selected model. Context and max tokens adapt to what this device supports."
+                    android:text="@string/ai_engine_help"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="13sp" />
 
@@ -755,7 +753,7 @@
                                 <TextView
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:text="Think mode"
+                                    android:text="@string/ai_think_mode"
                                     android:textColor="?attr/colorOnSurface"
                                     android:textSize="14sp"
                                     android:textStyle="bold" />
@@ -764,7 +762,7 @@
                                     android:id="@+id/think_mode_summary"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:text="Show reasoning (Qwen3.5/Ornith, DeepSeek, Gemma4)"
+                                    android:text="@string/ai_think_mode_visible"
                                     android:textColor="?attr/colorOnSurfaceVariant"
                                     android:textSize="11sp" />
                             </LinearLayout>
@@ -775,6 +773,38 @@
                                 android:layout_height="wrap_content"
                                 android:checked="true" />
                         </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="12dp"
+                                android:orientation="horizontal">
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/engine_recommended_button"
+                                    style="@style/Widget.Material3.Button.OutlinedButton"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:ellipsize="end"
+                                    android:singleLine="true"
+                                    android:text="@string/ai_engine_recommended"
+                                    android:textAllCaps="false"
+                                    android:textSize="12sp" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/engine_reset_button"
+                                    style="@style/Widget.Material3.Button.TextButton"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp"
+                                    android:layout_weight="1"
+                                    android:ellipsize="end"
+                                    android:singleLine="true"
+                                    android:text="@string/ai_engine_reset"
+                                    android:textAllCaps="false"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>

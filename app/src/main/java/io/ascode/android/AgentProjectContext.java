@@ -68,7 +68,7 @@ public final class AgentProjectContext {
             }
         }
         if (totalViews >= 40) {
-            sb.append("  (límite de 40 views para mantener el prompt ligero)\n");
+            sb.append("  (limited to 40 views to keep the prompt light)\n");
         }
     }
 

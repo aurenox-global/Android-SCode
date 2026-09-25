@@ -28,7 +28,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="AI Local"
+                    android:text="@string/ai_chat_title"
                     android:textColor="?attr/colorOnSurface"
                     android:textSize="14sp"
                     android:textStyle="bold" />
@@ -42,7 +42,7 @@
                     android:minHeight="36dp"
                     android:textAllCaps="false"
                     android:textSize="11sp"
-                    android:text="Open AI Manager" />
+                    android:text="@string/ai_open_manager" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/chat_new_chat_button"
@@ -52,7 +52,7 @@
                     android:layout_marginStart="8dp"
                     android:minWidth="0dp"
                     android:minHeight="36dp"
-                    android:text="New"
+                    android:text="@string/ai_new_chat"
                     android:textAllCaps="false"
                     android:textSize="11sp" />
 
@@ -64,7 +64,7 @@
                     android:layout_marginStart="4dp"
                     android:minWidth="0dp"
                     android:minHeight="36dp"
-                    android:text="Export"
+                    android:text="@string/ai_export"
                     android:textAllCaps="false"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -95,7 +95,7 @@
                     android:layout_marginStart="8dp"
                     android:minWidth="0dp"
                     android:minHeight="34dp"
-                    android:text="Razonar"
+                    android:text="@string/ai_think"
                     android:textAllCaps="false"
                     android:textSize="10sp" />
 
@@ -109,7 +109,7 @@
                     android:focusable="false"
                     android:minWidth="0dp"
                     android:minHeight="34dp"
-                    android:text="Agent"
+                    android:text="@string/ai_agent"
                     android:textAllCaps="false"
                     android:textSize="10sp"
                     app:icon="@drawable/ic_mtrl_android"
@@ -165,7 +165,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="2dp"
                     android:layout_weight="1"
-                    android:hint="Describe qué quieres: crear pantalla, botón, lógica…"
+                    android:hint="@string/ai_chat_hint"
                     app:boxBackgroundMode="none"
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 

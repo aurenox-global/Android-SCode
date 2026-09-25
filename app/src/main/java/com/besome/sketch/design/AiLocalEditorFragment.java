@@ -19,6 +19,8 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import mod.hey.studios.util.Helper;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.graphics.Insets;
@@ -320,7 +322,7 @@ public class AiLocalEditorFragment extends Fragment {
 
     private void updateReasoningButtonState() {
         chatReasoningButton.setChecked(reasoningEnabled);
-        chatReasoningButton.setText(reasoningEnabled ? "Razonar: ON" : "Razonar: OFF");
+        chatReasoningButton.setText(reasoningEnabled ? Helper.getResString(R.string.ai_think_on) : Helper.getResString(R.string.ai_think_off));
     }
 
     private String buildPromptForSelectedRole(String userPrompt) {
@@ -401,7 +403,7 @@ public class AiLocalEditorFragment extends Fragment {
         cancelStreamingAnimation();
         running = false;
         setBusy(false);
-        addChatMessage(false, "Request cancelled.", true);
+        addChatMessage(false, Helper.getResString(R.string.ai_request_cancelled), true);
     }
 
     private int addChatMessage(boolean user, String text, boolean persist) {
@@ -550,7 +552,7 @@ public class AiLocalEditorFragment extends Fragment {
     private void copyMessageToClipboard(String text) {
         ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
         clipboard.setPrimaryClip(ClipData.newPlainText("AI response", text == null ? "" : text));
-        Toast.makeText(getContext(), "Copied to clipboard", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), Helper.getResString(R.string.ai_copied), Toast.LENGTH_SHORT).show();
     }
 
     private void applyMessageCode(String text) {
@@ -560,18 +562,18 @@ public class AiLocalEditorFragment extends Fragment {
 
         if (hadCodeBlock && !projectId.isEmpty()) {
             new MaterialAlertDialogBuilder(requireContext())
-                    .setTitle("Apply code")
-                    .setMessage("¿Aplicar el código al proyecto (initializeLogic de MainActivity) o solo copiarlo?")
-                    .setPositiveButton("Aplicar al proyecto", (dialog, which) -> {
+                    .setTitle(Helper.getResString(R.string.ai_apply_code_title))
+                    .setMessage(Helper.getResString(R.string.ai_apply_code_message))
+                    .setPositiveButton(Helper.getResString(R.string.ai_apply_to_project), (dialog, which) -> {
                         boolean applied = io.ascode.android.ProjectCodeInjector.injectIntoInitializeLogic(
                                 projectId, io.ascode.android.ProjectCodeInjector.getMainJavaName(), code);
                         Toast.makeText(getContext(),
-                                applied ? "Código aplicado a MainActivity (initializeLogic)." : "No se pudo aplicar el código.",
+                                applied ? Helper.getResString(R.string.ai_code_applied) : Helper.getResString(R.string.ai_code_apply_failed),
                                 Toast.LENGTH_SHORT).show();
                     })
-                    .setNegativeButton("Solo copiar", (dialog, which) -> {
+                    .setNegativeButton(Helper.getResString(R.string.ai_copy_only), (dialog, which) -> {
                         copyMessageToClipboard(code);
-                        Toast.makeText(getContext(), "Código copiado.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), Helper.getResString(R.string.ai_code_copied), Toast.LENGTH_SHORT).show();
                     })
                     .show();
             return;
@@ -579,7 +581,7 @@ public class AiLocalEditorFragment extends Fragment {
 
         copyMessageToClipboard(code);
         Toast.makeText(getContext(),
-                hadCodeBlock ? "Code block copied. Paste it in your editor." : "Copied to clipboard.",
+                hadCodeBlock ? Helper.getResString(R.string.ai_code_copied_hint) : "Copied to clipboard.",
                 Toast.LENGTH_SHORT).show();
     }
 
@@ -648,7 +650,7 @@ public class AiLocalEditorFragment extends Fragment {
                     if (which == 0) {
                         ClipboardManager cm = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
                         cm.setPrimaryClip(ClipData.newPlainText("AI Chat Export", md.toString()));
-                        Toast.makeText(getContext(), "Copied to clipboard", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), Helper.getResString(R.string.ai_copied), Toast.LENGTH_SHORT).show();
                     } else {
                         try {
                             File dir = new File(Environment.getExternalStorageDirectory(), ".AndroidSCode/ai/exports");

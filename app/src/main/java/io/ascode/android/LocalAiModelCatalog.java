@@ -19,7 +19,7 @@ public final class LocalAiModelCatalog {
         families.add(new ModelFamily(
                 "qwen35_08b",
                 "Qwen3.5-0.8B",
-                "Qwen3.5 0.8B de Alibaba (Unsloth): muy rapido y ligero, contexto 256K, razonamiento desactivado por defecto. Q8_0 recomendado para maxima fidelidad de instrucciones.",
+                "Qwen3.5 0.8B by Alibaba (Unsloth): very fast and light, 256K context, reasoning off by default. Q8_0 is recommended for maximum instruction fidelity.",
                 "unsloth/Qwen3.5-0.8B-GGUF",
                 262144,
                 new QuantEntry("Qwen3.5-0.8B-Q8_0.gguf", 811_843_840L, true),

@@ -1,5 +1,7 @@
 package io.ascode.android;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -48,21 +50,34 @@ public class LocalAiModelDownloader {
 
         cancelled.set(false);
 
-        Request request = new Request.Builder()
+        long existingBytes = temporaryTarget.isFile() ? temporaryTarget.length() : 0L;
+        Request.Builder requestBuilder = new Request.Builder()
                 .url(url)
-                .header("User-Agent", "Ascode-LocalAI/7.0.4")
-                .build();
+                .header("User-Agent", userAgent());
+        if (existingBytes > 0L) {
+            // Reanuda la descarga a partir de lo ya bajado (el fichero .part se conserva).
+            requestBuilder.header("Range", "bytes=" + existingBytes + "-");
+        }
+        Request request = requestBuilder.build();
 
         Call call = httpClient.newCall(request);
         activeCall.set(call);
 
         new Thread(() -> {
-            long downloadedBytes = 0L;
+            long downloadedBytes = existingBytes;
+            long baseBytes = existingBytes;
+            boolean append = false;
             try (Response response = call.execute()) {
                 if (cancelled.get()) {
-                    FileUtil.deleteFile(temporaryTarget.getAbsolutePath());
                     callback.onError(new IOException("Download cancelled."));
                     return;
+                }
+                if (response.code() == 206) {
+                    append = true;
+                } else if (baseBytes > 0L) {
+                    // El servidor no acepta reanudar: se empieza de cero.
+                    baseBytes = 0L;
+                    downloadedBytes = 0L;
                 }
                 if (!response.isSuccessful()) {
                     callback.onError(new IOException("Download failed with status " + response.code()));
@@ -75,15 +90,16 @@ public class LocalAiModelDownloader {
                     return;
                 }
 
-                long totalBytes = body.contentLength();
+                long contentLength = body.contentLength();
+                long totalBytes = contentLength > 0L ? contentLength + baseBytes : -1L;
                 try (InputStream inputStream = body.byteStream();
-                     FileOutputStream outputStream = new FileOutputStream(temporaryTarget, false)) {
+                     FileOutputStream outputStream = new FileOutputStream(temporaryTarget, append)) {
                     byte[] buffer = new byte[1024 * 256];
                     int read;
                     while ((read = inputStream.read(buffer)) > 0) {
                         if (cancelled.get()) {
+                            outputStream.flush();
                             outputStream.close();
-                            FileUtil.deleteFile(temporaryTarget.getAbsolutePath());
                             callback.onError(new IOException("Download cancelled."));
                             return;
                         }
@@ -100,7 +116,6 @@ public class LocalAiModelDownloader {
                 }
                 callback.onSuccess(finalTarget);
             } catch (Throwable throwable) {
-                FileUtil.deleteFile(temporaryTarget.getAbsolutePath());
                 if (cancelled.get()) {
                     callback.onError(new IOException("Download cancelled."));
                 } else {
@@ -110,6 +125,18 @@ public class LocalAiModelDownloader {
                 activeCall.set(null);
             }
         }, "local-ai-model-download").start();
+    }
+
+    /** Identifica la app y su version ante el servidor de descargas. */
+    private static String userAgent() {
+        try {
+            Context context = com.ascode.android.AscodeApplication.getContext();
+            String versionName = context.getPackageManager()
+                    .getPackageInfo(context.getPackageName(), 0).versionName;
+            return "AndroidSCode/" + (versionName == null || versionName.isEmpty() ? "1.0" : versionName);
+        } catch (Throwable ignored) {
+            return "AndroidSCode";
+        }
     }
 
     public void cancel() {

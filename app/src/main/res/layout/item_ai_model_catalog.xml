@@ -82,7 +82,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Download"
+                android:text="@string/ai_catalog_download"
                 android:textAllCaps="false"
                 android:textSize="11sp"
                 app:icon="@drawable/ic_mtrl_download"
@@ -101,7 +101,7 @@
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Importar modelo"
+                android:text="@string/ai_catalog_import"
                 android:textAllCaps="false"
                 android:textSize="11sp" />
         </LinearLayout>
@@ -119,7 +119,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:minHeight="0dp"
-                android:text="Activar"
+                android:text="@string/ai_catalog_activate"
                 android:textColor="?attr/colorOnSurfaceVariant"
                 android:textSize="11sp" />
 
@@ -128,7 +128,7 @@
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Eliminar"
+                android:text="@string/ai_catalog_delete"
                 android:textAllCaps="false"
                 android:textColor="?attr/colorError"
                 android:textSize="11sp"

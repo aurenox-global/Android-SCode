@@ -492,6 +492,77 @@ public class DesignActivity extends BaseAppCompatActivity implements View.OnClic
         projectSaver.execute();
     }
 
+    /**
+     * Exports the currently open project as a Flutter project ({@code .zip}) without leaving the
+     * editor. The zip is written to {@code /sdcard/ascode/export_src/<projectName>_flutter.zip}
+     * and afterwards a dialog offers to share it.
+     */
+    private void exportProjectAsFlutter() {
+        if (q == null) {
+            AscodeUtil.toast("Project is not loaded yet");
+            return;
+        }
+        final String projectName = q.projectName;
+        final String applicationName = q.applicationName;
+        final String packageName = q.packageName;
+        AscodeUtil.toast(getString(R.string.design_export_flutter_started));
+        new Thread(() -> {
+            try {
+                File outputDirectory = new File(wq.s(), "export_src");
+                //noinspection ResultOfMethodCallIgnored
+                outputDirectory.mkdirs();
+                com.besome.sketch.export.flutter.FlutterProjectExporter exporter =
+                        new com.besome.sketch.export.flutter.FlutterProjectExporter(getApplicationContext(),
+                                sc_id, projectName, applicationName, packageName);
+                File exported = exporter.export(outputDirectory);
+                for (String mapping : exporter.getScreenMappings()) {
+                    Log.i("FlutterExporter", "screen " + mapping);
+                }
+                for (String todo : exporter.getTodos()) {
+                    Log.i("FlutterExporter", "TODO " + todo);
+                }
+                runOnUiThread(() -> showExportedFlutterProject(exported));
+            } catch (Throwable throwable) {
+                Log.e("FlutterExporter", "While trying to export the project as Flutter project: "
+                        + throwable.getMessage(), throwable);
+                runOnUiThread(() -> AscodeUtil.showAnErrorOccurredDialog(this, Log.getStackTraceString(throwable)));
+            }
+        }).start();
+    }
+
+    /**
+     * Shows the exported Flutter zip path and offers to share the generated file.
+     */
+    private void showExportedFlutterProject(File exported) {
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.design_export_flutter_title)
+                .setMessage(getString(R.string.design_export_flutter_message, exported.getAbsolutePath()))
+                .setPositiveButton(R.string.design_export_flutter_share,
+                        (dialog, which) -> shareExportedFlutterProject(exported))
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    /**
+     * Shares a previously generated Flutter project zip.
+     */
+    private void shareExportedFlutterProject(File exported) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("application/zip");
+        intent.putExtra(Intent.EXTRA_SUBJECT, getString(
+                R.string.myprojects_export_flutter_title_email_subject, exported.getName()));
+        intent.putExtra(Intent.EXTRA_TEXT, getString(
+                R.string.myprojects_export_flutter_title_email_body, exported.getName()));
+        intent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(getApplicationContext(),
+                getApplicationContext().getPackageName() + ".provider", exported));
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(Intent.createChooser(intent, getString(
+                R.string.myprojects_export_src_chooser_title_email)));
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         enableEdgeToEdgeNoContrast();
@@ -582,6 +653,10 @@ public class DesignActivity extends BaseAppCompatActivity implements View.OnClic
         });
         bottomMenu.add(Menu.NONE, 7, Menu.NONE, "Direct XML editor").setOnMenuItemClickListener(item -> {
             toViewCodeEditor();
+            return true;
+        });
+        bottomMenu.add(Menu.NONE, 9, Menu.NONE, getString(R.string.design_option_menu_title_export_flutter)).setOnMenuItemClickListener(item -> {
+            exportProjectAsFlutter();
             return true;
         });
         bottomPopupMenu.setOnDismissListener(menu -> btnOptions.setChecked(false));

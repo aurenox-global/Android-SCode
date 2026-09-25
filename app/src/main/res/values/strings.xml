@@ -1268,6 +1268,7 @@ You must enter the API key to operate the map normally."</string>
     <string name="design_manager_view_title_view_name">View name:</string>
     <string name="design_manager_widget_hint_enter_widget_name">Enter widget name</string>
     <string name="design_manager_widget_title_actionbar_title">Widget details</string>
+    <string name="design_option_menu_title_export_flutter">Export Flutter (.zip)</string>
     <string name="design_option_menu_title_save_project">Save project</string>
     <string name="design_property_recent_message_nodata">Recently used properties will be displayed</string>
     <string name="design_quit_button_save_and_exit">Save &amp; exit</string>
@@ -1282,6 +1283,10 @@ You must enter the API key to operate the map normally."</string>
     <string name="design_cancel_build_desc">Are you sure you want to cancel building? This may take some time.</string>
     <string name="design_cancel_build_btn_stop">Stop building</string>
     <string name="design_cancel_build_btn_continue">Continue building</string>
+    <string name="design_export_flutter_message">Saved to:\n%s</string>
+    <string name="design_export_flutter_share">Share</string>
+    <string name="design_export_flutter_started">Exporting project as Flutter…</string>
+    <string name="design_export_flutter_title">Flutter project exported</string>
     <string name="design_tab_title_component">Component</string>
     <string name="design_tab_title_event">Event</string>
     <string name="design_tab_title_view">View</string>

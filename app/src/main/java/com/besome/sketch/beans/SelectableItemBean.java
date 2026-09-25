@@ -19,8 +19,8 @@ public class SelectableItemBean extends nA implements Parcelable {
     };
 
     public static final int SRC_TYPE_NONE = -1;
-    public static final int SRC_TYPE_SKETCHWARE_DATA = 1;
-    public static final int SRC_TYPE_SKETCHWARE_ICONPACK = 2;
+    public static final int SRC_TYPE_ASCODE_DATA = 1;
+    public static final int SRC_TYPE_ASCODE_ICONPACK = 2;
     public static final int SRC_TYPE_STORAGE = 0;
     public String desc;
     public boolean isNew;

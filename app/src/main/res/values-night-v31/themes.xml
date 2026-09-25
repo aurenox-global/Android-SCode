@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.SketchwarePro.Starting" parent="Theme.SketchwarePro.Starting.Base">
+    <style name="Theme.Ascode.Starting" parent="Theme.Ascode.Starting.Base">
         <item name="windowSplashScreenBackground">@color/m3_sys_color_dynamic_dark_surface</item>
 
         <item name="android:navigationBarColor">@color/m3_sys_color_dynamic_dark_surface</item>

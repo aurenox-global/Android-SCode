@@ -14,9 +14,9 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import a.a.a.wq;
-import pro.sketchware.SketchApplication;
-import pro.sketchware.activities.resourceseditor.components.utils.ColorsEditorManager;
-import pro.sketchware.utility.FileUtil;
+import com.ascode.android.AscodeApplication;
+import com.ascode.android.activities.resourceseditor.components.utils.ColorsEditorManager;
+import com.ascode.android.utility.FileUtil;
 
 public class VectorDrawableParser {
 
@@ -403,7 +403,7 @@ public class VectorDrawableParser {
 
     private String resolveColorForSvg(String value) {
         if (isEmpty(value)) return "";
-        String resolved = colors().getColorValue(SketchApplication.getContext(), value, 4);
+        String resolved = colors().getColorValue(AscodeApplication.getContext(), value, 4);
         if (resolved == null) resolved = "";
         return normalizeColorForSvg(resolved);
     }
@@ -430,7 +430,7 @@ public class VectorDrawableParser {
     }
 
     private int dpToPx(int dp) {
-        return (int) (dp * SketchApplication
+        return (int) (dp * AscodeApplication
                 .getContext()
                 .getResources()
                 .getDisplayMetrics().density);

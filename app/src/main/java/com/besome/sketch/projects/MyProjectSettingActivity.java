@@ -48,25 +48,25 @@ import mod.hey.studios.project.ProjectSettings;
 import mod.hey.studios.util.Helper;
 import mod.hey.studios.util.ProjectFile;
 import mod.hilal.saif.activities.tools.ConfigActivity;
-import pro.sketchware.R;
-import pro.sketchware.activities.iconcreator.IconCreatorActivity;
-import pro.sketchware.control.VersionDialog;
-import pro.sketchware.databinding.MyprojectSettingBinding;
-import pro.sketchware.featureflags.FeatureFlags;
-import pro.sketchware.flutter.FlutterBuildMode;
-import pro.sketchware.flutter.FlutterProject;
-import pro.sketchware.flutter.FlutterProjectDefaults;
-import pro.sketchware.flutter.FlutterProjectStore;
-import pro.sketchware.flutter.FlutterScaffoldInitializer;
-import pro.sketchware.flutter.FlutterToolchainUi;
-import pro.sketchware.kmp.KmpProject;
-import pro.sketchware.kmp.KmpProjectSerializer;
-import pro.sketchware.kmp.KmpScaffoldInitResult;
-import pro.sketchware.kmp.KmpScaffoldInitializer;
-import pro.sketchware.lib.validator.AppNameValidator;
-import pro.sketchware.lib.validator.PackageNameValidator;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.activities.iconcreator.IconCreatorActivity;
+import com.ascode.android.control.VersionDialog;
+import com.ascode.android.databinding.MyprojectSettingBinding;
+import com.ascode.android.featureflags.FeatureFlags;
+import com.ascode.android.flutter.FlutterBuildMode;
+import com.ascode.android.flutter.FlutterProject;
+import com.ascode.android.flutter.FlutterProjectDefaults;
+import com.ascode.android.flutter.FlutterProjectStore;
+import com.ascode.android.flutter.FlutterScaffoldInitializer;
+import com.ascode.android.flutter.FlutterToolchainUi;
+import com.ascode.android.kmp.KmpProject;
+import com.ascode.android.kmp.KmpProjectSerializer;
+import com.ascode.android.kmp.KmpScaffoldInitResult;
+import com.ascode.android.kmp.KmpScaffoldInitializer;
+import com.ascode.android.lib.validator.AppNameValidator;
+import com.ascode.android.lib.validator.PackageNameValidator;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.AscodeUtil;
 
 public class MyProjectSettingActivity extends BaseAppCompatActivity implements View.OnClickListener {
 
@@ -97,7 +97,7 @@ public class MyProjectSettingActivity extends BaseAppCompatActivity implements V
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
             fileOutputStream.flush();
         } catch (IOException ignored) {
-            android.util.Log.d("SketchwarePro", "MyProjectSettingActivity: failed to save bitmap to file", ignored);
+            android.util.Log.d("Ascode", "MyProjectSettingActivity: failed to save bitmap to file", ignored);
         }
     }
 
@@ -441,7 +441,7 @@ public class MyProjectSettingActivity extends BaseAppCompatActivity implements V
             projectVersionNameFirstPart = parseInt(split[0], 1);
             projectVersionNameSecondPart = parseInt(split[1], 0);
         } catch (Exception ignored) {
-            android.util.Log.d("SketchwarePro", "MyProjectSettingActivity: failed to parse project version name", ignored);
+            android.util.Log.d("Ascode", "MyProjectSettingActivity: failed to parse project version name", ignored);
         }
     }
 
@@ -547,7 +547,7 @@ public class MyProjectSettingActivity extends BaseAppCompatActivity implements V
         ThemeManager.ThemePreset randomTheme = ThemeManager.generateRandomTheme();
         applyTheme(randomTheme);
 
-        SketchwareUtil.toast(Helper.getResString(R.string.theme_random_generated));
+        AscodeUtil.toast(Helper.getResString(R.string.theme_random_generated));
     }
 
     private void applyTheme(ThemeManager.ThemePreset theme) {
@@ -609,7 +609,7 @@ public class MyProjectSettingActivity extends BaseAppCompatActivity implements V
                 data.put("isIconAdaptive", isIconAdaptive);
                 data.put("sc_ver_code", Helper.getText(binding.verCode));
                 data.put("sc_ver_name", Helper.getText(binding.verName));
-                data.put("sketchware_ver", GB.d(getApplicationContext()));
+                data.put("ascode_ver", GB.d(getApplicationContext()));
                 for (int i = 0; i < themeColorKeys.length; i++) {
                     data.put(themeColorKeys[i], projectThemeColors[i]);
                 }
@@ -621,7 +621,7 @@ public class MyProjectSettingActivity extends BaseAppCompatActivity implements V
                 data.put("isIconAdaptive", isIconAdaptive);
                 data.put("sc_ver_code", Helper.getText(binding.verCode));
                 data.put("sc_ver_name", Helper.getText(binding.verName));
-                data.put("sketchware_ver", GB.d(getApplicationContext()));
+                data.put("ascode_ver", GB.d(getApplicationContext()));
                 for (int i = 0; i < themeColorKeys.length; i++) {
                     data.put(themeColorKeys[i], projectThemeColors[i]);
                 }
@@ -659,7 +659,7 @@ public class MyProjectSettingActivity extends BaseAppCompatActivity implements V
                 String packageName = Helper.getText(binding.etPackageName).trim();
                 String projectName = Helper.getText(binding.etProjectName).trim();
                 if (packageName.isEmpty()) {
-                    packageName = "pro.sketchware.kmp";
+                    packageName = "com.ascode.android.kmp";
                 }
                 if (projectName.isEmpty()) {
                     projectName = "KmpProject";
@@ -693,7 +693,7 @@ public class MyProjectSettingActivity extends BaseAppCompatActivity implements V
                 String packageName = Helper.getText(binding.etPackageName).trim();
                 String projectName = Helper.getText(binding.etProjectName).trim();
                 if (packageName.isEmpty()) {
-                    packageName = "pro.sketchware.flutter";
+                    packageName = "com.ascode.android.flutter";
                 }
                 if (projectName.isEmpty()) {
                     projectName = "FlutterProject";

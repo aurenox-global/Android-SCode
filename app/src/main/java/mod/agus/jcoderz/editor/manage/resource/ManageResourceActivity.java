@@ -36,15 +36,15 @@ import dev.pranav.filepicker.SelectionMode;
 import mod.bobur.VectorDrawableLoader;
 import mod.hey.studios.code.SrcCodeEditor;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
-import pro.sketchware.databinding.DialogCreateNewFileLayoutBinding;
-import pro.sketchware.databinding.DialogInputLayoutBinding;
-import pro.sketchware.databinding.ManageFileBinding;
-import pro.sketchware.databinding.ManageJavaItemHsBinding;
-import pro.sketchware.utility.FilePathUtil;
-import pro.sketchware.utility.FileResConfig;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.databinding.DialogCreateNewFileLayoutBinding;
+import com.ascode.android.databinding.DialogInputLayoutBinding;
+import com.ascode.android.databinding.ManageFileBinding;
+import com.ascode.android.databinding.ManageJavaItemHsBinding;
+import com.ascode.android.utility.FilePathUtil;
+import com.ascode.android.utility.FileResConfig;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.AscodeUtil;
 
 @SuppressLint("SetTextI18n")
 public class ManageResourceActivity extends BaseAppCompatActivity {
@@ -181,7 +181,7 @@ public class ManageResourceActivity extends BaseAppCompatActivity {
                 return;
             }
         } catch (IndexOutOfBoundsException ignored) {
-            android.util.Log.d("SketchwarePro", "ManageResourceActivity: IndexOutOfBoundsException ignored", ignored);
+            android.util.Log.d("Ascode", "ManageResourceActivity: IndexOutOfBoundsException ignored", ignored);
         }
         setResult(RESULT_OK);
         finish();
@@ -212,7 +212,7 @@ public class ManageResourceActivity extends BaseAppCompatActivity {
 
                 String nameError = validateNewName(name, isFolder);
                 if (nameError != null) {
-                    SketchwareUtil.toastError(nameError);
+                    AscodeUtil.toastError(nameError);
                     return;
                 }
 
@@ -224,7 +224,7 @@ public class ManageResourceActivity extends BaseAppCompatActivity {
                 }
 
                 if (FileUtil.isExistFile(path)) {
-                    SketchwareUtil.toastError("File exists already");
+                    AscodeUtil.toastError("File exists already");
                     return;
                 }
                 if (isFolder) {
@@ -236,7 +236,7 @@ public class ManageResourceActivity extends BaseAppCompatActivity {
                     FileUtil.writeFile(path, getNewFileTemplate(new File(temp).getName()));
                 }
                 handleAdapter(temp);
-                SketchwareUtil.toast("Created file successfully");
+                AscodeUtil.toast("Created file successfully");
                 dialog.dismiss();
             });
 
@@ -331,14 +331,14 @@ public class ManageResourceActivity extends BaseAppCompatActivity {
             @Override
             public void onFilesSelected(@NotNull List<? extends File> files) {
                 if (files.isEmpty()) {
-                    SketchwareUtil.toastError("No files selected");
+                    AscodeUtil.toastError("No files selected");
                     return;
                 }
                 for (File file : files) {
                     try {
                         FileUtil.copyDirectory(file, new File(temp + File.separator + file.getName()));
                     } catch (IOException e) {
-                        SketchwareUtil.toastError("Couldn't import resource! [" + e.getMessage() + "]");
+                        AscodeUtil.toastError("Couldn't import resource! [" + e.getMessage() + "]");
                     }
                 }
                 handleAdapter(temp);
@@ -361,9 +361,9 @@ public class ManageResourceActivity extends BaseAppCompatActivity {
                 .setPositiveButton("Rename", (dialogInterface, i) -> {
                     if (!Helper.getText(inputText).isEmpty()) {
                         if (FileUtil.renameFile(path, path.substring(0, path.lastIndexOf("/")) + "/" + Helper.getText(inputText))) {
-                            SketchwareUtil.toast("Renamed successfully");
+                            AscodeUtil.toast("Renamed successfully");
                         } else {
-                            SketchwareUtil.toastError("Renaming failed");
+                            AscodeUtil.toastError("Renaming failed");
                         }
                         handleAdapter(temp);
                         handleFab();
@@ -394,7 +394,7 @@ public class ManageResourceActivity extends BaseAppCompatActivity {
                 .setPositiveButton(R.string.common_word_delete, (dialog, which) -> {
                     FileUtil.deleteFile(frc.listFileResource.get(position));
                     handleAdapter(temp);
-                    SketchwareUtil.toast("Deleted");
+                    AscodeUtil.toast("Deleted");
                 })
                 .setNegativeButton(R.string.common_word_cancel, null)
                 .create()
@@ -413,7 +413,7 @@ public class ManageResourceActivity extends BaseAppCompatActivity {
             }
             startActivity(intent);
         } else {
-            SketchwareUtil.toast("Only XML files can be edited");
+            AscodeUtil.toast("Only XML files can be edited");
         }
     }
 
@@ -426,7 +426,7 @@ public class ManageResourceActivity extends BaseAppCompatActivity {
             intent.putExtra("xml", "");
             startActivity(intent);
         } else {
-            SketchwareUtil.toast("Only XML files can be edited");
+            AscodeUtil.toast("Only XML files can be edited");
         }
     }
 
@@ -481,7 +481,7 @@ public class ManageResourceActivity extends BaseAppCompatActivity {
                                 intent.setDataAndType(Uri.fromFile(new File(frc.listFileResource.get(position))), "text/plain");
                                 startActivity(intent);
                             } else {
-                                SketchwareUtil.toast("Only XML files can be edited");
+                                AscodeUtil.toast("Only XML files can be edited");
                             }
                         }
                         case "Edit" -> goEdit2(position);

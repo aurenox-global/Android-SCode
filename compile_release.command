@@ -29,7 +29,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-echo "==> Compilando Sketchware Pro (Release APK firmado)..."
+echo "==> Compilando Android SCode (Release APK firmado)..."
 echo "==> Firma usada: signingConfigs.debug (testkey.keystore)"
 ./gradlew --no-daemon :app:assembleRelease
 

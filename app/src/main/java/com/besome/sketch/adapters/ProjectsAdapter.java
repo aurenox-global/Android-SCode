@@ -34,10 +34,10 @@ import a.a.a.yB;
 import mod.hey.studios.project.ProjectSettingsDialog;
 import mod.hey.studios.project.backup.BackupRestoreManager;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
-import pro.sketchware.activities.main.fragments.projects.ProjectsFragment;
-import pro.sketchware.databinding.BottomSheetProjectOptionsBinding;
-import pro.sketchware.databinding.MyprojectsItemBinding;
+import com.ascode.android.R;
+import com.ascode.android.activities.main.fragments.projects.ProjectsFragment;
+import com.ascode.android.databinding.BottomSheetProjectOptionsBinding;
+import com.ascode.android.databinding.MyprojectsItemBinding;
 
 public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.ProjectViewHolder> {
     private final ProjectsFragment projectsFragment;
@@ -147,8 +147,8 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
             lC.b(scId, projectMap);
         }
 
-        if (yB.b(projectMap, "sketchware_ver") <= 0) {
-            projectMap.put("sketchware_ver", 61);
+        if (yB.b(projectMap, "ascode_ver") <= 0) {
+            projectMap.put("ascode_ver", 61);
             lC.b(scId, projectMap);
         }
 

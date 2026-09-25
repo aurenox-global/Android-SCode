@@ -3,7 +3,7 @@ package mod.hilal.saif.events;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import pro.sketchware.utility.FileUtil;
+import com.ascode.android.utility.FileUtil;
 
 public class LogicHandler {
 
@@ -99,9 +99,9 @@ public class LogicHandler {
                     newStr = newStr.concat("\n").concat(arr2.get(i));
                 }
             }
-            FileUtil.writeFile(FileUtil.getExternalStorageDir().concat("/.sketchware/data/system/temp/").concat(javaName), newStr);
+            FileUtil.writeFile(FileUtil.getExternalStorageDir().concat("/.ascode/data/system/temp/").concat(javaName), newStr);
         } catch (Exception ignored) {
-            android.util.Log.d("SketchwarePro", "LogicHandler: failed to write system temp file", ignored);
+            android.util.Log.d("Ascode", "LogicHandler: failed to write system temp file", ignored);
         }
     }
 

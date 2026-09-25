@@ -7,12 +7,12 @@ SMOKE_DIR="$ROOT_DIR/build/kmp-smoke-workflow"
 rm -rf "$SMOKE_DIR"
 mkdir -p "$SMOKE_DIR/gradle/wrapper"
 mkdir -p "$SMOKE_DIR/gradle"
-mkdir -p "$SMOKE_DIR/shared/src/commonMain/kotlin/pro/sketchware/smoke"
+mkdir -p "$SMOKE_DIR/shared/src/commonMain/kotlin/pro/ascode/smoke"
 mkdir -p "$SMOKE_DIR/shared/src/androidMain"
-mkdir -p "$SMOKE_DIR/shared/src/androidMain/kotlin/pro/sketchware/smoke"
-mkdir -p "$SMOKE_DIR/shared/src/desktopMain/kotlin/pro/sketchware/smoke"
-mkdir -p "$SMOKE_DIR/androidApp/src/main/kotlin/pro/sketchware/smoke/android"
-mkdir -p "$SMOKE_DIR/desktopApp/src/main/kotlin/pro/sketchware/smoke/desktop"
+mkdir -p "$SMOKE_DIR/shared/src/androidMain/kotlin/pro/ascode/smoke"
+mkdir -p "$SMOKE_DIR/shared/src/desktopMain/kotlin/pro/ascode/smoke"
+mkdir -p "$SMOKE_DIR/androidApp/src/main/kotlin/pro/ascode/smoke/android"
+mkdir -p "$SMOKE_DIR/desktopApp/src/main/kotlin/pro/ascode/smoke/desktop"
 
 echo "[KMP smoke] Preparing scaffold at $SMOKE_DIR"
 
@@ -99,7 +99,7 @@ kotlin {
 }
 
 android {
-    namespace = "pro.sketchware.smoke.shared"
+    namespace = "com.ascode.android.smoke.shared"
     compileSdk = 35
     defaultConfig {
         minSdk = 24
@@ -118,11 +118,11 @@ plugins {
 }
 
 android {
-    namespace = "pro.sketchware.smoke.android"
+    namespace = "com.ascode.android.smoke.android"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "pro.sketchware.smoke.androidapp"
+        applicationId = "com.ascode.android.smoke.androidapp"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -168,7 +168,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("pro.sketchware.smoke.desktop.MainKt")
+    mainClass.set("com.ascode.android.smoke.desktop.MainKt")
 }
 
 tasks.register<Jar>("desktopJar") {
@@ -176,7 +176,7 @@ tasks.register<Jar>("desktopJar") {
     description = "Assembles runnable Desktop JAR including runtime dependencies."
     archiveClassifier.set("desktop")
     manifest {
-        attributes["Main-Class"] = "pro.sketchware.smoke.desktop.MainKt"
+        attributes["Main-Class"] = "com.ascode.android.smoke.desktop.MainKt"
     }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from(sourceSets.main.get().output)
@@ -198,8 +198,8 @@ cat > "$SMOKE_DIR/shared/src/androidMain/AndroidManifest.xml" <<'EOF'
 <manifest />
 EOF
 
-cat > "$SMOKE_DIR/shared/src/commonMain/kotlin/pro/sketchware/smoke/Platform.kt" <<'EOF'
-package pro.sketchware.smoke
+cat > "$SMOKE_DIR/shared/src/commonMain/kotlin/pro/ascode/smoke/Platform.kt" <<'EOF'
+package com.ascode.android.smoke
 
 object Platform {
     fun name(): String = GeneratedPlatformBindings.platformName()
@@ -215,8 +215,8 @@ object Platform {
 }
 EOF
 
-cat > "$SMOKE_DIR/shared/src/commonMain/kotlin/pro/sketchware/smoke/GeneratedPlatformBindings.kt" <<'EOF'
-package pro.sketchware.smoke
+cat > "$SMOKE_DIR/shared/src/commonMain/kotlin/pro/ascode/smoke/GeneratedPlatformBindings.kt" <<'EOF'
+package com.ascode.android.smoke
 
 expect object GeneratedPlatformBindings {
     fun platformName(): String
@@ -227,8 +227,8 @@ expect object GeneratedPlatformBindings {
 }
 EOF
 
-cat > "$SMOKE_DIR/shared/src/androidMain/kotlin/pro/sketchware/smoke/GeneratedPlatformBindings.kt" <<'EOF'
-package pro.sketchware.smoke
+cat > "$SMOKE_DIR/shared/src/androidMain/kotlin/pro/ascode/smoke/GeneratedPlatformBindings.kt" <<'EOF'
+package com.ascode.android.smoke
 
 actual object GeneratedPlatformBindings {
     actual fun platformName(): String = "Android"
@@ -239,8 +239,8 @@ actual object GeneratedPlatformBindings {
 }
 EOF
 
-cat > "$SMOKE_DIR/shared/src/desktopMain/kotlin/pro/sketchware/smoke/GeneratedPlatformBindings.kt" <<'EOF'
-package pro.sketchware.smoke
+cat > "$SMOKE_DIR/shared/src/desktopMain/kotlin/pro/ascode/smoke/GeneratedPlatformBindings.kt" <<'EOF'
+package com.ascode.android.smoke
 
 actual object GeneratedPlatformBindings {
     actual fun platformName(): String = "Desktop"
@@ -256,7 +256,7 @@ cat > "$SMOKE_DIR/androidApp/src/main/AndroidManifest.xml" <<'EOF'
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application android:label="KMP Smoke">
         <activity
-            android:name="pro.sketchware.smoke.android.MainActivity"
+            android:name="com.ascode.android.smoke.android.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -267,8 +267,8 @@ cat > "$SMOKE_DIR/androidApp/src/main/AndroidManifest.xml" <<'EOF'
 </manifest>
 EOF
 
-cat > "$SMOKE_DIR/androidApp/src/main/kotlin/pro/sketchware/smoke/android/MainActivity.kt" <<'EOF'
-package pro.sketchware.smoke.android
+cat > "$SMOKE_DIR/androidApp/src/main/kotlin/pro/ascode/smoke/android/MainActivity.kt" <<'EOF'
+package com.ascode.android.smoke.android
 
 import android.app.Activity
 import android.os.Bundle
@@ -280,10 +280,10 @@ class MainActivity : Activity() {
 }
 EOF
 
-cat > "$SMOKE_DIR/desktopApp/src/main/kotlin/pro/sketchware/smoke/desktop/Main.kt" <<'EOF'
-package pro.sketchware.smoke.desktop
+cat > "$SMOKE_DIR/desktopApp/src/main/kotlin/pro/ascode/smoke/desktop/Main.kt" <<'EOF'
+package com.ascode.android.smoke.desktop
 
-import pro.sketchware.smoke.Platform
+import com.ascode.android.smoke.Platform
 
 fun main() {
     println(Platform.name())

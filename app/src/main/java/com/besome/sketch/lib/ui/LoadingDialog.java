@@ -11,7 +11,7 @@ import androidx.core.view.WindowCompat;
 import com.airbnb.lottie.LottieAnimationView;
 
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
+import com.ascode.android.R;
 
 public class LoadingDialog extends Dialog {
 
@@ -20,7 +20,7 @@ public class LoadingDialog extends Dialog {
     public LoadingDialog(Context context) {
         super(context, R.style.progress);
         setContentView(R.layout.progress);
-        animationView = findViewById(R.id.anim_sketchware);
+        animationView = findViewById(R.id.anim_ascode);
         TextView tvProgress = findViewById(R.id.tv_progress);
         tvProgress.setText(Helper.getResString(R.string.common_message_loading));
         super.setCancelable(false);

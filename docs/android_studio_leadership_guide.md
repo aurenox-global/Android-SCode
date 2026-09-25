@@ -2,7 +2,7 @@
 
 Fecha base: 2026-05-10
 Estado global: Iniciado
-Objetivo: llevar Sketchware Pro de paridad parcial a liderazgo funcional en flujos reales de desarrollo.
+Objetivo: llevar Android SCode de paridad parcial a liderazgo funcional en flujos reales de desarrollo.
 
 ## Alcance de esta guia
 

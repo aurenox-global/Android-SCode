@@ -75,26 +75,26 @@ import mod.jbk.util.TestkeySignBridge;
 import mod.pranav.build.JarBuilder;
 import mod.pranav.build.R8Compiler;
 import mod.pranav.viewbinding.ViewBindingBuilder;
-import pro.sketchware.kmp.KmpBuildOrchestrationReport;
-import pro.sketchware.kmp.KmpBuildDiagnosticsReport;
-import pro.sketchware.kmp.KmpBuildDiagnosticsReportSerializer;
-import pro.sketchware.kmp.KmpBuildFailureTaxonomy;
-import pro.sketchware.kmp.KmpBuildOrchestrationReportSerializer;
-import pro.sketchware.kmp.KmpBuildPipelineMode;
-import pro.sketchware.kmp.KmpBuildPipelineResolution;
-import pro.sketchware.kmp.KmpBuildPipelineResolver;
-import pro.sketchware.kmp.KmpMultiTargetBuildOrchestrator;
-import pro.sketchware.kmp.KmpProject;
-import pro.sketchware.kmp.KmpProjectIssue;
-import pro.sketchware.kmp.KmpProjectIssueSeverity;
-import pro.sketchware.kmp.KmpProjectParseResult;
-import pro.sketchware.kmp.KmpProjectSerializer;
-import pro.sketchware.metrics.KmpBuildPerformanceMetricsStore;
-import pro.sketchware.SketchApplication;
-import pro.sketchware.util.library.BuiltInLibraryManager;
-import pro.sketchware.utility.FilePathUtil;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.kmp.KmpBuildOrchestrationReport;
+import com.ascode.android.kmp.KmpBuildDiagnosticsReport;
+import com.ascode.android.kmp.KmpBuildDiagnosticsReportSerializer;
+import com.ascode.android.kmp.KmpBuildFailureTaxonomy;
+import com.ascode.android.kmp.KmpBuildOrchestrationReportSerializer;
+import com.ascode.android.kmp.KmpBuildPipelineMode;
+import com.ascode.android.kmp.KmpBuildPipelineResolution;
+import com.ascode.android.kmp.KmpBuildPipelineResolver;
+import com.ascode.android.kmp.KmpMultiTargetBuildOrchestrator;
+import com.ascode.android.kmp.KmpProject;
+import com.ascode.android.kmp.KmpProjectIssue;
+import com.ascode.android.kmp.KmpProjectIssueSeverity;
+import com.ascode.android.kmp.KmpProjectParseResult;
+import com.ascode.android.kmp.KmpProjectSerializer;
+import com.ascode.android.metrics.KmpBuildPerformanceMetricsStore;
+import com.ascode.android.AscodeApplication;
+import com.ascode.android.util.library.BuiltInLibraryManager;
+import com.ascode.android.utility.FilePathUtil;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.AscodeUtil;
 import proguard.Configuration;
 import proguard.ConfigurationParser;
 import proguard.ParseException;
@@ -147,7 +147,7 @@ public class ProjectBuilder {
         try {
             PackageInfo info = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
 
-            LogUtil.d(TAG, "Running Sketchware Pro " + info.versionName + " (" + info.versionCode + ")");
+            LogUtil.d(TAG, "Running Android SCode " + info.versionName + " (" + info.versionCode + ")");
 
             ApplicationInfo applicationInfo = context.getPackageManager().getApplicationInfo(context.getPackageName(), 0);
 
@@ -201,7 +201,7 @@ public class ProjectBuilder {
         long length;
         File compareToFile = new File(targetFile);
         oB fileUtil = new oB();
-        long lengthOfFileInAssets = fileUtil.a(SketchApplication.getContext(), fileInAssets);
+        long lengthOfFileInAssets = fileUtil.a(AscodeApplication.getContext(), fileInAssets);
         if (compareToFile.exists()) {
             length = compareToFile.length();
         } else {
@@ -214,7 +214,7 @@ public class ProjectBuilder {
         /* Delete the file */
         fileUtil.a(compareToFile);
         /* Copy the file from assets to local storage */
-        fileUtil.a(SketchApplication.getContext(), fileInAssets, targetFile);
+        fileUtil.a(AscodeApplication.getContext(), fileInAssets, targetFile);
         return true;
     }
 
@@ -312,7 +312,7 @@ public class ProjectBuilder {
         StringBuilder classpath = new StringBuilder();
 
         /*
-         * Add yq#u (.sketchware/mysc/xxx/bin/classes) if it exists
+         * Add yq#u (.ascode/mysc/xxx/bin/classes) if it exists
          * since there might be compiled Kotlin files for ecj to use classpath as.
          */
         KotlinCompilerBridge.maybeAddKotlinFilesToClasspath(classpath, yq);
@@ -358,7 +358,7 @@ public class ProjectBuilder {
         }
 
         /* Add JARs from project's classpath */
-        String path = FileUtil.getExternalStorageDir() + "/.sketchware/data/" + yq.sc_id + "/files/classpath/";
+        String path = FileUtil.getExternalStorageDir() + "/.ascode/data/" + yq.sc_id + "/files/classpath/";
         ArrayList<String> jars = FileUtil.listFiles(path, "jar");
         classpath.append(":").append(TextUtils.join(":", jars));
 
@@ -768,10 +768,10 @@ public class ProjectBuilder {
                         }
                     }
                 } else {
-                    SketchwareUtil.toastError("Invalid DEX file path of enabled Local library #" + i1, Toast.LENGTH_LONG);
+                    AscodeUtil.toastError("Invalid DEX file path of enabled Local library #" + i1, Toast.LENGTH_LONG);
                 }
             } else {
-                SketchwareUtil.toastError("Invalid name of enabled Local library #" + i1, Toast.LENGTH_LONG);
+                AscodeUtil.toastError("Invalid name of enabled Local library #" + i1, Toast.LENGTH_LONG);
             }
         }
 

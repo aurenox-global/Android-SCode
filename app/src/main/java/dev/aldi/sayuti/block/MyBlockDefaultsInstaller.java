@@ -11,7 +11,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
-import pro.sketchware.utility.FileUtil;
+import com.ascode.android.utility.FileUtil;
 
 public final class MyBlockDefaultsInstaller {
     private static final String TAG = "MyBlockDefaultsInstaller";
@@ -19,7 +19,7 @@ public final class MyBlockDefaultsInstaller {
     private static final String ASSET_BASE_PATH_V2 = "default-my-block-2";
     private static final File MENU_FILE = new File(
             Environment.getExternalStorageDirectory(),
-            ".sketchware/resources/block/My Block/menu.json"
+            ".ascode/resources/block/My Block/menu.json"
     );
 
     private MyBlockDefaultsInstaller() {

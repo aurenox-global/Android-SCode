@@ -24,8 +24,8 @@ public class tq {
         a.add(new QuizBean("SoundPool component can play any sound file of any length.", QuizBean.QUIZ_FALSE));
         a.add(new QuizBean("Adding a Drawer or FAB in an activity has no effect on the compilation time.", QuizBean.QUIZ_FALSE));
         a.add(new QuizBean("The activity's lifecycle, \"onStop\" occurs after the \"onDestroy\" event.", QuizBean.QUIZ_FALSE));
-        a.add(new QuizBean("Deleting the Sketchware app will remove all the saved projects.", QuizBean.QUIZ_FALSE));
-        a.add(new QuizBean("Sketchware automatically saves the project for you.", QuizBean.QUIZ_FALSE));
+        a.add(new QuizBean("Deleting the Android SCode app will remove all the saved projects.", QuizBean.QUIZ_FALSE));
+        a.add(new QuizBean("Android SCode automatically saves the project for you.", QuizBean.QUIZ_FALSE));
         a.add(new QuizBean("SharedPreferences and FileUtil does the same thing.", QuizBean.QUIZ_FALSE));
         a.add(new QuizBean("You can update the app on the Play Store using a different release key.", QuizBean.QUIZ_FALSE));
         a.add(new QuizBean("A local project that has not been backed up can be recovered if deleted.", QuizBean.QUIZ_FALSE));
@@ -62,7 +62,7 @@ public class tq {
         a.add(new QuizBean("A deleted Collection item can be recovered.", QuizBean.QUIZ_FALSE));
         a.add(new QuizBean("A variable created in \"Activity A\" can be accessed from \"Activity B.\"", QuizBean.QUIZ_FALSE));
         a.add(new QuizBean("A component created in \"Activity A\" can be accessed from \"Activity B.\"", QuizBean.QUIZ_FALSE));
-        a.add(new QuizBean("You can use custom Blocks created with Sketchware Pro in Sketchware from Google Play.", QuizBean.QUIZ_FALSE));
+        a.add(new QuizBean("You can use custom Blocks created with Android SCode in Android SCode from Google Play.", QuizBean.QUIZ_FALSE));
         a.add(new QuizBean("File blocks work on Android 11 and newer when target SDK version is set to 30 and higher.", QuizBean.QUIZ_FALSE));
         a.add(new QuizBean("You can choose a file using \"FilePicker\" component.", QuizBean.QUIZ_TRUE));
         a.add(new QuizBean("The \"finishAffinity\" block is used to close the application.", QuizBean.QUIZ_TRUE));
@@ -97,7 +97,7 @@ public class tq {
         a.add(new QuizBean("There is a Discord community that can help you.", QuizBean.QUIZ_TRUE));
         a.add(new QuizBean("You can add onClick event on Widgets other than the Button.", QuizBean.QUIZ_TRUE));
         a.add(new QuizBean("You can also add events inside the \"Component\" tab.", QuizBean.QUIZ_TRUE));
-        a.add(new QuizBean("You can change the language settings for Sketchware.", QuizBean.QUIZ_TRUE));
+        a.add(new QuizBean("You can change the language settings for Android SCode.", QuizBean.QUIZ_TRUE));
         a.add(new QuizBean("You can edit the image file after it has been added.", QuizBean.QUIZ_TRUE));
         a.add(new QuizBean("You can export the project to continue working on Android Studio.", QuizBean.QUIZ_TRUE));
         a.add(new QuizBean("You can sign the project to upload it to the Play Store.", QuizBean.QUIZ_TRUE));
@@ -120,7 +120,7 @@ public class tq {
         a.add(new QuizBean("You can create a pop-up message using the Dialog component.", QuizBean.QUIZ_TRUE));
         a.add(new QuizBean("Timer component may not cancel if you assign more than one task to it.", QuizBean.QUIZ_TRUE));
         a.add(new QuizBean("You can use MoreBlocks to develop more quickly and efficiently.", QuizBean.QUIZ_TRUE));
-        a.add(new QuizBean("You can share finished projects to other people without Sketchware.", QuizBean.QUIZ_TRUE));
+        a.add(new QuizBean("You can share finished projects to other people without Android SCode.", QuizBean.QUIZ_TRUE));
         a.add(new QuizBean("Verbally abusing other people in the community could result in a ban.", QuizBean.QUIZ_TRUE));
         a.add(new QuizBean("You can use a MoreBlock within a MoreBlock.", QuizBean.QUIZ_TRUE));
         a.add(new QuizBean("It's possible to add custom hex color code.", QuizBean.QUIZ_TRUE));
@@ -132,7 +132,7 @@ public class tq {
         a.add(new QuizBean("You can programmatically change the styling of the widgets using blocks.", QuizBean.QUIZ_TRUE));
         a.add(new QuizBean("The \"Hint\" property for EditText hints the user for what should be accepted as an input.", QuizBean.QUIZ_TRUE));
         a.add(new QuizBean("The \"INVISIBLE\" option for visibility property makes the widget disappear, but still takes up space.", QuizBean.QUIZ_TRUE));
-        a.add(new QuizBean("It's possible to create a landscape application on Sketchware.", QuizBean.QUIZ_TRUE));
+        a.add(new QuizBean("It's possible to create a landscape application on Android SCode.", QuizBean.QUIZ_TRUE));
         a.add(new QuizBean("It's possible to infinitely loop a sound file.", QuizBean.QUIZ_TRUE));
         a.add(new QuizBean("You can create algorithms with blocks, such as an algorithm that shuffles a deck of card.", QuizBean.QUIZ_TRUE));
         a.add(new QuizBean("The \"onCreate\" event is the first lifecycle event that occurs when an activity is started.", QuizBean.QUIZ_TRUE));

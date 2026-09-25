@@ -21,8 +21,8 @@ import java.util.concurrent.Executors;
 
 import a.a.a.Vs;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
-import pro.sketchware.databinding.PalettesSearchDialogBinding;
+import com.ascode.android.R;
+import com.ascode.android.databinding.PalettesSearchDialogBinding;
 
 public class PaletteSelector extends RecyclerView {
 

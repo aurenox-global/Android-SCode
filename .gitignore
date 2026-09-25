@@ -48,9 +48,9 @@ captures/
 *.jks
 *.keystore
 
-# Excepcion: la testkey es la clave PUBLICA de AOSP y es la que firma las releases de este fork
-# (siempre la misma, para que las actualizaciones instalen encima). El CI la necesita para compilar.
-!testkey.keystore
+# Excepcion: ascode.keystore es la firma propia del proyecto; el CI la necesita para compilar
+# releases que instalen encima de las anteriores.
+!ascode.keystore
 
 # External native build folder generated in Android Studio 2.2 and later
 .externalNativeBuild

@@ -18,7 +18,7 @@ public class ListPermission {
         } catch (ClassNotFoundException e) {
             Log.e("ListPermission", "Couldn't find class android.Manifest.permission!");
         } catch (IllegalAccessException ignored) {
-            android.util.Log.d("SketchwarePro", "ListPermission: IllegalAccessException ignored", ignored);
+            android.util.Log.d("Ascode", "ListPermission: IllegalAccessException ignored", ignored);
         }
         return permissions;
     }

@@ -1,7 +1,7 @@
 package dev.aldi.sayuti.block;
 
-import static pro.sketchware.utility.ThemeUtils.getColor;
-import static pro.sketchware.utility.ThemeUtils.isDarkThemeEnabled;
+import static com.ascode.android.utility.ThemeUtils.getColor;
+import static com.ascode.android.utility.ThemeUtils.isDarkThemeEnabled;
 
 import android.util.Pair;
 
@@ -27,14 +27,14 @@ import mod.hey.studios.moreblock.ReturnMoreblockManager;
 import mod.hilal.saif.activities.tools.ConfigActivity;
 import mod.hilal.saif.blocks.BlocksHandler;
 import mod.pranav.viewbinding.ViewBindingBuilder;
-import pro.sketchware.R;
-import pro.sketchware.activities.resourceseditor.components.utils.StringsEditorManager;
-import pro.sketchware.blocks.ExtraBlocks;
-import pro.sketchware.control.logic.LogicClickListener;
-import pro.sketchware.utility.CustomVariableUtil;
-import pro.sketchware.utility.FileResConfig;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.activities.resourceseditor.components.utils.StringsEditorManager;
+import com.ascode.android.blocks.ExtraBlocks;
+import com.ascode.android.control.logic.LogicClickListener;
+import com.ascode.android.utility.CustomVariableUtil;
+import com.ascode.android.utility.FileResConfig;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.AscodeUtil;
 
 public class ExtraPaletteBlock {
 
@@ -191,7 +191,7 @@ public class ExtraPaletteBlock {
             if (split.length > 1) {
                 logicEditor.a(split[1], "v", split[0], "getVar").setTag(customVariables.get(i));
             } else {
-                SketchwareUtil.toastError("Found invalid data of Custom Variable #" + (i + 1) + ": \"" + customVariables.get(i) + "\"");
+                AscodeUtil.toastError("Found invalid data of Custom Variable #" + (i + 1) + ": \"" + customVariables.get(i) + "\"");
             }
         }
 
@@ -395,7 +395,7 @@ public class ExtraPaletteBlock {
 
         switch (paletteId) {
             case -1:
-                String filePath = FileUtil.getExternalStorageDir().concat("/.sketchware/data/").concat(sc_id.concat("/files/resource/values/strings.xml"));
+                String filePath = FileUtil.getExternalStorageDir().concat("/.ascode/data/").concat(sc_id.concat("/files/resource/values/strings.xml"));
                 ArrayList<HashMap<String, Object>> StringsListMap = new ArrayList<>();
                 StringsEditorManager stringsEditorManager = new StringsEditorManager();
                 stringsEditorManager.convertXmlStringsToListMap(FileUtil.readFileIfExist(filePath), StringsListMap);
@@ -1213,7 +1213,7 @@ public class ExtraPaletteBlock {
                                     if (spec instanceof String specString) {
                                         logicEditor.a(specString, getTitleBgColor());
                                     } else {
-                                        SketchwareUtil.toastError("Custom Block #" + paletteBlocks +
+                                        AscodeUtil.toastError("Custom Block #" + paletteBlocks +
                                                 " of current palette has an invalid spec data type");
                                     }
                                 } else {
@@ -1228,17 +1228,17 @@ public class ExtraPaletteBlock {
                                             logicEditor.a("", typeString, "", nameString);
                                         }
                                     } else {
-                                        SketchwareUtil.toastError("Custom Block #" + paletteBlocks +
+                                        AscodeUtil.toastError("Custom Block #" + paletteBlocks +
                                                 " of current palette has an invalid name data type");
                                     }
                                 }
                             } else {
-                                SketchwareUtil.toastError("Custom Block #" + paletteBlocks +
+                                AscodeUtil.toastError("Custom Block #" + paletteBlocks +
                                         " of current palette has an invalid block type data type");
                             }
                         }
                     } else {
-                        SketchwareUtil.toastError("Custom Block #" + paletteBlocks +
+                        AscodeUtil.toastError("Custom Block #" + paletteBlocks +
                                 " of current palette has an invalid block palette data type");
                     }
                 }

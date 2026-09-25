@@ -20,10 +20,10 @@ import com.besome.sketch.beans.ProjectLibraryBean;
 import a.a.a.Uu;
 import a.a.a.gB;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
-import pro.sketchware.databinding.ManageLibraryAdmobPreviewBinding;
-import pro.sketchware.databinding.ManageLibrarySettingAdmobTestDeviceItemBinding;
-import pro.sketchware.lib.base.BaseViewBindingAdapter;
+import com.ascode.android.R;
+import com.ascode.android.databinding.ManageLibraryAdmobPreviewBinding;
+import com.ascode.android.databinding.ManageLibrarySettingAdmobTestDeviceItemBinding;
+import com.ascode.android.lib.base.BaseViewBindingAdapter;
 
 public class ReviewStepView extends LinearLayout implements Uu {
 

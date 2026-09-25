@@ -219,7 +219,7 @@ public class Fx {
                 attr = param.substring("getMaterialColor(".length(), param.length() - 1);
             }
             if (attr != null) {
-                return String.format("SketchwareUtil.getMaterialColor(%s, %s)", context, attr);
+                return String.format("AscodeUtil.getMaterialColor(%s, %s)", context, attr);
             }
         }
         return param;
@@ -318,7 +318,7 @@ public class Fx {
                 opcode = String.format("%s.isEmpty()", params.get(0));
                 break;
             case "mapGetAllKeys":
-                opcode = String.format("SketchwareUtil.getAllKeysFromMap(%s, %s);", params.get(0), params.get(1));
+                opcode = String.format("AscodeUtil.getAllKeysFromMap(%s, %s);", params.get(0), params.get(1));
                 break;
             case "addListInt":
                 opcode = String.format("%s.add(Double.valueOf(%s));", params.get(1), params.get(0));
@@ -420,7 +420,7 @@ public class Fx {
                 opcode = String.format("%s %s %s", params.get(0), bean.opCode, params.get(1));
                 break;
             case "random":
-                opcode = String.format("SketchwareUtil.getRandom((int)(%s), (int)(%s))", params.get(0), params.get(1));
+                opcode = String.format("AscodeUtil.getRandom((int)(%s), (int)(%s))", params.get(0), params.get(1));
                 break;
             case "stringLength":
                 opcode = String.format("%s.length()", params.get(0));
@@ -493,13 +493,13 @@ public class Fx {
 
                 break;
             case "mathGetDip":
-                opcode = String.format("SketchwareUtil.getDip(getApplicationContext(), (int)(%s))", params.get(0));
+                opcode = String.format("AscodeUtil.getDip(getApplicationContext(), (int)(%s))", params.get(0));
                 break;
             case "mathGetDisplayWidth":
-                opcode = "SketchwareUtil.getDisplayWidthPixels(getApplicationContext())";
+                opcode = "AscodeUtil.getDisplayWidthPixels(getApplicationContext())";
                 break;
             case "mathGetDisplayHeight":
-                opcode = "SketchwareUtil.getDisplayHeightPixels(getApplicationContext())";
+                opcode = "AscodeUtil.getDisplayHeightPixels(getApplicationContext())";
                 break;
             case "mathPi":
                 opcode = "Math.PI";
@@ -638,7 +638,7 @@ public class Fx {
                 opcode = String.format("%s.requestFocus();", params.get(0));
                 break;
             case "doToast":
-                opcode = String.format("SketchwareUtil.showMessage(getApplicationContext(), %s);", params.get(0));
+                opcode = String.format("AscodeUtil.showMessage(getApplicationContext(), %s);", params.get(0));
                 break;
             case "copyToClipboard":
                 opcode = String.format("((ClipboardManager) getSystemService(getApplicationContext().CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText(\"clipboard\", %s));", params.get(0));
@@ -746,10 +746,10 @@ public class Fx {
                 opcode = String.format("%s.getScaleY()", params.get(0));
                 break;
             case "getLocationX":
-                opcode = String.format("SketchwareUtil.getLocationX(%s)", params.get(0));
+                opcode = String.format("AscodeUtil.getLocationX(%s)", params.get(0));
                 break;
             case "getLocationY":
-                opcode = String.format("SketchwareUtil.getLocationY(%s)", params.get(0));
+                opcode = String.format("AscodeUtil.getLocationY(%s)", params.get(0));
                 break;
             case "setChecked":
                 opcode = String.format("%s.setChecked(%s);", params.get(0), params.get(1));
@@ -785,7 +785,7 @@ public class Fx {
                 opcode = String.format("%s.getCheckedItemPosition()", params.get(0));
                 break;
             case "listGetCheckedPositions":
-                opcode = String.format("%s = SketchwareUtil.getCheckedItemPositionsToArray(%s);", params.get(1), params.get(0));
+                opcode = String.format("%s = AscodeUtil.getCheckedItemPositionsToArray(%s);", params.get(1), params.get(0));
                 break;
             case "listGetCheckedCount":
                 opcode = String.format("%s.getCheckedItemCount()", params.get(0));

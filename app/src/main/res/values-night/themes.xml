@@ -1,8 +1,8 @@
 <resources>
-    <style name="Platform.V21.Theme.SketchwarePro" parent="Base.Theme.SketchwarePro">
+    <style name="Platform.V21.Theme.Ascode" parent="Base.Theme.Ascode">
         <item name="android:navigationBarColor">?android:attr/colorBackground</item>
         <item name="android:statusBarColor">?android:attr/colorBackground</item>
     </style>
 
-    <style name="Platform.Theme.SketchwarePro" parent="Platform.V21.Theme.SketchwarePro" />
+    <style name="Platform.Theme.Ascode" parent="Platform.V21.Theme.Ascode" />
 </resources>

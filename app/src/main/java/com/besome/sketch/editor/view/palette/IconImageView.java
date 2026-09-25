@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.besome.sketch.beans.ViewBean;
 
-import pro.sketchware.R;
+import com.ascode.android.R;
 
 public class IconImageView extends IconBase {
     public String f = "";

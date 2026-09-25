@@ -11,7 +11,7 @@ import android.widget.RelativeLayout;
 
 import a.a.a.Rs;
 import a.a.a.wB;
-import pro.sketchware.R;
+import com.ascode.android.R;
 
 public class ViewDummy extends RelativeLayout {
     public ImageView img_notallowed;

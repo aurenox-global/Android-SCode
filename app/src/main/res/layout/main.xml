@@ -32,7 +32,7 @@
                 android:layout_marginEnd="20dp"
                 android:layout_marginTop="8dp"
                 app:cardBackgroundColor="?colorSurfaceContainer"
-                app:shapeAppearance="@style/ShapeAppearance.SketchwarePro.AsymmetricCard"
+                app:shapeAppearance="@style/ShapeAppearance.Ascode.AsymmetricCard"
                 app:layout_scrollFlags="scroll|enterAlways|snap">
 
                 <com.google.android.material.appbar.MaterialToolbar

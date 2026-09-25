@@ -20,7 +20,7 @@ import mod.hilal.saif.components.ComponentsHandler;
 import mod.jbk.build.BuiltInLibraries;
 import mod.jbk.editor.manage.library.ExcludeBuiltInLibrariesActivity;
 import mod.pranav.viewbinding.ViewBindingBuilder;
-import pro.sketchware.utility.FileUtil;
+import com.ascode.android.utility.FileUtil;
 
 public class Lx {
 
@@ -164,7 +164,7 @@ public class Lx {
         }
 
         String sc_id = metadata.sc_id;
-        String local_lib_file = FileUtil.getExternalStorageDir() + "/.sketchware/data/" + sc_id + "/local_library";
+        String local_lib_file = FileUtil.getExternalStorageDir() + "/.ascode/data/" + sc_id + "/local_library";
         String fileContent = FileUtil.readFile(local_lib_file);
 
         if (!fileContent.isEmpty()) {
@@ -1152,7 +1152,7 @@ public class Lx {
             case "Gyroscope":
                 return componentName + " = (SensorManager) getSystemService(Context.SENSOR_SERVICE);\r\n" +
                         "if (" + componentName + ".getDefaultSensor(Sensor.TYPE_GYROSCOPE) == null) {\r\n" +
-                        "SketchwareUtil.showMessage(getApplicationContext(), \"Gyroscope is not supported on this device\");\r\n" +
+                        "AscodeUtil.showMessage(getApplicationContext(), \"Gyroscope is not supported on this device\");\r\n" +
                         "}";
 
             case "FirebaseAuth":
@@ -2766,14 +2766,14 @@ public class Lx {
     }
 
     /**
-     * @return Content of a <code>SketchwareUtil.java</code> file, with indentation
+     * @return Content of a <code>AscodeUtil.java</code> file, with indentation
      */
     public static String i(String packageName, boolean isMaterial3Enabled) {
-        StringBuilder sketchwareUtilSource = new StringBuilder();
+        StringBuilder ascodeUtilSource = new StringBuilder();
 
-        sketchwareUtilSource.append("package ").append(packageName).append(";");
+        ascodeUtilSource.append("package ").append(packageName).append(";");
 
-        sketchwareUtilSource.append("""
+        ascodeUtilSource.append("""
                 
                 import android.app.*;
                 import android.content.*;
@@ -2790,14 +2790,14 @@ public class Lx {
                 """);
 
         if (isMaterial3Enabled) {
-            sketchwareUtilSource.append("""
+            ascodeUtilSource.append("""
                     import com.google.android.material.color.MaterialColors;
                     
                     """);
         }
 
-        sketchwareUtilSource.append("""
-                public class SketchwareUtil {
+        ascodeUtilSource.append("""
+                public class AscodeUtil {
                 
                     public static int TOP = 1;
                     public static int CENTER = 2;
@@ -2924,7 +2924,7 @@ public class Lx {
                             _outputStream.close();
                             _inputStream.close();
                         } catch (IOException _e) {
-                            android.util.Log.d("SketchwarePro", "Lx: IOException ignored", _e);
+                            android.util.Log.d("Ascode", "Lx: IOException ignored", _e);
                         }
                 
                         return _outputStream.toString();
@@ -2946,7 +2946,7 @@ public class Lx {
                 """);
 
         if (isMaterial3Enabled) {
-            sketchwareUtilSource.append("""
+            ascodeUtilSource.append("""
                     
                         public static int getMaterialColor(Context context, int resourceId) {
                             return MaterialColors.getColor(context, resourceId, "getMaterialColor");
@@ -2955,7 +2955,7 @@ public class Lx {
                     """);
         }
 
-        sketchwareUtilSource.append("""
+        ascodeUtilSource.append("""
                     public static int getLocationX(View _view) {
                         int _location[] = new int[2];
                         _view.getLocationInWindow(_location);
@@ -3006,7 +3006,7 @@ public class Lx {
                 }
                 """);
 
-        return sketchwareUtilSource.toString();
+        return ascodeUtilSource.toString();
     }
 
     /**

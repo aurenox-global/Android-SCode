@@ -1,6 +1,6 @@
 package mod.khaled.logcat;
 
-import static pro.sketchware.utility.FileUtil.createNewFileIfNotPresent;
+import static com.ascode.android.utility.FileUtil.createNewFileIfNotPresent;
 
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
@@ -33,13 +33,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
-import pro.sketchware.databinding.ActivityLogcatreaderBinding;
-import pro.sketchware.databinding.EasyDeleteEdittextBinding;
-import pro.sketchware.databinding.ViewLogcatItemBinding;
-import pro.sketchware.lib.base.BaseTextWatcher;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.databinding.ActivityLogcatreaderBinding;
+import com.ascode.android.databinding.EasyDeleteEdittextBinding;
+import com.ascode.android.databinding.ViewLogcatItemBinding;
+import com.ascode.android.lib.base.BaseTextWatcher;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.AscodeUtil;
 
 public class LogReaderActivity extends BaseAppCompatActivity {
 
@@ -47,7 +47,7 @@ public class LogReaderActivity extends BaseAppCompatActivity {
     private final Pattern logPattern = Pattern.compile("^(.*\\d) ([VADEIW]) (.*): (.*)");
     private final ArrayList<HashMap<String, Object>> mainList = new ArrayList<>();
     private String pkgFilter = "";
-    private String packageName = "pro.sketchware";
+    private String packageName = "com.ascode.android";
     private boolean autoScroll = true;
     private ArrayList<String> pkgFilterList = new ArrayList<>();
 
@@ -68,7 +68,7 @@ public class LogReaderActivity extends BaseAppCompatActivity {
         binding.logsRecyclerView.setAdapter(new Adapter(new ArrayList<>()));
 
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("pro.sketchware.ACTION_NEW_DEBUG_LOG");
+        intentFilter.addAction("com.ascode.android.ACTION_NEW_DEBUG_LOG");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             registerReceiver(logger, intentFilter, Context.RECEIVER_EXPORTED);
         } else {
@@ -154,12 +154,12 @@ public class LogReaderActivity extends BaseAppCompatActivity {
 
     private void exportLogcat(ArrayList<HashMap<String, Object>> logs) {
         if (logs.isEmpty()) {
-            SketchwareUtil.toastError("Nothing to Export");
+            AscodeUtil.toastError("Nothing to Export");
             return;
         }
         try {
             String fileName = Calendar.getInstance(Locale.ENGLISH).getTimeInMillis() + ".txt";
-            String filePath = Environment.getExternalStorageDirectory() + "/.sketchware/logcat/" + packageName + "/" + fileName;
+            String filePath = Environment.getExternalStorageDirectory() + "/.ascode/logcat/" + packageName + "/" + fileName;
             String stars = "*".repeat(95);
             String blank = " ".repeat(87);
             createNewFileIfNotPresent(filePath);
@@ -190,9 +190,9 @@ public class LogReaderActivity extends BaseAppCompatActivity {
 
             }
             FileUtil.writeFile(filePath, contentBuilder.toString());
-            SketchwareUtil.toast("Logcat exported successfully: " + filePath);
+            AscodeUtil.toast("Logcat exported successfully: " + filePath);
         } catch (Exception ex) {
-            SketchwareUtil.toastError("Something went wrong!");
+            AscodeUtil.toastError("Something went wrong!");
         }
     }
 
@@ -340,7 +340,7 @@ public class LogReaderActivity extends BaseAppCompatActivity {
                         }
                     }
                 } catch (Exception ignored) {
-                    android.util.Log.d("SketchwarePro", "LogReaderActivity: failed to format log entry", ignored);
+                    android.util.Log.d("Ascode", "LogReaderActivity: failed to format log entry", ignored);
                 }
             } else {
                 binding.log.setText(data.get(position).get("logRaw").toString());
@@ -349,7 +349,7 @@ public class LogReaderActivity extends BaseAppCompatActivity {
                 binding.dateHeader.setVisibility(View.GONE);
             }
             binding.getRoot().setOnLongClickListener(v -> {
-                SketchwareUtil.toast("Copied to clipboard");
+                AscodeUtil.toast("Copied to clipboard");
                 ((ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("clipboard", data.get(position).get("logRaw").toString()));
                 return true;
             });

@@ -28,19 +28,6 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install Dependencies
-        run: |
-          pip install requests
-
-      - name: Send a message to Telegram
-        env:
-          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          TOPIC_ID: ${{ secrets.TELEGRAM_TOPIC_ID }}
-        run: |
-          python ./.github/workflows/notify_telegram.py
-        continue-on-error: true
-
   build:
     name: Build APKs
     runs-on: ${{ vars.IS_USING_HOSTED_RUNNERS == 'true' && 'self-hosted' || 'ubuntu-latest' }}
@@ -161,8 +148,8 @@ jobs:
           GH_ABOUT_APP_WORKFLOW_TOKEN: ${{ secrets.GH_ABOUT_APP_WORKFLOW_TOKEN }}
         run: |
           git checkout host
-          git config --global user.name "Sketchware Pro Actions"
-          git config --global user.email "hello@sketchware.pro"
+          git config --global user.name "Android SCode Actions"
+          git config --global user.email "hello@ascode.pro"
           git add about.json
           git commit -m "feat: Update app about screen data"
           git push

@@ -1,4 +1,4 @@
-Copyright ⓒ Sketchware. All Rights Reserved.
+Copyright ⓒ Android SCode. All Rights Reserved.
 
 This application uses Open Source Software (OSS). You can find the source code of these open source projects, along with applicable license information below.
 We are deeply grateful to these developers for their work and contributions.
@@ -66,7 +66,7 @@ We are deeply grateful to these developers for their work and contributions.
 	by mr jorge cruz from cary
 
 
-Libraries added with Sketchware Pro
+Libraries added with Android SCode
 
 * R8
 

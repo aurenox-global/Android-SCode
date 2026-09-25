@@ -1,3 +1,3 @@
 <resources>
-    <style name="Scheme.SketchwarePro.DayNight" parent="Scheme.SketchwarePro.Dark" />
+    <style name="Scheme.Ascode.DayNight" parent="Scheme.Ascode.Dark" />
 </resources>

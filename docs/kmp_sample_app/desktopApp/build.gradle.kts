@@ -15,7 +15,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("pro.sketchware.kmpsample.desktop.MainKt")
+    mainClass.set("com.ascode.android.kmpsample.desktop.MainKt")
 }
 
 tasks.register<Jar>("desktopJar") {
@@ -23,7 +23,7 @@ tasks.register<Jar>("desktopJar") {
     description = "Assembles runnable Desktop JAR including runtime dependencies."
     archiveClassifier.set("desktop")
     manifest {
-        attributes["Main-Class"] = "pro.sketchware.kmpsample.desktop.MainKt"
+        attributes["Main-Class"] = "com.ascode.android.kmpsample.desktop.MainKt"
     }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from(sourceSets.main.get().output)

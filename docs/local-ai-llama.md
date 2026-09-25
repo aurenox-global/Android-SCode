@@ -1,14 +1,14 @@
 # Local AI with llama.cpp
 
-Sketchware Pro now has a local AI layer for offline code assistance. The Java side and JNI bridge are integrated in the app, while GGUF model files stay external and are imported from the device.
+Android SCode now has a local AI layer for offline code assistance. The Java side and JNI bridge are integrated in the app, while GGUF model files stay external and are imported from the device.
 
-## Main Sketchware Pro app
+## Main Android SCode app
 
-- Native library name: `libsketchware_llama.so`
-- Java bridge: `pro.sketchware.ai.LocalAiBridge`
+- Native library name: `libascode_llama.so`
+- Java bridge: `io.ascode.android.LocalAiBridge`
 - Model manager: main drawer > Local AI Manager
 - AI inside the project editor: `Design > AI` tab (agent that modifies the open project)
-- Imported models directory: `/sdcard/.sketchware/ai/models`
+- Imported models directory: `/sdcard/.ascode/ai/models`
 
 Build the native engine with:
 
@@ -22,16 +22,16 @@ By default it builds `arm64-v8a`, which is the right ABI for most modern phones.
 ABIS="arm64-v8a armeabi-v7a x86_64 x86" scripts/build_local_ai_engine.command
 ```
 
-The script downloads `ggml-org/llama.cpp`, compiles `libsketchware_llama.so`, and places one native library per ABI under:
+The script downloads `ggml-org/llama.cpp`, compiles `libascode_llama.so`, and places one native library per ABI under:
 
 ```text
-app/src/main/jniLibs/arm64-v8a/libsketchware_llama.so
-app/src/main/jniLibs/armeabi-v7a/libsketchware_llama.so
-app/src/main/jniLibs/x86/libsketchware_llama.so
-app/src/main/jniLibs/x86_64/libsketchware_llama.so
+app/src/main/jniLibs/arm64-v8a/libascode_llama.so
+app/src/main/jniLibs/armeabi-v7a/libascode_llama.so
+app/src/main/jniLibs/x86/libascode_llama.so
+app/src/main/jniLibs/x86_64/libascode_llama.so
 ```
 
-The native JNI bridge in `app/src/main/cpp/sketchware_llama_jni.cpp` exposes:
+The native JNI bridge in `app/src/main/cpp/ascode_llama_jni.cpp` exposes:
 
 ```text
 nativeLoadModel(String modelPath, int contextSize, int threads) -> long
@@ -57,7 +57,7 @@ The prompt includes the project context (screens, events, variables, file list) 
 ## Model workflow
 
 1. Open `Local AI Manager` from the main drawer.
-2. Tap `Import GGUF` and select a model from any location exposed by the phone's system file picker, including Downloads, SD card, cloud/file-manager providers, or recent files. The import progress bar shows copy percentage while the file is moved into `/sdcard/.sketchware/ai/models`.
+2. Tap `Import GGUF` and select a model from any location exposed by the phone's system file picker, including Downloads, SD card, cloud/file-manager providers, or recent files. The import progress bar shows copy percentage while the file is moved into `/sdcard/.ascode/ai/models`.
 3. The `Model Catalog` tab offers one-tap downloads. The default catalog is tuned for **Qwen3.5-0.8B** (Unsloth, 256K context, reasoning off by default):
    - `Qwen3.5-0.8B-Q8_0.gguf` (812 MB) — recommended for maximum instruction fidelity.
    - `Qwen3.5-0.8B-Q4_K_M.gguf` and `UD-Q4_K_XL` as lighter alternatives.
@@ -68,8 +68,8 @@ The prompt includes the project context (screens, events, variables, file list) 
 Generated APKs and AABs include native libraries from both the project native library folder and enabled local libraries. For a reusable llama.cpp local library, place ABI folders under the local library `jni` directory, for example:
 
 ```text
-/sdcard/.sketchware/libs/local_libs/llama-cpp/jni/arm64-v8a/libllama.so
-/sdcard/.sketchware/libs/local_libs/llama-cpp/jni/arm64-v8a/libggml.so
+/sdcard/.ascode/libs/local_libs/llama-cpp/jni/arm64-v8a/libllama.so
+/sdcard/.ascode/libs/local_libs/llama-cpp/jni/arm64-v8a/libggml.so
 ```
 
 When a generated project contains native libraries with names containing `llama`, `ggml`, or `local_ai`, its generated manifest gets `android:largeHeap="true"` automatically.

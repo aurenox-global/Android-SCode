@@ -11,7 +11,7 @@ import com.besome.sketch.beans.ViewBean;
 import com.besome.sketch.editor.view.ItemView;
 
 import a.a.a.wB;
-import pro.sketchware.R;
+import com.ascode.android.R;
 
 public class ItemSignInButton extends AppCompatButton implements ItemView {
     private final Paint paint;

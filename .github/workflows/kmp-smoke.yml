@@ -4,8 +4,8 @@ on:
   pull_request:
     paths:
       - '.github/workflows/kmp-smoke.yml'
-      - 'app/src/main/java/pro/sketchware/kmp/**'
-      - 'app/src/test/java/pro/sketchware/kmp/**'
+      - 'app/src/main/java/pro/ascode/kmp/**'
+      - 'app/src/test/java/pro/ascode/kmp/**'
       - 'scripts/check_kmp_smoke_workflow.sh'
       - 'docs/kmp_sample_app/**'
       - 'docs/kmp_developer_docs.md'
@@ -20,8 +20,8 @@ on:
       - 'wip/**'
     paths:
       - '.github/workflows/kmp-smoke.yml'
-      - 'app/src/main/java/pro/sketchware/kmp/**'
-      - 'app/src/test/java/pro/sketchware/kmp/**'
+      - 'app/src/main/java/pro/ascode/kmp/**'
+      - 'app/src/test/java/pro/ascode/kmp/**'
       - 'scripts/check_kmp_smoke_workflow.sh'
       - 'docs/kmp_sample_app/**'
       - 'docs/kmp_developer_docs.md'
@@ -50,7 +50,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: KMP unit tests
-        run: ./gradlew :app:testDebugUnitTest --tests "pro.sketchware.kmp.*" --no-daemon
+        run: ./gradlew :app:testDebugUnitTest --tests "com.ascode.android.kmp.*" --no-daemon
 
       - name: KMP smoke workflow (scaffold + compile + package)
         run: bash ./scripts/check_kmp_smoke_workflow.sh

@@ -52,11 +52,11 @@ import a.a.a.MA;
 import mod.hey.studios.util.Helper;
 import mod.jbk.build.BuiltInLibraries;
 import mod.jbk.util.LogUtil;
-import pro.sketchware.R;
-import pro.sketchware.databinding.DialogSelectLibrariesBinding;
-import pro.sketchware.databinding.ManageLibraryExcludeBuiltinLibrariesBinding;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.databinding.DialogSelectLibrariesBinding;
+import com.ascode.android.databinding.ManageLibraryExcludeBuiltinLibrariesBinding;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.AscodeUtil;
 
 public class ExcludeBuiltInLibrariesActivity extends BaseAppCompatActivity {
     private static final String TAG = "ExcludeBuiltInLibraries";
@@ -69,7 +69,7 @@ public class ExcludeBuiltInLibrariesActivity extends BaseAppCompatActivity {
 
     private static File getConfigPath(String sc_id) {
         return new File(Environment.getExternalStorageDirectory(),
-                ".sketchware" + File.separator + "data" + File.separator + sc_id + File.separator + "excluded_library");
+                ".ascode" + File.separator + "data" + File.separator + sc_id + File.separator + "excluded_library");
     }
 
     private static void saveConfig(String sc_id, boolean isExcludingEnabled, List<BuiltInLibraries.BuiltInLibrary> excludedLibraries) {
@@ -223,7 +223,7 @@ public class ExcludeBuiltInLibrariesActivity extends BaseAppCompatActivity {
     }
 
     private void onSaveError(String errorMessage) {
-        SketchwareUtil.toastError(errorMessage);
+        AscodeUtil.toastError(errorMessage);
         h();
     }
 

@@ -26,11 +26,11 @@ import mod.hey.studios.project.ProjectSettings;
 import mod.hey.studios.util.Helper;
 import mod.hilal.saif.android_manifest.AndroidManifestInjector;
 import mod.jbk.build.BuiltInLibraries;
-import pro.sketchware.util.library.BuiltInLibraryManager;
-import pro.sketchware.utility.FilePathUtil;
-import pro.sketchware.utility.FileResConfig;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.xml.XmlBuilder;
+import com.ascode.android.util.library.BuiltInLibraryManager;
+import com.ascode.android.utility.FilePathUtil;
+import com.ascode.android.utility.FileResConfig;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.xml.XmlBuilder;
 
 public class Ix {
     private final BuiltInLibraryManager builtInLibraryManager;
@@ -474,7 +474,7 @@ public class Ix {
             }
         }
         // Always iterate the permissions tracked by FileResConfig (loaded from
-        // .sketchware/data/<sc_id>/permission). The previous FileUtil.isExistFile()
+        // .ascode/data/<sc_id>/permission). The previous FileUtil.isExistFile()
         // gate was redundant: FileResConfig already returns an empty list when the
         // file is missing or empty, and removing the gate guarantees user-added
         // permissions from the Permission Manager always reach the manifest, even
@@ -551,7 +551,7 @@ public class Ix {
             applicationTag.addAttribute("android", "largeHeap", "true");
         }
 
-        String applicationClassName = settings.getValue(ProjectSettings.SETTING_APPLICATION_CLASS, ".SketchApplication");
+        String applicationClassName = settings.getValue(ProjectSettings.SETTING_APPLICATION_CLASS, ".AscodeApplication");
         applicationTag.addAttribute("android", "name", applicationClassName);
         if (addRequestLegacyExternalStorage) {
             applicationTag.addAttribute("android", "requestLegacyExternalStorage", "true");
@@ -744,12 +744,12 @@ public class Ix {
     }
 
     private ArrayList<HashMap<String, Object>> getActivityAttrs() {
-        String activityAttributesPath = FileUtil.getExternalStorageDir().concat("/.sketchware/data/").concat(c.sc_id).concat("/Injection/androidmanifest/attributes.json");
+        String activityAttributesPath = FileUtil.getExternalStorageDir().concat("/.ascode/data/").concat(c.sc_id).concat("/Injection/androidmanifest/attributes.json");
         if (FileUtil.isExistFile(activityAttributesPath)) {
             try {
                 return new Gson().fromJson(FileUtil.readFile(activityAttributesPath), Helper.TYPE_MAP_LIST);
             } catch (Exception ignored) {
-                android.util.Log.d("SketchwarePro", "Ix: Exception ignored", ignored);
+                android.util.Log.d("Ascode", "Ix: Exception ignored", ignored);
             }
         }
         return new ArrayList<>();

@@ -1,6 +1,6 @@
 package com.besome.sketch.editor.manage.library.material3;
 
-import static pro.sketchware.SketchApplication.getContext;
+import static com.ascode.android.AscodeApplication.getContext;
 
 import android.content.Context;
 
@@ -9,8 +9,8 @@ import androidx.annotation.StyleRes;
 import com.besome.sketch.beans.ProjectLibraryBean;
 
 import a.a.a.jC;
-import pro.sketchware.R;
-import pro.sketchware.utility.ThemeUtils;
+import com.ascode.android.R;
+import com.ascode.android.utility.ThemeUtils;
 
 public class Material3LibraryManager {
 
@@ -77,18 +77,18 @@ public class Material3LibraryManager {
     @StyleRes
     public int getViewEditorThemeOverlay() {
         if (!isMaterial3Enabled()) {
-            return R.style.ThemeOverlay_SketchwarePro_ViewEditor;
+            return R.style.ThemeOverlay_Ascode_ViewEditor;
         }
         boolean isDark = canUseNightVariantColors();
 
         if (isDynamicColorsEnabled()) {
             return isDark
-                    ? R.style.ThemeOverlay_SketchwarePro_ViewEditor_Material3_Dark
-                    : R.style.ThemeOverlay_SketchwarePro_ViewEditor_Material3_Light;
+                    ? R.style.ThemeOverlay_Ascode_ViewEditor_Material3_Dark
+                    : R.style.ThemeOverlay_Ascode_ViewEditor_Material3_Light;
         } else {
             return isDark
-                    ? R.style.ThemeOverlay_SketchwarePro_ViewEditor_Material3_NON_DYNAMIC_Dark
-                    : R.style.ThemeOverlay_SketchwarePro_ViewEditor_Material3_NON_DYNAMIC_Light;
+                    ? R.style.ThemeOverlay_Ascode_ViewEditor_Material3_NON_DYNAMIC_Dark
+                    : R.style.ThemeOverlay_Ascode_ViewEditor_Material3_NON_DYNAMIC_Light;
         }
     }
 

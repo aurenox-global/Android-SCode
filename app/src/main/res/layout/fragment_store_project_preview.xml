@@ -55,7 +55,7 @@
                     app:layout_constraintStart_toEndOf="@+id/icon"
                     app:layout_constraintTop_toTopOf="@+id/icon"
                     app:lineHeight="33dp"
-                    tools:text="Sketchware Pro - a new place to create android apps!" />
+                    tools:text="Android SCode - a new place to create android apps!" />
 
                 <TextView
                     android:id="@+id/author"
@@ -89,7 +89,7 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="?attr/textAppearanceBodyMedium"
                     android:textIsSelectable="true"
-                    tools:text="Meet Sketchware Pro v7.0.4!\nFinally, the long-awaited version has been released!" />
+                    tools:text="Meet Android SCode v7.0.4!\nFinally, the long-awaited version has been released!" />
             </com.google.android.material.card.MaterialCardView>
 
             <TextView
@@ -128,7 +128,7 @@
                     android:clipToPadding="false"
                     android:orientation="horizontal"
                     android:paddingHorizontal="24dp"
-                    android:theme="@style/ThemeOverlay.SketchwarePro.Chip.ProjectPreview" />
+                    android:theme="@style/ThemeOverlay.Ascode.Chip.ProjectPreview" />
 
             </HorizontalScrollView>
 
@@ -224,7 +224,7 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="?attr/textAppearanceBodyMedium"
                     android:textIsSelectable="true"
-                    tools:text="Sketchware Pro's sources in Java. Now anyone can contribute to Sketchware Pro." />
+                    tools:text="Android SCode's sources in Java. Now anyone can contribute to Android SCode." />
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
@@ -275,7 +275,7 @@
                 android:singleLine="true"
                 android:textAppearance="?attr/textAppearanceBodyLargeEmphasized"
                 android:textSize="18sp"
-                tools:text="Sketchware Pro - a new place to create android apps!" />
+                tools:text="Android SCode - a new place to create android apps!" />
 
             <TextView
                 android:id="@+id/toolbar_subtitle"

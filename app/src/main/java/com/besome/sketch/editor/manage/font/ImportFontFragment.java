@@ -26,12 +26,12 @@ import a.a.a.jC;
 import a.a.a.oB;
 import a.a.a.qA;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
-import pro.sketchware.databinding.FrManageFontListBinding;
-import pro.sketchware.databinding.ManageFontBinding;
-import pro.sketchware.databinding.ManageFontListItemBinding;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.databinding.FrManageFontListBinding;
+import com.ascode.android.databinding.ManageFontBinding;
+import com.ascode.android.databinding.ManageFontListItemBinding;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.AscodeUtil;
 
 public class ImportFontFragment extends qA {
 
@@ -86,9 +86,9 @@ public class ImportFontFragment extends qA {
             String unavailableMessage = Helper.getResString(R.string.common_message_name_unavailable);
             String unavailableList = String.join(", ", unavailableResourceNames);
             String message = unavailableMessage + "\n[" + unavailableList + "]";
-            SketchwareUtil.toast(message);
+            AscodeUtil.toast(message);
         } else {
-            SketchwareUtil.toast(Helper.getResString(R.string.design_manager_message_import_complete));
+            AscodeUtil.toast(Helper.getResString(R.string.design_manager_message_import_complete));
             projectResourceBeans.addAll(newResourceBeans);
             adapter.notifyDataSetChanged();
         }
@@ -141,7 +141,7 @@ public class ImportFontFragment extends qA {
                     importFont(resourceBean.resFullName, getResourceFilePath(resourceBean));
                     oB.c(resourceBean.resFullName);
                 } catch (Exception ignored) {
-                    android.util.Log.d("SketchwarePro", "ImportFontFragment: failed to import font", ignored);
+                    android.util.Log.d("Ascode", "ImportFontFragment: failed to import font", ignored);
                 }
             }
         }
@@ -217,14 +217,14 @@ public class ImportFontFragment extends qA {
             adapter.notifyDataSetChanged();
             toggleEmptyStateVisibility();
             ((ManageFontActivity) requireActivity()).collectionFontsFragment.loadProjectResources();
-            SketchwareUtil.toast(Helper.getResString(R.string.design_manager_message_add_complete));
+            AscodeUtil.toast(Helper.getResString(R.string.design_manager_message_add_complete));
         } else if (requestCode == 272 && resultCode == Activity.RESULT_OK) {
             resourceBean = intent.getParcelableExtra("resource_bean");
             projectResourceBeans.set(adapter.selectedPosition, resourceBean);
             adapter.notifyDataSetChanged();
             toggleEmptyStateVisibility();
             ((ManageFontActivity) requireActivity()).collectionFontsFragment.loadProjectResources();
-            SketchwareUtil.toast(Helper.getResString(R.string.design_manager_message_edit_complete));
+            AscodeUtil.toast(Helper.getResString(R.string.design_manager_message_edit_complete));
         }
 
     }
@@ -261,7 +261,7 @@ public class ImportFontFragment extends qA {
 
                 setSelectingMode(false);
                 toggleEmptyStateVisibility();
-                SketchwareUtil.toast(Helper.getResString(R.string.common_message_complete_delete));
+                AscodeUtil.toast(Helper.getResString(R.string.common_message_complete_delete));
                 ((ManageFontActivity) requireActivity()).changeFabState(true);
             }
         });
@@ -357,7 +357,7 @@ public class ImportFontFragment extends qA {
             try {
                 holder.binding.tvFontPreview.setTypeface(Typeface.createFromFile(fontPath));
             } catch (Exception ignored) {
-                android.util.Log.d("SketchwarePro", "ImportFontFragment: failed to render font preview", ignored);
+                android.util.Log.d("Ascode", "ImportFontFragment: failed to render font preview", ignored);
             }
         }
 

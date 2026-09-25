@@ -7,11 +7,11 @@ import java.io.PrintStream;
 import kellinwood.logging.LogManager;
 import kellinwood.logging.Logger;
 import mod.jbk.util.LogUtil;
-import pro.sketchware.utility.FileUtil;
+import com.ascode.android.utility.FileUtil;
 
 public class SystemLogPrinter {
 
-    private static final String PATH = FileUtil.getExternalStorageDir().concat("/.sketchware/debug.txt");
+    private static final String PATH = FileUtil.getExternalStorageDir().concat("/.ascode/debug.txt");
     private static PrintStream ps;
 
     public static void start() {

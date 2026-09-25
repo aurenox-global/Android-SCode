@@ -7,14 +7,14 @@ import java.util.HashMap;
 import a.a.a.ProjectBuilder;
 import mod.hey.studios.util.Helper;
 import mod.jbk.build.BuildProgressReceiver;
-import pro.sketchware.utility.FileUtil;
+import com.ascode.android.utility.FileUtil;
 
 public class StringfogHandler {
 
     private final String config_path;
 
     public StringfogHandler(String sc_id) {
-        config_path = FileUtil.getExternalStorageDir().concat("/.sketchware/data/" + sc_id + "/stringfog");
+        config_path = FileUtil.getExternalStorageDir().concat("/.ascode/data/" + sc_id + "/stringfog");
 
         if (!FileUtil.isExistFile(config_path)) FileUtil.writeFile(config_path, getDefaultConfig());
     }

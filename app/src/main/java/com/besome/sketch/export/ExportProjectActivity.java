@@ -61,14 +61,14 @@ import mod.jbk.build.BuiltInLibraries;
 import mod.jbk.build.compiler.bundle.AppBundleCompiler;
 import mod.jbk.export.GetKeyStoreCredentialsDialog;
 import mod.jbk.util.TestkeySignBridge;
-import pro.sketchware.R;
-import pro.sketchware.keystore.CompilePreferences;
-import pro.sketchware.keystore.KeystoreStore;
-import pro.sketchware.metrics.BuildMetricsStore;
+import com.ascode.android.R;
+import com.ascode.android.keystore.CompilePreferences;
+import com.ascode.android.keystore.KeystoreStore;
+import com.ascode.android.metrics.BuildMetricsStore;
 import com.android.apksig.ApkVerifier;
-import pro.sketchware.utility.FilePathUtil;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.utility.FilePathUtil;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.AscodeUtil;
 
 public class ExportProjectActivity extends BaseAppCompatActivity {
 
@@ -81,15 +81,15 @@ public class ExportProjectActivity extends BaseAppCompatActivity {
 
     private final oB file_utility = new oB();
     /**
-     * /sketchware/signed_apk
+     * /ascode/signed_apk
      */
     private String signed_apk_postfix;
     /**
-     * /sketchware/export_src
+     * /ascode/export_src
      */
     private String export_src_postfix;
     /**
-     * /sdcard/sketchware/export_src
+     * /sdcard/ascode/export_src
      */
     private String export_src_full_path;
     private String export_src_filename;
@@ -276,7 +276,7 @@ public class ExportProjectActivity extends BaseAppCompatActivity {
         }
         sign_apk_loading_anim.setVisibility(View.GONE);
         sign_apk_output_path.setText(signed_apk_postfix + File.separator + filePath);
-        SketchwareUtil.toast(Helper.getResString(R.string.sign_apk_title_export_apk_file));
+        AscodeUtil.toast(Helper.getResString(R.string.sign_apk_title_export_apk_file));
     }
 
     private void exportSrc() {
@@ -353,8 +353,8 @@ public class ExportProjectActivity extends BaseAppCompatActivity {
             }
 
             ArrayList<String> toExclude = new ArrayList<>();
-            if (!new File(new FilePathUtil().getPathJava(sc_id) + File.separator + "SketchApplication.java").exists()) {
-                toExclude.add("SketchApplication.java");
+            if (!new File(new FilePathUtil().getPathJava(sc_id) + File.separator + "AscodeApplication.java").exists()) {
+                toExclude.add("AscodeApplication.java");
             }
             toExclude.add("DebugActivity.java");
 
@@ -365,7 +365,7 @@ public class ExportProjectActivity extends BaseAppCompatActivity {
             runOnUiThread(() -> {
                 Log.e("ProjectExporter", "While trying to export project's sources: "
                         + e.getMessage(), e);
-                SketchwareUtil.showAnErrorOccurredDialog(this, Log.getStackTraceString(e));
+                AscodeUtil.showAnErrorOccurredDialog(this, Log.getStackTraceString(e));
                 export_source_output_stage.setVisibility(View.GONE);
                 export_source_loading_anim.setVisibility(View.GONE);
                 export_source_button.setVisibility(View.VISIBLE);
@@ -568,9 +568,9 @@ public class ExportProjectActivity extends BaseAppCompatActivity {
     }
 
     private void initializeOutputDirectories() {
-        signed_apk_postfix = File.separator + "sketchware" + File.separator + "signed_apk";
-        export_src_postfix = File.separator + "sketchware" + File.separator + "export_src";
-        /* /sdcard/sketchware/signed_apk */
+        signed_apk_postfix = File.separator + "ascode" + File.separator + "signed_apk";
+        export_src_postfix = File.separator + "ascode" + File.separator + "export_src";
+        /* /sdcard/ascode/signed_apk */
         String signed_apk_full_path = wq.s() + File.separator + "signed_apk";
         export_src_full_path = wq.s() + File.separator + "export_src";
 
@@ -661,7 +661,7 @@ public class ExportProjectActivity extends BaseAppCompatActivity {
 
                 publishProgress(Helper.getResString(R.string.design_run_title_ready_to_build));
                 oB oBVar = new oB();
-                /* Check if /Internal storage/sketchware/signed_apk/ exists */
+                /* Check if /Internal storage/ascode/signed_apk/ exists */
                 if (!oBVar.e(wq.o())) {
                     /* Doesn't exist yet, let's create it */
                     oBVar.f(wq.o());
@@ -818,7 +818,7 @@ public class ExportProjectActivity extends BaseAppCompatActivity {
 
                     String createdBundlePath = AppBundleCompiler.getDefaultAppBundleOutputFile(project_metadata).getAbsolutePath();
                     String signedAppBundleDirectoryPath = FileUtil.getExternalStorageDir()
-                            + File.separator + "sketchware"
+                            + File.separator + "ascode"
                             + File.separator + "signed_aab";
                     FileUtil.makeDir(signedAppBundleDirectoryPath);
                     String outputPath = signedAppBundleDirectoryPath + File.separator +
@@ -884,11 +884,11 @@ public class ExportProjectActivity extends BaseAppCompatActivity {
                 failedWithError = true;
                 if (throwable instanceof LoadKeystoreException &&
                         "Incorrect password, or integrity check failed.".equals(throwable.getMessage())) {
-                    activity.get().runOnUiThread(() -> SketchwareUtil.showAnErrorOccurredDialog(activity.get(),
+                    activity.get().runOnUiThread(() -> AscodeUtil.showAnErrorOccurredDialog(activity.get(),
                             "Either an incorrect password was entered, or your key store is corrupt."));
                 } else {
                     Log.e("AppExporter", throwable.getMessage(), throwable);
-                    activity.get().runOnUiThread(() -> SketchwareUtil.showAnErrorOccurredDialog(activity.get(),
+                    activity.get().runOnUiThread(() -> AscodeUtil.showAnErrorOccurredDialog(activity.get(),
                             Log.getStackTraceString(throwable)));
                 }
 
@@ -985,7 +985,7 @@ public class ExportProjectActivity extends BaseAppCompatActivity {
             activity.get().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             // Dismiss the ProgressDialog
             activity.get().i();
-            SketchwareUtil.showAnErrorOccurredDialog(activity.get(), str);
+            AscodeUtil.showAnErrorOccurredDialog(activity.get(), str);
             activity.get().sign_apk_output_stage.setVisibility(View.GONE);
             LottieAnimationView loading_sign_apk = this.loading_sign_apk.get();
             if (loading_sign_apk.isAnimating()) {
@@ -1013,7 +1013,7 @@ public class ExportProjectActivity extends BaseAppCompatActivity {
         private File getBuiltResultFile() {
             if (buildingAppBundle) {
                 File aab = new File(Environment.getExternalStorageDirectory(),
-                        "sketchware" + File.separator + "signed_aab" + File.separator
+                        "ascode" + File.separator + "signed_aab" + File.separator
                                 + getCorrectResultFilename(project_metadata.projectName + ".aab"));
                 return aab.exists() ? aab : null;
             }

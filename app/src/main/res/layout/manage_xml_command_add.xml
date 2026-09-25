@@ -45,7 +45,7 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/input_xml_name"
-                style="@style/Widget.SketchwarePro.TextInputLayout.ExposedDropdownMenu"
+                style="@style/Widget.Ascode.TextInputLayout.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="4dp">
@@ -73,7 +73,7 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/input_command"
-                style="@style/Widget.SketchwarePro.TextInputLayout.ExposedDropdownMenu"
+                style="@style/Widget.Ascode.TextInputLayout.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="4dp">

@@ -30,7 +30,7 @@ import a.a.a.mv;
 import a.a.a.nv;
 import mod.hey.studios.util.Helper;
 import mod.jbk.editor.manage.library.LibrarySettingsImporter;
-import pro.sketchware.R;
+import com.ascode.android.R;
 
 public class FirebaseActivity extends BaseAppCompatActivity implements View.OnClickListener {
     private static final int STEP_1 = 0;

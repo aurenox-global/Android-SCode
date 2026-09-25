@@ -28,9 +28,9 @@ Objetivo de iteracion: dejar un baseline ejecutable para Q1 y un plan tecnico po
 
 ### L1 - LSP real
 Archivos de arranque:
-- app/src/main/java/pro/sketchware/lsp/LspClientFactory.java
-- app/src/main/java/pro/sketchware/lsp/NoOpLspClient.java
-- app/src/main/java/pro/sketchware/featureflags/FeatureFlags.java
+- app/src/main/java/pro/ascode/lsp/LspClientFactory.java
+- app/src/main/java/pro/ascode/lsp/NoOpLspClient.java
+- app/src/main/java/pro/ascode/featureflags/FeatureFlags.java
 
 Tareas iniciales:
 - Implementar factory con proveedor real y fallback.
@@ -39,9 +39,9 @@ Tareas iniciales:
 
 ### D1 - JDWP real
 Archivos de arranque:
-- app/src/main/java/pro/sketchware/debugger/jdwp/JdwpDebugSessionManager.java
-- app/src/main/java/pro/sketchware/debugger/jdwp/NoOpJdwpBridge.java
-- app/src/main/java/pro/sketchware/debugger/variables/NoOpJdwpVariableInspectorTransport.java
+- app/src/main/java/pro/ascode/debugger/jdwp/JdwpDebugSessionManager.java
+- app/src/main/java/pro/ascode/debugger/jdwp/NoOpJdwpBridge.java
+- app/src/main/java/pro/ascode/debugger/variables/NoOpJdwpVariableInspectorTransport.java
 
 Tareas iniciales:
 - Definir contrato de conexion/sesion real.
@@ -60,9 +60,9 @@ Tareas iniciales:
 
 ### S1 - seguridad plugins
 Archivos de arranque:
-- app/src/main/java/pro/sketchware/plugins/manifest/PluginManifestVerifier.java
-- app/src/main/java/pro/sketchware/plugins/security/NoOpPluginSignatureValidator.java
-- app/src/main/java/pro/sketchware/plugins/security/vulnerability/NoOpPluginDependencyVulnerabilityScanAdapter.java
+- app/src/main/java/pro/ascode/plugins/manifest/PluginManifestVerifier.java
+- app/src/main/java/pro/ascode/plugins/security/NoOpPluginSignatureValidator.java
+- app/src/main/java/pro/ascode/plugins/security/vulnerability/NoOpPluginDependencyVulnerabilityScanAdapter.java
 
 Tareas iniciales:
 - Definir backend de firma y formato soportado.
@@ -71,7 +71,7 @@ Tareas iniciales:
 
 ### M1 - migracion KMP + iOS asistido
 Archivos de arranque:
-- app/src/main/java/pro/sketchware/kmp/KmpMigrationAssistantWorkflow.java
+- app/src/main/java/pro/ascode/kmp/KmpMigrationAssistantWorkflow.java
 - docs/kmp_functional_plan.md
 
 Tareas iniciales:

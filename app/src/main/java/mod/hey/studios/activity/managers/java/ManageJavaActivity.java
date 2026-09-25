@@ -35,15 +35,15 @@ import dev.pranav.filepicker.FilePickerDialogFragment;
 import dev.pranav.filepicker.FilePickerOptions;
 import mod.hey.studios.code.SrcCodeEditor;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
-import pro.sketchware.databinding.DialogCreateNewFileLayoutBinding;
-import pro.sketchware.databinding.DialogInputLayoutBinding;
-import pro.sketchware.databinding.ManageFileBinding;
-import pro.sketchware.databinding.ManageJavaItemHsBinding;
-import pro.sketchware.utility.FilePathUtil;
-import pro.sketchware.utility.FileResConfig;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.databinding.DialogCreateNewFileLayoutBinding;
+import com.ascode.android.databinding.DialogInputLayoutBinding;
+import com.ascode.android.databinding.ManageFileBinding;
+import com.ascode.android.databinding.ManageJavaItemHsBinding;
+import com.ascode.android.utility.FilePathUtil;
+import com.ascode.android.utility.FileResConfig;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.AscodeUtil;
 
 public class ManageJavaActivity extends BaseAppCompatActivity {
 
@@ -192,7 +192,7 @@ public class ManageJavaActivity extends BaseAppCompatActivity {
             Button positiveButton = ((androidx.appcompat.app.AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE);
             positiveButton.setOnClickListener(view -> {
                 if (Helper.getText(inputText).isEmpty()) {
-                    SketchwareUtil.toastError("Invalid file name");
+                    AscodeUtil.toastError("Invalid file name");
                     return;
                 }
 
@@ -217,17 +217,17 @@ public class ManageJavaActivity extends BaseAppCompatActivity {
                 } else if (checkedChipId == R.id.chip_folder) {
                     FileUtil.makeDir(new File(current_path, name).getAbsolutePath());
                     refresh();
-                    SketchwareUtil.toast("Folder was created successfully");
+                    AscodeUtil.toast("Folder was created successfully");
                     dialog.dismiss();
                     return;
                 } else {
-                    SketchwareUtil.toast("Select a file type");
+                    AscodeUtil.toast("Select a file type");
                     return;
                 }
 
                 FileUtil.writeFile(new File(current_path, name + extension).getAbsolutePath(), newFileContent);
                 refresh();
-                SketchwareUtil.toast("File was created successfully");
+                AscodeUtil.toast("File was created successfully");
                 dialog.dismiss();
             });
 
@@ -283,7 +283,7 @@ public class ManageJavaActivity extends BaseAppCompatActivity {
                     if (frc.getJavaManifestList().contains(filesAdapter.getFullName(position))) {
                         frc.getJavaManifestList().remove(filesAdapter.getFullName(position));
                         FileUtil.writeFile(fpu.getManifestJava(sc_id), new Gson().toJson(frc.listJavaManifest));
-                        SketchwareUtil.toast("NOTE: Removed Activity from manifest");
+                        AscodeUtil.toast("NOTE: Removed Activity from manifest");
                     }
 
                     if (renameOccurrencesCheckBox.isChecked()) {
@@ -294,7 +294,7 @@ public class ManageJavaActivity extends BaseAppCompatActivity {
 
                 FileUtil.renameFile(filesAdapter.getItem(position), new File(current_path, Helper.getText(inputText)).getAbsolutePath());
                 refresh();
-                SketchwareUtil.toast("Renamed successfully");
+                AscodeUtil.toast("Renamed successfully");
             }
             dialogInterface.dismiss();
         }).create();
@@ -325,7 +325,7 @@ public class ManageJavaActivity extends BaseAppCompatActivity {
 
             FileUtil.deleteFile(filesAdapter.getItem(position));
             refresh();
-            SketchwareUtil.toast("Deleted successfully");
+            AscodeUtil.toast("Deleted successfully");
         }).setNegativeButton(R.string.common_word_cancel, null).create().show();
     }
 
@@ -496,27 +496,27 @@ public class ManageJavaActivity extends BaseAppCompatActivity {
                     case "Add as Activity to manifest" -> {
                         frc.getJavaManifestList().add(getFullName(position));
                         FileUtil.writeFile(fpu.getManifestJava(sc_id), new Gson().toJson(frc.listJavaManifest));
-                        SketchwareUtil.toast("Successfully added " + getFileNameWoExt(position) + " as Activity to AndroidManifest");
+                        AscodeUtil.toast("Successfully added " + getFileNameWoExt(position) + " as Activity to AndroidManifest");
                     }
                     case "Remove Activity from manifest" -> {
                         if (frc.getJavaManifestList().remove(getFullName(position))) {
                             FileUtil.writeFile(fpu.getManifestJava(sc_id), new Gson().toJson(frc.listJavaManifest));
-                            SketchwareUtil.toast("Successfully removed Activity " + getFileNameWoExt(position) + " from AndroidManifest");
+                            AscodeUtil.toast("Successfully removed Activity " + getFileNameWoExt(position) + " from AndroidManifest");
                         } else {
-                            SketchwareUtil.toast("Activity was not defined in AndroidManifest.");
+                            AscodeUtil.toast("Activity was not defined in AndroidManifest.");
                         }
                     }
                     case "Add as Service to manifest" -> {
                         frc.getServiceManifestList().add(getFullName(position));
                         FileUtil.writeFile(fpu.getManifestService(sc_id), new Gson().toJson(frc.listServiceManifest));
-                        SketchwareUtil.toast("Successfully added " + getFileNameWoExt(position) + " as Service to AndroidManifest");
+                        AscodeUtil.toast("Successfully added " + getFileNameWoExt(position) + " as Service to AndroidManifest");
                     }
                     case "Remove Service from manifest" -> {
                         if (frc.getServiceManifestList().remove(getFullName(position))) {
                             FileUtil.writeFile(fpu.getManifestService(sc_id), new Gson().toJson(frc.listServiceManifest));
-                            SketchwareUtil.toast("Successfully removed Service " + getFileNameWoExt(position) + " from AndroidManifest");
+                            AscodeUtil.toast("Successfully removed Service " + getFileNameWoExt(position) + " from AndroidManifest");
                         } else {
-                            SketchwareUtil.toast("Service was not defined in AndroidManifest.");
+                            AscodeUtil.toast("Service was not defined in AndroidManifest.");
                         }
                     }
                     case "Edit" -> goEditFile(position);

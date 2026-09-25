@@ -20,7 +20,7 @@ import io.github.rosemoe.sora.langs.java.JavaLanguage;
 import io.github.rosemoe.sora.text.CharPosition;
 import io.github.rosemoe.sora.text.ContentReference;
 import io.github.rosemoe.sora.widget.SymbolPairMatch;
-import pro.sketchware.SketchApplication;
+import com.ascode.android.AscodeApplication;
 
 /**
  * Variante del lenguaje Java del editor que ademas ofrece autocompletado con los simbolos del
@@ -179,7 +179,7 @@ public class ProjectJavaLanguage implements Language {
         if (alreadyAdded >= MAX_ITEMS) {
             return;
         }
-        android.content.Context context = SketchApplication.getContext();
+        android.content.Context context = AscodeApplication.getContext();
         if (context == null) {
             return;
         }

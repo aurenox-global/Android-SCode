@@ -10,8 +10,8 @@ import com.besome.sketch.lib.base.BaseAppCompatActivity;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
-import pro.sketchware.databinding.ManageLibraryManageCompatBinding;
+import com.ascode.android.R;
+import com.ascode.android.databinding.ManageLibraryManageCompatBinding;
 
 public class ManageCompatActivity extends BaseAppCompatActivity implements View.OnClickListener {
 

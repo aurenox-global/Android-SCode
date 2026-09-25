@@ -12,8 +12,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import pro.sketchware.utility.FilePathUtil;
-import pro.sketchware.utility.FileUtil;
+import com.ascode.android.utility.FilePathUtil;
+import com.ascode.android.utility.FileUtil;
 
 /**
  * Indice ligero de simbolos del proyecto (clases, metodos y campos) con su ubicacion, para el

@@ -15,8 +15,8 @@ import java.util.Objects;
 
 import a.a.a.jq;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.xml.XmlBuilder;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.xml.XmlBuilder;
 
 public class AppCompatInjection {
 
@@ -39,7 +39,7 @@ public class AppCompatInjection {
         String toParse;
 
         File injectionFile = new File(Environment.getExternalStorageDirectory(),
-                ".sketchware/data/" + sc_id + "/injection/appcompat/" + activityFilename);
+                ".ascode/data/" + sc_id + "/injection/appcompat/" + activityFilename);
         String fileContent;
         if (injectionFile.exists() && !(fileContent = FileUtil.readFile(injectionFile.getAbsolutePath())).isEmpty()) {
             toParse = fileContent;

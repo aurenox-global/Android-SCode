@@ -18,7 +18,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import a.a.a.jC;
 import a.a.a.mB;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
+import com.ascode.android.R;
 
 public class MakeBlockActivity extends BaseAppCompatActivity {
 

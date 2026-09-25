@@ -23,10 +23,10 @@ import a.a.a.oB;
 import a.a.a.qA;
 import a.a.a.wq;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
-import pro.sketchware.databinding.FrManageFontListBinding;
-import pro.sketchware.databinding.ManageFontBinding;
-import pro.sketchware.databinding.ManageFontListItemBinding;
+import com.ascode.android.R;
+import com.ascode.android.databinding.FrManageFontListBinding;
+import com.ascode.android.databinding.ManageFontBinding;
+import com.ascode.android.databinding.ManageFontListItemBinding;
 
 public class FontManagerFragment extends qA {
 
@@ -198,7 +198,7 @@ public class FontManagerFragment extends qA {
             try {
                 holder.binding.tvFontPreview.setTypeface(Typeface.createFromFile(fontPath));
             } catch (Exception ignored) {
-                android.util.Log.d("SketchwarePro", "FontManagerFragment: Exception ignored", ignored);
+                android.util.Log.d("Ascode", "FontManagerFragment: Exception ignored", ignored);
             }
         }
 

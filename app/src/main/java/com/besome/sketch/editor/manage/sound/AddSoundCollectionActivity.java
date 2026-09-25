@@ -29,8 +29,8 @@ import a.a.a.uq;
 import a.a.a.wq;
 import a.a.a.yy;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
-import pro.sketchware.databinding.ManageSoundAddBinding;
+import com.ascode.android.R;
+import com.ascode.android.databinding.ManageSoundAddBinding;
 
 public class AddSoundCollectionActivity extends BaseDialogActivity implements View.OnClickListener {
 
@@ -344,7 +344,7 @@ public class AddSoundCollectionActivity extends BaseDialogActivity implements Vi
                     binding.edInput.setText(a.substring(lastIndexOf + 1, lastIndexOf2));
                 }
             } catch (Exception ignored) {
-                android.util.Log.d("SketchwarePro", "AddSoundCollectionActivity: failed to extract sound name", ignored);
+                android.util.Log.d("Ascode", "AddSoundCollectionActivity: failed to extract sound name", ignored);
             }
         } catch (Exception e) {
             L = false;

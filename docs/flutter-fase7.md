@@ -1,4 +1,4 @@
-# Fase 7 — Flutter experimental en Sketchware Pro (v7.0.7.0)
+# Fase 7 — Flutter experimental en Android SCode (v7.0.7.0)
 
 **Versión:** v7.0.7.0 · versionCode **161** · Fecha: 2026-09-23
 **Fuente principal de los datos técnicos:** `flutter-e2e/INFORME-E2E.md` (prueba real sobre emulador), junto con los
@@ -17,7 +17,7 @@ mínimo y el móvil descarga y usa su propio toolchain para compilar. Todo es **
 | Área | Qué hay ahora |
 |---|---|
 | **Editor** | Gramática TextMate de Dart (del proyecto Dart-Code, licencia MIT) + `language-configuration.json` + entrada en `textmate/languages.json` + `SCOPE_NAME_DART` + `ProjectDartLanguage` (autocompletado de Dart) + ramas `.dart` en `SrcCodeEditor` + icono `ic_flutter`. |
-| **Proyecto** | Paquete `pro/sketchware/flutter/` (`FlutterProject`, `Store`, `Serializer`, `ScaffoldTemplates`, `ScaffoldInitializer`): siembra `pubspec.yaml`, `lib/main.dart` (Material 3, contador), `assets/`, `.gitignore`, `android/` y `project.json` bajo `files/flutter/` del proyecto. |
+| **Proyecto** | Paquete `pro/ascode/flutter/` (`FlutterProject`, `Store`, `Serializer`, `ScaffoldTemplates`, `ScaffoldInitializer`): siembra `pubspec.yaml`, `lib/main.dart` (Material 3, contador), `assets/`, `.gitignore`, `android/` y `project.json` bajo `files/flutter/` del proyecto. |
 | **Feature flag** | `FLUTTER_EXPERIMENTAL_ENABLE` en **Ajustes › Feature flags**, **apagado por defecto**. Con el flag apagado no se siembra nada ni aparece nada en el editor. |
 | **Menú Flutter** | En el editor: *Flutter: compilar y ejecutar*, *Flutter: estado del toolchain*, *Flutter: información del proyecto*; al compilar se elige modo *Debug (JIT)* o *Release (AOT)*. |
 | **Toolchain on-device** | Descarga al propio móvil el Dart SDK para Android (paquete `dart 3.13.4`, `.deb` del repo de Termux) y los artefactos del engine de Flutter 3.47.5 (embedding + `libflutter.so` + `flutter_patched_sdk` + fuentes del framework). Parser **ar** propio, XZ (`org.tukaani:xz:1.10`) y lector **tar** propio. |
@@ -196,7 +196,7 @@ I flutter : Using the Impeller rendering backend (OpenGLES).
 ## 9. Estado honesto de esta fase
 
 - La prueba E2E se hizo con **scripts equivalentes al pipeline** (`build_apk.sh`, `build_apk_jit.sh`), no ejecutando
-  la app Sketchware Pro.
+  la app Android SCode.
 - La implementación dentro de la app (carriles A/B2/C: editor, scaffold, toolchain, bridge) **no se ha compilado ni
   ejecutado** en un dispositivo: el host de desarrollo no tiene un SDK de Android usable para esos carriles y
   **Gradle está prohibido** en este trabajo. La verificación fue relectura de imports, firmas cruzadas contra el repo

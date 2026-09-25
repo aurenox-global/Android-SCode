@@ -1,7 +1,7 @@
 package mod.hilal.saif.activities.android_manifest;
 
-import static pro.sketchware.utility.GsonUtils.getGson;
-import static pro.sketchware.utility.SketchwareUtil.getDip;
+import static com.ascode.android.utility.GsonUtils.getGson;
+import static com.ascode.android.utility.AscodeUtil.getDip;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -22,12 +22,12 @@ import java.util.HashMap;
 import mod.hey.studios.code.SrcCodeEditor;
 import mod.hey.studios.util.Helper;
 import mod.remaker.view.CustomAttributeView;
-import pro.sketchware.R;
-import pro.sketchware.databinding.ActivityManageCustomAttributeBinding;
-import pro.sketchware.databinding.CustomDialogAttributeBinding;
-import pro.sketchware.databinding.DialogCreateNewFileLayoutBinding;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.ThemeUtils;
+import com.ascode.android.R;
+import com.ascode.android.databinding.ActivityManageCustomAttributeBinding;
+import com.ascode.android.databinding.CustomDialogAttributeBinding;
+import com.ascode.android.databinding.DialogCreateNewFileLayoutBinding;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.ThemeUtils;
 
 public class AndroidManifestInjectionDetails extends BaseAppCompatActivity {
 
@@ -51,7 +51,7 @@ public class AndroidManifestInjectionDetails extends BaseAppCompatActivity {
             activityName = getIntent().getStringExtra("file_name").replaceAll(".java", "");
             type = getIntent().getStringExtra("type");
         }
-        ATTRIBUTES_FILE_PATH = FileUtil.getExternalStorageDir().concat("/.sketchware/data/").concat(src_id).concat("/Injection/androidmanifest/attributes.json");
+        ATTRIBUTES_FILE_PATH = FileUtil.getExternalStorageDir().concat("/.ascode/data/").concat(src_id).concat("/Injection/androidmanifest/attributes.json");
         setupConst();
         setToolbar();
         setupViews();

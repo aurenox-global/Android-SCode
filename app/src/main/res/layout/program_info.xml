@@ -20,7 +20,7 @@
         android:layout_height="72dp"
         android:layout_marginStart="20dp"
         android:layout_marginTop="8dp"
-        android:src="@drawable/sketch_app_icon"
+        android:src="@drawable/ascode_app_icon"
         app:shapeAppearance="?attr/shapeAppearanceCornerLarge"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar" />
@@ -30,7 +30,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:text="@string/title_sketchware"
+        android:text="@string/title_ascode"
         android:textAppearance="?attr/textAppearanceHeadlineSmall"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/app_icon"

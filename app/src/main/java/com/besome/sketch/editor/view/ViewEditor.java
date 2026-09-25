@@ -62,10 +62,10 @@ import a.a.a.wq;
 import mod.agus.jcoderz.beans.ViewBeans;
 import mod.hey.studios.util.ProjectFile;
 import mod.jbk.util.LogUtil;
-import pro.sketchware.R;
-import pro.sketchware.utility.ThemeUtils;
-import pro.sketchware.widgets.IconCustomWidget;
-import pro.sketchware.widgets.WidgetsCreatorManager;
+import com.ascode.android.R;
+import com.ascode.android.utility.ThemeUtils;
+import com.ascode.android.widgets.IconCustomWidget;
+import com.ascode.android.widgets.WidgetsCreatorManager;
 
 @SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
 public class ViewEditor extends RelativeLayout implements View.OnClickListener, View.OnTouchListener {
@@ -744,7 +744,7 @@ public class ViewEditor extends RelativeLayout implements View.OnClickListener, 
                     countItems[viewBean.type] = intValue;
                 }
             } catch (NumberFormatException ignored) {
-                android.util.Log.d("SketchwarePro", "ViewEditor: NumberFormatException ignored", ignored);
+                android.util.Log.d("Ascode", "ViewEditor: NumberFormatException ignored", ignored);
             }
         }
         itemView.setOnTouchListener(this);
@@ -1129,7 +1129,7 @@ public class ViewEditor extends RelativeLayout implements View.OnClickListener, 
 
         public void setPaletteGroup(PaletteGroup group) {
             imgGroup.setImageResource(group == PaletteGroup.BASIC ?
-                    R.drawable.selector_palette_tab_ic_sketchware :
+                    R.drawable.selector_palette_tab_ic_ascode :
                     R.drawable.selector_palette_tab_ic_bookmark);
             setOnClickListener(this);
         }

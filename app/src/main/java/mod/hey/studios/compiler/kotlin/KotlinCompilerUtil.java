@@ -8,16 +8,16 @@ import java.util.List;
 
 import a.a.a.ProjectBuilder;
 import a.a.a.yq;
-import pro.sketchware.utility.FilePathUtil;
+import com.ascode.android.utility.FilePathUtil;
 
 public class KotlinCompilerUtil {
 
     /**
      * Returns whether there are any .kt files in
      * <p>
-     * > .sketchware/mysc/xxx/app/src/main/java,
-     * > .sketchware/mysc/xxx/gen,
-     * > .sketchware/data/xxx/files/java
+     * > .ascode/mysc/xxx/app/src/main/java,
+     * > .ascode/mysc/xxx/gen,
+     * > .ascode/data/xxx/files/java
      * <p>
      * or not.
      */
@@ -41,17 +41,17 @@ public class KotlinCompilerUtil {
         String scId = workspace.sc_id;
         List<File> mFilesToCompile = new ArrayList<>();
 
-        // .sketchware/mysc/xxx/app/src/main/java
+        // .ascode/mysc/xxx/app/src/main/java
         mFilesToCompile.addAll(getSourceFiles(
                 new File(workspace.javaFilesPath)
         ));
 
-        // .sketchware/mysc/xxx/gen
+        // .ascode/mysc/xxx/gen
         mFilesToCompile.addAll(getSourceFiles(
                 new File(workspace.rJavaDirectoryPath)
         ));
 
-        // .sketchware/data/xxx/files/java
+        // .ascode/data/xxx/files/java
         mFilesToCompile.addAll(getSourceFiles(
                 new File(new FilePathUtil().getPathJava(scId))
         ));
@@ -61,7 +61,7 @@ public class KotlinCompilerUtil {
 
     /**
      * Returns a list of available kotlin compiler plugins (.jar)
-     * found in `/.sketchware/data/xxx/files/kt_plugins` dir.
+     * found in `/.ascode/data/xxx/files/kt_plugins` dir.
      */
     static List<File> getCompilerPlugins(yq workspace) {
         String scId = workspace.sc_id;

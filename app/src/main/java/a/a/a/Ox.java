@@ -32,15 +32,15 @@ import java.util.regex.Pattern;
 import dev.aldi.sayuti.editor.injection.AppCompatInjection;
 import mod.agus.jcoderz.beans.ViewBeans;
 import mod.jbk.util.LogUtil;
-import pro.sketchware.managers.inject.InjectRootLayoutManager;
-import pro.sketchware.utility.InjectAttributeHandler;
-import pro.sketchware.utility.ScaleTypeCompat;
-import pro.sketchware.xml.XmlBuilder;
+import com.ascode.android.managers.inject.InjectRootLayoutManager;
+import com.ascode.android.utility.InjectAttributeHandler;
+import com.ascode.android.utility.ScaleTypeCompat;
+import com.ascode.android.xml.XmlBuilder;
 
 @SuppressLint("RtlHardcoded")
 public class Ox {
 
-    private static final String TAG = "SketchwarePro";
+    private static final String TAG = "Ascode";
 
     private final jq buildConfig;
     private final InjectRootLayoutManager rootManager;

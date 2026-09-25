@@ -1,6 +1,6 @@
 # KMP Developer Docs
 
-This guide documents the Kotlin Multiplatform experimental flow used in Sketchware Pro and includes a versioned sample project.
+This guide documents the Kotlin Multiplatform experimental flow used in Android SCode and includes a versioned sample project.
 
 ## Scope
 
@@ -14,8 +14,8 @@ This guide documents the Kotlin Multiplatform experimental flow used in Sketchwa
 - Path: `docs/kmp_sample_app`
 - Modules: `shared`, `androidApp`, `desktopApp`
 - Shared logic entry points:
-  - `shared/src/commonMain/kotlin/pro/sketchware/kmpsample/Platform.kt`
-  - `shared/src/commonMain/kotlin/pro/sketchware/kmpsample/GeneratedPlatformBindings.kt`
+  - `shared/src/commonMain/kotlin/pro/ascode/kmpsample/Platform.kt`
+  - `shared/src/commonMain/kotlin/pro/ascode/kmpsample/GeneratedPlatformBindings.kt`
 
 ## Build The Sample
 

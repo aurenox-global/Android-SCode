@@ -1,8 +1,8 @@
 # La vista previa de diseños vuelve a pintar (v7.0.8.2)
 
-Fecha: 2026-09-23 · Versión: **v7.0.8.2** (versionCode 164) · Repo: `Sketchware-Pro-main`
+Fecha: 2026-09-23 · Versión: **v7.0.8.2** (versionCode 164) · Repo: `Android-SCode-main`
 
-Release: <https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.8.2>
+Release: <https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.8.2>
 
 Arreglo del **centinela `0xffffff`** en la vista previa de diseños (layouts) hechos con elementos View: el IDE
 aplicaba como color real el valor con el que su propio modelo de datos dice "aquí no hay color elegido", así que la
@@ -111,7 +111,7 @@ Bugs secundarios encontrados en la misma ruta (todos producían pantallas mudas)
 ## 6. Ronda 2 (v7.0.8.3)
 
 Fecha: 2026-09-23 · Versión: **v7.0.8.3** (versionCode 165) · Release:
-<https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.8.3>
+<https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.8.3>
 
 Los defectos y el arreglo de la ronda 1 están descritos arriba (secciones 1–5) y **no se repiten aquí**. Esta ronda
 cierra tres cabos que seguían abiertos en la misma ruta de la vista previa. Todo medido **píxel a píxel** sobre
@@ -180,7 +180,7 @@ Medidas sobre esta captura (`44_test_light_B_magenta.png`, en `preview-evidence/
 ## 7. Ronda 3 (v7.0.9.0)
 
 Fecha: 2026-09-23 · Versión: **v7.0.9.0** (versionCode 166) · Release:
-<https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.9.0>
+<https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.9.0>
 
 Cuatro síntomas distintos, **cuatro causas raíz distintas**, todas reproducidas y medidas **píxel a píxel** sobre un
 emulador arm64 API 34. «Antes» es el build de la ronda 2 (v7.0.8.2/164).
@@ -268,7 +268,7 @@ El detalle completo (método, XML de los casos, evidencia cruda) está en `previ
 ## 8. Ronda 4 (v7.0.10.0)
 
 Fecha: 2026-09-24 · Versión: **v7.0.10.0** (versionCode 167) · Release:
-<https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.10.0>
+<https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.10.0>
 
 Las rondas 1-3 están arriba (secciones 1-7) y **no se repiten aquí**. Esta ronda arregla un fallo real de resolución
 de recursos, hace útil el aviso de «vista previa parcial» y corrige una lectura equivocada del mensaje. Todo medido
@@ -301,17 +301,17 @@ rotos + 1 vista no instanciable):
 ### 8.2 El fallo real: la vista previa no miraba las librerías del proyecto
 
 `ResourceCompiler` enlaza los recursos de las librerías con `aapt2` (`-R`): los AAR locales que
-`DependencyResolver` descomprime en `.sketchware/libs/local_libs/<lib>/` (paths `resPath` del JSON
+`DependencyResolver` descomprime en `.ascode/libs/local_libs/<lib>/` (paths `resPath` del JSON
 `files/local_library`, gestionados por `ManageLocalLibrary`) y las librerías integradas del IDE ya extraídas
 (`BuiltInLibraries.getLibraryResourcesPath()` → `<filesDir>/libs/libs/<lib>/res`). **La vista previa no miraba
 ninguna de las dos.**
 
 `ProjectResourceResolver` ahora indexa y busca (recursivo, solo `drawable*`/`mipmap*` dentro de `res/`) en el JSON
-`files/local_library` (`resPath`/`assetsPath` + `.sketchware/libs/local_libs/<name>/{res,assets}`), en la ruta heredada
+`files/local_library` (`resPath`/`assetsPath` + `.ascode/libs/local_libs/<name>/{res,assets}`), en la ruta heredada
 `<proyecto>/files/library/res` (+ `library/assets`) y en las librerías integradas ya extraídas.
 
 Probado con un **fixture de librería local** (`testlib` con
-`.sketchware/libs/local_libs/testlib/res/drawable/ic_tune_white.xml`, registrada en el JSON del proyecto):
+`.ascode/libs/local_libs/testlib/res/drawable/ic_tune_white.xml`, registrada en el JSON del proyecto):
 
 | caso | Antes | Después |
 | --- | --- | --- |
@@ -344,9 +344,9 @@ corto. `@mipmap/ic_launcher` y el nombre inexistente siguen en rojo, como debe s
 | `res/drawable*` del proyecto | No | `ls` del proyecto en el dispositivo |
 | Recursos del IDE (APK debug) | **No** | `unzip -l …apk \| grep -i tune` → solo `ic_mtrl_tune.xml` y `ic_tune_24.xml` |
 | AAR de Material (`material-1.13.0`) | No | 84 entradas `res/drawable*`, ninguna `*tune*` |
-| `OldResourceIdMapper` (ids viejos de Sketchware) | El id viejo `2131166544` → `R.drawable.ic_mtrl_tune` | `app/src/main/java/mod/jbk/util/OldResourceIdMapper.java:1297` |
+| `OldResourceIdMapper` (ids viejos de Android SCode) | El id viejo `2131166544` → `R.drawable.ic_mtrl_tune` | `app/src/main/java/mod/jbk/util/OldResourceIdMapper.java:1297` |
 
-**Conclusión honesta:** `ic_tune_white` es un **nombre heredado** (la vieja Sketchware usaba `ic_*_white`; el id
+**Conclusión honesta:** `ic_tune_white` es un **nombre heredado** (la vieja Android SCode usaba `ic_*_white`; el id
 viejo `2131166544` se mapea hoy a `ic_mtrl_tune`), **no un drawable de este IDE**, así que ese nombre concreto **no se
 puede dibujar**. Ahora la barra lo dice claro y se marca **solo el recurso**, sin marcar la vista entera. Lo que **sí**
 era un fallo real y queda arreglado es 8.2: si el nombre existe en una **librería del proyecto**, ahora se resuelve.
@@ -380,9 +380,9 @@ Todas salen con **`Preview OK`**, sin avisos.
   de `assets/libs/libs.zip` del propio APK (copiar 26 MB a caché en cada preview no compensa); tras la primera
   compilación del proyecto esos `res/` se extraen y entonces sí se resuelven.
 - **`@mipmap/ic_launcher`**: vive en el proyecto de compilación generado
-  (`.sketchware/mysc/<scId>/app/src/main/res/mipmap-*`), que no es una fuente de recursos de diseño (podría mostrar
+  (`.ascode/mysc/<scId>/app/src/main/res/mipmap-*`), que no es una fuente de recursos de diseño (podría mostrar
   recursos obsoletos de la última compilación); no se ha añadido.
-- **Nombres heredados** de Sketchware que el IDE ya no incluye: **no hay renombrado automático** en la preview (existe
+- **Nombres heredados** de Android SCode que el IDE ya no incluye: **no hay renombrado automático** en la preview (existe
   `OldResourceIdMapper`, pero solo se usa para el selector de icono de app; un alias por nombre sería adivinar).
 - Siguen en pie los pendientes de las rondas 1-3 (selector/ripple/layer-list aproximados, vectores con `<group>`/
   degradados, `.9.png` sin parches, `?atributo` con el tema del IDE, Material3 sin probar, nada en móvil físico).
@@ -393,7 +393,7 @@ El detalle completo (método, XML de los casos, evidencia cruda) está en `previ
 
 ### 9.1 Nombres heredados de iconos (`ic_tune_white` y familia)
 
-El diseño real usa `@drawable/ic_tune_white`, un nombre heredado de una Sketchware vieja, y la vista previa lo marcaba
+El diseño real usa `@drawable/ic_tune_white`, un nombre heredado de una Android SCode vieja, y la vista previa lo marcaba
 en rojo. El mensaje ya era correcto y se mantiene; lo nuevo es una **red de último recurso**: si el nombre heredado **se
 puede mapear sin ambigüedad** a un icono que el IDE **sí** tiene, se dibuja ese icono y **el aviso lo explica** (nunca
 se sustituye en silencio).
@@ -450,7 +450,7 @@ color/estilos/fondos/imágenes/`MaterialButton`+WebView/layout real siguen en `P
 
 ## 10. Ronda 6 (v7.0.10.2)
 
-Release: <https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.10.2> · Fecha: 2026-09-24
+Release: <https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.10.2> · Fecha: 2026-09-24
 Dispositivo: emulador `emulator-5554` (`sdk_gphone64_arm64`, arm64-v8a, API 34) · Build del IDE: **release real**
 (`minifyEnabled = true`, R8). Evidencia: `preview-evidence/r6/` (`release/` antes, `final/` despues, `debug/`,
 `logcat_crudo_antes.txt`, `r6.diff`).
@@ -505,7 +505,7 @@ descriptores aparecen en `classes*.dex`). Lo que rompia era el **constructor que
   `no hay constructor usable con Context: faltan ...`,
   `el constructor <init>(...) fallo: IllegalArgumentException: ...`. Cuando cae al constructor de inflado lo deja
   trazado en el log:
-  `I SketchwarePro: InvokeUtil: <clase> creada con <init>(Context, AttributeSet) (el de 1 argumento no esta en el APK)`.
+  `I Ascode: InvokeUtil: <clase> creada con <init>(Context, AttributeSet) (el de 1 argumento no esta en el APK)`.
   Probado por separado con `com.airbnb.lottie.LottieAnimationView` (fuera de los paquetes con `-keep`, solo
   `(Context, AttributeSet)` en el dex): **la cadena funciona sola** (`caseR6_fallback.xml`,
   `final/after_R6_fallback.png`).
@@ -611,7 +611,7 @@ Tambien comprobado en **debug** con el arreglo: `debug_R6_ten` → `Preview PARC
 
 ## 11. Ronda 7 (v7.0.10.3)
 
-Release: <https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.10.3> · Fecha: 2026-09-24
+Release: <https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.10.3> · Fecha: 2026-09-24
 Dispositivo: emulador `emulator-5554` (`sdk_gphone64_arm64`, arm64-v8a, API 34) · Build del IDE: **release real**
 (`minifyEnabled = true`, R8). Evidencia: `preview-evidence/r7/` (`before_*`, `after2_*`, `reg7/`, `r7.diff`,
 `measure7.py`).
@@ -657,7 +657,7 @@ lo ataca de raiz, en el generador y en los proyectos ya existentes, no solo en l
    (detectado por `convert` o por `type == 43`) el XML sale siempre con `centerCrop`, y si el `inject` trae un
    `scaleType` escrito a mano no admitido, se sanea antes de volcarlo y se deja traza en el log. El resto de widgets
    de imagen conservan el comportamiento historico.
-2. **Clase nueva `pro.sketchware.utility.ScaleTypeCompat`** (logica pura, sin Android, para poder probarla en JVM):
+2. **Clase nueva `com.ascode.android.utility.ScaleTypeCompat`** (logica pura, sin Android, para poder probarla en JVM):
    traduccion XML↔enum en los dos sentidos, deteccion del widget, valor soportado, ajuste e idempotencia
    (`adjustEnum(adjustEnum(x)) == adjustEnum(x)`) y saneado del `inject`. **60 comprobaciones en JVM, 0 fallos.**
 3. **Normalizacion de proyectos ya existentes en cuatro puntos:** al **compilar/generar** (`Ox`), al **leer XML**
@@ -729,7 +729,7 @@ esta aislado: basta devolver `FIT_CENTER` como valor por defecto en `parseScaleT
 
 ## 12. Ronda 8 (v7.0.10.4)
 
-Release: <https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.10.4> · Fecha: 2026-09-24
+Release: <https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.10.4> · Fecha: 2026-09-24
 Dispositivo: emulador `emulator-5554` (`sdk_gphone64_arm64`, arm64-v8a, API 34, densidad 2.75) · Build del IDE:
 **debug** (`:app:assembleDebug`, arm64-v8a) · Baseline «antes»: **release** pre-cambio (rondas 1-7) sobre los MISMOS
 XML. Evidencia: `preview-evidence/r8/` (`pre8_*`, `after_*`, `dark_pre8_*`, `dark_after_*`, `reg8/`, `reg8b/`,
@@ -756,7 +756,7 @@ sin ningún color en la vista previa.
 
 | # | Cambio | Fichero |
 |---|---|---|
-| 1 | **Appliers compartidos** (`TabLayout`, `CircleImageView`, `MaterialButton`, `CardView`) extraídos del editor de diseño: un solo sitio para los dos motores | **NUEVO** `pro/sketchware/utility/WidgetInjectApplier.java` |
+| 1 | **Appliers compartidos** (`TabLayout`, `CircleImageView`, `MaterialButton`, `CardView`) extraídos del editor de diseño: un solo sitio para los dos motores | **NUEVO** `pro/ascode/utility/WidgetInjectApplier.java` |
 | 2 | `applyInjectAttributes` reescrito: familias + **aplicador genérico por tipo de vista** (TextView, ImageView, Progress/Seek/Rating, CompoundButton, ListView/GridView/Spinner, BottomNavigationView, TextInputLayout, Calendar/Date/TimePicker, SearchView, LinearLayout…) + **último recurso por reflexión** (`app:loQueSea` → `setLoQueSea`) | `LayoutPreviewActivity.java` |
 | 3 | Lo que NO se aplica → **aviso ámbar con el motivo**, nunca más un descarte mudo | `LayoutPreviewActivity.java` |
 | 4 | `@dimen`/`@color`/`@drawable`/`?attr` resueltos también en estos atributos: nuevo `resolveDimen()` (dimens.xml del proyecto, `@android:dimen/`, dp/sp/px) | `activities/preview/ProjectResourceResolver.java` |
@@ -846,7 +846,7 @@ falso**, porque la fuente la aplica `applyTextTypeface`. Se marcaron `fontFamily
 
 ## 13. Ronda 9 (v7.0.10.5)
 
-Release: <https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.10.5> · Fecha: 2026-09-24
+Release: <https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.10.5> · Fecha: 2026-09-24
 Dispositivo: emulador `RV_API34` (`sdk_gphone64_arm64`, arm64-v8a, API 34, `adb root`) · Build del IDE:
 **debug** (`:app:assembleDebug`, arm64-v8a) · Evidencia: `preview-evidence/r9a/` y `preview-evidence/r9b/`.
 
@@ -854,8 +854,8 @@ La ronda 9 va en **dos piezas**: la primera (r9a) quita el rojo mal pintado y re
 proyecto; la segunda (r9b) aplica de verdad `android:theme` y `app:tabTextAppearance`. Dos ficheros tocados en
 total, ninguno más (ni README/web/docs, ni `versionCode`/`versionName`):
 
-- `app/src/main/java/pro/sketchware/activities/preview/LayoutPreviewActivity.java`
-- `app/src/main/java/pro/sketchware/activities/preview/ProjectResourceResolver.java`
+- `app/src/main/java/pro/ascode/activities/preview/LayoutPreviewActivity.java`
+- `app/src/main/java/pro/ascode/activities/preview/ProjectResourceResolver.java`
 
 ### 13.1 Pieza A (r9a): regla nueva — rojo solo si la vista NO se puede dibujar
 
@@ -991,9 +991,9 @@ Ningún caso que diera `Preview OK` ha dejado de darlo; los que ya eran parciale
 
 ## 14. Ronda 10 (v7.0.11.0)
 
-Fecha: 2026-09-24 · Versión: **v7.0.11.0** (versionCode 173) · Repo: `Sketchware-Pro-main`
+Fecha: 2026-09-24 · Versión: **v7.0.11.0** (versionCode 173) · Repo: `Android-SCode-main`
 
-Release: <https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.11.0>
+Release: <https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.11.0>
 
 Tres piezas de la vista previa de diseños (iconos, estilos del proyecto y constructores que R8 borraba en release) y,
 además, el toolchain de Flutter para **x86_64** (§14.7). Ficheros tocados por los tres bloques de preview:
@@ -1006,7 +1006,7 @@ además, el toolchain de Flutter para **x86_64** (§14.7). Ficheros tocados por 
   **2.191 nombres × 5 estilos (`baseline`, `outline`, `round`, `sharp`, `twotone`) = 10.955 SVG**, en
   `svg/<nombre>/<estilo>.svg`. El selector (`ImportIconActivity`) los llama `icon_<nombre>_<estilo>` y guarda el
   elegido **convertido a vector XML** (`SvgUtils.convert`) en el **almacén de imágenes del proyecto**
-  `.sketchware/resources/images/<sc_id>/<nombre>.xml` — **no** en `files/resource/drawable`.
+  `.ascode/resources/images/<sc_id>/<nombre>.xml` — **no** en `files/resource/drawable`.
 - **Qué fallaba.** La vista previa no miraba ni ese almacén, ni el `res` generado del build, ni el zip del set del IDE
   (no es un `res/drawable` del APK del editor: `getIdentifier()` no lo ve) → los iconos salían en **rojo**
   (`2 recursos no encontrados`).
@@ -1026,7 +1026,7 @@ además, el toolchain de Flutter para **x86_64** (§14.7). Ficheros tocados por 
 
 - **Ruta real.** Lo que edita el usuario es `files/resource/values/styles.xml` (y variantes `value/`, `values-v21`,
   `values-night`); lo que **compila aapt2** es el `res` GENERADO del build
-  `.sketchware/mysc/<sc_id>/app/src/main/res/values/styles.xml`. Y, si el proyecto no tiene el fichero en disco, el IDE
+  `.ascode/mysc/<sc_id>/app/src/main/res/values/styles.xml`. Y, si el proyecto no tiene el fichero en disco, el IDE
   lo **genera** (`yq.getXMLStyle()`), incluyendo en las ramas Material3/AppCompat los **autocerrados**
   `AppTheme.AppBarOverlay` y `AppTheme.PopupOverlay` — justo los dos que el IDE inyecta en los widgets
   (`AppCompatInjection.getDefaultActivityInjections()`) y los que se veían como «no presentes».
@@ -1130,15 +1130,15 @@ hay imagen x86_64 disponible y compilar/ejecutar en Apple Silicon es inviable. D
 
 ## 15. Ronda 11 (v7.0.12.0)
 
-Fecha: 2026-09-24 · Versión: **v7.0.12.0** (versionCode 174) · Repo: `Sketchware-Pro-main`
+Fecha: 2026-09-24 · Versión: **v7.0.12.0** (versionCode 174) · Repo: `Android-SCode-main`
 
-Release: <https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.12.0>
+Release: <https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.12.0>
 
 Tres piezas de la vista previa de diseños: el botón **Copiar** del diálogo de avisos (petición del usuario), la
 causa confirmada de "no veo los colores" (**el permiso de almacenamiento**) con su arreglo, y una **segunda causa
 real** medida (`colors.xml` solo se leía de `values/`). Ficheros tocados:
-`app/src/main/java/pro/sketchware/activities/preview/LayoutPreviewActivity.java` (+221) y
-`app/src/main/java/pro/sketchware/activities/preview/ProjectResourceResolver.java` (+72); **261 inserciones y 32
+`app/src/main/java/pro/ascode/activities/preview/LayoutPreviewActivity.java` (+221) y
+`app/src/main/java/pro/ascode/activities/preview/ProjectResourceResolver.java` (+72); **261 inserciones y 32
 borrados** en total. Todo se volvió a comprobar después en el **APK release (R8)** (§15.4).
 
 | El diálogo de avisos, con el botón **Copiar** | Con el permiso denegado: línea y barra en **ámbar** |
@@ -1170,7 +1170,7 @@ shell **no** es posible en API 34: `cmd clipboard` responde *"No shell command i
 **Contenido del texto copiado** (autosuficiente, se entiende sin la app): cabecera `Vista previa · <layout>`, la
 línea `Estado:` (vistas dibujadas · recursos no encontrados · vistas aproximadas · atributos no aplicados ·
 estilos/medidas no aplicados), un bloque por causa con su recuento y **cada** elemento con su motivo, la línea
-`Drawables buscados en: …`, las notas explicativas y la firma `— Sketchware Pro · vista previa de disenos`.
+`Drawables buscados en: …`, las notas explicativas y la firma `— Android SCode · vista previa de disenos`.
 
 ### 15.2 Causa confirmada (con prueba): el permiso de almacenamiento
 
@@ -1188,8 +1188,8 @@ Con el permiso denegado, logcat confirma la causa raíz (no es una suposición):
 ```
 warning: recurso no resuelto [colores]: @color/color_proyecto (no esta en files/resource/values/colors.xml)
 warning: recurso no resuelto [drawables/imagenes]: @drawable/r8_anillo (buscado en: 2 carpetas drawable* ...)
-E MediaProvider: Permission to access file: /storage/emulated/0/.sketchware/mysc/list/601/project is denied
-E ERROR: /storage/emulated/0/.sketchware/mysc/list/601/project: open failed: EACCES (Permission denied)
+E MediaProvider: Permission to access file: /storage/emulated/0/.ascode/mysc/list/601/project is denied
+E ERROR: /storage/emulated/0/.ascode/mysc/list/601/project: open failed: EACCES (Permission denied)
 ```
 
 => **Sin el permiso, los colores `@color/` del proyecto y los iconos desaparecen y la vista previa se queda con
@@ -1203,14 +1203,14 @@ valores por defecto, en silencio.** (Además la app no puede leer ni el fichero 
 2. **La barra de estado** ya no se pinta roja por culpa del permiso: con el permiso ausente va en **ámbar** y añade
    `· falta el permiso de almacenamiento (Acceso a todos los archivos)`. Con el permiso concedido se comporta
    **exactamente** como antes (rojo solo si faltan recursos de verdad): regresión intacta.
-3. **Diálogo "Permiso de almacenamiento" antes de dibujar**: si la app no puede leer `.sketchware`, sale un diálogo
-   con **Conceder** (abre los ajustes de "Acceso a todos los archivos" de `pro.sketchware` vía
+3. **Diálogo "Permiso de almacenamiento" antes de dibujar**: si la app no puede leer `.ascode`, sale un diálogo
+   con **Conceder** (abre los ajustes de "Acceso a todos los archivos" de `com.ascode.android` vía
    `FileUtil.requestAllFilesAccessPermission` → `com.android.settings.spa.SpaActivity`) y **Ahora no**. No bloquea el
    dibujado: sin permiso se dibuja igual, pero ya no en silencio.
 
 **Relectura al volver.** Al cambiar el permiso se reconstruye el `ProjectResourceResolver` (que cacheaba "no pude
 leer nada" y no se recuperaba sin reiniciar la app). Verificado por log:
-`info: permiso de almacenamiento concedido: se releen los recursos del proyecto (.sketchware) en la siguiente
+`info: permiso de almacenamiento concedido: se releen los recursos del proyecto (.ascode) en la siguiente
 previsualizacion`, seguido de `Preview OK`. Con permiso: **373.070 px exactos, mismo bbox** que antes de los cambios.
 
 ### 15.3 Segunda causa real: los colores del proyecto (el `colors.xml` del `res` generado)
@@ -1220,12 +1220,12 @@ colores": sin permiso la app no puede leer ni el fichero del proyecto (`mysc/lis
 la lista de proyectos estaría vacía. Por eso se fue también a la otra vía y **se encontró un fallo real y medido**:
 
 `ensureColorsLoaded()` leía **solo** `files/resource/values/colors.xml`. Nunca miraba `value/`, `values-v21`,
-`values-night` **ni el `res` generado del build** (`.sketchware/mysc/<sc_id>/app/src/main/res/value*`) — justo las
+`values-night` **ni el `res` generado del build** (`.ascode/mysc/<sc_id>/app/src/main/res/value*`) — justo las
 rutas que sí se arreglaron en `styles.xml` en la ronda 9a. Y en el proyecto 601 el `res` generado define colores que
 la app **sí** tiene:
 
 ```xml
-<!-- .sketchware/mysc/601/app/src/main/res/values/colors.xml -->
+<!-- .ascode/mysc/601/app/src/main/res/values/colors.xml -->
 <color name="colorPrimary">#007FAC</color>  (colorPrimaryDark, colorAccent, colorControlHighlight, colorControlNormal)
 ```
 
@@ -1273,8 +1273,8 @@ el texto exacto del informe, que depende del fixture):
   realmente ausentes (`caseD` → barra roja `Preview PARCIAL: 20 recursos no encontrados`).
 
 **Nota de herramienta** (útil para futuras rondas): tras conceder por el toggle de Ajustes, `appops get` deja **dos
-entradas** (`Uid mode: allow` + entrada de paquete `deny`); `appops set pro.sketchware … deny` **no** deniega (gana
-el uid mode), hay que usar `appops set --uid pro.sketchware MANAGE_EXTERNAL_STORAGE deny`.
+entradas** (`Uid mode: allow` + entrada de paquete `deny`); `appops set com.ascode.android … deny` **no** deniega (gana
+el uid mode), hay que usar `appops set --uid com.ascode.android MANAGE_EXTERNAL_STORAGE deny`.
 
 ### 15.5 Pendientes honestos de la ronda 11
 
@@ -1296,11 +1296,11 @@ el uid mode), hay que usar `appops set --uid pro.sketchware MANAGE_EXTERNAL_STOR
 
 ## 16. Ronda 12 (v7.0.13.0)
 
-Fecha: 2026-09-24 · Versión: **v7.0.13.0** (versionCode 175) · Repo: `Sketchware-Pro-main`
+Fecha: 2026-09-24 · Versión: **v7.0.13.0** (versionCode 175) · Repo: `Android-SCode-main`
 
-Release: <https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.13.0>
+Release: <https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.13.0>
 
-Un bug **heredado del Sketchware Pro original**: los colores elegidos en el editor se escribían en el XML con el
+Un bug **heredado del Android SCode original**: los colores elegidos en el editor se escribían en el XML con el
 **alfa a cero** (`#00RRGGBB` = **transparente**), así que no se veían **ni en la vista previa ni en la app compilada**
 — y encima la app decía *"Preview OK"*. Fichero tocado: `app/src/main/java/a/a/a/Ox.java` (**4 inserciones / 4
 borrados**; **no** se tocó `formatColor`). Se verificó en el **APK release (R8)** con el **flujo real** (editor →
@@ -1389,7 +1389,7 @@ cumplen tras el arreglo: opaco → **6 dígitos** (`#2196F3`); translúcido (alf
 ### 16.4 Medición: antes → después (release, flujo real)
 
 `./gradlew :app:assembleRelease` → **BUILD SUCCESSFUL in 4m 45s**; APK nuevo instalado con `adb install -r` →
-`Success`; `dumpsys package pro.sketchware` → `flags=0x0`, **no debuggable** (`versionName=v7.0.12.0`, es la base
+`Success`; `dumpsys package com.ascode.android` → `flags=0x0`, **no debuggable** (`versionName=v7.0.12.0`, es la base
 sobre la que se construyó la ronda). El flujo se hizo **desde el editor** (se arrastró un `TextView` dentro del
 `LinearLayout` verde → `textview1`, con `#F44336`), se guardó y se abrió la **preview en vivo**.
 
@@ -1471,9 +1471,9 @@ Recuentos de vistas `Preview OK · vistas: 4` (caseA), `5` (caseC) y `2` (caseE)
 
 ## 17. Ronda A (v7.0.14.0)
 
-Fecha: 2026-09-24 · Versión: **v7.0.14.0** (versionCode 176) · Repo: `Sketchware-Pro-main`
+Fecha: 2026-09-24 · Versión: **v7.0.14.0** (versionCode 176) · Repo: `Android-SCode-main`
 
-Release: <https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.14.0>
+Release: <https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.14.0>
 
 La ronda que pedía el dueño del fork era una sola frase: *al compilar, poder elegir APK o AAB y firmarlo con su
 propia firma de una sola vez*. Se hizo en tres carriles (A1: gestor de keystores + firma; A2: build on-device + APK y
@@ -1495,7 +1495,7 @@ Recon previo (`sw-features-recon.md`), todo **verificado** en código (fichero:l
   llamadas de `AppSettings` (`:241`, `:246`) iban con **`useTestkey=true` hardcodeado**. Con un keystore propio
   guardado, la herramienta **ni lo miraba**. Medido: el APK resultante verificaba con `a40da80a…`, la testkey AOSP.
 - **El diálogo de firma del Export** (mismo widget para APK y AAB) asumía **ruta fija**
-  (`/storage/emulated/0/sketchware/keystore/release_key.jks`, `wq.j()`), **no tenía campo de ruta** y tenía **un solo
+  (`/storage/emulated/0/ascode/keystore/release_key.jks`, `wq.j()`), **no tenía campo de ruta** y tenía **un solo
   campo de contraseña**: `GetKeyStoreCredentialsDialog` construía `new Credentials(alg, etPassword, etAlias,
   etPassword)` → la misma contraseña para keystore y para alias. Un `.jks` real (contraseñas distintas, lo normal de
   `keytool`) **no se podía usar**; si el fichero no estaba en la ruta fija: toast "Keystore not found" y el diálogo
@@ -1511,9 +1511,9 @@ Recon previo (`sw-features-recon.md`), todo **verificado** en código (fichero:l
 
 ### 17.2 Gestor de keystores (nuevo)
 
-`pro/sketchware/security/SecurePrefs.java` (extrae el patrón `EncryptedSharedPreferences` + `MasterKey` AES256_GCM
-que ya usaba el IDE en `pro/sketchware/ai/AiSecretStore`, con fallback si el cifrado no está disponible) y
-`pro/sketchware/keystore/KeystoreStore.java`:
+`pro/ascode/security/SecurePrefs.java` (extrae el patrón `EncryptedSharedPreferences` + `MasterKey` AES256_GCM
+que ya usaba el IDE en `pro/ascode/ai/AiSecretStore`, con fallback si el cifrado no está disponible) y
+`pro/ascode/keystore/KeystoreStore.java`:
 
 - copia el `.jks` al **almacenamiento privado de la app** (`filesDir/keystores/<id>.jks`, **no** `/sdcard`, que es
   legible por cualquiera) y guarda alias + contraseña de store + contraseña de clave + algoritmo, cifrados;
@@ -1550,7 +1550,7 @@ y para AAB** (idéntico, mismo widget):
 
 ```
 'Saved keystore'
-'/data/user/0/pro.sketchware/files/keystores/ks_…jks'     et_keystore_path
+'/data/user/0/com.ascode.android/files/keystores/ks_…jks'     et_keystore_path
 'StorePass123'                                            et_store_password
 'myalias'                                                 et_alias
 'KeyPass456'                                              et_password
@@ -1568,7 +1568,7 @@ copiar nada a `release_key.jks`.
 - `mod/alucard/tn/apksigner/ApkSigner.java`: `signWithKeyStore(...)` deja de usar el **CLI** de apksig y usa la **API
   programática** (cargador agnóstico de tipo + `com.android.apksig.ApkSigner`, V1+V2+V3). Esto arregla de golpe dos
   fallos de §17.6: Android no puede abrir un JKS real con `getInstance("JKS")`, y el CLI llama a `System.exit()` al
-  fallar → **mataba Sketchware** (`System.exit called, status: 2` → `Process pro.sketchware has died`).
+  fallar → **mataba Android SCode** (`System.exit called, status: 2` → `Process com.ascode.android has died`).
 - Al terminar, la app **muestra el certificado resultante** (subject + SHA-256) leyendo el APK firmado con
   `ApkVerifier`.
 
@@ -1696,8 +1696,8 @@ Encontrados **midiendo**, no leyendo, y **todos** corregidos y verificados en el
 3. **`NEXT` se salía de la pantalla** cuando el formulario mostraba todos los campos (defecto heredado del diálogo
    de A1 que la fila nueva empeoraba): arreglado acotando la altura y desplazando arriba.
 4. **Pulsar `Install` mataba la app** (`IllegalArgumentException: Failed to find configured root that contains
-   /storage/emulated/0/sketchware/signed_apk/…`): el `FileProvider` solo exponía `.sketchware/` → añadida la ruta
-   `sketchware/signed_apk/` a `provider_paths.xml`.
+   /storage/emulated/0/ascode/signed_apk/…`): el `FileProvider` solo exponía `.ascode/` → añadida la ruta
+   `ascode/signed_apk/` a `provider_paths.xml`.
 5. **Se ofrecía instalar un APK sin firmar**: el botón `Install` ahora solo aparece si el resultado está firmado
    (más el foco/teclado, que ya solo aparece cuando hay que escribir).
 

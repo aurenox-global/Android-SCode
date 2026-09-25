@@ -82,7 +82,7 @@ Attach build logs, Desktop artifact path, and JVM run output.
 
 - [ ] Update docs/kmp_phase7_epic_issue_checklist.md if scope changed.
 - [ ] Update docs/kmp_phase7_sprint_board.md if estimate changed.
-- [ ] Update docs/sketchware_pro_improvement_backlog.md milestone status.
+- [ ] Update docs/ascode_pro_improvement_backlog.md milestone status.
 
 ## KMP-206: Unified build report and artifact index
 
@@ -156,7 +156,7 @@ Attach one successful and one partial-failure report sample.
 
 - [ ] Update docs/kmp_phase7_epic_issue_checklist.md if scope changed.
 - [ ] Update docs/kmp_phase7_sprint_board.md if estimate changed.
-- [ ] Update docs/sketchware_pro_improvement_backlog.md milestone status.
+- [ ] Update docs/ascode_pro_improvement_backlog.md milestone status.
 
 ## KMP-301: Add block scope metadata model
 
@@ -230,7 +230,7 @@ Attach migration summary and round-trip fixture results.
 
 - [ ] Update docs/kmp_phase7_epic_issue_checklist.md if scope changed.
 - [ ] Update docs/kmp_phase7_sprint_board.md if estimate changed.
-- [ ] Update docs/sketchware_pro_improvement_backlog.md milestone status.
+- [ ] Update docs/ascode_pro_improvement_backlog.md milestone status.
 
 ## KMP-302: Implement target compatibility validator in editor
 
@@ -304,7 +304,7 @@ Attach screenshots or logs for warnings and rule coverage summary.
 
 - [ ] Update docs/kmp_phase7_epic_issue_checklist.md if scope changed.
 - [ ] Update docs/kmp_phase7_sprint_board.md if estimate changed.
-- [ ] Update docs/sketchware_pro_improvement_backlog.md milestone status.
+- [ ] Update docs/ascode_pro_improvement_backlog.md milestone status.
 
 ## KMP-303: Implement expect/actual generator from block contracts
 
@@ -378,7 +378,7 @@ Attach generated file list and compile logs for Android and Desktop smoke sample
 
 - [ ] Update docs/kmp_phase7_epic_issue_checklist.md if scope changed.
 - [ ] Update docs/kmp_phase7_sprint_board.md if estimate changed.
-- [ ] Update docs/sketchware_pro_improvement_backlog.md milestone status.
+- [ ] Update docs/ascode_pro_improvement_backlog.md milestone status.
 
 ## KMP-304: Add initial template catalog seed (logger, key-value, clock)
 
@@ -451,7 +451,7 @@ Attach template test output and generated sample code snapshot.
 
 - [ ] Update docs/kmp_phase7_epic_issue_checklist.md if scope changed.
 - [ ] Update docs/kmp_phase7_sprint_board.md if estimate changed.
-- [ ] Update docs/sketchware_pro_improvement_backlog.md milestone status.
+- [ ] Update docs/ascode_pro_improvement_backlog.md milestone status.
 
 ## Optional Stretch: KMP-401 Add dependency compatibility resolver by target
 
@@ -524,4 +524,4 @@ Attach fixture matrix output and one compatibility report example.
 
 - [ ] Update docs/kmp_phase7_epic_issue_checklist.md if scope changed.
 - [ ] Update docs/kmp_phase7_sprint_board.md if estimate changed.
-- [ ] Update docs/sketchware_pro_improvement_backlog.md milestone status.
+- [ ] Update docs/ascode_pro_improvement_backlog.md milestone status.

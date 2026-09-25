@@ -8,5 +8,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Sketchware Pro"
+rootProject.name = "Android SCode"
 include(":app")

@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">Sketchware Pro</string>
+    <string name="app_name">Android SCode</string>
     <string name="appbar_scrolling_view_behavior">com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior</string>
-    <string name="besome_blog_url">http://medium.com/sketchware</string>
+    <string name="besome_blog_url">http://medium.com/ascode</string>
     <string name="block_add_list_int_body_1">to</string>
     <string name="block_add_list_int_head">add</string>
     <string name="block_add_list_int_tail" />
@@ -922,7 +922,7 @@ Please make room and try again"</string>
     <string name="common_message_name_unavailable">Current name is unavailable</string>
     <string name="common_message_permission_denied">Permission denied</string>
     <string name="common_message_permission_need_load_project">We need your permission to Storage to save and load projects</string>
-    <string name="common_message_permission_storage">To access photos, media, and files, please give Sketchware permission in the next step</string>
+    <string name="common_message_permission_storage">To access photos, media, and files, please give Android SCode permission in the next step</string>
     <string name="common_message_permission_storage1">"Permission Denied.
 Please click on Settings to allow permission for Storage. Without this permission, some features may not function properly"</string>
     <string name="common_message_permission_title_storage">Permission Required</string>
@@ -1302,7 +1302,7 @@ You must enter the API key to operate the map normally."</string>
     <string name="developer_tools_component_type_class">Type Class</string>
     <string name="developer_tools_component_type_name">Type Name</string>
     <string name="developer_tools_component_var_type_name">Variable Type Name</string>
-    <string name="docs_url">https://docs.sketchware.io/</string>
+    <string name="docs_url">https://docs.ascode.io/</string>
     <string name="event_context_menu_title">Event Menu</string>
     <string name="event_context_menu_title_delete_event">Delete Event</string>
     <string name="event_context_menu_title_delete_more_block">Delete moreBlock</string>
@@ -1378,10 +1378,10 @@ Do you want to continue?"</string>
     <string name="event_title_add_new_component">Add new component</string>
     <string name="event_title_add_new_event">Add new event</string>
     <string name="event_title_edit_component">Edit component</string>
-    <string name="facebook_url">https://fb.com/sketchware</string>
+    <string name="facebook_url">https://fb.com/ascode</string>
     <string name="firebase_database_url">https://dependable-flag-825.firebaseio.com</string>
     <string name="ga_trackingId">UA-80718117-1</string>
-    <string name="ideas_url">https://ideas.sketchware.io/</string>
+    <string name="ideas_url">https://ideas.ascode.io/</string>
     <string name="invalid_component">Invalid component</string>
     <string name="invalid_icon_id">Invalid icon ID</string>
     <string name="invalid_required_fields">Some required fields are empty</string>
@@ -1517,16 +1517,16 @@ But, components should be added manually for working correctly."</string>
     <string name="logic_variable_type_string">String</string>
     <string name="main_drawer_context_menu_title_slack_invitation">Get my invitation</string>
     <string name="main_drawer_context_menu_title_slack_open">Open in Slack (Invitation Required)</string>
-    <string name="main_drawer_title_ad_label">Another Apps of Sketchware</string>
+    <string name="main_drawer_title_ad_label">Another Apps of Android SCode</string>
     <string name="main_drawer_title_docs">Documentation</string>
     <string name="main_drawer_title_export_urls">Export URLs</string>
     <string name="main_drawer_title_language_settings">Language Settings</string>
     <string name="main_drawer_title_program_information">Program information</string>
     <string name="main_drawer_title_purchase_list">Purchase List</string>
     <string name="main_drawer_title_remove_ads">Remove Ads</string>
-    <string name="main_drawer_title_save_sketchware">Save Sketchware</string>
+    <string name="main_drawer_title_save_ascode">Save Android SCode</string>
     <string name="main_drawer_title_share_with_friends">Share with Friends</string>
-    <string name="main_drawer_title_sketchware_for_arduino">Sketchware for Arduino</string>
+    <string name="main_drawer_title_ascode_for_arduino">Android SCode for Arduino</string>
     <string name="main_drawer_title_subscribe">Subscribe</string>
     <string name="main_drawer_title_system_settings">System Settings</string>
     <string name="main_tab_title_competitions">Competitions</string>
@@ -1550,7 +1550,7 @@ But, components should be added manually for working correctly."</string>
     <string name="manage_export_url_tab_title_apk">Signed APK</string>
     <string name="manage_export_url_tab_title_data">Exported Data</string>
     <string name="manage_export_url_word_extend">Expand</string>
-    <string name="medium_url">https://medium.com/sketchware</string>
+    <string name="medium_url">https://medium.com/ascode</string>
     <string name="message_compatible_chrome_brower">The following page is compatible with Google Chrome. Would you like to install Chrome?</string>
     <string name="message_device_not_support">Your device does not support this hardware. This component may not function properly</string>
     <string name="message_device_not_supported">"This device is not supported. Google Play Services aren't installed."</string>
@@ -1660,7 +1660,7 @@ ACTION_CALL, ACTION_DIAL
  tel:number (tel:12345678)
 
 ACTION_VIEW
- url type (http://sketchware.io)"</string>
+ url type (http://ascode.io)"</string>
     <string name="property_description_edittext_ime_options">"It does not work when single_line is 'false' and input_type is 'text'"</string>
     <string name="property_divider_height">Divider height</string>
     <string name="property_enabled">Enabled</string>
@@ -1714,7 +1714,7 @@ ACTION_VIEW
     <string name="publish_account_setting_connecting_account_step_name">Do you have a Google Play Developer Account?</string>
     <string name="publish_account_setting_select_json_step_name">Check Service Account Credentials</string>
     <string name="publish_account_setting_title">Publish Account Settings</string>
-    <string name="publish_check_upload_apk_message_dialog_upload_apk_agreement">After the app is published, the APK file will be uploaded to Sketchware server for backup purposes. Do you want to continue?</string>
+    <string name="publish_check_upload_apk_message_dialog_upload_apk_agreement">After the app is published, the APK file will be uploaded to Android SCode server for backup purposes. Do you want to continue?</string>
     <string name="publish_check_upload_apk_step_desc">Determine the type of this publishing</string>
     <string name="publish_check_upload_apk_step_name">Publish Type</string>
     <string name="publish_check_upload_apk_title_dialog_upload_apk_agreement">Upload APK File Agreement</string>
@@ -1979,7 +1979,7 @@ Please try again after adding at least one collection."</string>
     <string name="shared_collection_bookmark_list_title_shared_more_blocks">Shared More Blocks Bookmark</string>
     <string name="shared_collection_bookmark_list_title_shared_views">Shared Views Bookmark</string>
     <string name="shared_collection_detail_button_included_collection_show_detail">Show Details</string>
-    <string name="shared_collection_detail_description_recommend_collection">Recommended By Sketchware</string>
+    <string name="shared_collection_detail_description_recommend_collection">Recommended By Android SCode</string>
     <string name="shared_collection_detail_header_name">Update Information</string>
     <string name="shared_collection_detail_message_add_bookmark">Bookmark Added</string>
     <string name="shared_collection_detail_message_add_bookmark_failed">Bookmark Add Failed. Please Try Again Later</string>
@@ -1990,7 +1990,7 @@ Please try again after adding at least one collection."</string>
     <string name="shared_collection_detail_message_delete_bookmark_failed">Bookmark Delete Failed. Please Try Again Later</string>
     <string name="shared_collection_detail_message_no_included_collection">No included collection to show</string>
     <string name="shared_collection_detail_message_set_data_complete">Adding collection is completed</string>
-    <string name="shared_collection_detail_message_warn_comment">If you write a comment not related to this collection, the comment could be deleted and you could be banned from Sketchware</string>
+    <string name="shared_collection_detail_message_warn_comment">If you write a comment not related to this collection, the comment could be deleted and you could be banned from Android SCode</string>
     <string name="shared_collection_detail_title_dialog_add_collection_complete">Add Collection Complete</string>
     <string name="shared_collection_detail_title_included_collection">Included Collection</string>
     <string name="shared_collection_list_title_down">Download</string>
@@ -2065,7 +2065,7 @@ Please try again later"</string>
     <string name="shared_project_detail_comments_message_already_delete_comment">This comment was already deleted</string>
     <string name="shared_project_detail_comments_message_commented">Commented</string>
     <string name="shared_project_detail_comments_message_no_comments">No comments to display</string>
-    <string name="shared_project_detail_dialog_last_version_description">You need the latest version of Sketchware to open this project</string>
+    <string name="shared_project_detail_dialog_last_version_description">You need the latest version of Android SCode to open this project</string>
     <string name="shared_project_detail_dialog_last_version_title">Update Required</string>
     <string name="shared_project_detail_dialog_share_project_confirm">Would you like to share this project?</string>
     <string name="shared_project_detail_dialog_share_project_title">Share Project</string>
@@ -2107,8 +2107,8 @@ Please try again later"</string>
     <string name="sign_apk_desc_generate_apk_file">Click sign button below and generate an APK file!</string>
     <string name="sign_apk_title_apk_file_save_path">Save Directory</string>
     <string name="sign_apk_title_export_apk_file">Generate APK File Complete</string>
-    <string name="slack_url_primary">http://slack.sketchware.io</string>
-    <string name="slack_url_secondary">http://sketchware.slack.com</string>
+    <string name="slack_url_primary">http://slack.ascode.io</string>
+    <string name="slack_url_secondary">http://ascode.slack.com</string>
     <string name="system_information_developer_options">Developer options</string>
     <string name="system_information_dpi">DPI</string>
     <string name="system_information_model_name">Model name</string>
@@ -2128,7 +2128,7 @@ Please try again later"</string>
     <string name="title_compatible_chrome_browser">Chrome Browser Required</string>
     <string name="title_discord_community">Discord</string>
     <string name="title_telegram_community">Telegram</string>
-    <string name="title_sketchware">Sketchware Pro</string>
+    <string name="title_ascode">Android SCode</string>
     <string name="view_panel_title_layouts">Layouts</string>
     <string name="view_panel_title_properties">Properties</string>
     <string name="view_panel_title_widgets">Widgets</string>
@@ -2190,7 +2190,7 @@ Please try again later"</string>
     <string name="code_shrinker_warning">Using R8/ProGuard might be risky to some extent. Make sure to provide a proper rules configuration file in order not to break your project.</string>
     <string name="code_shrinker_rules">Code Shrinker Rules</string>
     <string name="code_shrinker_configure_shrinker">Configure R8/ProGuard by editing the rules file. This step is necessary because without a proper configuration, ProGuard might break your project.</string>
-    <string name="code_shrinker_full_mode_def">Using this, you can configure specific local libs to be included in R8/ProGuarding process. (Note: Enabling this will ignore DEX files of the local libs you select and it will force Sketchware to compile them to dex, making compilation noticeably slower.)</string>
+    <string name="code_shrinker_full_mode_def">Using this, you can configure specific local libs to be included in R8/ProGuarding process. (Note: Enabling this will ignore DEX files of the local libs you select and it will force Android SCode to compile them to dex, making compilation noticeably slower.)</string>
     <string name="code_shrinker_generate_debug_files">Generate debug files</string>
     <string name="local_library_manager_dependency_example">Example: org.ow2.asm:asm:9.5</string>
     <string name="local_library_manager">Local library Manager</string>
@@ -2203,8 +2203,8 @@ Please try again later"</string>
     <string name="local_library_manager_skip_downloading_dependencies">Skip downloading sub-dependencies</string>
     <string name="signatures_title">Signatures</string>
     <string name="settings_appearance">Appearance</string>
-    <string name="settings_appearance_description">Change the Sketchware appearance</string>
-    <string name="settings_appearance_theme">Sketchware Theme</string>
+    <string name="settings_appearance_description">Change the Android SCode appearance</string>
+    <string name="settings_appearance_theme">Android SCode Theme</string>
     <string name="settings_appearance_theme_system">System default</string>
     <string name="settings_appearance_theme_light">Light theme</string>
     <string name="settings_appearance_theme_dark">Dark theme</string>
@@ -2224,7 +2224,7 @@ Please try again later"</string>
     <string name="assets_manager_rename">Rename</string>
 
     <!--  about the team screen  -->
-    <string name="about_title">About Sketchware Pro</string>
+    <string name="about_title">About Android SCode</string>
     <string name="about_team_title">The team</string>
     <string name="about_specialthanks_title">Special Thanks</string>
     <string name="about_changelog_title">Changelog</string>
@@ -2234,16 +2234,16 @@ Please try again later"</string>
     <string name="about_joindiscord">Join our Discord server</string>
 
     <!--  links  -->
-    <string name="link_github_release">https://github.com/aurenox-global/Sketchware-Pro/releases</string>
-    <string name="link_docs_url">https://docs.sketchware.pro</string>
-    <string name="link_ideas_url">https://discord.gg/4uxhMwCt</string>
-    <string name="link_discord_invite">https://discord.gg/kq39yhT4rX</string>
-    <string name="link_telegram_invite">https://t.me/sketchwarepro</string>
-    <string name="link_about_team">https://sketchware-pro.github.io/Sketchware-Pro/about.json</string>
-    <string name="link_github_commits_url"><![CDATA[https://api.github.com/repos/aurenox-global/Sketchware-Pro/commits?per_page=%s&page=%s]]></string>
+    <string name="link_github_release">https://github.com/aurenox-global/Android-SCode/releases</string>
+    <string name="link_docs_url">https://aurenox-global.github.io/Android-SCode/</string>
+    <string name="link_ideas_url">https://github.com/aurenox-global/Android-SCode/issues</string>
+    <string name="link_discord_invite">https://aurenox-global.github.io/Android-SCode/</string>
+    <string name="link_telegram_invite">https://aurenox-global.github.io/Android-SCode/</string>
+    <string name="link_about_team">https://ascode-pro.github.io/Android-SCode/about.json</string>
+    <string name="link_github_commits_url"><![CDATA[https://api.github.com/repos/aurenox-global/Android-SCode/commits?per_page=%s&page=%s]]></string>
     <string name="github_api_error_message">Something went wrong. Please wait and try again.</string>
     <string name="github_api_date_unavailable">Date unavailable</string>
-    <string name="link_github_url">https://github.com/aurenox-global/Sketchware-Pro</string>
+    <string name="link_github_url">https://github.com/aurenox-global/Android-SCode</string>
     <string name="change_launcher_activity_dialog_title">Launcher Activity</string>
     <string name="common_word_add_activtiy">Add Activity</string>
     <string name="delete_custom_activity_dialog_message">All features related to %1$s will be removed. Are you sure?</string>
@@ -2291,7 +2291,7 @@ Please try again later"</string>
     <string name="save_to_collection">Save to collection</string>
     <string name="unknown_attr">Unknown Attribute</string>
     <string name="attr_already_exist">This attribute already exists</string>
-    <string name="link_sw_assist">https://play.google.com/store/apps/details?id=com.w3wide.swassist</string>
+    <string name="link_sw_assist">https://github.com/aurenox-global/Android-SCode</string>
 
     <!-- Fase 7: soporte Flutter (carril B2) -->
     <string name="flutter_menu_build_and_run">Flutter: compilar y ejecutar</string>

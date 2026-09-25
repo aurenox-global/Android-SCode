@@ -34,9 +34,9 @@ import dev.pranav.filepicker.FilePickerCallback;
 import dev.pranav.filepicker.FilePickerDialogFragment;
 import dev.pranav.filepicker.FilePickerOptions;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.AscodeUtil;
 
 public class ManageFirebaseActivity extends BaseAppCompatActivity implements View.OnClickListener {
     private final String realtime_db = "realtime_db";
@@ -85,7 +85,7 @@ public class ManageFirebaseActivity extends BaseAppCompatActivity implements Vie
             s.a("P1I15", true);
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.setData(Uri.parse("https://sketchware-pro.vercel.app/docs/components/Firebase/connect-to-firebase"));
+            intent.setData(Uri.parse("https://ascode-pro.vercel.app/docs/components/Firebase/connect-to-firebase"));
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
@@ -152,7 +152,7 @@ public class ManageFirebaseActivity extends BaseAppCompatActivity implements Vie
                     firebaseLibraryBean.useYn = "Y";
                 }
             } else {
-                SketchwareUtil.toast("Configure Firebase settings first, either by importing google-services.json, " +
+                AscodeUtil.toast("Configure Firebase settings first, either by importing google-services.json, " +
                         "or by manually entering the project's details.", Toast.LENGTH_LONG);
             }
         }
@@ -341,7 +341,7 @@ public class ManageFirebaseActivity extends BaseAppCompatActivity implements Vie
 
         }
 
-        if (hasNullConfig) SketchwareUtil.toastError(notFoundLog.toString());
+        if (hasNullConfig) AscodeUtil.toastError(notFoundLog.toString());
         configure();
     }
 

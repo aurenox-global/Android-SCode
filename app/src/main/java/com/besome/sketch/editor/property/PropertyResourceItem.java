@@ -37,11 +37,11 @@ import a.a.a.mB;
 import a.a.a.wB;
 import mod.bobur.VectorDrawableLoader;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
-import pro.sketchware.databinding.ImagePickerItemBinding;
-import pro.sketchware.databinding.SearchWithRecyclerViewBinding;
-import pro.sketchware.utility.FilePathUtil;
-import pro.sketchware.utility.SvgUtils;
+import com.ascode.android.R;
+import com.ascode.android.databinding.ImagePickerItemBinding;
+import com.ascode.android.databinding.SearchWithRecyclerViewBinding;
+import com.ascode.android.utility.FilePathUtil;
+import com.ascode.android.utility.SvgUtils;
 
 public class PropertyResourceItem extends RelativeLayout implements View.OnClickListener {
 

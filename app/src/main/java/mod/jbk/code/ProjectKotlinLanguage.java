@@ -19,7 +19,7 @@ import io.github.rosemoe.sora.lang.smartEnter.NewlineHandler;
 import io.github.rosemoe.sora.text.CharPosition;
 import io.github.rosemoe.sora.text.ContentReference;
 import io.github.rosemoe.sora.widget.SymbolPairMatch;
-import pro.sketchware.SketchApplication;
+import com.ascode.android.AscodeApplication;
 
 /**
  * Lenguaje del editor para ficheros Kotlin: resaltado (TextMate) mas autocompletado con los
@@ -175,9 +175,9 @@ public class ProjectKotlinLanguage implements Language {
                                      int prefixLength, int alreadyAdded) {
         int added = alreadyAdded;
         try {
-            List<String> classNames = SdkSymbolIndex.getSdkClasses(SketchApplication.getContext());
+            List<String> classNames = SdkSymbolIndex.getSdkClasses(AscodeApplication.getContext());
             classNames = new ArrayList<>(classNames);
-            classNames.addAll(SdkSymbolIndex.getLibraryClasses(SketchApplication.getContext(), scId));
+            classNames.addAll(SdkSymbolIndex.getLibraryClasses(AscodeApplication.getContext(), scId));
 
             int fromClasspath = 0;
             for (String fullName : classNames) {

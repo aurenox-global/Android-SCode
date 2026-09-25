@@ -28,7 +28,7 @@ import mod.hilal.saif.android_manifest.AndroidManifestInjector;
 import mod.hilal.saif.blocks.CommandBlock;
 import mod.hilal.saif.events.LogicHandler;
 import mod.pranav.viewbinding.ViewBindingBuilder;
-import pro.sketchware.control.logic.PermissionManager;
+import com.ascode.android.control.logic.PermissionManager;
 
 public class Jx {
 
@@ -539,7 +539,7 @@ public class Jx {
             sb.append("_filePathCallback.onReceiveValue(null);").append(EOL);
             sb.append("_filePathCallback = null;").append(EOL);
             sb.append("}").append(EOL);
-            sb.append("SketchwareUtil.showMessage(getApplicationContext(), \"No file picker found\");").append(EOL);
+            sb.append("AscodeUtil.showMessage(getApplicationContext(), \"No file picker found\");").append(EOL);
             sb.append("}").append(EOL);
             sb.append("return false;").append(EOL);
             sb.append("}").append(EOL);
@@ -1309,7 +1309,7 @@ public class Jx {
                 + "try {" + EOL
                 + "_downloadWebFile(" + webViewName + ", _url, _userAgent, _contentDisposition, _mimeType);" + EOL
                 + "} catch (Throwable _e) {" + EOL
-                + "SketchwareUtil.showMessage(getApplicationContext(), \"Download failed\");" + EOL
+                + "AscodeUtil.showMessage(getApplicationContext(), \"Download failed\");" + EOL
                 + "}" + EOL
                 + "}" + EOL
                 + "});" + EOL
@@ -1635,7 +1635,7 @@ public class Jx {
         sb.append("_url = _url == null ? \"\" : _url.trim();").append(EOL);
         sb.append("_url = Uri.decode(_url);").append(EOL);
         sb.append("if (_url.isEmpty()) {").append(EOL);
-        sb.append("SketchwareUtil.showMessage(getApplicationContext(), \"No file to export\");").append(EOL);
+        sb.append("AscodeUtil.showMessage(getApplicationContext(), \"No file to export\");").append(EOL);
         sb.append("return;").append(EOL);
         sb.append("}").append(EOL);
         sb.append("Uri _parsedUri = Uri.parse(_url);").append(EOL);
@@ -1644,18 +1644,18 @@ public class Jx {
         sb.append("if (_downloadBlobFromWebView(_sourceWebView, _url, _mimeType, _contentDisposition)) {").append(EOL);
         sb.append("return;").append(EOL);
         sb.append("}").append(EOL);
-        sb.append("SketchwareUtil.showMessage(getApplicationContext(), \"Export failed\");").append(EOL);
+        sb.append("AscodeUtil.showMessage(getApplicationContext(), \"Export failed\");").append(EOL);
         sb.append("return;").append(EOL);
         sb.append("}").append(EOL);
         sb.append("if (_scheme.equals(\"data\")) {").append(EOL);
         sb.append("if (_saveDataUrlToDownloads(_url, _mimeType, _contentDisposition)) {").append(EOL);
         sb.append("return;").append(EOL);
         sb.append("}").append(EOL);
-        sb.append("SketchwareUtil.showMessage(getApplicationContext(), \"Export failed\");").append(EOL);
+        sb.append("AscodeUtil.showMessage(getApplicationContext(), \"Export failed\");").append(EOL);
         sb.append("return;").append(EOL);
         sb.append("}").append(EOL);
         sb.append("if (!_scheme.equals(\"http\") && !_scheme.equals(\"https\")) {").append(EOL);
-        sb.append("SketchwareUtil.showMessage(getApplicationContext(), \"Unsupported export URL\");").append(EOL);
+        sb.append("AscodeUtil.showMessage(getApplicationContext(), \"Unsupported export URL\");").append(EOL);
         sb.append("return;").append(EOL);
         sb.append("}").append(EOL);
         sb.append("DownloadManager.Request _request = new DownloadManager.Request(_parsedUri);").append(EOL);
@@ -1671,10 +1671,10 @@ public class Jx {
         sb.append("DownloadManager _downloadManager = (DownloadManager) _context.getSystemService(Context.DOWNLOAD_SERVICE);").append(EOL);
         sb.append("if (_downloadManager != null) {").append(EOL);
         sb.append("_downloadManager.enqueue(_request);").append(EOL);
-        sb.append("SketchwareUtil.showMessage(_context, \"Downloading: \" + _fileName);").append(EOL);
+        sb.append("AscodeUtil.showMessage(_context, \"Downloading: \" + _fileName);").append(EOL);
         sb.append("}").append(EOL);
         sb.append("} catch (Throwable _e) {").append(EOL);
-        sb.append("SketchwareUtil.showMessage(getApplicationContext(), \"Download failed\");").append(EOL);
+        sb.append("AscodeUtil.showMessage(getApplicationContext(), \"Download failed\");").append(EOL);
         sb.append("}").append(EOL);
         sb.append("}").append(EOL);
 
@@ -1694,7 +1694,7 @@ public class Jx {
         sb.append("}").append(EOL);
         sb.append("String _resolvedOrigin = _safeWebOrigin(_sourceWebView.getUrl());").append(EOL);
         sb.append("if (_resolvedOrigin.isEmpty()) {").append(EOL);
-        sb.append("SketchwareUtil.showMessage(getApplicationContext(), \"Untrusted page\");").append(EOL);
+        sb.append("AscodeUtil.showMessage(getApplicationContext(), \"Untrusted page\");").append(EOL);
         sb.append("return false;").append(EOL);
         sb.append("}").append(EOL);
         sb.append("_blobDownloadOrigin = _resolvedOrigin;").append(EOL);
@@ -1734,7 +1734,7 @@ public class Jx {
         sb.append("} else {").append(EOL);
         sb.append("_sourceWebView.loadUrl(\"javascript:\" + _javascript);").append(EOL);
         sb.append("}").append(EOL);
-        sb.append("SketchwareUtil.showMessage(getApplicationContext(), \"Preparing export...\");").append(EOL);
+        sb.append("AscodeUtil.showMessage(getApplicationContext(), \"Preparing export...\");").append(EOL);
         sb.append("return true;").append(EOL);
         sb.append("}").append(EOL);
 
@@ -1786,7 +1786,7 @@ public class Jx {
         sb.append("return;").append(EOL);
         sb.append("}").append(EOL);
         sb.append("if (_base64Data == null || _base64Data.isEmpty()) {").append(EOL);
-        sb.append("SketchwareUtil.showMessage(_context, \"Export failed\");").append(EOL);
+        sb.append("AscodeUtil.showMessage(_context, \"Export failed\");").append(EOL);
         sb.append("return;").append(EOL);
         sb.append("}").append(EOL);
         sb.append("String _resolvedMimeType = (_mimeType == null || _mimeType.isEmpty()) ? \"application/octet-stream\" : _mimeType;").append(EOL);
@@ -1800,12 +1800,12 @@ public class Jx {
         sb.append("_values.put(android.provider.MediaStore.Downloads.IS_PENDING, 1);").append(EOL);
         sb.append("Uri _uri = _context.getContentResolver().insert(android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI, _values);").append(EOL);
         sb.append("if (_uri == null) {").append(EOL);
-        sb.append("SketchwareUtil.showMessage(_context, \"Export failed\");").append(EOL);
+        sb.append("AscodeUtil.showMessage(_context, \"Export failed\");").append(EOL);
         sb.append("return;").append(EOL);
         sb.append("}").append(EOL);
         sb.append("OutputStream _outputStream = _context.getContentResolver().openOutputStream(_uri);").append(EOL);
         sb.append("if (_outputStream == null) {").append(EOL);
-        sb.append("SketchwareUtil.showMessage(_context, \"Export failed\");").append(EOL);
+        sb.append("AscodeUtil.showMessage(_context, \"Export failed\");").append(EOL);
         sb.append("return;").append(EOL);
         sb.append("}").append(EOL);
         sb.append("_outputStream.write(_bytes);").append(EOL);
@@ -1826,9 +1826,9 @@ public class Jx {
         sb.append("_fileOutputStream.close();").append(EOL);
         sb.append("sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(_outputFile)));").append(EOL);
         sb.append("}").append(EOL);
-        sb.append("SketchwareUtil.showMessage(_context, \"Exported: \" + _resolvedFileName);").append(EOL);
+        sb.append("AscodeUtil.showMessage(_context, \"Exported: \" + _resolvedFileName);").append(EOL);
         sb.append("} catch (Exception _e) {").append(EOL);
-        sb.append("SketchwareUtil.showMessage(_context, \"Export failed\");").append(EOL);
+        sb.append("AscodeUtil.showMessage(_context, \"Export failed\");").append(EOL);
         sb.append("}").append(EOL);
         sb.append("}").append(EOL);
 
@@ -1840,7 +1840,7 @@ public class Jx {
         sb.append("@Override").append(EOL);
         sb.append("public void run() {").append(EOL);
         sb.append("if (!_isTrustedBlobBridgeCall(_origin, _nonce)) {").append(EOL);
-        sb.append("SketchwareUtil.showMessage(getApplicationContext(), \"Blocked untrusted export\");").append(EOL);
+        sb.append("AscodeUtil.showMessage(getApplicationContext(), \"Blocked untrusted export\");").append(EOL);
         sb.append("return;").append(EOL);
         sb.append("}").append(EOL);
         sb.append("_saveBlobBase64ToDownloads(_base64Data, _mimeType, _fileName);").append(EOL);

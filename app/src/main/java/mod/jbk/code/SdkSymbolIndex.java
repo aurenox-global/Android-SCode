@@ -14,9 +14,9 @@ import java.util.zip.ZipFile;
 
 import a.a.a.Jp;
 import mod.jbk.build.BuiltInLibraries;
-import pro.sketchware.util.library.BuiltInLibraryManager;
-import pro.sketchware.utility.FilePathUtil;
-import pro.sketchware.utility.FileUtil;
+import com.ascode.android.util.library.BuiltInLibraryManager;
+import com.ascode.android.utility.FilePathUtil;
+import com.ascode.android.utility.FileUtil;
 
 /**
  * Indice de los nombres de clase disponibles para el autocompletado, aparte de los del propio

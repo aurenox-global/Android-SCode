@@ -1,13 +1,13 @@
 # Flutter: la descarga de Dart ya es una decisión tuya (v7.0.9.0)
 
-Fecha: 2026-09-23 · Versión: **v7.0.9.0** (versionCode 166) · Repo: `Sketchware-Pro-main`
+Fecha: 2026-09-23 · Versión: **v7.0.9.0** (versionCode 166) · Repo: `Android-SCode-main`
 
 Actualizado en **v7.0.10.0** (versionCode 167): el toolchain ya se encuentra sin buscar el flag (ver «Dónde está ahora»).
 
 Actualizado en **v7.0.10.1** (versionCode 168): el estado y la instalación del toolchain quedan arreglados
 (ver «6. v7.0.10.1: el estado y la instalación del toolchain (arreglado)»).
 
-Release: <https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.9.0>
+Release: <https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.9.0>
 
 Antes, al compilar un proyecto Flutter (modo experimental, detrás del flag `FLUTTER_EXPERIMENTAL_ENABLE`) la app
 podía **descargar sola** el toolchain de Dart (~307 MB) sin avisar ni preguntar. Ahora la descarga **no ocurre nunca
@@ -51,7 +51,7 @@ binarios y mide el disco) y el diálogo Material muestra:
   toolchain entero). El tarball del framework es el único tamaño que no venía en el código: se midió a mano
   (34.580.315 B) porque GitHub no publica `content-length`.
 - **Aviso de red**: se descarga por internet, mejor con Wi-Fi; son unos 307,2 MB y puede tardar varios minutos.
-- **Dónde se guarda**: `/data/user/0/pro.sketchware/files/flutter-toolchain`.
+- **Dónde se guarda**: `/data/user/0/com.ascode.android/files/flutter-toolchain`.
 - **Y que después funciona sin conexión**: una vez instalado, compilar y ejecutar Flutter va en local.
 
 Botones del diálogo:
@@ -113,14 +113,14 @@ de descargar los 91 MB del `.deb` de Dart.
 `targetSdk >= 29` en el dominio `untrusted_app`:
 
 ```
-avc: denied { execute_no_trans } for path="/data/data/pro.sketchware/files/flutter-toolchain/dart/bin/dart"
+avc: denied { execute_no_trans } for path="/data/data/com.ascode.android/files/flutter-toolchain/dart/bin/dart"
      scontext=u:r:untrusted_app:s0 tcontext=u:object_r:app_data_file:s0 tclass=file permissive=0
 java.io.IOException: Cannot run program "…/bin/dart": error=13, Permission denied
 ```
 
 La sonda devolvía `null` y el instalador **abortaba antes de bajar los artefactos del engine**, así que la UI concluía
 *"Toolchain de Flutter no instalado"* cuando los datos del SDK **sí** estaban extraídos. Era un bug de comprobación
-nuestro. Nota: `adb shell run-as pro.sketchware …/bin/dart --version` **sí** funciona (acaba en el dominio `runas_app`),
+nuestro. Nota: `adb shell run-as com.ascode.android …/bin/dart --version` **sí** funciona (acaba en el dominio `runas_app`),
 por eso esa vía no sirve como prueba — la sonda válida es la que ejecuta la propia app.
 
 **Qué se cambió.**

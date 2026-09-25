@@ -44,16 +44,16 @@ import mod.alucard.tn.apksigner.ApkSigner;
 import mod.hey.studios.code.SrcCodeEditor;
 import mod.hey.studios.util.Helper;
 import mod.khaled.logcat.LogReaderActivity;
-import pro.sketchware.R;
-import pro.sketchware.activities.editor.component.ManageCustomComponentActivity;
-import pro.sketchware.activities.settings.FeatureFlagsActivity;
-import pro.sketchware.activities.settings.SettingsActivity;
-import pro.sketchware.databinding.ActivityAppSettingsBinding;
-import pro.sketchware.databinding.DialogSelectApkToSignBinding;
-import pro.sketchware.keystore.KeystoreManagerActivity;
-import pro.sketchware.keystore.KeystoreStore;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.activities.editor.component.ManageCustomComponentActivity;
+import com.ascode.android.activities.settings.FeatureFlagsActivity;
+import com.ascode.android.activities.settings.SettingsActivity;
+import com.ascode.android.databinding.ActivityAppSettingsBinding;
+import com.ascode.android.databinding.DialogSelectApkToSignBinding;
+import com.ascode.android.keystore.KeystoreManagerActivity;
+import com.ascode.android.keystore.KeystoreStore;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.AscodeUtil;
 
 public class AppSettings extends BaseAppCompatActivity {
     @Override
@@ -116,7 +116,7 @@ public class AppSettings extends BaseAppCompatActivity {
         generalCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_settings_applications, "App settings", "Change general app settings", new ActivityLauncher(new Intent(getApplicationContext(), ConfigActivity.class))), true);
         generalCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_settings, "Feature flags", "Enable or disable experimental features", new ActivityLauncher(new Intent(getApplicationContext(), FeatureFlagsActivity.class))), true);
         generalCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_palette, Helper.getResString(R.string.settings_appearance), Helper.getResString(R.string.settings_appearance_description), openSettingsActivity(SettingsActivity.SETTINGS_APPEARANCE_FRAGMENT)), true);
-        generalCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_folder, "Open working directory", "Open Sketchware Pro's directory and edit files in it", v -> openWorkingDirectory()), true);
+        generalCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_folder, "Open working directory", "Open Android SCode's directory and edit files in it", v -> openWorkingDirectory()), true);
         generalCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_key, "Keystore manager", "Import and manage the keystores used to sign your APKs and AABs", new ActivityLauncher(new Intent(getApplicationContext(), KeystoreManagerActivity.class))), true);
         generalCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_apk_document, "Sign an APK file", "Sign an already existing APK file with the testkey or a saved keystore, signature schemes up to V4", v -> signApkFileDialog()), true);
         generalCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_settings, Helper.getResString(R.string.main_drawer_title_system_settings), "Auto-save and vibrations", new ActivityLauncher(new Intent(getApplicationContext(), SystemSettingActivity.class))), false);
@@ -226,20 +226,20 @@ public class AppSettings extends BaseAppCompatActivity {
 
         apkPathDialog.setPositiveButton("Continue", (v, which) -> {
             if (!isAPKSelected[0]) {
-                SketchwareUtil.toast("Please select an APK file to sign", Toast.LENGTH_SHORT);
+                AscodeUtil.toast("Please select an APK file to sign", Toast.LENGTH_SHORT);
                 shakeView(binding.selectFile);
                 return;
             }
             String input_apk_path = Helper.getText(apk_path_txt);
             String output_apk_file_name = Uri.fromFile(new File(input_apk_path)).getLastPathSegment();
             String output_apk_path = new File(Environment.getExternalStorageDirectory(),
-                    "sketchware/signed_apk/" + output_apk_file_name).getAbsolutePath();
+                    "ascode/signed_apk/" + output_apk_file_name).getAbsolutePath();
 
             if (new File(output_apk_path).exists()) {
                 MaterialAlertDialogBuilder confirmOverwrite = new MaterialAlertDialogBuilder(this);
                 confirmOverwrite.setIcon(R.drawable.color_save_as_new_96);
                 confirmOverwrite.setTitle("File exists");
-                confirmOverwrite.setMessage("An APK named " + output_apk_file_name + " already exists at /sketchware/signed_apk/.  Overwrite it?");
+                confirmOverwrite.setMessage("An APK named " + output_apk_file_name + " already exists at /ascode/signed_apk/.  Overwrite it?");
 
                 confirmOverwrite.setNegativeButton(Helper.getResString(R.string.common_word_cancel), null);
                 confirmOverwrite.setPositiveButton("Overwrite", (view, which1) -> {
@@ -281,7 +281,7 @@ public class AppSettings extends BaseAppCompatActivity {
                     KeystoreStore.Entry entry = savedKeystores.get(which - 1);
                     File source = entry.file(this);
                     if (!source.exists()) {
-                        SketchwareUtil.toastError("The keystore file is missing. Import it again from Settings → Keystore manager.");
+                        AscodeUtil.toastError("The keystore file is missing. Import it again from Settings → Keystore manager.");
                         return;
                     }
                     signApkFileWithDialog(inputApkPath, outputApkPath, false,
@@ -329,7 +329,7 @@ public class AppSettings extends BaseAppCompatActivity {
                 runOnUiThread(() -> {
                     if (ApkSigner.LogCallback.errorCount.get() == 0) {
                         building_dialog.dismiss();
-                        SketchwareUtil.toast("Successfully saved signed APK to: /Internal storage/sketchware/signed_apk/"
+                        AscodeUtil.toast("Successfully saved signed APK to: /Internal storage/ascode/signed_apk/"
                                         + Uri.fromFile(new File(outputApkPath)).getLastPathSegment(),
                                 Toast.LENGTH_LONG);
                         showSignedApkCertificate(outputApkPath);

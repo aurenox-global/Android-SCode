@@ -49,18 +49,18 @@ import mod.hey.studios.editor.manage.block.v2.BlockLoader;
 import mod.hey.studios.project.custom_blocks.CustomBlocksManager;
 import mod.hey.studios.util.Helper;
 import mod.hilal.saif.activities.tools.ConfigActivity;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.AscodeUtil;
 
 public class BackupFactory {
     public static final String EXTENSION = "swb";
-    public static final String DEF_PATH = ".sketchware/backups/";
+    public static final String DEF_PATH = ".ascode/backups/";
     private static final String TAG = "BackupFactory";
 
     private static final byte[] ENCRYPTION_MAGIC = new byte[]{'S', 'W', 'B', '2'};
     private static final int AES_BLOCK_SIZE = 16;
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
-    private static final String LEGACY_SECRET = "sketchwaresecure";
+    private static final String LEGACY_SECRET = "ascodesecure";
 
     private static final String[] resSubfolders = {
             "fonts", "icons", "images", "sounds"
@@ -88,7 +88,7 @@ public class BackupFactory {
 
     private static File getAllLocalLibsDir() {
         return new File(Environment.getExternalStorageDirectory(),
-                ".sketchware/libs/local_libs");
+                ".ascode/libs/local_libs");
     }
 
     private static HashMap<String, Object> getProject(File file) {
@@ -181,7 +181,7 @@ public class BackupFactory {
 
     public static String getNewScId() {
         File myscList = new File(Environment.getExternalStorageDirectory(),
-                ".sketchware/mysc/list/");
+                ".ascode/mysc/list/");
 
         ArrayList<String> list = new ArrayList<>();
         FileUtil.listDir(myscList.getAbsolutePath(), list);
@@ -402,7 +402,7 @@ public class BackupFactory {
             zp.close();
 
         } catch (Exception ignored) {
-            android.util.Log.d("SketchwarePro", "BackupFactory: Exception ignored", ignored);
+            android.util.Log.d("Ascode", "BackupFactory: Exception ignored", ignored);
         }
 
         return false;
@@ -432,7 +432,7 @@ public class BackupFactory {
                 finalFileName = finalFileName.replaceFirst(Pattern.quote(Objects.requireNonNull(matcher.group(0))), getFormattedDateFrom(matcher.group(1)));
             }
         } catch (Exception ignored) {
-            SketchwareUtil.toastError("Failed To Parse Custom Filename For Backup. Using default");
+            AscodeUtil.toastError("Failed To Parse Custom Filename For Backup. Using default");
             // Example name: InternalDemo v1.0 (com.jbk.internal.demo, 1) 2021-12-31T125827
             finalFileName = projectNameOnly + " v" + versionName + " (" + pkgName + ", " + versionCode + ") " + getFormattedDateFrom("yyyy-M-dd'T'HHmmss");
         }
@@ -510,7 +510,7 @@ public class BackupFactory {
                     }
 
                 } catch (Exception ignored) {
-                    android.util.Log.d("SketchwarePro", "BackupFactory: Exception ignored", ignored);
+                    android.util.Log.d("Ascode", "BackupFactory: Exception ignored", ignored);
                 }
             }
         }
@@ -701,21 +701,21 @@ public class BackupFactory {
 
     private File getDataDir() {
         return new File(Environment.getExternalStorageDirectory(),
-                ".sketchware/data/" + sc_id);
+                ".ascode/data/" + sc_id);
     }
 
     private File getResDir(String subfolder) {
         return new File(Environment.getExternalStorageDirectory(),
-                ".sketchware/resources/" + subfolder + "/" + sc_id);
+                ".ascode/resources/" + subfolder + "/" + sc_id);
     }
 
     private File getProjectPath() {
         return new File(Environment.getExternalStorageDirectory(),
-                ".sketchware/mysc/list/" + sc_id + "/project");
+                ".ascode/mysc/list/" + sc_id + "/project");
     }
 
     private File getLocalLibsPath() {
         return new File(Environment.getExternalStorageDirectory(),
-                ".sketchware/data/" + sc_id + "/local_library");
+                ".ascode/data/" + sc_id + "/local_library");
     }
 }

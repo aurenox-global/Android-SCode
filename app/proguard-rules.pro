@@ -1,7 +1,7 @@
 -keepattributes SourceFile,LineNumberTable
 -renamesourcefileattribute SourceFile
 
--keep class pro.sketchware.** { *; }
+-keep class com.ascode.android.** { *; }
 -keep class a.a.a.** { *; }
 -keep class com.besome.sketch.** { *; }
 -keep class mod.** { *; }
@@ -34,12 +34,12 @@
 
 -keep class com.google.firebase.** { *; }
 
--keep class pro.sketchware.plugins.** { *; }
--keep class pro.sketchware.debugger.** { *; }
--keep class pro.sketchware.lsp.** { *; }
--keep class pro.sketchware.kmp.** { *; }
--keep class pro.sketchware.metrics.** { *; }
--keep class pro.sketchware.ai.** { *; }
+-keep class com.ascode.android.plugins.** { *; }
+-keep class com.ascode.android.debugger.** { *; }
+-keep class com.ascode.android.lsp.** { *; }
+-keep class com.ascode.android.kmp.** { *; }
+-keep class com.ascode.android.metrics.** { *; }
+-keep class io.ascode.android.** { *; }
 
 -keep class kellinwood.** { *; }
 
@@ -91,7 +91,7 @@
 
 # --- Hotfix v7.0.10.1: cuarto fallo R8 (vista previa de disenos "no instanciable") ---
 # La vista previa crea las vistas del XML POR REFLEXION
-# (pro.sketchware.utility.InvokeUtil -> Class.forName + getDeclaredConstructor(Context.class)).
+# (com.ascode.android.utility.InvokeUtil -> Class.forName + getDeclaredConstructor(Context.class)).
 # R8 no ve esa llamada, y los constructores de un argumento de las vistas de AndroidX/Material
 # (el recurso "new X(context)" que solo usa la reflexion) tampoco los usa NADIE del bytecode: los
 # borra. Los de inflado (Context, AttributeSet) SI sobreviven, porque son los que piden las reglas

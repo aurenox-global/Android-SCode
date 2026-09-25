@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import mod.hey.studios.util.Helper;
-import pro.sketchware.utility.FileUtil;
+import com.ascode.android.utility.FileUtil;
 
 /**
  * Sample usage of CommandBlock:
@@ -27,7 +27,7 @@ public class CommandBlock {
 
     public static String applyCommands(String fileName, String c) {
         String str = c;
-        String path = FileUtil.getExternalStorageDir().concat("/.sketchware/temp/commands");
+        String path = FileUtil.getExternalStorageDir().concat("/.ascode/temp/commands");
         ArrayList<HashMap<String, Object>> data;
         try {
             //writeLog("try");
@@ -250,21 +250,21 @@ public class CommandBlock {
 
     // Write Temporary File
     private static void WTF(ArrayList<HashMap<String, Object>> list) {
-        String path = FileUtil.getExternalStorageDir().concat("/.sketchware/temp/commands");
+        String path = FileUtil.getExternalStorageDir().concat("/.ascode/temp/commands");
         ArrayList<HashMap<String, Object>> data = new ArrayList<>();
         try {
             if (FileUtil.isExistFile(path) && !FileUtil.readFile(path).isEmpty() && !FileUtil.readFile(path).equals("[]")) {
                 data = new Gson().fromJson(FileUtil.readFile(path), Helper.TYPE_MAP_LIST);
             }
         } catch (Exception ignored) {
-            android.util.Log.d("SketchwarePro", "CommandBlock: failed to read existing block data", ignored);
+            android.util.Log.d("Ascode", "CommandBlock: failed to read existing block data", ignored);
         }
         data.addAll(list);
         FileUtil.writeFile(path, new Gson().toJson(data));
     }
 
     public static void x() {
-        String path = FileUtil.getExternalStorageDir().concat("/.sketchware/temp/commands");
+        String path = FileUtil.getExternalStorageDir().concat("/.ascode/temp/commands");
         if (FileUtil.isExistFile(path)) {
             FileUtil.deleteFile(path);
         }
@@ -294,7 +294,7 @@ public class CommandBlock {
     }
 
     private static void writeLog(String s) {
-        String path = FileUtil.getExternalStorageDir().concat("/.sketchware/temp/log.txt");
+        String path = FileUtil.getExternalStorageDir().concat("/.ascode/temp/log.txt");
         String text = "";
         if (FileUtil.isExistFile(path)) {
             text = FileUtil.readFile(path);

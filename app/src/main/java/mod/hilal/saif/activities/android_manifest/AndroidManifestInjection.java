@@ -1,6 +1,6 @@
 package mod.hilal.saif.activities.android_manifest;
 
-import static pro.sketchware.utility.GsonUtils.getGson;
+import static com.ascode.android.utility.GsonUtils.getGson;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -33,11 +33,11 @@ import mod.hey.studios.code.SrcCodeEditor;
 import mod.hey.studios.util.Helper;
 import mod.hilal.saif.android_manifest.AndroidManifestInjector;
 import mod.remaker.view.CustomAttributeView;
-import pro.sketchware.R;
-import pro.sketchware.activities.editor.view.CodeViewerActivity;
-import pro.sketchware.databinding.AndroidManifestInjectionBinding;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.activities.editor.view.CodeViewerActivity;
+import com.ascode.android.databinding.AndroidManifestInjectionBinding;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.AscodeUtil;
 
 @SuppressLint("SetTextI18n")
 public class AndroidManifestInjection extends BaseAppCompatActivity {
@@ -75,7 +75,7 @@ public class AndroidManifestInjection extends BaseAppCompatActivity {
     }
 
     private void checkAttrs() {
-        String path = FileUtil.getExternalStorageDir().concat("/.sketchware/data/").concat(sc_id).concat("/Injection/androidmanifest/attributes.json");
+        String path = FileUtil.getExternalStorageDir().concat("/.ascode/data/").concat(sc_id).concat("/Injection/androidmanifest/attributes.json");
         if (FileUtil.isExistFile(path)) {
             ArrayList<HashMap<String, Object>> data = getGson().fromJson(FileUtil.readFile(path), Helper.TYPE_MAP_LIST);
             for (int i = 0; i < data.size(); i++) {
@@ -143,7 +143,7 @@ public class AndroidManifestInjection extends BaseAppCompatActivity {
         Intent intent = new Intent();
         intent.setClass(getApplicationContext(), SrcCodeEditor.class);
 
-        String APP_COMPONENTS_PATH = FileUtil.getExternalStorageDir().concat("/.sketchware/data/").concat(sc_id).concat("/Injection/androidmanifest/app_components.txt");
+        String APP_COMPONENTS_PATH = FileUtil.getExternalStorageDir().concat("/.ascode/data/").concat(sc_id).concat("/Injection/androidmanifest/app_components.txt");
         if (!FileUtil.isExistFile(APP_COMPONENTS_PATH)) FileUtil.writeFile(APP_COMPONENTS_PATH, "");
         intent.putExtra("content", APP_COMPONENTS_PATH);
         intent.putExtra("xml", "");
@@ -166,7 +166,7 @@ public class AndroidManifestInjection extends BaseAppCompatActivity {
         dialog.setPositiveButton(Helper.getResString(R.string.common_word_save), (v, which) -> {
             if (!Helper.getText(activity_name_input).trim().isEmpty()) {
                 AndroidManifestInjector.setLauncherActivity(sc_id, Helper.getText(activity_name_input));
-                SketchwareUtil.toast("Saved");
+                AscodeUtil.toast("Saved");
                 v.dismiss();
             } else {
                 activity_name_input.setError("Enter activity name");
@@ -190,7 +190,7 @@ public class AndroidManifestInjection extends BaseAppCompatActivity {
         dialog.setPositiveButton(Helper.getResString(R.string.common_word_save), (v, which) -> {
             if (!Helper.getText(activity_name_input).trim().isEmpty()) {
                 addNewActivity(Helper.getText(activity_name_input));
-                SketchwareUtil.toast("New Activity added");
+                AscodeUtil.toast("New Activity added");
                 v.dismiss();
             } else {
                 activity_name_input.setError("Enter activity name");
@@ -201,7 +201,7 @@ public class AndroidManifestInjection extends BaseAppCompatActivity {
     }
 
     private void addNewActivity(String componentName) {
-        String path = FileUtil.getExternalStorageDir().concat("/.sketchware/data/").concat(sc_id).concat("/Injection/androidmanifest/attributes.json");
+        String path = FileUtil.getExternalStorageDir().concat("/.ascode/data/").concat(sc_id).concat("/Injection/androidmanifest/attributes.json");
         ArrayList<HashMap<String, Object>> data = new ArrayList<>();
         if (FileUtil.isExistFile(path)) {
             data = getGson().fromJson(FileUtil.readFile(path), Helper.TYPE_MAP_LIST);
@@ -256,7 +256,7 @@ public class AndroidManifestInjection extends BaseAppCompatActivity {
 
     private void refreshList() {
         activitiesListMap.clear();
-        String path = FileUtil.getExternalStorageDir().concat("/.sketchware/data/").concat(sc_id).concat("/Injection/androidmanifest/attributes.json");
+        String path = FileUtil.getExternalStorageDir().concat("/.ascode/data/").concat(sc_id).concat("/Injection/androidmanifest/attributes.json");
         ArrayList<String> temp = new ArrayList<>();
         ArrayList<HashMap<String, Object>> data;
         if (FileUtil.isExistFile(path)) {
@@ -280,7 +280,7 @@ public class AndroidManifestInjection extends BaseAppCompatActivity {
 
     private void deleteActivity(int pos) {
         String activity_name = (String) activitiesListMap.get(pos).get("act_name");
-        String path = FileUtil.getExternalStorageDir().concat("/.sketchware/data/").concat(sc_id).concat("/Injection/androidmanifest/attributes.json");
+        String path = FileUtil.getExternalStorageDir().concat("/.ascode/data/").concat(sc_id).concat("/Injection/androidmanifest/attributes.json");
         ArrayList<HashMap<String, Object>> data;
         data = getGson().fromJson(FileUtil.readFile(path), Helper.TYPE_MAP_LIST);
         for (int i = data.size() - 1; i > -1; i--) {
@@ -292,11 +292,11 @@ public class AndroidManifestInjection extends BaseAppCompatActivity {
         FileUtil.writeFile(path, getGson().toJson(data));
         refreshList();
         removeComponents(activity_name);
-        SketchwareUtil.toast("Activity removed");
+        AscodeUtil.toast("Activity removed");
     }
 
     private void removeComponents(String str) {
-        String path = FileUtil.getExternalStorageDir().concat("/.sketchware/data/").concat(sc_id).concat("/Injection/androidmanifest/activities_components.json");
+        String path = FileUtil.getExternalStorageDir().concat("/.ascode/data/").concat(sc_id).concat("/Injection/androidmanifest/activities_components.json");
         ArrayList<HashMap<String, Object>> data;
         if (FileUtil.isExistFile(path)) {
             data = getGson().fromJson(FileUtil.readFile(path), Helper.TYPE_MAP_LIST);

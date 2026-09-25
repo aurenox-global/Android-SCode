@@ -33,8 +33,8 @@ import java.util.regex.Matcher;
 import a.a.a.Lx;
 import a.a.a.wB;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.utility.AscodeUtil;
 
 /**
  * A lightweight Code Editor with syntax highlighting, auto indentation, word wrap and lines.
@@ -207,7 +207,7 @@ public class CodeEditorLayout extends LinearLayout implements TextWatcher {
                     try {
                         prettifiedString = Lx.j(Lx.j(prettifiedString, false), false);
                     } catch (Exception e) {
-                        SketchwareUtil.toastError("Error: Your code contains incorrectly nested parentheses");
+                        AscodeUtil.toastError("Error: Your code contains incorrectly nested parentheses");
                         break;
                     }
 

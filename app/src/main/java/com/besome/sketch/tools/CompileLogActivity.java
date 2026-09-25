@@ -22,8 +22,8 @@ import mod.hey.studios.util.CompileLogHelper;
 import mod.hey.studios.util.Helper;
 import mod.jbk.diagnostic.CompileErrorSaver;
 import mod.jbk.util.AddMarginOnApplyWindowInsetsListener;
-import pro.sketchware.databinding.CompileLogBinding;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.databinding.CompileLogBinding;
+import com.ascode.android.utility.AscodeUtil;
 
 public class CompileLogActivity extends BaseAppCompatActivity {
 
@@ -69,9 +69,9 @@ public class CompileLogActivity extends BaseAppCompatActivity {
                 if (compileErrorSaver.logFileExists()) {
                     compileErrorSaver.deleteSavedLogs();
                     getIntent().removeExtra("error");
-                    SketchwareUtil.toast("Compile logs have been cleared.");
+                    AscodeUtil.toast("Compile logs have been cleared.");
                 } else {
-                    SketchwareUtil.toast("No compile logs found.");
+                    AscodeUtil.toast("No compile logs found.");
                 }
 
                 setErrorText();

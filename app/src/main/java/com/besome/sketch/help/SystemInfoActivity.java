@@ -14,8 +14,8 @@ import com.besome.sketch.lib.ui.PropertyTwoLineItem;
 import a.a.a.GB;
 import a.a.a.mB;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
-import pro.sketchware.databinding.ActivitySystemInfoBinding;
+import com.ascode.android.R;
+import com.ascode.android.databinding.ActivitySystemInfoBinding;
 
 public class SystemInfoActivity extends BaseAppCompatActivity {
 
@@ -66,7 +66,7 @@ public class SystemInfoActivity extends BaseAppCompatActivity {
                     Intent intent = new Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS);
                     startActivity(intent);
                 } catch (ActivityNotFoundException ignored) {
-                    android.util.Log.d("SketchwarePro", "SystemInfoActivity: developer settings screen not available", ignored);
+                    android.util.Log.d("Ascode", "SystemInfoActivity: developer settings screen not available", ignored);
                 }
             }
         });

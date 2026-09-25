@@ -1,13 +1,13 @@
 <paths>
     <external-path
-        name="sketchware_data"
-        path=".sketchware/" />
+        name="ascode_data"
+        path=".ascode/" />
     <external-path
-        name="sketchware_backups"
-        path=".sketchware/backups/" />
+        name="ascode_backups"
+        path=".ascode/backups/" />
     <!-- Signed APKs built by the unified compile dialog, so its "Install" button can hand the
-         file to the package installer ("sketchware/signed_apk"). -->
+         file to the package installer ("ascode/signed_apk"). -->
     <external-path
-        name="sketchware_signed_apk"
-        path="sketchware/signed_apk/" />
+        name="ascode_signed_apk"
+        path="ascode/signed_apk/" />
 </paths>

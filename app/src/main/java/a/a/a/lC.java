@@ -166,7 +166,7 @@ public class lC {
                     a.put("my_app_name", hashMap.get("my_app_name"));
                     a.put("sc_ver_code", hashMap.get("sc_ver_code"));
                     a.put("sc_ver_name", hashMap.get("sc_ver_name"));
-                    a.put("sketchware_ver", hashMap.get("sketchware_ver"));
+                    a.put("ascode_ver", hashMap.get("ascode_ver"));
                     a.put("color_accent", hashMap.get("color_accent"));
                     a.put("color_primary", hashMap.get("color_primary"));
                     a.put("color_primary_dark", hashMap.get("color_primary_dark"));
@@ -192,7 +192,7 @@ public class lC {
                 try {
                     projectIndices.add(Integer.parseInt(workspaceName.substring(10)));
                 } catch (Exception ignored) {
-                    android.util.Log.d("SketchwarePro", "lC: Exception ignored", ignored);
+                    android.util.Log.d("Ascode", "lC: Exception ignored", ignored);
                 }
             }
         }

@@ -13,8 +13,8 @@ import java.util.regex.Pattern;
 
 import io.github.rosemoe.sora.lang.diagnostic.DiagnosticRegion;
 import mod.jbk.build.BuiltInLibraries;
-import pro.sketchware.utility.FilePathUtil;
-import pro.sketchware.utility.FileUtil;
+import com.ascode.android.utility.FilePathUtil;
+import com.ascode.android.utility.FileUtil;
 
 /**
  * Diagnostico de Java "al vuelo" reutilizando el compilador de Eclipse (ECJ) que la app ya lleva

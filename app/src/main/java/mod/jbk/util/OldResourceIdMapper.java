@@ -2,7 +2,7 @@ package mod.jbk.util;
 
 import androidx.annotation.DrawableRes;
 
-import pro.sketchware.R;
+import com.ascode.android.R;
 
 public class OldResourceIdMapper {
     public static final int LOWEST_ID = 2131165190;
@@ -635,8 +635,8 @@ public class OldResourceIdMapper {
             case 2131165854 -> R.drawable.ic_share_white_24dp;
             case 2131165855 -> R.drawable.ic_short_desc;
             case 2131165856 -> R.drawable.ic_sign_up_grey_48dp;
-            case 2131165857 -> R.drawable.ic_sketchware_48dp;
-            case 2131165858 -> R.drawable.ic_sketchware_96dp;
+            case 2131165857 -> R.drawable.ic_ascode_48dp;
+            case 2131165858 -> R.drawable.ic_ascode_96dp;
             case 2131165859 -> R.drawable.ic_sms_white_24dp;
             case 2131165860 -> R.drawable.ic_social_white_48dp;
             case 2131165861 -> R.drawable.ic_sound_wave_48dp;
@@ -890,7 +890,7 @@ public class OldResourceIdMapper {
             case 2131166110 -> R.drawable.selector_menu_tadvanced;
             case 2131166111 -> R.drawable.selector_menu_tbasic;
             case 2131166112 -> R.drawable.selector_palette_tab_ic_bookmark;
-            case 2131166113 -> R.drawable.selector_palette_tab_ic_sketchware;
+            case 2131166113 -> R.drawable.selector_palette_tab_ic_ascode;
             case 2131166114 -> R.drawable.selector_palette_tab_round;
             case 2131166115 -> R.drawable.selector_plugin;
             case 2131166116 -> R.drawable.selector_save;
@@ -930,14 +930,14 @@ public class OldResourceIdMapper {
             case 2131166158 -> R.drawable.side_menu_widget_icon_over_white;
             case 2131166159 -> R.drawable.sign_up_96;
             case 2131166160 -> R.drawable.siren_48;
-            case 2131166161 -> R.drawable.sketch_app_icon;
-            case 2131166162 -> R.drawable.sketchbear_head;
-            case 2131166163 -> R.drawable.sketchware_48_white;
-            case 2131166164 -> R.drawable.sketchware_bi;
-            case 2131166165 -> R.drawable.sketchware_bi_blue;
-            case 2131166166 -> R.drawable.sketchware_bi_gray;
-            case 2131166167 -> R.drawable.sketchware_noti_icon;
-            case 2131166168 -> R.drawable.sketchware_welcome;
+            case 2131166161 -> R.drawable.ascode_app_icon;
+            case 2131166162 -> R.drawable.ascode_bear_head;
+            case 2131166163 -> R.drawable.ascode_48_white;
+            case 2131166164 -> R.drawable.ascode_bi;
+            case 2131166165 -> R.drawable.ascode_bi_blue;
+            case 2131166166 -> R.drawable.ascode_bi_gray;
+            case 2131166167 -> R.drawable.ascode_noti_icon;
+            case 2131166168 -> R.drawable.ascode_welcome;
             case 2131166169 -> R.drawable.slack;
             case 2131166170 -> R.drawable.slack_color;
             case 2131166171 -> R.drawable.slack_white;

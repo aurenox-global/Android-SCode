@@ -42,15 +42,15 @@ echo "Running architectural fitness checks..."
 # Keep core configuration/storage packages independent from UI and legacy compiler/editor layers.
 check_forbidden_imports \
   "Core packages must not depend on UI or legacy layers" \
-  "com\\.besome\\.sketch|a\\.a\\.a|mod\\.|pro\\.sketchware\\.(activities|fragments|dialogs)\\." \
-  "app/src/main/java/pro/sketchware/featureflags" \
-  "app/src/main/java/pro/sketchware/metrics"
+  "com\\.besome\\.sketch|a\\.a\\.a|mod\\.|pro\\.ascode\\.(activities|fragments|dialogs)\\." \
+  "app/src/main/java/pro/ascode/featureflags" \
+  "app/src/main/java/pro/ascode/metrics"
 
 # Keep AI core services free of direct Activity imports.
 check_forbidden_imports \
   "AI core package must not depend on Activities" \
-  "pro\\.sketchware\\.activities\\." \
-  "app/src/main/java/pro/sketchware/ai"
+  "pro\\.ascode\\.activities\\." \
+  "app/src/main/java/pro/ascode/ai"
 
 if [ "$VIOLATIONS" -gt 0 ]; then
   echo "Architectural fitness checks failed with $VIOLATIONS rule violation(s)."

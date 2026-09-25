@@ -18,7 +18,7 @@
         errorLine1="    public void onBackPressed() {"
         errorLine2="                ~~~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/activities/editor/view/CodeViewerActivity.java"
+            file="src/main/java/pro/ascode/activities/editor/view/CodeViewerActivity.java"
             line="214"
             column="17"/>
     </issue>
@@ -92,7 +92,7 @@
     <issue
         id="DefaultLocale"
         message="Implicitly using the default locale is a common source of bugs: Use `toLowerCase(Locale)` instead. For strings meant to be internal use `Locale.ROOT`, otherwise `Locale.getDefault()`."
-        errorLine1="                    String extractedFontName = SketchwareUtil.getSafDocumentDisplayName(intentData).orElse(&quot;invalid.tff&quot;).toLowerCase();"
+        errorLine1="                    String extractedFontName = AscodeUtil.getSafDocumentDisplayName(intentData).orElse(&quot;invalid.tff&quot;).toLowerCase();"
         errorLine2="                                                                                                                          ~~~~~~~~~~~">
         <location
             file="src/main/java/com/besome/sketch/editor/manage/font/AddFontActivity.java"
@@ -172,7 +172,7 @@
         errorLine1="            if (array.getArrayName().toLowerCase().contains(newText)) {"
         errorLine2="                                     ~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/activities/resourceseditor/components/adapters/ArraysAdapter.java"
+            file="src/main/java/pro/ascode/activities/resourceseditor/components/adapters/ArraysAdapter.java"
             line="56"
             column="38"/>
     </issue>
@@ -183,7 +183,7 @@
         errorLine1="            ARRAYS_TYPES arrayType = ARRAYS_TYPES.valueOf(arrayTypeString.toUpperCase());"
         errorLine2="                                                                          ~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/activities/resourceseditor/components/fragments/ArraysEditor.java"
+            file="src/main/java/pro/ascode/activities/resourceseditor/components/fragments/ArraysEditor.java"
             line="159"
             column="75"/>
     </issue>
@@ -194,7 +194,7 @@
         errorLine1="            array.setArrayType(ARRAYS_TYPES.valueOf(arrayType.toUpperCase()));"
         errorLine2="                                                              ~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/activities/resourceseditor/components/fragments/ArraysEditor.java"
+            file="src/main/java/pro/ascode/activities/resourceseditor/components/fragments/ArraysEditor.java"
             line="210"
             column="63"/>
     </issue>
@@ -216,7 +216,7 @@
         errorLine1="            String filterText = newText.toLowerCase().trim();"
         errorLine2="                                        ~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/activities/resourceseditor/components/adapters/ColorsAdapter.java"
+            file="src/main/java/pro/ascode/activities/resourceseditor/components/adapters/ColorsAdapter.java"
             line="72"
             column="41"/>
     </issue>
@@ -227,7 +227,7 @@
         errorLine1="                    .filter(item -> item.getColorName().toLowerCase().contains(filterText) ||"
         errorLine2="                                                        ~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/activities/resourceseditor/components/adapters/ColorsAdapter.java"
+            file="src/main/java/pro/ascode/activities/resourceseditor/components/adapters/ColorsAdapter.java"
             line="74"
             column="57"/>
     </issue>
@@ -238,7 +238,7 @@
         errorLine1="                            item.getColorValue().toLowerCase().contains(filterText))"
         errorLine2="                                                 ~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/activities/resourceseditor/components/adapters/ColorsAdapter.java"
+            file="src/main/java/pro/ascode/activities/resourceseditor/components/adapters/ColorsAdapter.java"
             line="75"
             column="50"/>
     </issue>
@@ -315,7 +315,7 @@
         errorLine1="                String filterText = s.toString().toLowerCase();"
         errorLine2="                                                 ~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/menu/ExtraMenuBean.java"
+            file="src/main/java/pro/ascode/menu/ExtraMenuBean.java"
             line="100"
             column="50"/>
     </issue>
@@ -326,7 +326,7 @@
         errorLine1="                        String itemText = Helper.getText(textView).toLowerCase();"
         errorLine2="                                                                   ~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/menu/ExtraMenuBean.java"
+            file="src/main/java/pro/ascode/menu/ExtraMenuBean.java"
             line="104"
             column="68"/>
     </issue>
@@ -337,7 +337,7 @@
         errorLine1="            return String.format(&quot;%d %s&quot;, (int) value, units[unitIndex]);"
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/utility/FileUtil.java"
+            file="src/main/java/pro/ascode/utility/FileUtil.java"
             line="106"
             column="20"/>
     </issue>
@@ -348,7 +348,7 @@
         errorLine1="            return String.format(&quot;%.1f %s&quot;, value, units[unitIndex]);"
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/utility/FileUtil.java"
+            file="src/main/java/pro/ascode/utility/FileUtil.java"
             line="108"
             column="20"/>
     </issue>
@@ -458,7 +458,7 @@
         errorLine1="            if (icon.first.toLowerCase().contains(query.toLowerCase())) {"
         errorLine2="                           ~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/activities/importicon/ImportIconActivity.java"
+            file="src/main/java/pro/ascode/activities/importicon/ImportIconActivity.java"
             line="268"
             column="28"/>
     </issue>
@@ -469,7 +469,7 @@
         errorLine1="            if (icon.first.toLowerCase().contains(query.toLowerCase())) {"
         errorLine2="                                                        ~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/activities/importicon/ImportIconActivity.java"
+            file="src/main/java/pro/ascode/activities/importicon/ImportIconActivity.java"
             line="268"
             column="57"/>
     </issue>
@@ -755,7 +755,7 @@
         errorLine1="                        var widget = tab.getTag().toString().toLowerCase();"
         errorLine2="                                                             ~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/activities/appcompat/ManageAppCompatActivity.java"
+            file="src/main/java/pro/ascode/activities/appcompat/ManageAppCompatActivity.java"
             line="127"
             column="62"/>
     </issue>
@@ -1096,7 +1096,7 @@
         errorLine1="        String trimmedLowerName = charSequence.toString().trim().toLowerCase();"
         errorLine2="                                                                 ~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/lib/validator/PropertyNameValidator.java"
+            file="src/main/java/pro/ascode/lib/validator/PropertyNameValidator.java"
             line="34"
             column="66"/>
     </issue>
@@ -1107,7 +1107,7 @@
         errorLine1="        if (value != null &amp;&amp; value.length() > 0 &amp;&amp; trimmedLowerName.equals(value.toLowerCase())) {"
         errorLine2="                                                                                 ~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/lib/validator/PropertyNameValidator.java"
+            file="src/main/java/pro/ascode/lib/validator/PropertyNameValidator.java"
             line="47"
             column="82"/>
     </issue>
@@ -1140,7 +1140,7 @@
         errorLine1="                    newText = newText.toLowerCase().trim();"
         errorLine2="                                      ~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/activities/resourceseditor/ResourcesEditorActivity.java"
+            file="src/main/java/pro/ascode/activities/resourceseditor/ResourcesEditorActivity.java"
             line="316"
             column="39"/>
     </issue>
@@ -1228,7 +1228,7 @@
         errorLine1="                if (key != null &amp;&amp; key.toLowerCase().contains(query) || text != null &amp;&amp; text.toLowerCase().contains(query)) {"
         errorLine2="                                       ~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/activities/resourceseditor/components/adapters/StringsAdapter.java"
+            file="src/main/java/pro/ascode/activities/resourceseditor/components/adapters/StringsAdapter.java"
             line="154"
             column="40"/>
     </issue>
@@ -1239,7 +1239,7 @@
         errorLine1="                if (key != null &amp;&amp; key.toLowerCase().contains(query) || text != null &amp;&amp; text.toLowerCase().contains(query)) {"
         errorLine2="                                                                                             ~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/activities/resourceseditor/components/adapters/StringsAdapter.java"
+            file="src/main/java/pro/ascode/activities/resourceseditor/components/adapters/StringsAdapter.java"
             line="154"
             column="94"/>
     </issue>
@@ -1250,7 +1250,7 @@
         errorLine1="            if (style.getStyleName().toLowerCase().contains(newText)) {"
         errorLine2="                                     ~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/activities/resourceseditor/components/adapters/StylesAdapter.java"
+            file="src/main/java/pro/ascode/activities/resourceseditor/components/adapters/StylesAdapter.java"
             line="57"
             column="38"/>
     </issue>
@@ -1272,7 +1272,7 @@
         errorLine1="                    .toUpperCase();"
         errorLine2="                     ~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/blocks/typing/TypedBlockTargetCompatibilityValidator.java"
+            file="src/main/java/pro/ascode/blocks/typing/TypedBlockTargetCompatibilityValidator.java"
             line="85"
             column="22"/>
     </issue>
@@ -1305,7 +1305,7 @@
         errorLine1="        return input.substring(0, 1).toLowerCase() + input.substring(1);"
         errorLine2="                                     ~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/widgets/WidgetsCreatorManager.java"
+            file="src/main/java/pro/ascode/widgets/WidgetsCreatorManager.java"
             line="559"
             column="38"/>
     </issue>
@@ -1481,7 +1481,7 @@
         errorLine1="import android.media.ExifInterface;"
         errorLine2="       ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/utility/FileUtil.java"
+            file="src/main/java/pro/ascode/utility/FileUtil.java"
             line="21"
             column="8"/>
     </issue>
@@ -1579,7 +1579,7 @@
         errorLine1="                    getContentResolver().takePersistableUriPermission(uri, takeFlags);"
         errorLine2="                                                                           ~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/activities/ai/LocalAiManagerActivity.java"
+            file="src/main/java/pro/ascode/activities/ai/LocalAiManagerActivity.java"
             line="653"
             column="76"/>
     </issue>
@@ -1667,7 +1667,7 @@
         errorLine1="            if (intent.resolveActivity(getPackageManager()) != null) {"
         errorLine2="                       ~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/activities/importicon/ImportIconActivity.java"
+            file="src/main/java/pro/ascode/activities/importicon/ImportIconActivity.java"
             line="431"
             column="24"/>
     </issue>
@@ -2402,7 +2402,7 @@
         errorLine1="        int attrId = context.getResources().getIdentifier(attrName, &quot;attr&quot;, defPackage);"
         errorLine2="                                            ~~~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/activities/preview/ProjectResourceResolver.java"
+            file="src/main/java/pro/ascode/activities/preview/ProjectResourceResolver.java"
             line="100"
             column="45"/>
     </issue>
@@ -2413,7 +2413,7 @@
         errorLine1="            attrId = context.getResources().getIdentifier(attrName, &quot;attr&quot;, &quot;com.google.android.material&quot;);"
         errorLine2="                                            ~~~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/activities/preview/ProjectResourceResolver.java"
+            file="src/main/java/pro/ascode/activities/preview/ProjectResourceResolver.java"
             line="102"
             column="45"/>
     </issue>
@@ -2758,7 +2758,7 @@
         errorLine1="            webView.getSettings().setJavaScriptEnabled(true);"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/activities/preview/LayoutPreviewActivity.java"
+            file="src/main/java/pro/ascode/activities/preview/LayoutPreviewActivity.java"
             line="784"
             column="13"/>
     </issue>
@@ -2893,7 +2893,7 @@
         errorLine1="        android:pathData=&quot;M52.43,13.7h9.72v22.1h0.58l18.86,-22.1h11.73v0.57L74.68,35.59l20.59,29.09v0.57h-11.88L68.06,43.29l-5.91,6.84L62.15,65.25h-9.72ZM110.42,22.91v11.95h20.66v9.22h-20.66v11.95h22.97v9.22h-32.69L100.7,13.7h32.69v9.21ZM153.38,65.25L153.38,22.91h-14.4L138.98,13.7h38.52v9.22h-14.4L163.1,65.25ZM227.41,56.97c-2.54,3.07 -5.54,5.43 -9,7.06 -3.46,1.58 -7.32,2.38 -11.59,2.38 -3.84,0 -7.42,-0.69 -10.73,-2.09 -3.26,-1.39 -6.09,-3.29 -8.5,-5.69 -2.4,-2.4 -4.3,-5.23 -5.69,-8.5 -1.39,-3.31 -2.09,-6.86 -2.09,-10.66 0,-3.79 0.7,-7.32 2.09,-10.58 1.39,-3.31 3.29,-6.17 5.69,-8.57 2.4,-2.4 5.23,-4.29 8.5,-5.69 3.31,-1.39 6.89,-2.09 10.73,-2.09 4.13,0 7.75,0.72 10.87,2.16 3.17,1.44 5.98,3.53 8.42,6.26l-6.84,6.63a18.06,18.06 0,0 0,-5.33 -4.25c-1.96,-1.06 -4.32,-1.59 -7.05,-1.59 -2.4,0 -4.66,0.43 -6.77,1.3a16.38,16.38 0,0 0,-5.54 3.53c-1.53,1.53 -2.76,3.41 -3.67,5.62 -0.91,2.16 -1.37,4.58 -1.37,7.27 0,2.69 0.46,5.14 1.37,7.34 0.91,2.16 2.14,4.01 3.67,5.55 1.59,1.53 3.43,2.73 5.54,3.6 2.11,0.82 4.37,1.23 6.77,1.23 2.88,0 5.43,-0.58 7.63,-1.73 2.25,-1.2 4.25,-2.88 5.98,-5.04ZM235.32,13.7h9.72v20.59h21.67L266.71,13.7h9.72L276.43,65.25h-9.72L266.71,43.51h-21.67L245.04,65.25h-9.72ZM282.86,13.7h10.3l7.99,30.09 1.15,5.55h0.57l1.51,-5.55 7.42,-23.18h9.07l7.49,23.18 1.44,5.47h0.57l1.08,-5.47 7.49,-30.09h10.3L335.56,65.25h-9.36l-8.06,-24.84 -1.51,-5.69h-0.58l-1.51,5.69 -8.06,24.84h-9.36ZM367.5,13.7h11.09l19.37,51.55L387.23,65.25l-4.25,-12.31h-19.87l-4.25,12.31h-10.73ZM379.81,44.01 L375.21,31.12 373.34,24.86h-0.58l-1.87,6.26 -4.61,12.89ZM404.1,13.7h18.79c2.59,0 4.95,0.41 7.05,1.22 2.11,0.82 3.91,1.95 5.4,3.38 1.53,1.44 2.71,3.17 3.53,5.18 0.82,1.97 1.22,4.13 1.22,6.48 0,1.73 -0.29,3.36 -0.86,4.9a15.32,15.32 0,0 1,-2.38 4.1,19.16 19.16,0 0,1 -3.53,3.24 18.69,18.69 0,0 1,-4.25 2.16l-0.07,0.5 13.82,19.8v0.57h-11.16l-13.32,-19.37h-4.54L413.82,65.25h-9.72ZM422.82,36.95c2.21,0 4.01,-0.67 5.4,-2.02 1.44,-1.34 2.16,-3.05 2.16,-5.11 0,-0.91 -0.17,-1.81 -0.5,-2.66a6.27,6.27 0,0 0,-1.37 -2.3c-0.63,-0.67 -1.42,-1.2 -2.38,-1.59 -0.91,-0.43 -1.96,-0.65 -3.17,-0.65h-9.14v14.33ZM458.57,22.91v11.95h20.66v9.22L458.57,44.08v11.95h22.97v9.22h-32.69L448.85,13.7h32.69v9.21ZM52.41,90.75L52.41,69.27h7.56a7.85,7.85 0,0 1,2.85 0.51c0.9,0.32 1.68,0.78 2.34,1.38 0.66,0.6 1.18,1.32 1.56,2.16 0.38,0.82 0.57,1.73 0.57,2.73 0,1.02 -0.19,1.95 -0.57,2.79a6.61,6.61 0,0 1,-1.56 2.13,7.23 7.23,0 0,1 -2.34,1.41c-0.88,0.32 -1.83,0.48 -2.85,0.48L56.46,82.86v7.89ZM60.03,79.02c1.06,0 1.86,-0.3 2.4,-0.9 0.54,-0.6 0.81,-1.29 0.81,-2.07 0,-0.38 -0.07,-0.75 -0.21,-1.11a2.17,2.17 0,0 0,-0.6 -0.93,2.64 2.64,0 0,0 -0.99,-0.66c-0.4,-0.16 -0.87,-0.24 -1.41,-0.24h-3.57v5.91ZM70.27,69.27h7.83c1.08,0 2.06,0.17 2.94,0.51 0.88,0.34 1.63,0.81 2.25,1.41a5.98,5.98 0,0 1,1.47 2.16c0.34,0.82 0.51,1.72 0.51,2.7 0,0.72 -0.12,1.4 -0.36,2.04a6.36,6.36 0,0 1,-0.99 1.71c-0.43,0.51 -0.93,0.97 -1.47,1.35a7.64,7.64 0,0 1,-1.77 0.9l-0.03,0.21 5.76,8.25v0.24h-4.65l-5.55,-8.07h-1.89v8.07L70.27,90.75ZM78.07,78.96c0.92,0 1.67,-0.28 2.25,-0.84 0.6,-0.56 0.9,-1.27 0.9,-2.13 0,-0.38 -0.07,-0.75 -0.21,-1.11a2.61,2.61 0,0 0,-1.56 -1.62c-0.38,-0.18 -0.82,-0.27 -1.32,-0.27L74.32,72.99v5.97ZM99.9,91.23c-1.6,0 -3.09,-0.29 -4.47,-0.87a11.09,11.09 0,0 1,-3.54 -2.37,11.52 11.52,0 0,1 -2.37,-3.57 11.66,11.66 0,0 1,-0.84 -4.41c0,-1.56 0.28,-3.02 0.84,-4.38 0.58,-1.38 1.37,-2.57 2.37,-3.57a10.98,10.98 0,0 1,3.54 -2.4c1.38,-0.58 2.87,-0.87 4.47,-0.87 1.6,0 3.08,0.29 4.44,0.87a10.74,10.74 0,0 1,3.57 2.4c1,1 1.78,2.19 2.34,3.57 0.58,1.36 0.87,2.82 0.87,4.38 0,1.56 -0.29,3.03 -0.87,4.41a11.02,11.02 0,0 1,-2.34 3.57c-1,1 -2.19,1.79 -3.57,2.37 -1.36,0.58 -2.84,0.87 -4.44,0.87ZM99.9,87.39c1,0 1.93,-0.18 2.79,-0.54a6.95,6.95 0,0 0,2.28 -1.5,6.57 6.57,0 0,0 1.53,-2.31c0.38,-0.92 0.57,-1.93 0.57,-3.03 0,-1.1 -0.19,-2.1 -0.57,-3 -0.36,-0.92 -0.87,-1.7 -1.53,-2.34a6.83,6.83 0,0 0,-2.28 -1.5,7.09 7.09,0 0,0 -2.79,-0.54c-1,0 -1.94,0.18 -2.82,0.54a7.28,7.28 0,0 0,-2.28 1.5c-0.64,0.64 -1.15,1.42 -1.53,2.34 -0.36,0.9 -0.54,1.9 -0.54,3 0,1.1 0.18,2.11 0.54,3.03 0.38,0.9 0.89,1.67 1.53,2.31a7.41,7.41 0,0 0,2.28 1.5c0.88,0.36 1.82,0.54 2.82,0.54ZM99.9,87.39&quot;"
         errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/drawable/swpro_header_logo.xml"
+            file="src/main/res/drawable/ascode_header_logo.xml"
             line="9"
             column="27"/>
     </issue>
@@ -2966,7 +2966,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?android:colorBackground` with a theme that also paints a background (inferred theme is `@style/Theme.SketchwarePro`)"
+        message="Possible overdraw: Root element paints background `?android:colorBackground` with a theme that also paints a background (inferred theme is `@style/Theme.Ascode`)"
         errorLine1="    android:background=&quot;?android:colorBackground&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -2977,7 +2977,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?android:colorBackground` with a theme that also paints a background (inferred theme is `@style/Theme.SketchwarePro`)"
+        message="Possible overdraw: Root element paints background `?android:colorBackground` with a theme that also paints a background (inferred theme is `@style/Theme.Ascode`)"
         errorLine1="    android:background=&quot;?android:colorBackground&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -2988,7 +2988,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?android:colorBackground` with a theme that also paints a background (inferred theme is `@style/Theme.SketchwarePro`)"
+        message="Possible overdraw: Root element paints background `?android:colorBackground` with a theme that also paints a background (inferred theme is `@style/Theme.Ascode`)"
         errorLine1="    android:background=&quot;?android:colorBackground&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -2999,7 +2999,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.SketchwarePro`)"
+        message="Possible overdraw: Root element paints background `?attr/colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.Ascode`)"
         errorLine1="    android:background=&quot;?attr/colorSurface&quot;>"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -3010,7 +3010,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.SketchwarePro`)"
+        message="Possible overdraw: Root element paints background `?attr/colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.Ascode`)"
         errorLine1="    android:background=&quot;?attr/colorSurface&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -3021,7 +3021,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.SketchwarePro`)"
+        message="Possible overdraw: Root element paints background `?attr/colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.Ascode`)"
         errorLine1="    android:background=&quot;?attr/colorSurface&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -3032,7 +3032,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.SketchwarePro`)"
+        message="Possible overdraw: Root element paints background `?colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.Ascode`)"
         errorLine1="    android:background=&quot;?colorSurface&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -3043,7 +3043,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.SketchwarePro`)"
+        message="Possible overdraw: Root element paints background `?colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.Ascode`)"
         errorLine1="    android:background=&quot;?colorSurface&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -3054,7 +3054,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.SketchwarePro`)"
+        message="Possible overdraw: Root element paints background `?attr/colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.Ascode`)"
         errorLine1="    android:background=&quot;?attr/colorSurface&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -3065,7 +3065,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `#66000000` with a theme that also paints a background (inferred theme is `@style/Theme.SketchwarePro`)"
+        message="Possible overdraw: Root element paints background `#66000000` with a theme that also paints a background (inferred theme is `@style/Theme.Ascode`)"
         errorLine1="    android:background=&quot;#66000000&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -3076,7 +3076,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `#66000000` with a theme that also paints a background (inferred theme is `@style/Theme.SketchwarePro`)"
+        message="Possible overdraw: Root element paints background `#66000000` with a theme that also paints a background (inferred theme is `@style/Theme.Ascode`)"
         errorLine1="    android:background=&quot;#66000000&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -3087,7 +3087,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `#80000000` with a theme that also paints a background (inferred theme is `@style/Theme.SketchwarePro`)"
+        message="Possible overdraw: Root element paints background `#80000000` with a theme that also paints a background (inferred theme is `@style/Theme.Ascode`)"
         errorLine1="    android:background=&quot;#80000000&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -3098,7 +3098,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/colorSurfaceContainer` with a theme that also paints a background (inferred theme is `@style/Theme.SketchwarePro`)"
+        message="Possible overdraw: Root element paints background `?attr/colorSurfaceContainer` with a theme that also paints a background (inferred theme is `@style/Theme.Ascode`)"
         errorLine1="    android:background=&quot;?attr/colorSurfaceContainer&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -3109,7 +3109,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.SketchwarePro`)"
+        message="Possible overdraw: Root element paints background `?attr/colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.Ascode`)"
         errorLine1="    android:background=&quot;?attr/colorSurface&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -3120,7 +3120,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.SketchwarePro`)"
+        message="Possible overdraw: Root element paints background `?attr/colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.Ascode`)"
         errorLine1="    android:background=&quot;?attr/colorSurface&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -3131,7 +3131,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.SketchwarePro`)"
+        message="Possible overdraw: Root element paints background `?attr/colorSurface` with a theme that also paints a background (inferred theme is `@style/Theme.Ascode`)"
         errorLine1="    android:background=&quot;?attr/colorSurface&quot;>"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -3142,7 +3142,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?android:selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Theme.SketchwarePro`)"
+        message="Possible overdraw: Root element paints background `?android:selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Theme.Ascode`)"
         errorLine1="    android:background=&quot;?android:selectableItemBackground&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -3153,7 +3153,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?android:selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Theme.SketchwarePro`)"
+        message="Possible overdraw: Root element paints background `?android:selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Theme.Ascode`)"
         errorLine1="    android:background=&quot;?android:selectableItemBackground&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -3164,7 +3164,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/colorSurfaceContainer` with a theme that also paints a background (inferred theme is `@style/Theme.SketchwarePro`)"
+        message="Possible overdraw: Root element paints background `?attr/colorSurfaceContainer` with a theme that also paints a background (inferred theme is `@style/Theme.Ascode`)"
         errorLine1="    android:background=&quot;?attr/colorSurfaceContainer&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -3175,7 +3175,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@color/backgroundOpenColor` with a theme that also paints a background (inferred theme is `@style/Theme.SketchwarePro`)"
+        message="Possible overdraw: Root element paints background `@color/backgroundOpenColor` with a theme that also paints a background (inferred theme is `@style/Theme.Ascode`)"
         errorLine1="    android:background=&quot;@color/backgroundOpenColor&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -3186,7 +3186,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Theme.SketchwarePro`)"
+        message="Possible overdraw: Root element paints background `?selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/Theme.Ascode`)"
         errorLine1="    android:background=&quot;?selectableItemBackground&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -3197,7 +3197,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/properties_bg` with a theme that also paints a background (inferred theme is `@style/Theme.SketchwarePro`)"
+        message="Possible overdraw: Root element paints background `@drawable/properties_bg` with a theme that also paints a background (inferred theme is `@style/Theme.Ascode`)"
         errorLine1="    android:background=&quot;@drawable/properties_bg&quot;>"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -3208,7 +3208,7 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `?attr/colorSurfaceContainer` with a theme that also paints a background (inferred theme is `@style/Theme.SketchwarePro`)"
+        message="Possible overdraw: Root element paints background `?attr/colorSurfaceContainer` with a theme that also paints a background (inferred theme is `@style/Theme.Ascode`)"
         errorLine1="    android:background=&quot;?attr/colorSurfaceContainer&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -4938,7 +4938,7 @@
     <issue
         id="UnusedResources"
         message="The resource `R.string.besome_blog_url` appears to be unused"
-        errorLine1="    &lt;string name=&quot;besome_blog_url&quot;>http://medium.com/sketchware&lt;/string>"
+        errorLine1="    &lt;string name=&quot;besome_blog_url&quot;>http://medium.com/ascode&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
@@ -15707,7 +15707,7 @@
     <issue
         id="UnusedResources"
         message="The resource `R.string.docs_url` appears to be unused"
-        errorLine1="    &lt;string name=&quot;docs_url&quot;>https://docs.sketchware.io/&lt;/string>"
+        errorLine1="    &lt;string name=&quot;docs_url&quot;>https://docs.ascode.io/&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
@@ -15817,7 +15817,7 @@
     <issue
         id="UnusedResources"
         message="The resource `R.string.facebook_url` appears to be unused"
-        errorLine1="    &lt;string name=&quot;facebook_url&quot;>https://fb.com/sketchware&lt;/string>"
+        errorLine1="    &lt;string name=&quot;facebook_url&quot;>https://fb.com/ascode&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
@@ -15839,7 +15839,7 @@
     <issue
         id="UnusedResources"
         message="The resource `R.string.ideas_url` appears to be unused"
-        errorLine1="    &lt;string name=&quot;ideas_url&quot;>https://ideas.sketchware.io/&lt;/string>"
+        errorLine1="    &lt;string name=&quot;ideas_url&quot;>https://ideas.ascode.io/&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
@@ -16136,7 +16136,7 @@
     <issue
         id="UnusedResources"
         message="The resource `R.string.main_drawer_title_ad_label` appears to be unused"
-        errorLine1="    &lt;string name=&quot;main_drawer_title_ad_label&quot;>Another Apps of Sketchware&lt;/string>"
+        errorLine1="    &lt;string name=&quot;main_drawer_title_ad_label&quot;>Another Apps of Android SCode&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
@@ -16212,8 +16212,8 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.string.main_drawer_title_save_sketchware` appears to be unused"
-        errorLine1="    &lt;string name=&quot;main_drawer_title_save_sketchware&quot;>Save Sketchware&lt;/string>"
+        message="The resource `R.string.main_drawer_title_save_ascode` appears to be unused"
+        errorLine1="    &lt;string name=&quot;main_drawer_title_save_ascode&quot;>Save Android SCode&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
@@ -16234,8 +16234,8 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.string.main_drawer_title_sketchware_for_arduino` appears to be unused"
-        errorLine1="    &lt;string name=&quot;main_drawer_title_sketchware_for_arduino&quot;>Sketchware for Arduino&lt;/string>"
+        message="The resource `R.string.main_drawer_title_ascode_for_arduino` appears to be unused"
+        errorLine1="    &lt;string name=&quot;main_drawer_title_ascode_for_arduino&quot;>Android SCode for Arduino&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
@@ -16488,7 +16488,7 @@
     <issue
         id="UnusedResources"
         message="The resource `R.string.medium_url` appears to be unused"
-        errorLine1="    &lt;string name=&quot;medium_url&quot;>https://medium.com/sketchware&lt;/string>"
+        errorLine1="    &lt;string name=&quot;medium_url&quot;>https://medium.com/ascode&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
@@ -17269,7 +17269,7 @@
     <issue
         id="UnusedResources"
         message="The resource `R.string.publish_check_upload_apk_message_dialog_upload_apk_agreement` appears to be unused"
-        errorLine1="    &lt;string name=&quot;publish_check_upload_apk_message_dialog_upload_apk_agreement&quot;>After the app is published, the APK file will be uploaded to Sketchware server for backup purposes. Do you want to continue?&lt;/string>"
+        errorLine1="    &lt;string name=&quot;publish_check_upload_apk_message_dialog_upload_apk_agreement&quot;>After the app is published, the APK file will be uploaded to Android SCode server for backup purposes. Do you want to continue?&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
@@ -20129,7 +20129,7 @@
     <issue
         id="UnusedResources"
         message="The resource `R.string.shared_collection_detail_description_recommend_collection` appears to be unused"
-        errorLine1="    &lt;string name=&quot;shared_collection_detail_description_recommend_collection&quot;>Recommended By Sketchware&lt;/string>"
+        errorLine1="    &lt;string name=&quot;shared_collection_detail_description_recommend_collection&quot;>Recommended By Android SCode&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
@@ -20250,7 +20250,7 @@
     <issue
         id="UnusedResources"
         message="The resource `R.string.shared_collection_detail_message_warn_comment` appears to be unused"
-        errorLine1="    &lt;string name=&quot;shared_collection_detail_message_warn_comment&quot;>If you write a comment not related to this collection, the comment could be deleted and you could be banned from Sketchware&lt;/string>"
+        errorLine1="    &lt;string name=&quot;shared_collection_detail_message_warn_comment&quot;>If you write a comment not related to this collection, the comment could be deleted and you could be banned from Android SCode&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
@@ -21009,7 +21009,7 @@
     <issue
         id="UnusedResources"
         message="The resource `R.string.shared_project_detail_dialog_last_version_description` appears to be unused"
-        errorLine1="    &lt;string name=&quot;shared_project_detail_dialog_last_version_description&quot;>You need the latest version of Sketchware to open this project&lt;/string>"
+        errorLine1="    &lt;string name=&quot;shared_project_detail_dialog_last_version_description&quot;>You need the latest version of Android SCode to open this project&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
@@ -21438,7 +21438,7 @@
     <issue
         id="UnusedResources"
         message="The resource `R.string.slack_url_primary` appears to be unused"
-        errorLine1="    &lt;string name=&quot;slack_url_primary&quot;>http://slack.sketchware.io&lt;/string>"
+        errorLine1="    &lt;string name=&quot;slack_url_primary&quot;>http://slack.ascode.io&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
@@ -21449,7 +21449,7 @@
     <issue
         id="UnusedResources"
         message="The resource `R.string.slack_url_secondary` appears to be unused"
-        errorLine1="    &lt;string name=&quot;slack_url_secondary&quot;>http://sketchware.slack.com&lt;/string>"
+        errorLine1="    &lt;string name=&quot;slack_url_secondary&quot;>http://ascode.slack.com&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
@@ -21669,7 +21669,7 @@
     <issue
         id="UnusedResources"
         message="The resource `R.string.settings_appearance_theme` appears to be unused"
-        errorLine1="    &lt;string name=&quot;settings_appearance_theme&quot;>Sketchware Theme&lt;/string>"
+        errorLine1="    &lt;string name=&quot;settings_appearance_theme&quot;>Android SCode Theme&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
@@ -21844,8 +21844,8 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.style.ShapeAppearance_SketchwarePro_AsymmetricInput` appears to be unused"
-        errorLine1="    &lt;style name=&quot;ShapeAppearance.SketchwarePro.AsymmetricInput&quot; parent=&quot;ShapeAppearance.Material3.Corner.Small&quot;>"
+        message="The resource `R.style.ShapeAppearance_Ascode_AsymmetricInput` appears to be unused"
+        errorLine1="    &lt;style name=&quot;ShapeAppearance.Ascode.AsymmetricInput&quot; parent=&quot;ShapeAppearance.Material3.Corner.Small&quot;>"
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/styles_new.xml"
@@ -21855,8 +21855,8 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.style.Widget_SketchwarePro_TextInputLayout_Asymmetric` appears to be unused"
-        errorLine1="    &lt;style name=&quot;Widget.SketchwarePro.TextInputLayout.Asymmetric&quot; parent=&quot;Widget.Material3.TextInputLayout.OutlinedBox&quot;>"
+        message="The resource `R.style.Widget_Ascode_TextInputLayout_Asymmetric` appears to be unused"
+        errorLine1="    &lt;style name=&quot;Widget.Ascode.TextInputLayout.Asymmetric&quot; parent=&quot;Widget.Material3.TextInputLayout.OutlinedBox&quot;>"
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/styles_new.xml"
@@ -23063,16 +23063,16 @@
 
     <issue
         id="IconDipSize"
-        message="Suspicious file name `ic_sketchware_48dp.png`: The implied 48 `dp` size does not match the actual `dp` size (pixel size 48×48 in a `drawable-xhdpi` folder computes to 24×24 `dp`)">
+        message="Suspicious file name `ic_ascode_48dp.png`: The implied 48 `dp` size does not match the actual `dp` size (pixel size 48×48 in a `drawable-xhdpi` folder computes to 24×24 `dp`)">
         <location
-            file="src/main/res/drawable-xhdpi/ic_sketchware_48dp.png"/>
+            file="src/main/res/drawable-xhdpi/ic_ascode_48dp.png"/>
     </issue>
 
     <issue
         id="IconDipSize"
-        message="Suspicious file name `ic_sketchware_96dp.png`: The implied 96 `dp` size does not match the actual `dp` size (pixel size 96×96 in a `drawable-xhdpi` folder computes to 48×48 `dp`)">
+        message="Suspicious file name `ic_ascode_96dp.png`: The implied 96 `dp` size does not match the actual `dp` size (pixel size 96×96 in a `drawable-xhdpi` folder computes to 48×48 `dp`)">
         <location
-            file="src/main/res/drawable-xhdpi/ic_sketchware_96dp.png"/>
+            file="src/main/res/drawable-xhdpi/ic_ascode_96dp.png"/>
     </issue>
 
     <issue
@@ -23831,7 +23831,7 @@
         errorLine1="            prefs.edit()"
         errorLine2="            ~~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/metrics/AccessibilityIssueReportStore.kt"
+            file="src/main/java/pro/ascode/metrics/AccessibilityIssueReportStore.kt"
             line="59"
             column="13"/>
     </issue>
@@ -23842,7 +23842,7 @@
         errorLine1="            prefs(context).edit().clear().apply()"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/metrics/AccessibilityIssueReportStore.kt"
+            file="src/main/java/pro/ascode/metrics/AccessibilityIssueReportStore.kt"
             line="111"
             column="13"/>
     </issue>
@@ -23853,7 +23853,7 @@
         errorLine1="        prefs.edit()"
         errorLine2="        ~~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/metrics/BuildMetricsStore.kt"
+            file="src/main/java/pro/ascode/metrics/BuildMetricsStore.kt"
             line="89"
             column="9"/>
     </issue>
@@ -23864,7 +23864,7 @@
         errorLine1="        prefs(context).edit().clear().apply()"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/metrics/BuildMetricsStore.kt"
+            file="src/main/java/pro/ascode/metrics/BuildMetricsStore.kt"
             line="163"
             column="9"/>
     </issue>
@@ -23875,7 +23875,7 @@
         errorLine1="            prefs.edit().putString(key, encodeSamples(samples)).apply()"
         errorLine2="            ~~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/metrics/EditorPerformanceMetricsStore.kt"
+            file="src/main/java/pro/ascode/metrics/EditorPerformanceMetricsStore.kt"
             line="50"
             column="13"/>
     </issue>
@@ -23886,7 +23886,7 @@
         errorLine1="            val editor = prefs(context).edit()"
         errorLine2="                         ~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/metrics/EditorPerformanceMetricsStore.kt"
+            file="src/main/java/pro/ascode/metrics/EditorPerformanceMetricsStore.kt"
             line="101"
             column="26"/>
     </issue>
@@ -23897,7 +23897,7 @@
         errorLine1="                prefs.edit()"
         errorLine2="                ~~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/metrics/KmpBuildPerformanceMetricsStore.kt"
+            file="src/main/java/pro/ascode/metrics/KmpBuildPerformanceMetricsStore.kt"
             line="67"
             column="17"/>
     </issue>
@@ -23908,7 +23908,7 @@
         errorLine1="            prefs.edit()"
         errorLine2="            ~~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/metrics/KmpBuildPerformanceMetricsStore.kt"
+            file="src/main/java/pro/ascode/metrics/KmpBuildPerformanceMetricsStore.kt"
             line="72"
             column="13"/>
     </issue>
@@ -23919,7 +23919,7 @@
         errorLine1="            prefs(context).edit().clear().apply()"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/metrics/KmpBuildPerformanceMetricsStore.kt"
+            file="src/main/java/pro/ascode/metrics/KmpBuildPerformanceMetricsStore.kt"
             line="125"
             column="13"/>
     </issue>
@@ -23930,7 +23930,7 @@
         errorLine1="            prefs.edit()"
         errorLine2="            ~~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/metrics/StartupPerformanceMetricsStore.kt"
+            file="src/main/java/pro/ascode/metrics/StartupPerformanceMetricsStore.kt"
             line="64"
             column="13"/>
     </issue>
@@ -23941,7 +23941,7 @@
         errorLine1="            prefs(context).edit().clear().apply()"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/pro/sketchware/metrics/StartupPerformanceMetricsStore.kt"
+            file="src/main/java/pro/ascode/metrics/StartupPerformanceMetricsStore.kt"
             line="127"
             column="13"/>
     </issue>
@@ -23952,7 +23952,7 @@
         errorLine1="                    val scaledBitmap = Bitmap.createScaledBitmap("
         errorLine2="                                       ^">
         <location
-            file="src/main/java/pro/sketchware/utility/SvgUtils.kt"
+            file="src/main/java/pro/ascode/utility/SvgUtils.kt"
             line="88"
             column="40"/>
     </issue>

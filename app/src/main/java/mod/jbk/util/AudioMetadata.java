@@ -10,8 +10,8 @@ import com.bumptech.glide.Glide;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import pro.sketchware.R;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.utility.AscodeUtil;
 
 public class AudioMetadata {
     public static final AudioAttributes MEDIA_PLAYER_AUDIO_ATTRIBUTES = new AudioAttributes.Builder()
@@ -41,7 +41,7 @@ public class AudioMetadata {
             try {
                 mediaMetadataRetriever.release();
             } catch (IOException e) {
-                SketchwareUtil.toastError("Failed to release file " + audio + ": " + e);
+                AscodeUtil.toastError("Failed to release file " + audio + ": " + e);
             }
         }
     }

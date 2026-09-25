@@ -28,7 +28,7 @@ import a.a.a.bB;
 import a.a.a.gB;
 import a.a.a.wB;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
+import com.ascode.android.R;
 
 public class AddAdUnitStepView extends LinearLayout implements Uu, OnClickListener {
     private AdUnitsAdapter adUnitsAdapter;
@@ -116,7 +116,7 @@ public class AddAdUnitStepView extends LinearLayout implements Uu, OnClickListen
 
     @Override
     public String getDocUrl() {
-        return "https://docs.sketchware.io/docs/admob-creating-ad-unit.html";
+        return "https://docs.ascode.io/docs/admob-creating-ad-unit.html";
     }
 
     @Override

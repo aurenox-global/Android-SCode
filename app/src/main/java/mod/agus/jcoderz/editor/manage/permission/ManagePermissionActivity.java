@@ -19,13 +19,13 @@ import java.util.Comparator;
 import java.util.Objects;
 
 import dev.chrisbanes.insetter.Insetter;
-import pro.sketchware.R;
-import pro.sketchware.databinding.ManagePermissionBinding;
-import pro.sketchware.databinding.ViewItemPermissionBinding;
-import pro.sketchware.lib.base.BaseTextWatcher;
-import pro.sketchware.utility.FilePathUtil;
-import pro.sketchware.utility.FileResConfig;
-import pro.sketchware.utility.FileUtil;
+import com.ascode.android.R;
+import com.ascode.android.databinding.ManagePermissionBinding;
+import com.ascode.android.databinding.ViewItemPermissionBinding;
+import com.ascode.android.lib.base.BaseTextWatcher;
+import com.ascode.android.utility.FilePathUtil;
+import com.ascode.android.utility.FileResConfig;
+import com.ascode.android.utility.FileUtil;
 
 public class ManagePermissionActivity extends BaseAppCompatActivity {
     private PermissionsAdapter adapter;

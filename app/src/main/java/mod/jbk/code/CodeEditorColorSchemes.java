@@ -11,7 +11,7 @@ import io.github.rosemoe.sora.langs.textmate.registry.model.ThemeModel;
 import io.github.rosemoe.sora.langs.textmate.registry.provider.AssetsFileResolver;
 import io.github.rosemoe.sora.widget.schemes.EditorColorScheme;
 import mod.jbk.util.LogUtil;
-import pro.sketchware.SketchApplication;
+import com.ascode.android.AscodeApplication;
 
 public class CodeEditorColorSchemes {
     public static final String THEME_DRACULA = "dracula.json";
@@ -20,7 +20,7 @@ public class CodeEditorColorSchemes {
     private static final String TAG = "CodeEditorColorSchemes";
 
     static {
-        AssetManager assets = SketchApplication.getContext().getAssets();
+        AssetManager assets = AscodeApplication.getContext().getAssets();
 
         FileProviderRegistry.getInstance().addFileProvider(new AssetsFileResolver(assets));
         ThemeRegistry registry = ThemeRegistry.getInstance();

@@ -29,12 +29,12 @@ import mod.hey.studios.editor.manage.block.ExtraBlockInfo;
 import mod.hey.studios.editor.manage.block.v2.BlockLoader;
 import mod.hey.studios.util.Helper;
 import mod.hilal.saif.activities.tools.ConfigActivity;
-import pro.sketchware.R;
-import pro.sketchware.databinding.DialogPaletteBinding;
-import pro.sketchware.databinding.ItemCustomBlockBinding;
-import pro.sketchware.databinding.ViewUsedCustomBlocksBinding;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.databinding.DialogPaletteBinding;
+import com.ascode.android.databinding.ItemCustomBlockBinding;
+import com.ascode.android.databinding.ViewUsedCustomBlocksBinding;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.AscodeUtil;
 
 public class CustomBlocksDialog {
 
@@ -78,7 +78,7 @@ public class CustomBlocksDialog {
                         String errorMsg = (missingBlocks == 1)
                                 ? "There is one missing block"
                                 : "There are " + missingBlocks + " missing blocks";
-                        SketchwareUtil.toastError(errorMsg);
+                        AscodeUtil.toastError(errorMsg);
                     }
 
                     dialogBinding.subtitle.setText(subtitle);
@@ -95,7 +95,7 @@ public class CustomBlocksDialog {
                         }
 
                         if (selectedBeans.isEmpty()) {
-                            SketchwareUtil.toastError("Please select at least one block to import.");
+                            AscodeUtil.toastError("Please select at least one block to import.");
                             return;
                         }
 
@@ -148,7 +148,7 @@ public class CustomBlocksDialog {
                     allBlocksList.addAll(blocksList);
                     FileUtil.writeFile(blocksDir, new Gson().toJson(allBlocksList));
                     BlockLoader.refresh();
-                    SketchwareUtil.toast("Blocks imported!");
+                    AscodeUtil.toast("Blocks imported!");
                 })
                 .show();
     }
@@ -167,7 +167,7 @@ public class CustomBlocksDialog {
                     result = new Gson().fromJson(content, Helper.TYPE_MAP_LIST);
                 }
             } catch (JsonParseException | NullPointerException ignored) {
-                android.util.Log.d("SketchwarePro", "CustomBlocksDialog: JsonParseException | NullPointerException ignored", ignored);
+                android.util.Log.d("Ascode", "CustomBlocksDialog: JsonParseException | NullPointerException ignored", ignored);
             }
         }
         return result;
@@ -220,7 +220,7 @@ public class CustomBlocksDialog {
             allBlocksList.addAll(blocksList);
             FileUtil.writeFile(blocksDir, new Gson().toJson(allBlocksList));
             BlockLoader.refresh();
-            SketchwareUtil.toast("Blocks imported!");
+            AscodeUtil.toast("Blocks imported!");
             dialogInterface.dismiss();
         });
         dialog.setNegativeButton(Helper.getResString(R.string.common_word_cancel), null);
@@ -270,7 +270,7 @@ public class CustomBlocksDialog {
                 blockData.put("palette", String.valueOf(paletteIndex));
                 blocksList.add(blockData);
             } catch (Exception ignored) {
-                android.util.Log.d("SketchwarePro", "CustomBlocksDialog: Exception ignored", ignored);
+                android.util.Log.d("Ascode", "CustomBlocksDialog: Exception ignored", ignored);
             }
         }
     }
@@ -374,9 +374,9 @@ public class CustomBlocksDialog {
                         binding.checkBox.setChecked(reversedState);
                         block.isSelected = reversedState;
                     } else if (blockInfo.equals("Missing")) {
-                        SketchwareUtil.toastError("This block is Missing");
+                        AscodeUtil.toastError("This block is Missing");
                     } else {
-                        SketchwareUtil.toastError("This block already exists in your collection");
+                        AscodeUtil.toastError("This block already exists in your collection");
                     }
                 });
             }

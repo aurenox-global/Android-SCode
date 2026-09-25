@@ -10,7 +10,7 @@ import com.besome.sketch.beans.ViewBean;
 import com.besome.sketch.editor.view.ItemView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import pro.sketchware.R;
+import com.ascode.android.R;
 
 public class ItemFloatingActionButton extends FloatingActionButton implements ItemView {
 

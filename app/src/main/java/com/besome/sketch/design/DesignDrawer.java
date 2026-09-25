@@ -24,11 +24,11 @@ import com.google.android.material.shape.MaterialShapeUtils;
 import com.google.android.material.shape.ShapeAppearanceModel;
 
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
-import pro.sketchware.databinding.DesignDrawerItemBinding;
-import pro.sketchware.utility.SketchwareUtil;
-import pro.sketchware.utility.ThemeUtils;
-import pro.sketchware.utility.UI;
+import com.ascode.android.R;
+import com.ascode.android.databinding.DesignDrawerItemBinding;
+import com.ascode.android.utility.AscodeUtil;
+import com.ascode.android.utility.ThemeUtils;
+import com.ascode.android.utility.UI;
 
 public class DesignDrawer extends LinearLayout {
     @SuppressLint("NonConstantResourceId")
@@ -94,8 +94,8 @@ public class DesignDrawer extends LinearLayout {
         setClickable(true);
 
         ShapeAppearanceModel shape = ShapeAppearanceModel.builder()
-                .setTopLeftCornerSize(SketchwareUtil.getDip(24))
-                .setBottomLeftCornerSize(SketchwareUtil.getDip(24))
+                .setTopLeftCornerSize(AscodeUtil.getDip(24))
+                .setBottomLeftCornerSize(AscodeUtil.getDip(24))
                 .build();
 
         MaterialShapeDrawable background = new MaterialShapeDrawable(shape);
@@ -103,7 +103,7 @@ public class DesignDrawer extends LinearLayout {
         background.initializeElevationOverlay(context);
         setBackground(background);
         setElevation(3f);
-        setPadding(0, 0, 0, SketchwareUtil.dpToPx(4));
+        setPadding(0, 0, 0, AscodeUtil.dpToPx(4));
 
         ScrollView scrollView = new ScrollView(context);
         scrollView.setFillViewport(true);
@@ -159,7 +159,7 @@ public class DesignDrawer extends LinearLayout {
 
     @Override
     protected void onMeasure(int widthSpec, int heightSpec) {
-        int maxWidth = SketchwareUtil.dpToPx(300);
+        int maxWidth = AscodeUtil.dpToPx(300);
         switch (MeasureSpec.getMode(widthSpec)) {
             case MeasureSpec.EXACTLY:
                 // nothing
@@ -188,9 +188,9 @@ public class DesignDrawer extends LinearLayout {
         subheader.setText(subheaderResId);
 
         LayoutParams textLp = new LayoutParams(LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        textLp.topMargin = SketchwareUtil.dpToPx(8);
-        textLp.bottomMargin = SketchwareUtil.dpToPx(8);
-        textLp.setMarginStart(SketchwareUtil.dpToPx(20));
+        textLp.topMargin = AscodeUtil.dpToPx(8);
+        textLp.bottomMargin = AscodeUtil.dpToPx(8);
+        textLp.setMarginStart(AscodeUtil.dpToPx(20));
 
         subheader.setLayoutParams(textLp);
         view.addView(subheader);
@@ -198,12 +198,12 @@ public class DesignDrawer extends LinearLayout {
 
     private void addDrawerDivider(ViewGroup view) {
         MaterialDivider divider = new MaterialDivider(getContext());
-        divider.setDividerInsetEnd(SketchwareUtil.dpToPx(20));
-        divider.setDividerInsetStart(SketchwareUtil.dpToPx(20));
+        divider.setDividerInsetEnd(AscodeUtil.dpToPx(20));
+        divider.setDividerInsetStart(AscodeUtil.dpToPx(20));
 
         LayoutParams dividerLp = new LayoutParams(LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        dividerLp.topMargin = SketchwareUtil.dpToPx(8);
-        dividerLp.bottomMargin = SketchwareUtil.dpToPx(8);
+        dividerLp.topMargin = AscodeUtil.dpToPx(8);
+        dividerLp.bottomMargin = AscodeUtil.dpToPx(8);
 
         divider.setLayoutParams(dividerLp);
         view.addView(divider);

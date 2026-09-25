@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22.1)
 
-project(sketchware_local_ai LANGUAGES C CXX)
+project(ascode_local_ai LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -27,10 +27,10 @@ endif()
 
 add_subdirectory("${LLAMA_CPP_DIR}" llama.cpp EXCLUDE_FROM_ALL)
 
-add_library(sketchware_llama SHARED sketchware_llama_jni.cpp)
+add_library(ascode_llama SHARED ascode_llama_jni.cpp)
 
-target_include_directories(sketchware_llama PRIVATE
+target_include_directories(ascode_llama PRIVATE
         "${LLAMA_CPP_DIR}/include"
         "${LLAMA_CPP_DIR}/ggml/include")
 
-target_link_libraries(sketchware_llama PRIVATE llama android log)
+target_link_libraries(ascode_llama PRIVATE llama android log)

@@ -21,7 +21,7 @@
     <Preference
         app:iconSpaceReserved="false"
         app:key="backup-dir"
-        app:summary="The default directory is /Internal storage/.sketchware/backups/."
+        app:summary="The default directory is /Internal storage/.ascode/backups/."
         app:title="Backup directory" />
 
     <Preference

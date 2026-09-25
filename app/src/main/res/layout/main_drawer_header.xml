@@ -15,7 +15,7 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/swpro_header_logo"
+        app:srcCompat="@drawable/ascode_header_logo"
         app:tint="?attr/colorPrimary" />
 
 </LinearLayout>

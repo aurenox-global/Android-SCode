@@ -35,8 +35,8 @@ import a.a.a.oq;
 import mod.agus.jcoderz.beans.ViewBeans;
 import mod.hey.studios.project.ProjectSettings;
 import mod.pranav.viewbinding.ViewBindingBuilder;
-import pro.sketchware.R;
-import pro.sketchware.utility.ScaleTypeCompat;
+import com.ascode.android.R;
+import com.ascode.android.utility.ScaleTypeCompat;
 
 public class ViewPropertyItems extends LinearLayout implements Kw, View.OnClickListener {
     private final boolean b = false;

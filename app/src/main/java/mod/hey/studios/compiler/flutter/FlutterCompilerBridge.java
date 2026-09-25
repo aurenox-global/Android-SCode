@@ -7,15 +7,15 @@ import java.io.File;
 
 import a.a.a.ProjectBuilder;
 import a.a.a.yq;
-import pro.sketchware.featureflags.FeatureFlags;
-import pro.sketchware.flutter.FlutterBuildMode;
-import pro.sketchware.flutter.FlutterDartCompileResult;
-import pro.sketchware.flutter.FlutterDartCompiler;
-import pro.sketchware.flutter.FlutterPackagingSupport;
-import pro.sketchware.flutter.FlutterProject;
-import pro.sketchware.flutter.FlutterProjectDefaults;
-import pro.sketchware.flutter.FlutterProjectStore;
-import pro.sketchware.flutter.FlutterToolchainManager;
+import com.ascode.android.featureflags.FeatureFlags;
+import com.ascode.android.flutter.FlutterBuildMode;
+import com.ascode.android.flutter.FlutterDartCompileResult;
+import com.ascode.android.flutter.FlutterDartCompiler;
+import com.ascode.android.flutter.FlutterPackagingSupport;
+import com.ascode.android.flutter.FlutterProject;
+import com.ascode.android.flutter.FlutterProjectDefaults;
+import com.ascode.android.flutter.FlutterProjectStore;
+import com.ascode.android.flutter.FlutterToolchainManager;
 
 /**
  * Punto de entrada del build Flutter/Dart dentro del pipeline Android del fork

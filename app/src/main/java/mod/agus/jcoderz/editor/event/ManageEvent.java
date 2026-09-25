@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import a.a.a.Gx;
 import a.a.a.Lx;
 import mod.hilal.saif.events.EventsHandler;
-import pro.sketchware.R;
-import pro.sketchware.blocks.generator.components.analyzers.BlockReturnAnalyzer;
+import com.ascode.android.R;
+import com.ascode.android.blocks.generator.components.analyzers.BlockReturnAnalyzer;
 
 public class ManageEvent {
 

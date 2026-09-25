@@ -28,10 +28,10 @@ import java.util.Locale;
 
 import mod.jbk.util.AudioMetadata;
 import mod.jbk.util.SoundPlayingAdapter;
-import pro.sketchware.R;
-import pro.sketchware.databinding.FrManageSoundListBinding;
-import pro.sketchware.databinding.ManageSoundBinding;
-import pro.sketchware.databinding.ManageSoundListItemBinding;
+import com.ascode.android.R;
+import com.ascode.android.databinding.FrManageSoundListBinding;
+import com.ascode.android.databinding.ManageSoundBinding;
+import com.ascode.android.databinding.ManageSoundListItemBinding;
 
 public class Yv extends qA {
     private String sc_id;

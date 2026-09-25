@@ -1,4 +1,4 @@
-package pro.sketchware.kmpsample.android
+package com.ascode.android.kmpsample.android
 
 import android.app.Activity
 import android.os.Bundle

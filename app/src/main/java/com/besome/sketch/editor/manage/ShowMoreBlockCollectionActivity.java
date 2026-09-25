@@ -29,10 +29,10 @@ import a.a.a.Ts;
 import a.a.a.bB;
 import mod.hey.studios.util.Helper;
 import mod.jbk.util.BlockUtil;
-import pro.sketchware.R;
-import pro.sketchware.databinding.ManageCollectionShowBlockBinding;
-import pro.sketchware.tools.ImageFactory;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.databinding.ManageCollectionShowBlockBinding;
+import com.ascode.android.tools.ImageFactory;
+import com.ascode.android.utility.AscodeUtil;
 
 public class ShowMoreBlockCollectionActivity extends BaseAppCompatActivity implements View.OnClickListener {
 
@@ -177,7 +177,7 @@ public class ShowMoreBlockCollectionActivity extends BaseAppCompatActivity imple
             addBlocks(moreBlock.blocks);
             resizeBottomViews();
         } else {
-            SketchwareUtil.toastError("Can't open corrupt More Block");
+            AscodeUtil.toastError("Can't open corrupt More Block");
             finish();
         }
     }
@@ -199,9 +199,9 @@ public class ShowMoreBlockCollectionActivity extends BaseAppCompatActivity imple
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == 12) {
             if (ImageFactory.saveBitmap(binding.editor.getChildAt(0), moreBlockName).exists()) {
-                SketchwareUtil.toast("Saved image to /Internal storage/sketchware/saved_block/" + moreBlockName + ".png!");
+                AscodeUtil.toast("Saved image to /Internal storage/ascode/saved_block/" + moreBlockName + ".png!");
             } else {
-                SketchwareUtil.toastError("Couldn't save image");
+                AscodeUtil.toastError("Couldn't save image");
             }
         }
 

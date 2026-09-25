@@ -13,9 +13,9 @@ import androidx.core.content.ContextCompat;
 import com.google.android.material.card.MaterialCardView;
 
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
-import pro.sketchware.databinding.LogicEditorTopMenuBinding;
-import pro.sketchware.utility.ThemeUtils;
+import com.ascode.android.R;
+import com.ascode.android.databinding.LogicEditorTopMenuBinding;
+import com.ascode.android.utility.ThemeUtils;
 
 public class LogicTopMenu extends LinearLayout {
 

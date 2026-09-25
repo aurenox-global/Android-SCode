@@ -128,36 +128,36 @@ import mod.jbk.editor.manage.MoreblockImporter;
 import mod.jbk.util.BlockUtil;
 import mod.jbk.util.LogUtil;
 import mod.pranav.viewbinding.ViewBindingBuilder;
-import pro.sketchware.R;
-import pro.sketchware.activities.editor.view.CodeViewerActivity;
-import pro.sketchware.activities.resourceseditor.ResourcesEditorActivity;
-import pro.sketchware.blocks.typing.TypedBlockTypeDiagnostic;
-import pro.sketchware.blocks.typing.TypedBlockTypeDiagnosticCode;
-import pro.sketchware.blocks.typing.TypedBlockTypeCheckResult;
-import pro.sketchware.databinding.ImagePickerItemBinding;
-import pro.sketchware.databinding.SearchWithRecyclerViewBinding;
-import pro.sketchware.featureflags.FeatureFlags;
-import pro.sketchware.flutter.FlutterBuildMode;
-import pro.sketchware.flutter.FlutterBuildOrchestrator;
-import pro.sketchware.flutter.FlutterProjectDefaults;
-import pro.sketchware.flutter.FlutterBuildResult;
-import pro.sketchware.flutter.FlutterProject;
-import pro.sketchware.flutter.FlutterProjectStore;
-import pro.sketchware.flutter.FlutterToolchainManager;
-import pro.sketchware.kmp.KmpBlockCompatibilityValidator;
-import pro.sketchware.kmp.KmpCompatibilityInspectorFormatter;
-import pro.sketchware.kmp.KmpCompatibilityInspectorSummary;
-import pro.sketchware.kmp.KmpPreviewSnapshot;
-import pro.sketchware.kmp.KmpPreviewSnapshotBuilder;
-import pro.sketchware.kmp.KmpProject;
-import pro.sketchware.kmp.KmpProjectParseResult;
-import pro.sketchware.kmp.KmpProjectSerializer;
-import pro.sketchware.kmp.KmpTarget;
-import pro.sketchware.menu.ExtraMenuBean;
-import pro.sketchware.metrics.FlutterBuildPerformanceMetricsStore;
-import pro.sketchware.utility.FilePathUtil;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.SvgUtils;
+import com.ascode.android.R;
+import com.ascode.android.activities.editor.view.CodeViewerActivity;
+import com.ascode.android.activities.resourceseditor.ResourcesEditorActivity;
+import com.ascode.android.blocks.typing.TypedBlockTypeDiagnostic;
+import com.ascode.android.blocks.typing.TypedBlockTypeDiagnosticCode;
+import com.ascode.android.blocks.typing.TypedBlockTypeCheckResult;
+import com.ascode.android.databinding.ImagePickerItemBinding;
+import com.ascode.android.databinding.SearchWithRecyclerViewBinding;
+import com.ascode.android.featureflags.FeatureFlags;
+import com.ascode.android.flutter.FlutterBuildMode;
+import com.ascode.android.flutter.FlutterBuildOrchestrator;
+import com.ascode.android.flutter.FlutterProjectDefaults;
+import com.ascode.android.flutter.FlutterBuildResult;
+import com.ascode.android.flutter.FlutterProject;
+import com.ascode.android.flutter.FlutterProjectStore;
+import com.ascode.android.flutter.FlutterToolchainManager;
+import com.ascode.android.kmp.KmpBlockCompatibilityValidator;
+import com.ascode.android.kmp.KmpCompatibilityInspectorFormatter;
+import com.ascode.android.kmp.KmpCompatibilityInspectorSummary;
+import com.ascode.android.kmp.KmpPreviewSnapshot;
+import com.ascode.android.kmp.KmpPreviewSnapshotBuilder;
+import com.ascode.android.kmp.KmpProject;
+import com.ascode.android.kmp.KmpProjectParseResult;
+import com.ascode.android.kmp.KmpProjectSerializer;
+import com.ascode.android.kmp.KmpTarget;
+import com.ascode.android.menu.ExtraMenuBean;
+import com.ascode.android.metrics.FlutterBuildPerformanceMetricsStore;
+import com.ascode.android.utility.FilePathUtil;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.SvgUtils;
 
 @SuppressLint({"ClickableViewAccessibility", "RtlHardcoded", "SetTextI18n", "DefaultLocale"})
 public class LogicEditorActivity extends BaseAppCompatActivity implements View.OnClickListener, Vs, View.OnTouchListener, MoreblockImporterDialog.CallBack {
@@ -1070,7 +1070,7 @@ public class LogicEditorActivity extends BaseAppCompatActivity implements View.O
                                         case "resource_bg":
                                         case "resource":
                                             for (String str : jC.d(scId).m()) {
-                                                // Like this in vanilla Sketchware. Don't ask me why.
+                                                // Like this in vanilla Android SCode. Don't ask me why.
                                                 //noinspection StatementWithEmptyBody
                                                 if (parameter.equals(str)) {
                                                 }
@@ -1079,7 +1079,7 @@ public class LogicEditorActivity extends BaseAppCompatActivity implements View.O
 
                                         case "activity":
                                             for (String str : jC.b(scId).d()) {
-                                                // Like this in vanilla Sketchware. Don't ask me why.
+                                                // Like this in vanilla Android SCode. Don't ask me why.
                                                 //noinspection StatementWithEmptyBody
                                                 if (parameter.equals(str.substring(str.indexOf(".java")))) {
                                                 }
@@ -1088,7 +1088,7 @@ public class LogicEditorActivity extends BaseAppCompatActivity implements View.O
 
                                         case "sound":
                                             for (String str : jC.d(scId).p()) {
-                                                // Like this in vanilla Sketchware. Don't ask me why.
+                                                // Like this in vanilla Android SCode. Don't ask me why.
                                                 //noinspection StatementWithEmptyBody
                                                 if (parameter.equals(str)) {
                                                 }
@@ -1299,7 +1299,7 @@ public class LogicEditorActivity extends BaseAppCompatActivity implements View.O
             try {
                 return Integer.parseInt(rawId);
             } catch (NumberFormatException ignored) {
-                android.util.Log.d("SketchwarePro", "LogicEditorActivity: block id is not numeric", ignored);
+                android.util.Log.d("Ascode", "LogicEditorActivity: block id is not numeric", ignored);
             }
         }
         Integer assigned = aiLegacyBlockIds.get(rawId);
@@ -2605,7 +2605,7 @@ public class LogicEditorActivity extends BaseAppCompatActivity implements View.O
                 return cachedKmpProjectForCompatibility;
             }
         } catch (Exception ignored) {
-            android.util.Log.d("SketchwarePro", "LogicEditorActivity: failed to parse KMP project", ignored);
+            android.util.Log.d("Ascode", "LogicEditorActivity: failed to parse KMP project", ignored);
         }
 
         return null;
@@ -2810,7 +2810,7 @@ public class LogicEditorActivity extends BaseAppCompatActivity implements View.O
             File filesDirectory = getFlutterProjectFilesDirectory();
             return filesDirectory != null && FlutterProjectStore.isFlutterProject(filesDirectory);
         } catch (Exception e) {
-            android.util.Log.d("SketchwarePro", "LogicEditorActivity: Flutter context detection failed", e);
+            android.util.Log.d("Ascode", "LogicEditorActivity: Flutter context detection failed", e);
             return false;
         }
     }
@@ -2851,7 +2851,7 @@ public class LogicEditorActivity extends BaseAppCompatActivity implements View.O
             }
             cachedFlutterProject = FlutterProjectStore.load(filesDirectory);
         } catch (Exception e) {
-            android.util.Log.d("SketchwarePro", "LogicEditorActivity: failed to load Flutter project", e);
+            android.util.Log.d("Ascode", "LogicEditorActivity: failed to load Flutter project", e);
         }
 
         return cachedFlutterProject;
@@ -3171,7 +3171,7 @@ public class LogicEditorActivity extends BaseAppCompatActivity implements View.O
                         })
                         .show();
             } catch (Exception e) {
-                android.util.Log.d("SketchwarePro", "Flutter: no se pudo mostrar el dialogo de consentimiento", e);
+                android.util.Log.d("Ascode", "Flutter: no se pudo mostrar el dialogo de consentimiento", e);
                 granted.set(false);
                 latch.countDown();
             }
@@ -3179,7 +3179,7 @@ public class LogicEditorActivity extends BaseAppCompatActivity implements View.O
 
         try {
             if (!latch.await(5, TimeUnit.MINUTES)) {
-                android.util.Log.w("SketchwarePro", "Flutter: sin respuesta al consentimiento del toolchain");
+                android.util.Log.w("Ascode", "Flutter: sin respuesta al consentimiento del toolchain");
                 return false;
             }
         } catch (InterruptedException e) {

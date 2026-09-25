@@ -7,7 +7,7 @@ import com.besome.sketch.beans.ViewBean;
 import com.besome.sketch.editor.view.palette.IconBase;
 
 import mod.agus.jcoderz.beans.ViewBeans;
-import pro.sketchware.R;
+import com.ascode.android.R;
 
 public class IconWaveSideBar extends IconBase {
 

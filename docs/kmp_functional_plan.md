@@ -1,15 +1,15 @@
-# Plan Funcional: Kotlin Multiplatform en Sketchware Pro
+# Plan Funcional: Kotlin Multiplatform en Android SCode
 
 Version: 1.0  
 Fecha: Mayo 2026  
 Alcance: Integracion completa de KMP como target de compilacion y paradigma de proyecto  
-Premisa: El usuario de Sketchware Pro puede crear apps Android, iOS, Desktop y Web desde un unico proyecto visual/codigo, sin salir del IDE movil.
+Premisa: El usuario de Android SCode puede crear apps Android, iOS, Desktop y Web desde un unico proyecto visual/codigo, sin salir del IDE movil.
 
 ## Indice
 
 1. Vision general y alcance real
-2. Encaje de KMP en Sketchware
-3. Arquitectura del sistema KMP en Sketchware Pro
+2. Encaje de KMP en Android SCode
+3. Arquitectura del sistema KMP en Android SCode
 4. Motor de compilacion multiplataforma
 5. Estructura de proyecto KMP generada
 6. Sistema de bloques adaptado a KMP
@@ -45,7 +45,7 @@ Premisa: El usuario de Sketchware Pro puede crear apps Android, iOS, Desktop y W
 - Salidas de build multi-artefacto: APK, JAR desktop, WASM web y KLIB para iOS.
 - Transicion de generacion Java-only a Kotlin idiomatico + expect/actual.
 
-## 2) Encaje de KMP en Sketchware
+## 2) Encaje de KMP en Android SCode
 
 Arquitectura conceptual:
 
@@ -55,13 +55,13 @@ Arquitectura conceptual:
 - wasmJsMain: UI y runtime web.
 - iosMain: actual iOS y bridge con toolchain de Apple (compilacion final fuera de Android).
 
-Experiencia en Sketchware:
+Experiencia en Android SCode:
 
 - El usuario sigue trabajando con bloques y/o codigo.
 - El generador produce source sets KMP, contratos expect y actuals por target habilitado.
 - El IDE muestra compatibilidad por target y recomendaciones de migracion.
 
-## 3) Arquitectura del sistema KMP en Sketchware Pro
+## 3) Arquitectura del sistema KMP en Android SCode
 
 Nuevos componentes propuestos:
 
@@ -129,7 +129,7 @@ Estructura objetivo:
 
 Recomendacion de generacion:
 
-- Mantener plantilla gradle parametrizable por placeholders SKETCHWARE_*_DEPS.
+- Mantener plantilla gradle parametrizable por placeholders ASCODE_*_DEPS.
 - Aplicar version catalog para controlar Kotlin/Compose/Ktor/coroutines/serialization y variantes por target.
 
 ## 6) Sistema de bloques adaptado a KMP
@@ -289,7 +289,7 @@ Build manager:
 
 ## 15) Limitaciones honestas y workarounds
 
-- IPA requiere Mac/Xcode: generar KLIB en Sketchware y completar en Mac/CI.
+- IPA requiere Mac/Xcode: generar KLIB en Android SCode y completar en Mac/CI.
 - Kotlin/Native es costoso: usar CI para builds pesados.
 - Librerias Android-only sin alternativa: aislar en androidMain con expect/actual.
 - Previews completos de escritorio en Android: usar simulacion/snapshots.

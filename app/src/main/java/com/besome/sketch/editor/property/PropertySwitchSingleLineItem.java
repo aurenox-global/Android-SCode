@@ -13,7 +13,7 @@ import a.a.a.Kw;
 import a.a.a.mB;
 import a.a.a.wB;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
+import com.ascode.android.R;
 
 @SuppressLint("ViewConstructor")
 public class PropertySwitchSingleLineItem extends LinearLayout implements View.OnClickListener {

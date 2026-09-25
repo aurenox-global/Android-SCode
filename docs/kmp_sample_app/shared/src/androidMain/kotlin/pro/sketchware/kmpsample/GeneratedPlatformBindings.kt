@@ -1,4 +1,4 @@
-package pro.sketchware.kmpsample
+package com.ascode.android.kmpsample
 
 actual object GeneratedPlatformBindings {
     actual fun platformName(): String = "Android"

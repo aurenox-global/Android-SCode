@@ -18,10 +18,10 @@ import java.util.ArrayList;
 
 import mod.hey.studios.util.Helper;
 import mod.jbk.util.BlockUtil;
-import pro.sketchware.R;
-import pro.sketchware.databinding.ManageCollectionPopupImportMoreBlockListItemBinding;
-import pro.sketchware.databinding.SearchWithRecyclerViewBinding;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.databinding.ManageCollectionPopupImportMoreBlockListItemBinding;
+import com.ascode.android.databinding.SearchWithRecyclerViewBinding;
+import com.ascode.android.utility.AscodeUtil;
 
 public class MoreblockImporterDialog extends MaterialAlertDialogBuilder {
 
@@ -62,7 +62,7 @@ public class MoreblockImporterDialog extends MaterialAlertDialogBuilder {
             MoreBlockCollectionBean selectedBean = adapter.getSelectedItem();
 
             if (selectedBean == null) {
-                SketchwareUtil.toastError("Select a more block");
+                AscodeUtil.toastError("Select a more block");
             } else {
                 callback.onSelected(selectedBean);
                 v.dismiss();

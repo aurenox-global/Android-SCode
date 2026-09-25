@@ -106,7 +106,7 @@
                 android:layout_alignParentBottom="true"
                 android:contentDescription="@null"
                 android:scaleType="centerCrop"
-                android:src="@drawable/sketch_app_icon" />
+                android:src="@drawable/ascode_app_icon" />
         </com.google.android.material.card.MaterialCardView>
 
 

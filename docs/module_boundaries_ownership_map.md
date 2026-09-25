@@ -23,25 +23,25 @@ Rules currently enforced in CI:
 
 Current guarded package roots:
 
-- app/src/main/java/pro/sketchware/featureflags
-- app/src/main/java/pro/sketchware/metrics
-- app/src/main/java/pro/sketchware/ai
+- app/src/main/java/pro/ascode/featureflags
+- app/src/main/java/pro/ascode/metrics
+- app/src/main/java/pro/ascode/ai
 
 ## Ownership Map
 
 | Area | Primary ownership group | Guarded package roots | Notes |
 |---|---|---|---|
-| Feature flags and rollout controls | Core Platform | pro.sketchware.featureflags | Must remain UI-independent |
-| Metrics, KPI, and release gates | Core Platform | pro.sketchware.metrics | Must remain UI-independent |
-| AI core orchestration | AI Platform | pro.sketchware.ai | Must not depend on Activities |
-| Editor and LSP integrations | Editor Platform | pro.sketchware.lsp, editor activities | Feature-flagged rollout |
-| Debugger and profiling foundations | Runtime Tooling | pro.sketchware.debugger | Keep deterministic and thread-safe contracts |
-| Plugin runtime and security | Plugin Runtime | pro.sketchware.plugins | Security scoring and static analysis chain |
+| Feature flags and rollout controls | Core Platform | com.ascode.android.featureflags | Must remain UI-independent |
+| Metrics, KPI, and release gates | Core Platform | com.ascode.android.metrics | Must remain UI-independent |
+| AI core orchestration | AI Platform | io.ascode.android | Must not depend on Activities |
+| Editor and LSP integrations | Editor Platform | com.ascode.android.lsp, editor activities | Feature-flagged rollout |
+| Debugger and profiling foundations | Runtime Tooling | com.ascode.android.debugger | Keep deterministic and thread-safe contracts |
+| Plugin runtime and security | Plugin Runtime | com.ascode.android.plugins | Security scoring and static analysis chain |
 
 ## Ownership Responsibilities
 
 1. Any boundary change requires updates in scripts/check_architecture_boundaries.sh and corresponding tests/docs.
-2. Any new package under pro.sketchware should be mapped to a primary ownership group here.
+2. Any new package under com.ascode.android should be mapped to a primary ownership group here.
 3. Boundary regressions are release blockers in CI.
 
 ## Next Increment

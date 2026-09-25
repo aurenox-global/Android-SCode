@@ -80,7 +80,7 @@ Attach unit test output and one serialized fixture before/after round-trip.
 
 - [ ] Update docs/kmp_phase7_epic_issue_checklist.md if scope changed.
 - [ ] Update docs/kmp_phase7_sprint_board.md if estimate changed.
-- [ ] Update docs/sketchware_pro_improvement_backlog.md milestone status.
+- [ ] Update docs/ascode_pro_improvement_backlog.md milestone status.
 
 ## KMP-102: Implement source set hierarchy contract validation
 
@@ -154,7 +154,7 @@ Attach validator test output and one blocked-build trace showing explicit diagno
 
 - [ ] Update docs/kmp_phase7_epic_issue_checklist.md if scope changed.
 - [ ] Update docs/kmp_phase7_sprint_board.md if estimate changed.
-- [ ] Update docs/sketchware_pro_improvement_backlog.md milestone status.
+- [ ] Update docs/ascode_pro_improvement_backlog.md milestone status.
 
 ## KMP-103: Add deterministic KMP project scaffold generator
 
@@ -228,7 +228,7 @@ Attach generated tree diff for run 1 vs run 2 and golden test report.
 
 - [ ] Update docs/kmp_phase7_epic_issue_checklist.md if scope changed.
 - [ ] Update docs/kmp_phase7_sprint_board.md if estimate changed.
-- [ ] Update docs/sketchware_pro_improvement_backlog.md milestone status.
+- [ ] Update docs/ascode_pro_improvement_backlog.md milestone status.
 
 ## KMP-104: Gate KMP project creation with feature flag
 
@@ -302,7 +302,7 @@ Attach UI capture for both flag states and routing logs.
 
 - [ ] Update docs/kmp_phase7_epic_issue_checklist.md if scope changed.
 - [ ] Update docs/kmp_phase7_sprint_board.md if estimate changed.
-- [ ] Update docs/sketchware_pro_improvement_backlog.md milestone status.
+- [ ] Update docs/ascode_pro_improvement_backlog.md milestone status.
 
 ## KMP-201: Add compile pipeline stages for commonMain and target fan-out
 
@@ -376,7 +376,7 @@ Attach orchestrator event timeline and fail-fast test output.
 
 - [ ] Update docs/kmp_phase7_epic_issue_checklist.md if scope changed.
 - [ ] Update docs/kmp_phase7_sprint_board.md if estimate changed.
-- [ ] Update docs/sketchware_pro_improvement_backlog.md milestone status.
+- [ ] Update docs/ascode_pro_improvement_backlog.md milestone status.
 
 ## KMP-202: Integrate Android target packaging path
 
@@ -449,4 +449,4 @@ Attach APK path, build logs, and smoke test evidence.
 
 - [ ] Update docs/kmp_phase7_epic_issue_checklist.md if scope changed.
 - [ ] Update docs/kmp_phase7_sprint_board.md if estimate changed.
-- [ ] Update docs/sketchware_pro_improvement_backlog.md milestone status.
+- [ ] Update docs/ascode_pro_improvement_backlog.md milestone status.

@@ -20,7 +20,7 @@ kotlin {
 }
 
 android {
-    namespace = "pro.sketchware.kmpsample.shared"
+    namespace = "com.ascode.android.kmpsample.shared"
     compileSdk = 35
     defaultConfig {
         minSdk = 24

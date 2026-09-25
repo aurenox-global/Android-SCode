@@ -23,7 +23,7 @@ import a.a.a.iC;
 import a.a.a.mB;
 import mod.hey.studios.util.Helper;
 import mod.jbk.editor.manage.library.LibrarySettingsImporter;
-import pro.sketchware.R;
+import com.ascode.android.R;
 
 public class ManageGoogleMapActivity extends BaseAppCompatActivity implements View.OnClickListener {
     private String sc_id;

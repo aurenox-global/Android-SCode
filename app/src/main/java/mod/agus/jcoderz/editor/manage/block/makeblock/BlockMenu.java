@@ -9,7 +9,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 
-import pro.sketchware.utility.FileUtil;
+import com.ascode.android.utility.FileUtil;
 
 /**
  * Helper used in {@link com.besome.sketch.editor.LogicEditorActivity} to get menus for custom
@@ -20,7 +20,7 @@ public class BlockMenu {
     public static Pair<String, String[]> getMenu(String name) {
         Pair<String, String[]> result = null;
         Pair<String, String[]> fallback = new Pair<>("Select a " + name + " Variable", new String[0]);
-        File file = new File(Environment.getExternalStorageDirectory(), ".sketchware/resources/block/My Block/menu.json");
+        File file = new File(Environment.getExternalStorageDirectory(), ".ascode/resources/block/My Block/menu.json");
         if (!file.exists()) {
             result = fallback;
         } else {
@@ -34,7 +34,7 @@ public class BlockMenu {
                     }
                 }
             } catch (Exception ignored) {
-                android.util.Log.d("SketchwarePro", "BlockMenu: failed to load custom block menu", ignored);
+                android.util.Log.d("Ascode", "BlockMenu: failed to load custom block menu", ignored);
             }
             if (result == null) {
                 result = fallback;

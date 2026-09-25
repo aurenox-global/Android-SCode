@@ -35,10 +35,10 @@ import mod.hey.studios.build.BuildSettings;
 import mod.hey.studios.util.Helper;
 import mod.jbk.build.BuiltInLibraries;
 import mod.pranav.dependency.resolver.DependencyResolver;
-import pro.sketchware.R;
-import pro.sketchware.databinding.LibraryDownloaderDialogBinding;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.databinding.LibraryDownloaderDialogBinding;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.AscodeUtil;
 
 public class LibraryDownloaderDialogFragment extends BottomSheetDialogFragment {
     private LibraryDownloaderDialogBinding binding;
@@ -209,7 +209,7 @@ public class LibraryDownloaderDialogFragment extends BottomSheetDialogFragment {
                 public void onArtifactNotFound(@NonNull Artifact dep) {
                     handler.post(() -> {
                         setDownloadState(false);
-                        SketchwareUtil.showAnErrorOccurredDialog(getActivity(), "Dependency '" + dep + "' not found");
+                        AscodeUtil.showAnErrorOccurredDialog(getActivity(), "Dependency '" + dep + "' not found");
                     });
                 }
 
@@ -284,7 +284,7 @@ public class LibraryDownloaderDialogFragment extends BottomSheetDialogFragment {
                         item.setError(e.getMessage());
                         dependencyAdapter.updateDependency(item);
                         setDownloadState(false);
-                        SketchwareUtil.showAnErrorOccurredDialog(getActivity(),
+                        AscodeUtil.showAnErrorOccurredDialog(getActivity(),
                                 "Downloading dependency '" + dep + "' failed: " + Log.getStackTraceString(e));
                     });
                 }
@@ -306,7 +306,7 @@ public class LibraryDownloaderDialogFragment extends BottomSheetDialogFragment {
                         item.setError("Dexing failed: " + e.getMessage());
                         dependencyAdapter.updateDependency(item);
                         setDownloadState(false);
-                        SketchwareUtil.showAnErrorOccurredDialog(getActivity(),
+                        AscodeUtil.showAnErrorOccurredDialog(getActivity(),
                                 "Dexing dependency '" + dependency + "' failed: " + Log.getStackTraceString(e));
                     });
                 }
@@ -316,11 +316,11 @@ public class LibraryDownloaderDialogFragment extends BottomSheetDialogFragment {
                     handler.post(() -> {
                         if (dependencies.isEmpty()) {
                             setDownloadState(false);
-                            SketchwareUtil.showAnErrorOccurredDialog(getActivity(),
+                            AscodeUtil.showAnErrorOccurredDialog(getActivity(),
                                     "Dependency not found. Check if the Maven coordinates are correct and a repository contains it.");
                             return;
                         }
-                        SketchwareUtil.toast("Library downloaded successfully");
+                        AscodeUtil.toast("Library downloaded successfully");
                         if (!notAssociatedWithProject) {
                             var fileContent = FileUtil.readFile(localLibFile);
                             var enabledLibs = gson.fromJson(fileContent, Helper.TYPE_MAP_LIST);

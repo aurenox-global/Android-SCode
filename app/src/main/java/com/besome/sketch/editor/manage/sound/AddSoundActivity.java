@@ -37,9 +37,9 @@ import a.a.a.uq;
 import a.a.a.yy;
 import mod.hey.studios.util.Helper;
 import mod.jbk.util.LogUtil;
-import pro.sketchware.R;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.AscodeUtil;
 
 public class AddSoundActivity extends BaseDialogActivity implements View.OnClickListener {
     private static final int REQUEST_CODE_SOUND_PICKER = 218;
@@ -209,7 +209,7 @@ public class AddSoundActivity extends BaseDialogActivity implements View.OnClick
         if (isSoundValid(soundNameValidator)) {
             String soundName = Helper.getText(this.soundName);
 
-            SketchwareUtil.copySafDocumentToTempFile(soundUri, this, FileUtil.getFileExtension(getFilenameOfPickedFile(soundUri)),
+            AscodeUtil.copySafDocumentToTempFile(soundUri, this, FileUtil.getFileExtension(getFilenameOfPickedFile(soundUri)),
                     tempFile -> {
                         String soundFilePath = tempFile.getAbsolutePath();
                         ProjectResourceBean projectResourceBean = new ProjectResourceBean(ProjectResourceBean.PROJECT_RES_TYPE_FILE, soundName, soundFilePath);
@@ -250,7 +250,7 @@ public class AddSoundActivity extends BaseDialogActivity implements View.OnClick
                             finish();
                         }
                     }, e -> {
-                        SketchwareUtil.toastError("Error while loading sound: " + e.getMessage());
+                        AscodeUtil.toastError("Error while loading sound: " + e.getMessage());
                         LogUtil.e("AddSoundActivity", "Failed to load sound", e);
                     });
         }
@@ -373,7 +373,7 @@ public class AddSoundActivity extends BaseDialogActivity implements View.OnClick
     }
 
     private String getFilenameOfPickedFile(Uri input) {
-        Optional<String> displayName = SketchwareUtil.getSafDocumentDisplayName(input);
+        Optional<String> displayName = AscodeUtil.getSafDocumentDisplayName(input);
 
         //noinspection SimplifyOptionalCallChains
         if (!displayName.isPresent()) return "Unknown filename";
@@ -383,7 +383,7 @@ public class AddSoundActivity extends BaseDialogActivity implements View.OnClick
             // Seems like that display name is a filename
             return name;
         } else {
-            Optional<String> optionalFilenameExtension = SketchwareUtil.doSingleStringContentQuery(input, MediaStore.MediaColumns.MIME_TYPE);
+            Optional<String> optionalFilenameExtension = AscodeUtil.doSingleStringContentQuery(input, MediaStore.MediaColumns.MIME_TYPE);
             String filenameExtension;
             if (optionalFilenameExtension.isPresent()) {
                 filenameExtension = optionalFilenameExtension.get().split("/")[1];

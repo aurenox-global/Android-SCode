@@ -34,17 +34,17 @@ import a.a.a.sq;
 import a.a.a.wq;
 import a.a.a.yq;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
-import pro.sketchware.activities.resourceseditor.components.models.ColorModel;
-import pro.sketchware.activities.resourceseditor.components.utils.ColorsEditorManager;
-import pro.sketchware.databinding.ColorPickerBinding;
-import pro.sketchware.databinding.ColorPickerCustomAttrBinding;
-import pro.sketchware.databinding.ColorPickerSimpleHexBinding;
-import pro.sketchware.databinding.ItemAttrBinding;
-import pro.sketchware.lib.validator.ColorInputValidator;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.PropertiesUtil;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.activities.resourceseditor.components.models.ColorModel;
+import com.ascode.android.activities.resourceseditor.components.utils.ColorsEditorManager;
+import com.ascode.android.databinding.ColorPickerBinding;
+import com.ascode.android.databinding.ColorPickerCustomAttrBinding;
+import com.ascode.android.databinding.ColorPickerSimpleHexBinding;
+import com.ascode.android.databinding.ItemAttrBinding;
+import com.ascode.android.lib.validator.ColorInputValidator;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.PropertiesUtil;
+import com.ascode.android.utility.AscodeUtil;
 
 public class ColorPickerDialog extends PopupWindow {
 
@@ -208,7 +208,7 @@ public class ColorPickerDialog extends PopupWindow {
                     return;
                 }
                 if (sc_id != null && finalJ == 2 && !material3LibraryManager.isMaterial3Enabled()) {
-                    SketchwareUtil.toastError("Please enable Material3 in the Library Manager first");
+                    AscodeUtil.toastError("Please enable Material3 in the Library Manager first");
                     return;
                 }
                 if (sc_id != null && finalJ == 1) {
@@ -337,7 +337,7 @@ public class ColorPickerDialog extends PopupWindow {
                 String attributeName = ((TextView) dialogBinding.getRoot().findViewById(R.id.tvAttrName)).getText().toString();
 
                 if (isAttrExist(attributeName)) {
-                    SketchwareUtil.toastError(Helper.getResString(R.string.attr_already_exist));
+                    AscodeUtil.toastError(Helper.getResString(R.string.attr_already_exist));
                     return;
                 }
 
@@ -350,7 +350,7 @@ public class ColorPickerDialog extends PopupWindow {
                 binding.colorList.smoothScrollToPosition(attributes.size());
                 dialog.dismiss();
             } else {
-                SketchwareUtil.toastError(Helper.getResString(R.string.unknown_attr));
+                AscodeUtil.toastError(Helper.getResString(R.string.unknown_attr));
             }
         });
     }

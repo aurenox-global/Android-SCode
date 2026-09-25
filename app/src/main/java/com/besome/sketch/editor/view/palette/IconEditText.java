@@ -5,7 +5,7 @@ import android.content.Context;
 import com.besome.sketch.beans.LayoutBean;
 import com.besome.sketch.beans.ViewBean;
 
-import pro.sketchware.R;
+import com.ascode.android.R;
 
 public class IconEditText extends IconBase {
     public IconEditText(Context context) {

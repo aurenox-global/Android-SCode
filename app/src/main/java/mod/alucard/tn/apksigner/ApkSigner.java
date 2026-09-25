@@ -88,7 +88,7 @@ public class ApkSigner {
      * <p>Deliberately not going through {@code ApkSignerTool}'s CLI: on Android,
      * {@code KeyStore.getInstance("JKS")} resolves to the BouncyCastle BKS implementation, so a real
      * Java-format JKS cannot be read that way ({@code IOException: Wrong version of key store}); and
-     * the CLI calls {@code System.exit()} when it fails, which kills Sketchware itself. The keystore
+     * the CLI calls {@code System.exit()} when it fails, which kills Android SCode itself. The keystore
      * is loaded with the same type-agnostic loader the Export signing uses, and signed through the
      * apksig programmatic API.</p>
      */

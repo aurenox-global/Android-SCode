@@ -16,9 +16,9 @@ Checklist:
 - [ ] Medir p50/p95 en completion/definition/references/diagnostics.
 
 Archivos semilla:
-- app/src/main/java/pro/sketchware/lsp/LspClientFactory.java
-- app/src/main/java/pro/sketchware/lsp/NoOpLspClient.java
-- app/src/main/java/pro/sketchware/featureflags/FeatureFlags.java
+- app/src/main/java/pro/ascode/lsp/LspClientFactory.java
+- app/src/main/java/pro/ascode/lsp/NoOpLspClient.java
+- app/src/main/java/pro/ascode/featureflags/FeatureFlags.java
 
 ## EPIC D1 - JDWP real + profiler usable
 
@@ -35,10 +35,10 @@ Checklist:
 - [x] Validar debug end-to-end con test automatizado.
 
 Archivos semilla:
-- app/src/main/java/pro/sketchware/debugger/jdwp/JdwpDebugSessionManager.java
-- app/src/main/java/pro/sketchware/debugger/jdwp/NoOpJdwpBridge.java
-- app/src/main/java/pro/sketchware/debugger/variables/NoOpJdwpVariableInspectorTransport.java
-- app/src/main/java/pro/sketchware/debugger/symbolication/NoOpCrashSymbolicationWorkflow.java
+- app/src/main/java/pro/ascode/debugger/jdwp/JdwpDebugSessionManager.java
+- app/src/main/java/pro/ascode/debugger/jdwp/NoOpJdwpBridge.java
+- app/src/main/java/pro/ascode/debugger/variables/NoOpJdwpVariableInspectorTransport.java
+- app/src/main/java/pro/ascode/debugger/symbolication/NoOpCrashSymbolicationWorkflow.java
 
 ## EPIC A1 - targetSdk moderno + compat
 
@@ -68,9 +68,9 @@ Checklist:
 - [ ] Exponer reporte de seguridad util en UI/logs.
 
 Archivos semilla:
-- app/src/main/java/pro/sketchware/plugins/manifest/PluginManifestVerifier.java
-- app/src/main/java/pro/sketchware/plugins/security/NoOpPluginSignatureValidator.java
-- app/src/main/java/pro/sketchware/plugins/security/vulnerability/NoOpPluginDependencyVulnerabilityScanAdapter.java
+- app/src/main/java/pro/ascode/plugins/manifest/PluginManifestVerifier.java
+- app/src/main/java/pro/ascode/plugins/security/NoOpPluginSignatureValidator.java
+- app/src/main/java/pro/ascode/plugins/security/vulnerability/NoOpPluginDependencyVulnerabilityScanAdapter.java
 
 ## EPIC Q1 - instrumented tests + quality gates
 
@@ -86,7 +86,7 @@ Checklist:
 - [x] Agregar smoke de estabilidad de lifecycle y navegacion base (BottomNavigation).
 
 Archivos semilla:
-- app/src/androidTest/java/pro/sketchware/AndroidDeviceSmokeTest.java
+- app/src/androidTest/java/pro/ascode/AndroidDeviceSmokeTest.java
 - .github/workflows/android-instrumented.yml
 - .github/workflows/verification.yml
 
@@ -102,8 +102,8 @@ Checklist:
 - [ ] Validar un proyecto legacy convertido de punta a punta.
 
 Archivos semilla:
-- app/src/main/java/pro/sketchware/kmp/KmpMigrationAssistantWorkflow.java
-- app/src/main/java/pro/sketchware/kmp/KmpMigrationAnalyzer.java
+- app/src/main/java/pro/ascode/kmp/KmpMigrationAssistantWorkflow.java
+- app/src/main/java/pro/ascode/kmp/KmpMigrationAnalyzer.java
 - docs/kmp_functional_plan.md
 
 ## Convencion de estados y prioridad

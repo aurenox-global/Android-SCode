@@ -93,9 +93,9 @@ import a.a.a.rs;
 import a.a.a.wq;
 import a.a.a.yB;
 
-import pro.sketchware.flutter.FlutterBuildMode;
-import pro.sketchware.flutter.FlutterProjectDefaults;
-import pro.sketchware.flutter.FlutterToolchainUi;
+import com.ascode.android.flutter.FlutterBuildMode;
+import com.ascode.android.flutter.FlutterProjectDefaults;
+import com.ascode.android.flutter.FlutterToolchainUi;
 import a.a.a.yq;
 import a.a.a.zy;
 import dev.chrisbanes.insetter.Insetter;
@@ -122,18 +122,18 @@ import mod.jbk.diagnostic.MissingFileException;
 import mod.jbk.export.GetKeyStoreCredentialsDialog;
 import mod.jbk.util.LogUtil;
 import mod.khaled.logcat.LogReaderActivity;
-import pro.sketchware.R;
-import pro.sketchware.activities.appcompat.ManageAppCompatActivity;
-import pro.sketchware.activities.editor.command.ManageXMLCommandActivity;
-import pro.sketchware.activities.editor.view.CodeViewerActivity;
-import pro.sketchware.activities.editor.view.ViewCodeEditorActivity;
-import pro.sketchware.activities.resourceseditor.ResourcesEditorActivity;
-import pro.sketchware.dialogs.BuildSettingsBottomSheet;
-import pro.sketchware.metrics.BuildMetricsStore;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.SketchwareUtil;
-import pro.sketchware.utility.ThemeUtils;
-import pro.sketchware.utility.apk.ApkSignatures;
+import com.ascode.android.R;
+import com.ascode.android.activities.appcompat.ManageAppCompatActivity;
+import com.ascode.android.activities.editor.command.ManageXMLCommandActivity;
+import com.ascode.android.activities.editor.view.CodeViewerActivity;
+import com.ascode.android.activities.editor.view.ViewCodeEditorActivity;
+import com.ascode.android.activities.resourceseditor.ResourcesEditorActivity;
+import com.ascode.android.dialogs.BuildSettingsBottomSheet;
+import com.ascode.android.metrics.BuildMetricsStore;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.AscodeUtil;
+import com.ascode.android.utility.ThemeUtils;
+import com.ascode.android.utility.apk.ApkSignatures;
 
 public class DesignActivity extends BaseAppCompatActivity implements View.OnClickListener {
     public static String sc_id;
@@ -218,12 +218,12 @@ public class DesignActivity extends BaseAppCompatActivity implements View.OnClic
     };
 
     /**
-     * Saves the app's version information to the currently opened Sketchware project file.
+     * Saves the app's version information to the currently opened Android SCode project file.
      */
     private void saveVersionCodeInformationToProject() {
         HashMap<String, Object> projectMetadata = lC.b(sc_id);
         if (projectMetadata != null) {
-            projectMetadata.put("sketchware_ver", GB.d(getApplicationContext()));
+            projectMetadata.put("ascode_ver", GB.d(getApplicationContext()));
             lC.b(sc_id, projectMetadata);
         }
     }
@@ -422,23 +422,23 @@ public class DesignActivity extends BaseAppCompatActivity implements View.OnClic
 
                     Shell.cmd("cat " + apkUri + " | pm install -S " + length).to(stdout, stderr).submit(result -> {
                         if (result.isSuccess()) {
-                            SketchwareUtil.toast("Package installed successfully!");
+                            AscodeUtil.toast("Package installed successfully!");
                             if (ConfigActivity.isSettingEnabled(ConfigActivity.SETTING_ROOT_AUTO_OPEN_AFTER_INSTALLING)) {
                                 Intent launcher = getPackageManager().getLaunchIntentForPackage(q.packageName);
                                 if (launcher != null) {
                                     startActivity(launcher);
                                 } else {
-                                    SketchwareUtil.toastError("Couldn't launch project, either not installed or not with launcher activity.");
+                                    AscodeUtil.toastError("Couldn't launch project, either not installed or not with launcher activity.");
                                 }
                             }
                         } else {
                             String sharedErrorMessage = "Failed to install package, result code: " + result.getCode() + ". ";
-                            SketchwareUtil.toastError(sharedErrorMessage + "Logs are available in /Internal storage/.sketchware/debug.txt", Toast.LENGTH_LONG);
+                            AscodeUtil.toastError(sharedErrorMessage + "Logs are available in /Internal storage/.ascode/debug.txt", Toast.LENGTH_LONG);
                             LogUtil.e("DesignActivity", sharedErrorMessage + "stdout: " + stdout + ", stderr: " + stderr);
                         }
                     });
                 } else {
-                    SketchwareUtil.toastError("No root access granted. Continuing using default package install prompt.");
+                    AscodeUtil.toastError("No root access granted. Continuing using default package install prompt.");
                     requestPackageInstallerInstall();
                 }
             });
@@ -557,7 +557,7 @@ public class DesignActivity extends BaseAppCompatActivity implements View.OnClic
             new Thread(() -> {
                 FileUtil.deleteFile(q.projectMyscPath);
                 updateBottomMenu();
-                runOnUiThread(() -> SketchwareUtil.toast("Done cleaning temporary files!"));
+                runOnUiThread(() -> AscodeUtil.toast("Done cleaning temporary files!"));
             }).start();
             return true;
         });
@@ -572,7 +572,7 @@ public class DesignActivity extends BaseAppCompatActivity implements View.OnClic
         bottomMenu.add(Menu.NONE, 4, Menu.NONE, "Install last built APK").setVisible(false).setOnMenuItemClickListener(item -> {
             if (FileUtil.isExistFile(q.finalToInstallApkPath)) {
                 installBuiltApk();
-            } else SketchwareUtil.toast("APK doesn't exist anymore");
+            } else AscodeUtil.toast("APK doesn't exist anymore");
             return true;
         });
         bottomMenu.add(Menu.NONE, 6, Menu.NONE, "Show Apk signatures").setVisible(false).setOnMenuItemClickListener(item -> {
@@ -871,7 +871,7 @@ public class DesignActivity extends BaseAppCompatActivity implements View.OnClic
     private void openLivePreview() {
         String layoutName = fileName.getText() == null ? "" : fileName.getText().toString();
         if (layoutName.isEmpty() || !layoutName.endsWith(".xml")) {
-            SketchwareUtil.toastError("Open a layout file to preview it.");
+            AscodeUtil.toastError("Open a layout file to preview it.");
             return;
         }
 
@@ -879,15 +879,15 @@ public class DesignActivity extends BaseAppCompatActivity implements View.OnClic
         try {
             xml = new yq(getApplicationContext(), sc_id).getFileSrc(layoutName, jC.b(sc_id), jC.a(sc_id), jC.c(sc_id));
         } catch (Throwable throwable) {
-            SketchwareUtil.showAnErrorOccurredDialog(this, "Couldn't generate the live preview: " + throwable.getMessage());
+            AscodeUtil.showAnErrorOccurredDialog(this, "Couldn't generate the live preview: " + throwable.getMessage());
             return;
         }
         if (xml == null || xml.trim().isEmpty()) {
-            SketchwareUtil.toastError("Couldn't generate the layout preview.");
+            AscodeUtil.toastError("Couldn't generate the layout preview.");
             return;
         }
 
-        Intent intent = new Intent(this, pro.sketchware.activities.preview.LayoutPreviewActivity.class);
+        Intent intent = new Intent(this, com.ascode.android.activities.preview.LayoutPreviewActivity.class);
         intent.putExtra("sc_id", sc_id);
         intent.putExtra("title", layoutName);
         intent.putExtra("xml", xml);
@@ -904,7 +904,7 @@ public class DesignActivity extends BaseAppCompatActivity implements View.OnClic
                 if (isFinishing()) return;
                 h();
                 if (code.isEmpty()) {
-                    SketchwareUtil.toast("Failed to generate source.");
+                    AscodeUtil.toast("Failed to generate source.");
                     return;
                 }
                 var scheme = filename.endsWith(".xml") ? CodeViewerActivity.SCHEME_XML : CodeViewerActivity.SCHEME_JAVA;
@@ -1004,7 +1004,7 @@ public class DesignActivity extends BaseAppCompatActivity implements View.OnClic
                 return FlutterToolchainUi.preferredMode(new File(wq.b(sc_id), "files"));
             }
         } catch (Exception e) {
-            Log.d("SketchwarePro", "DesignActivity: no se pudo resolver el modo Flutter del proyecto", e);
+            Log.d("Ascode", "DesignActivity: no se pudo resolver el modo Flutter del proyecto", e);
         }
         return FlutterProjectDefaults.DEFAULT_MODE;
     }
@@ -1357,12 +1357,12 @@ public class DesignActivity extends BaseAppCompatActivity implements View.OnClic
                     if (isMissingDirectory) {
                         dialog.setTitle("Missing directory detected");
                         dialog.setMessage("A directory important for building is missing. " +
-                                "Sketchware Pro can try creating " + e.getMissingFile().getAbsolutePath() +
+                                "Android SCode can try creating " + e.getMissingFile().getAbsolutePath() +
                                 " if you'd like to.");
                         dialog.setNeutralButton("Create", (v, which) -> {
                             v.dismiss();
                             if (!e.getMissingFile().mkdirs()) {
-                                SketchwareUtil.toastError("Failed to create directory / directories!");
+                                AscodeUtil.toastError("Failed to create directory / directories!");
                             }
                         });
                     } else {

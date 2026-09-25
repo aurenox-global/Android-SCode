@@ -254,7 +254,7 @@
                     android:id="@+id/local_model_card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:shapeAppearance="@style/ShapeAppearance.SketchwarePro.AsymmetricCard"
+                    app:shapeAppearance="@style/ShapeAppearance.Ascode.AsymmetricCard"
                     app:cardBackgroundColor="?attr/colorSurfaceContainer"
                     app:cardElevation="0dp">
 
@@ -278,7 +278,7 @@
                             android:layout_marginTop="8dp"
                             android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="13sp"
-                            tools:text="/storage/emulated/0/.sketchware/ai/models/model-q4.gguf" />
+                            tools:text="/storage/emulated/0/.ascode/ai/models/model-q4.gguf" />
 
                         <TextView
                             android:id="@+id/model_info_text"
@@ -323,7 +323,7 @@
                     android:id="@+id/cloud_config_card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:shapeAppearance="@style/ShapeAppearance.SketchwarePro.AsymmetricCard"
+                    app:shapeAppearance="@style/ShapeAppearance.Ascode.AsymmetricCard"
                     app:cardBackgroundColor="?attr/colorTertiaryContainer"
                     app:cardElevation="0dp">
 
@@ -411,7 +411,7 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:shapeAppearance="@style/ShapeAppearance.SketchwarePro.AsymmetricCard"
+                    app:shapeAppearance="@style/ShapeAppearance.Ascode.AsymmetricCard"
                     app:cardBackgroundColor="?attr/colorSurfaceContainer"
                     app:cardElevation="0dp">
 
@@ -523,7 +523,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    app:shapeAppearance="@style/ShapeAppearance.SketchwarePro.AsymmetricCard"
+                    app:shapeAppearance="@style/ShapeAppearance.Ascode.AsymmetricCard"
                     app:cardBackgroundColor="?attr/colorSurfaceContainer"
                     app:cardElevation="0dp">
 

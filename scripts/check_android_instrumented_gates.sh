@@ -9,7 +9,7 @@ MIN_TOTAL_TESTS=5
 VIOLATIONS=0
 
 required_classes=(
-  "pro.sketchware.AndroidDeviceSmokeTest"
+  "com.ascode.android.AndroidDeviceSmokeTest"
 )
 
 extract_attr() {

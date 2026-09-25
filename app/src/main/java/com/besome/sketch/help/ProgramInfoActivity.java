@@ -13,22 +13,16 @@ import com.besome.sketch.lib.ui.PropertyTwoLineItem;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import a.a.a.GB;
-import a.a.a.bB;
 import a.a.a.mB;
 import a.a.a.wB;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
-import pro.sketchware.databinding.ProgramInfoBinding;
+import com.ascode.android.R;
+import com.ascode.android.databinding.ProgramInfoBinding;
 
 public class ProgramInfoActivity extends BaseAppCompatActivity {
 
     private static final int ITEM_SYSTEM_INFORMATION = 1;
     private static final int ITEM_DOCS_LOG = 4;
-    private static final int ITEM_SOCIAL_NETWORK = 5;
-    private static final int ITEM_DISCORD = 6;
-    private static final int ITEM_TELEGRAM = 8;
-    private static final int ITEM_OPEN_SOURCE_LICENSES = 15;
-    private static final int ITEM_SUGGEST_IDEAS = 17;
 
     private ProgramInfoBinding binding;
 
@@ -72,7 +66,7 @@ public class ProgramInfoActivity extends BaseAppCompatActivity {
         item.setName(name);
         item.setHideDivider(hideDivider);
         binding.content.addView(item);
-        if (key == ITEM_SYSTEM_INFORMATION || key == ITEM_OPEN_SOURCE_LICENSES) {
+        if (key == ITEM_SYSTEM_INFORMATION) {
             item.setOnClickListener(this::handleItem);
         }
     }
@@ -106,13 +100,6 @@ public class ProgramInfoActivity extends BaseAppCompatActivity {
                 key = ((PropertyOneLineItem) v).getKey();
                 switch (key) {
                     case ITEM_SYSTEM_INFORMATION -> toSystemInfoActivity();
-                    case ITEM_OPEN_SOURCE_LICENSES -> {
-                        if (!GB.h(getApplicationContext())) {
-                            bB.a(getApplicationContext(), Helper.getResString(R.string.common_message_check_network), bB.TOAST_NORMAL).show();
-                        } else {
-                            toLicenseActivity();
-                        }
-                    }
                 }
             }
 
@@ -120,11 +107,6 @@ public class ProgramInfoActivity extends BaseAppCompatActivity {
                 key = ((PropertyTwoLineItem) v).getKey();
                 switch (key) {
                     case ITEM_DOCS_LOG -> openUrl(Helper.getResString(R.string.link_docs_url));
-                    case ITEM_SUGGEST_IDEAS ->
-                            openUrl(Helper.getResString(R.string.link_ideas_url));
-                    case ITEM_TELEGRAM ->
-                            openUrl(Helper.getResString(R.string.link_telegram_invite));
-                    case ITEM_DISCORD -> openUrl(Helper.getResString(R.string.link_discord_invite));
                 }
             }
         }
@@ -146,18 +128,7 @@ public class ProgramInfoActivity extends BaseAppCompatActivity {
         });
 
         addTwoLineItem(ITEM_DOCS_LOG, R.string.program_information_title_docs, R.string.link_docs_url);
-        addTwoLineItem(ITEM_SUGGEST_IDEAS, R.string.program_information_title_suggest_ideas, R.string.link_ideas_url);
-        addSingleLineItem(ITEM_SOCIAL_NETWORK, R.string.title_community);
-        addTwoLineItem(ITEM_DISCORD, R.string.title_discord_community, R.string.link_discord_invite);
-        addTwoLineItem(ITEM_TELEGRAM, R.string.title_telegram_community, R.string.link_telegram_invite);
-        addSingleLineItem(ITEM_SYSTEM_INFORMATION, R.string.program_information_title_system_information);
-        addSingleLineItem(ITEM_OPEN_SOURCE_LICENSES, R.string.program_information_title_open_source_license, true);
-    }
-
-    private void toLicenseActivity() {
-        Intent intent = new Intent(getApplicationContext(), LicenseActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        startActivity(intent);
+        addSingleLineItem(ITEM_SYSTEM_INFORMATION, R.string.program_information_title_system_information, true);
     }
 
     private void toSystemInfoActivity() {

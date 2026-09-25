@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "pro.sketchware.kmpsample.android"
+    namespace = "com.ascode.android.kmpsample.android"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "pro.sketchware.kmpsample.android"
+        applicationId = "com.ascode.android.kmpsample.android"
         minSdk = 24
         targetSdk = 35
         versionCode = 1

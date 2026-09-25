@@ -1,6 +1,6 @@
 package mod.hilal.saif.activities.tools;
 
-import static pro.sketchware.utility.GsonUtils.getGson;
+import static com.ascode.android.utility.GsonUtils.getGson;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -57,14 +57,14 @@ import java.util.Objects;
 import dev.aldi.sayuti.block.MyBlockDefaultsInstaller;
 import mod.hey.studios.editor.manage.block.v2.BlockLoader;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
-import pro.sketchware.databinding.ActivityBlocksManagerBinding;
-import pro.sketchware.databinding.DialogBlockConfigurationBinding;
-import pro.sketchware.databinding.DialogPaletteBinding;
-import pro.sketchware.databinding.PalletCustomviewBinding;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.PropertiesUtil;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.databinding.ActivityBlocksManagerBinding;
+import com.ascode.android.databinding.DialogBlockConfigurationBinding;
+import com.ascode.android.databinding.DialogPaletteBinding;
+import com.ascode.android.databinding.PalletCustomviewBinding;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.PropertiesUtil;
+import com.ascode.android.utility.AscodeUtil;
 
 public class BlocksManager extends BaseAppCompatActivity {
 
@@ -272,7 +272,7 @@ public class BlocksManager extends BaseAppCompatActivity {
                     readSettings();
                     refreshList();
                     refreshCount();
-                    SketchwareUtil.toast("My Block defaults restored.");
+                    AscodeUtil.toast("My Block defaults restored.");
                 })
                 .setNegativeButton(Helper.getResString(R.string.common_word_cancel), null)
                 .show();
@@ -360,7 +360,7 @@ public class BlocksManager extends BaseAppCompatActivity {
                 // fall-through to shared handler
             }
 
-            SketchwareUtil.showFailedToParseJsonDialog(this, new File(blocks_dir), "Custom Blocks", v -> readSettings());
+            AscodeUtil.showFailedToParseJsonDialog(this, new File(blocks_dir), "Custom Blocks", v -> readSettings());
         }
     }
 
@@ -389,7 +389,7 @@ public class BlocksManager extends BaseAppCompatActivity {
                     // fall-through to shared handler
                 }
 
-                SketchwareUtil.showFailedToParseJsonDialog(this, new File(pallet_dir), "Custom Block Palettes", v -> refreshList());
+                AscodeUtil.showFailedToParseJsonDialog(this, new File(pallet_dir), "Custom Block Palettes", v -> refreshList());
             }
             pallet_listmap = new ArrayList<>();
         }
@@ -700,14 +700,14 @@ public class BlocksManager extends BaseAppCompatActivity {
             String colorInput = Objects.requireNonNull(dialogBinding.colorEditText.getText()).toString();
 
             if (nameInput.isEmpty()) {
-                SketchwareUtil.toast("Name cannot be empty", Toast.LENGTH_SHORT);
+                AscodeUtil.toast("Name cannot be empty", Toast.LENGTH_SHORT);
                 return;
             }
             // add hash for the color 
             colorInput = "#" + colorInput;
 
             if (!PropertiesUtil.isHexColor(colorInput)) {
-                SketchwareUtil.toast("Please enter a valid HEX color", Toast.LENGTH_SHORT);
+                AscodeUtil.toast("Please enter a valid HEX color", Toast.LENGTH_SHORT);
                 return;
             }
 

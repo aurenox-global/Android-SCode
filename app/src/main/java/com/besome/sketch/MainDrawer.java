@@ -25,13 +25,12 @@ import a.a.a.mB;
 import dev.chrisbanes.insetter.Insetter;
 import dev.chrisbanes.insetter.Side;
 import mod.hilal.saif.activities.tools.AppSettings;
-import pro.sketchware.R;
-import pro.sketchware.activities.about.AboutActivity;
-import pro.sketchware.activities.ai.LocalAiManagerActivity;
-import pro.sketchware.utility.UI;
+import com.ascode.android.R;
+import com.ascode.android.activities.ai.LocalAiManagerActivity;
+import com.ascode.android.utility.UI;
 
 public class MainDrawer extends NavigationView {
-    private static final int DEF_STYLE_RES = R.style.Widget_SketchwarePro_NavigationView_Main;
+    private static final int DEF_STYLE_RES = R.style.Widget_Ascode_NavigationView_Main;
 
     public MainDrawer(@NonNull Context context) {
         this(context, null);
@@ -69,14 +68,8 @@ public class MainDrawer extends NavigationView {
     private void initializeSocialLinks(@IdRes int id) {
         if (!mB.a()) {
             @StringRes int url = -1;
-            if (id == R.id.social_discord) {
-                url = R.string.link_discord_invite;
-            } else if (id == R.id.social_telegram) {
-                url = R.string.link_telegram_invite;
-            } else if (id == R.id.social_github) {
+            if (id == R.id.social_github) {
                 url = R.string.link_github_url;
-            } else if (id == R.id.app_sw_assist) {
-                url = R.string.link_sw_assist;
             }
 
             if (url != -1) {
@@ -87,16 +80,7 @@ public class MainDrawer extends NavigationView {
 
     private void initializeDrawerItems(@IdRes int id) {
         Activity activity = unwrap(getContext());
-        if (id == R.id.about_team) {
-            Intent intent = new Intent(activity, AboutActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            activity.startActivity(intent);
-        } else if (id == R.id.changelog) {
-            Intent intent = new Intent(activity, AboutActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            intent.putExtra("select", "changelog");
-            activity.startActivity(intent);
-        } else if (id == R.id.program_info) {
+        if (id == R.id.program_info) {
             Intent intent = new Intent(activity, ProgramInfoActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
             activity.startActivityForResult(intent, 105);

@@ -45,7 +45,7 @@
         android:gravity="center_horizontal"
         android:textAppearance="?attr/textAppearanceBodyMedium"
         android:textColor="?attr/colorOnSurfaceVariant"
-        tools:text="Meet Sketchware Pro v7.0.4!\nFinally, the long-awaited version has been released!" />
+        tools:text="Meet Android SCode v7.0.4!\nFinally, the long-awaited version has been released!" />
 
     <LinearLayout
         android:layout_width="match_parent"

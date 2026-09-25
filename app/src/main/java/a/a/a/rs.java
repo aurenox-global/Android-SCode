@@ -51,7 +51,7 @@ import mod.hey.studios.moreblock.ReturnMoreblockManager;
 import mod.hey.studios.moreblock.importer.MoreblockImporterDialog;
 import mod.hey.studios.util.Helper;
 import mod.jbk.editor.manage.MoreblockImporter;
-import pro.sketchware.R;
+import com.ascode.android.R;
 
 public class rs extends qA implements View.OnClickListener, MoreblockImporterDialog.CallBack {
 

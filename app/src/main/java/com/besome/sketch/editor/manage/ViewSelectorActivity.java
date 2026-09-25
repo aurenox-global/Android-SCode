@@ -24,12 +24,12 @@ import a.a.a.jC;
 import a.a.a.mB;
 import a.a.a.rq;
 import a.a.a.wq;
-import pro.sketchware.R;
-import pro.sketchware.databinding.FileSelectorPopupSelectXmlActivityItemBinding;
-import pro.sketchware.databinding.FileSelectorPopupSelectXmlBinding;
-import pro.sketchware.utility.SketchwareUtil;
-import pro.sketchware.utility.ThemeUtils;
-import pro.sketchware.utility.UI;
+import com.ascode.android.R;
+import com.ascode.android.databinding.FileSelectorPopupSelectXmlActivityItemBinding;
+import com.ascode.android.databinding.FileSelectorPopupSelectXmlBinding;
+import com.ascode.android.utility.AscodeUtil;
+import com.ascode.android.utility.ThemeUtils;
+import com.ascode.android.utility.UI;
 
 public class ViewSelectorActivity extends BaseAppCompatActivity {
     private final int[] x = new int[19];
@@ -330,9 +330,9 @@ public class ViewSelectorActivity extends BaseAppCompatActivity {
                 if (currentXml.equals(xmlName)) {
                     viewHolder.itemBinding.cardView.setStrokeColor(
                             ThemeUtils.getColor(ViewSelectorActivity.this, R.attr.colorPrimary));
-                    viewHolder.itemBinding.cardView.setStrokeWidth(SketchwareUtil.dpToPx(3f));
+                    viewHolder.itemBinding.cardView.setStrokeWidth(AscodeUtil.dpToPx(3f));
                 } else {
-                    viewHolder.itemBinding.cardView.setStrokeWidth(SketchwareUtil.dpToPx(0f));
+                    viewHolder.itemBinding.cardView.setStrokeWidth(AscodeUtil.dpToPx(0f));
                 }
                 String javaName = projectFileBean.getJavaName();
                 viewHolder.itemBinding.imgEdit.setVisibility(View.VISIBLE);
@@ -347,9 +347,9 @@ public class ViewSelectorActivity extends BaseAppCompatActivity {
                 if (currentXml.equals(customView.getXmlName())) {
                     viewHolder.itemBinding.cardView.setStrokeColor(
                             ThemeUtils.getColor(ViewSelectorActivity.this, R.attr.colorPrimary));
-                    viewHolder.itemBinding.cardView.setStrokeWidth(SketchwareUtil.dpToPx(3f));
+                    viewHolder.itemBinding.cardView.setStrokeWidth(AscodeUtil.dpToPx(3f));
                 } else {
-                    viewHolder.itemBinding.cardView.setStrokeWidth(SketchwareUtil.dpToPx(0f));
+                    viewHolder.itemBinding.cardView.setStrokeWidth(AscodeUtil.dpToPx(0f));
                 }
                 if (customView.fileType == ProjectFileBean.PROJECT_FILE_TYPE_DRAWER) {
                     viewHolder.itemBinding.imgView.setImageResource(getViewIcon(4));

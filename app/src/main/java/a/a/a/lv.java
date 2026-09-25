@@ -6,8 +6,8 @@ import android.widget.LinearLayout;
 import com.besome.sketch.beans.ProjectLibraryBean;
 import com.besome.sketch.editor.manage.library.firebase.FirebaseActivity;
 
-import pro.sketchware.R;
-import pro.sketchware.databinding.ManageLibraryFirebaseProjectSettingsBinding;
+import com.ascode.android.R;
+import com.ascode.android.databinding.ManageLibraryFirebaseProjectSettingsBinding;
 
 public class lv extends LinearLayout implements nv {
 
@@ -43,7 +43,7 @@ public class lv extends LinearLayout implements nv {
 
     @Override
     public String getDocUrl() {
-        return "https://docs.sketchware.io/docs/firebase-project-settings.html";
+        return "https://docs.ascode.io/docs/firebase-project-settings.html";
     }
 
     @Override

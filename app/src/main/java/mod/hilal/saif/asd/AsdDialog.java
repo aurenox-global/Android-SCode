@@ -19,10 +19,10 @@ import a.a.a.Ss;
 import io.github.rosemoe.sora.widget.component.EditorAutoCompletion;
 import mod.hey.studios.code.SrcCodeEditor;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
-import pro.sketchware.databinding.CodeEditorHsAsdBinding;
-import pro.sketchware.utility.EditorUtils;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.databinding.CodeEditorHsAsdBinding;
+import com.ascode.android.utility.EditorUtils;
+import com.ascode.android.utility.AscodeUtil;
 
 public class AsdDialog extends Dialog implements DialogInterface.OnDismissListener {
     private SharedPreferences pref;
@@ -85,7 +85,7 @@ public class AsdDialog extends Dialog implements DialogInterface.OnDismissListen
                     code = Lx.j(code, true);
                 } catch (Exception e) {
                     failed = true;
-                    SketchwareUtil.toastError("Your code contains incorrectly nested parentheses");
+                    AscodeUtil.toastError("Your code contains incorrectly nested parentheses");
                 }
                 if (!failed) {
                     binding.editor.setText(code);

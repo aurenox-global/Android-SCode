@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import mod.agus.jcoderz.editor.event.ManageEvent;
 import mod.hey.studios.util.Helper;
 import mod.hilal.saif.events.EventsHandler;
-import pro.sketchware.R;
+import com.ascode.android.R;
 
 public class oq {
 

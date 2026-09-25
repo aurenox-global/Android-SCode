@@ -1,11 +1,11 @@
 package dev.aldi.sayuti.editor.manage;
 
-import static pro.sketchware.utility.FileUtil.deleteFile;
-import static pro.sketchware.utility.FileUtil.getExternalStorageDir;
-import static pro.sketchware.utility.FileUtil.isExistFile;
-import static pro.sketchware.utility.FileUtil.listDirAsFile;
-import static pro.sketchware.utility.FileUtil.readFile;
-import static pro.sketchware.utility.FileUtil.writeFile;
+import static com.ascode.android.utility.FileUtil.deleteFile;
+import static com.ascode.android.utility.FileUtil.getExternalStorageDir;
+import static com.ascode.android.utility.FileUtil.isExistFile;
+import static com.ascode.android.utility.FileUtil.listDirAsFile;
+import static com.ascode.android.utility.FileUtil.readFile;
+import static com.ascode.android.utility.FileUtil.writeFile;
 
 import com.google.gson.Gson;
 
@@ -19,7 +19,7 @@ import java.util.Map;
 import mod.hey.studios.util.Helper;
 
 public class LocalLibrariesUtil {
-    private static final String localLibsPath = getExternalStorageDir().concat("/.sketchware/libs/local_libs/");
+    private static final String localLibsPath = getExternalStorageDir().concat("/.ascode/libs/local_libs/");
 
     public static List<LocalLibrary> getAllLocalLibraries() {
         ArrayList<File> localLibraryFiles = new ArrayList<>();
@@ -72,7 +72,7 @@ public class LocalLibrariesUtil {
     }
 
     public static File getLocalLibFile(String scId) {
-        return new File(getExternalStorageDir().concat("/.sketchware/data/").concat(scId.concat("/local_library")));
+        return new File(getExternalStorageDir().concat("/.ascode/data/").concat(scId.concat("/local_library")));
     }
 
     public static void rewriteLocalLibFile(String scId, String newContent) {

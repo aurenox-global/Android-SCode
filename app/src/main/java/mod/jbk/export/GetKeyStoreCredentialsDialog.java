@@ -19,11 +19,11 @@ import java.util.List;
 
 import a.a.a.wq;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
-import pro.sketchware.databinding.DialogKeystoreCredentialsBinding;
-import pro.sketchware.keystore.CompilePreferences;
-import pro.sketchware.keystore.KeystoreStore;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.databinding.DialogKeystoreCredentialsBinding;
+import com.ascode.android.keystore.CompilePreferences;
+import com.ascode.android.keystore.KeystoreStore;
+import com.ascode.android.utility.AscodeUtil;
 
 /**
  * The one dialog used to compile something: what to build (APK debug / APK release / AAB, when the
@@ -360,7 +360,7 @@ public class GetKeyStoreCredentialsDialog {
         boolean isValid = true;
 
         if (mode == SigningMode.SAVED_KEY_STORE && selectedKeystore == null) {
-            SketchwareUtil.toastError("No saved keystore selected. Import one from Settings → Keystore manager.");
+            AscodeUtil.toastError("No saved keystore selected. Import one from Settings → Keystore manager.");
             return false;
         }
 

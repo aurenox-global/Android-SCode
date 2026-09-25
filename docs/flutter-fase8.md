@@ -1,4 +1,4 @@
-# Fase 8 — Flutter experimental en Sketchware Pro (v7.0.8.0)
+# Fase 8 — Flutter experimental en Android SCode (v7.0.8.0)
 
 **Versión:** v7.0.8.0 · versionCode **162** · Fecha: 2026-09-23
 **Fuentes:** `flutter-aot/INFORME-AOT.md` (receta AOT y prueba release), `flutter-carril-A2.md` (assets del bundle),

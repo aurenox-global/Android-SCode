@@ -22,8 +22,8 @@ import a.a.a.kq;
 import dev.aldi.sayuti.block.ExtraBlockFile;
 import mod.hey.studios.editor.manage.block.ExtraBlockInfo;
 import mod.hey.studios.editor.manage.block.v2.BlockLoader;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.AscodeUtil;
 
 public class CustomBlocksManager {
     private final Context context;
@@ -106,7 +106,7 @@ public class CustomBlocksManager {
         }
 
         File customBlocksConfig = new File(Environment.getExternalStorageDirectory(),
-                ".sketchware/data/" + sc_id + "/custom_blocks");
+                ".ascode/data/" + sc_id + "/custom_blocks");
         if (customBlocksConfig.exists()) {
             try {
                 custom_blocks = new Gson().fromJson(
@@ -114,7 +114,7 @@ public class CustomBlocksManager {
                         new TypeToken<ArrayList<ExtraBlockInfo>>() {
                         }.getType());
             } catch (Exception e) {
-                SketchwareUtil.toastError("Failed to get Custom Blocks : " + e.getMessage());
+                AscodeUtil.toastError("Failed to get Custom Blocks : " + e.getMessage());
             }
         }
 
@@ -128,7 +128,7 @@ public class CustomBlocksManager {
                 }
             }
         } catch (Exception ignored) {
-            android.util.Log.d("SketchwarePro", "CustomBlocksManager: Exception ignored", ignored);
+            android.util.Log.d("Ascode", "CustomBlocksManager: Exception ignored", ignored);
         }
         return "";
     }
@@ -141,7 +141,7 @@ public class CustomBlocksManager {
                 }
             }
         } catch (Exception ignored) {
-            android.util.Log.d("SketchwarePro", "CustomBlocksManager: Exception ignored", ignored);
+            android.util.Log.d("Ascode", "CustomBlocksManager: Exception ignored", ignored);
         }
         return "";
     }
@@ -150,7 +150,7 @@ public class CustomBlocksManager {
     /*public String getCustomBlocksJsonPath() {
         return new File(
             Environment.getExternalStorageDirectory(),
-            ".sketchware/data/" + sc_id + "/custom_blocks")
+            ".ascode/data/" + sc_id + "/custom_blocks")
             .getAbsolutePath();
     }
 
@@ -180,7 +180,7 @@ import a.a.a.eC;
 import a.a.a.jC;
 import mod.hey.studios.editor.manage.block.v2.BlockLoader;
 import mod.hey.studios.editor.manage.block.ExtraBlockInfo;
-import pro.sketchware.utility.FileUtil;
+import com.ascode.android.utility.FileUtil;
 import com.google.gson.Gson;
 import java.io.File;
 import android.os.Environment;
@@ -239,7 +239,7 @@ public class CustomBlocksManager {
     
     
     public String getCustomBlocksJsonPath() {
-        return new File(Environment.getExternalStorageDirectory(), ".sketchware/data/"+sc_id+"/custom_blocks").getAbsolutePath();
+        return new File(Environment.getExternalStorageDirectory(), ".ascode/data/"+sc_id+"/custom_blocks").getAbsolutePath();
     }
     
     

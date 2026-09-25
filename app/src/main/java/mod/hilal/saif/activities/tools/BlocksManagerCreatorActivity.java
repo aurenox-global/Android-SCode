@@ -1,6 +1,6 @@
 package mod.hilal.saif.activities.tools;
 
-import static pro.sketchware.utility.GsonUtils.getGson;
+import static com.ascode.android.utility.GsonUtils.getGson;
 
 import android.annotation.SuppressLint;
 import android.graphics.Color;
@@ -40,13 +40,13 @@ import java.util.regex.Pattern;
 import a.a.a.Rs;
 import mod.hey.studios.util.Helper;
 import mod.hilal.saif.lib.PCP;
-import pro.sketchware.R;
-import pro.sketchware.databinding.ActivityBlocksManagerCreatorBinding;
-import pro.sketchware.lib.base.BaseTextWatcher;
-import pro.sketchware.lib.highlighter.SimpleHighlighter;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.PropertiesUtil;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.databinding.ActivityBlocksManagerCreatorBinding;
+import com.ascode.android.lib.base.BaseTextWatcher;
+import com.ascode.android.lib.highlighter.SimpleHighlighter;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.PropertiesUtil;
+import com.ascode.android.utility.AscodeUtil;
 
 public class BlocksManagerCreatorActivity extends BaseAppCompatActivity {
 
@@ -191,12 +191,12 @@ public class BlocksManagerCreatorActivity extends BaseAppCompatActivity {
         binding.cancel.setOnClickListener(Helper.getBackPressedClickListener(this));
         binding.save.setOnClickListener(v -> {
             if (!PropertiesUtil.isHexColor(Helper.getText(binding.colour))) {
-                SketchwareUtil.showMessage(getApplicationContext(), "Invalid hex color");
+                AscodeUtil.showMessage(getApplicationContext(), "Invalid hex color");
                 return;
             }
             Matcher matcher = PARAM_PATTERN.matcher(Helper.getText(binding.spec));
             if (matcher.find()) {
-                SketchwareUtil.showMessage(getApplicationContext(), "Invalid block params");
+                AscodeUtil.showMessage(getApplicationContext(), "Invalid block params");
                 return;
             }
             if (Helper.getText(binding.type).isEmpty()) {
@@ -270,9 +270,9 @@ public class BlocksManagerCreatorActivity extends BaseAppCompatActivity {
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
         textView.setPadding(
-                (int) SketchwareUtil.getDip(8),
+                (int) AscodeUtil.getDip(8),
                 0,
-                (int) SketchwareUtil.getDip(8),
+                (int) AscodeUtil.getDip(8),
                 0
         );
         textView.setTextColor(MaterialColors.getColor(textView, R.attr.colorPrimary));
@@ -445,15 +445,15 @@ public class BlocksManagerCreatorActivity extends BaseAppCompatActivity {
                     if (name instanceof String) {
                         id_detector.add((String) name);
                     } else {
-                        SketchwareUtil.toastError("Custom Block #" + i + " in current palette has an invalid name");
+                        AscodeUtil.toastError("Custom Block #" + i + " in current palette has an invalid name");
                     }
                 }
                 return;
             }
         } catch (JsonParseException e) {
-            android.util.Log.d("SketchwarePro", "BlocksManagerCreatorActivity: invalid custom blocks JSON", e);
+            android.util.Log.d("Ascode", "BlocksManagerCreatorActivity: invalid custom blocks JSON", e);
         }
-        SketchwareUtil.showFailedToParseJsonDialog(this, new File(path), "Custom Blocks", v -> getBlockList());
+        AscodeUtil.showFailedToParseJsonDialog(this, new File(path), "Custom Blocks", v -> getBlockList());
         blocksList = new ArrayList<>();
     }
 
@@ -503,7 +503,7 @@ public class BlocksManagerCreatorActivity extends BaseAppCompatActivity {
         tempMap.put("palette", String.valueOf(blockPosition));
         blocksList.add(tempMap);
         FileUtil.writeFile(path, getGson().toJson(blocksList));
-        SketchwareUtil.toast("Saved");
+        AscodeUtil.toast("Saved");
         finish();
     }
 
@@ -528,7 +528,7 @@ public class BlocksManagerCreatorActivity extends BaseAppCompatActivity {
         tempMap.put("palette", blocksList.get(position).get("palette"));
         blocksList.add(position, tempMap);
         FileUtil.writeFile(path, getGson().toJson(blocksList));
-        SketchwareUtil.toast("Saved");
+        AscodeUtil.toast("Saved");
         finish();
     }
 
@@ -549,7 +549,7 @@ public class BlocksManagerCreatorActivity extends BaseAppCompatActivity {
         tempMap.put("imports", Helper.getText(binding.customImport));
         tempMap.put("code", Helper.getText(binding.code));
         FileUtil.writeFile(path, getGson().toJson(blocksList));
-        SketchwareUtil.toast("Saved");
+        AscodeUtil.toast("Saved");
         finish();
     }
 }

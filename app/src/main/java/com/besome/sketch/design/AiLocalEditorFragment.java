@@ -50,14 +50,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import io.noties.markwon.Markwon;
-import pro.sketchware.R;
-import pro.sketchware.activities.ai.LocalAiManagerActivity;
-import pro.sketchware.ai.CloudAiService;
-import pro.sketchware.ai.LocalAiConfig;
-import pro.sketchware.ai.LocalAiPromptFactory;
-import pro.sketchware.ai.LocalAiService;
-import pro.sketchware.ai.ThinkModeParser;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.activities.ai.LocalAiManagerActivity;
+import io.ascode.android.CloudAiService;
+import io.ascode.android.LocalAiConfig;
+import io.ascode.android.LocalAiPromptFactory;
+import io.ascode.android.LocalAiService;
+import io.ascode.android.ThinkModeParser;
+import com.ascode.android.utility.AscodeUtil;
 
 public class AiLocalEditorFragment extends Fragment {
     private static final String PREF_CHAT_HISTORY = "ai_local_editor_chat_history";
@@ -235,7 +235,7 @@ public class AiLocalEditorFragment extends Fragment {
 
         String prompt = chatPromptInput.getText() == null ? "" : chatPromptInput.getText().toString().trim();
         if (prompt.isEmpty()) {
-            SketchwareUtil.toastError("Escribe un mensaje primero.");
+            AscodeUtil.toastError("Escribe un mensaje primero.");
             return;
         }
 
@@ -328,8 +328,8 @@ public class AiLocalEditorFragment extends Fragment {
                 ? "unknown"
                 : DesignActivity.sc_id.trim();
 
-        String projectContext = pro.sketchware.ai.AgentProjectContext.build(projectId);
-        String filesContext = pro.sketchware.ai.ProjectCodeInjector.buildProjectContext(projectId);
+        String projectContext = io.ascode.android.AgentProjectContext.build(projectId);
+        String filesContext = io.ascode.android.ProjectCodeInjector.buildProjectContext(projectId);
         if (!filesContext.isEmpty()) {
             projectContext = (projectContext == null ? "" : projectContext) + filesContext;
         }
@@ -343,19 +343,19 @@ public class AiLocalEditorFragment extends Fragment {
         if (config.isCloudProvider()) {
             if (config.getCloudApiKey().isEmpty() && !LocalAiConfig.isCustomProvider(config.getProviderId())) {
                 String issue = "Configure the cloud API key in AI Manager first.";
-                SketchwareUtil.toastError(issue);
+                AscodeUtil.toastError(issue);
                 addChatMessage(false, issue, true);
                 return false;
             }
             if (config.resolveCloudModel().isEmpty()) {
                 String issue = "Configure the cloud model in AI Manager first.";
-                SketchwareUtil.toastError(issue);
+                AscodeUtil.toastError(issue);
                 addChatMessage(false, issue, true);
                 return false;
             }
             if (config.resolveCloudEndpoint().isEmpty()) {
                 String issue = "Configure the cloud endpoint in AI Manager first.";
-                SketchwareUtil.toastError(issue);
+                AscodeUtil.toastError(issue);
                 addChatMessage(false, issue, true);
                 return false;
             }
@@ -364,7 +364,7 @@ public class AiLocalEditorFragment extends Fragment {
 
         if (!config.hasModel()) {
             String issue = "No local model selected. Open AI Manager first.";
-            SketchwareUtil.toastError(issue);
+            AscodeUtil.toastError(issue);
             addChatMessage(false, issue, true);
             return false;
         }
@@ -472,8 +472,8 @@ public class AiLocalEditorFragment extends Fragment {
             StringBuilder resultText = new StringBuilder();
             final boolean[] changesApplied = {false};
             try {
-                pro.sketchware.ai.AgentActionExecutor executor = new pro.sketchware.ai.AgentActionExecutor(projectId);
-                pro.sketchware.ai.AgentActionExecutor.Result result = executor.execute(agentJson);
+                io.ascode.android.AgentActionExecutor executor = new io.ascode.android.AgentActionExecutor(projectId);
+                io.ascode.android.AgentActionExecutor.Result result = executor.execute(agentJson);
                 if (!result.getReply().trim().isEmpty()) {
                     resultText.append(result.getReply().trim()).append("\n\n");
                 }
@@ -488,7 +488,7 @@ public class AiLocalEditorFragment extends Fragment {
                         resultText.append("- ").append(line).append('\n');
                     }
                     changesApplied[0] = true;
-                    SketchwareUtil.toast("Agente: cambios aplicados al proyecto");
+                    AscodeUtil.toast("Agente: cambios aplicados al proyecto");
                 }
             } catch (Throwable throwable) {
                 resultText.setLength(0);
@@ -563,8 +563,8 @@ public class AiLocalEditorFragment extends Fragment {
                     .setTitle("Apply code")
                     .setMessage("¿Aplicar el código al proyecto (initializeLogic de MainActivity) o solo copiarlo?")
                     .setPositiveButton("Aplicar al proyecto", (dialog, which) -> {
-                        boolean applied = pro.sketchware.ai.ProjectCodeInjector.injectIntoInitializeLogic(
-                                projectId, pro.sketchware.ai.ProjectCodeInjector.getMainJavaName(), code);
+                        boolean applied = io.ascode.android.ProjectCodeInjector.injectIntoInitializeLogic(
+                                projectId, io.ascode.android.ProjectCodeInjector.getMainJavaName(), code);
                         Toast.makeText(getContext(),
                                 applied ? "Código aplicado a MainActivity (initializeLogic)." : "No se pudo aplicar el código.",
                                 Toast.LENGTH_SHORT).show();
@@ -623,7 +623,7 @@ public class AiLocalEditorFragment extends Fragment {
 
     private void exportChatHistory() {
         if (chatMessages.size() <= 1) {
-            SketchwareUtil.toastError("No messages to export.");
+            AscodeUtil.toastError("No messages to export.");
             return;
         }
 
@@ -651,15 +651,15 @@ public class AiLocalEditorFragment extends Fragment {
                         Toast.makeText(getContext(), "Copied to clipboard", Toast.LENGTH_SHORT).show();
                     } else {
                         try {
-                            File dir = new File(Environment.getExternalStorageDirectory(), ".sketchware/ai/exports");
+                            File dir = new File(Environment.getExternalStorageDirectory(), ".ascode/ai/exports");
                             dir.mkdirs();
                             File file = new File(dir, "chat_" + System.currentTimeMillis() + ".md");
                             try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
                                 writer.write(md.toString());
                             }
-                            SketchwareUtil.toast("Saved: " + file.getName());
+                            AscodeUtil.toast("Saved: " + file.getName());
                         } catch (Exception e) {
-                            SketchwareUtil.toastError("Failed to save: " + e.getMessage());
+                            AscodeUtil.toastError("Failed to save: " + e.getMessage());
                         }
                     }
                 })
@@ -691,7 +691,7 @@ public class AiLocalEditorFragment extends Fragment {
                     }
                 }
             } catch (JSONException ignored) {
-                android.util.Log.d("SketchwarePro", "AiLocalEditorFragment: failed to decode chat history", ignored);
+                android.util.Log.d("Ascode", "AiLocalEditorFragment: failed to decode chat history", ignored);
             }
         }
 
@@ -717,7 +717,7 @@ public class AiLocalEditorFragment extends Fragment {
                 }
                 array.put(object);
             } catch (JSONException ignored) {
-                android.util.Log.d("SketchwarePro", "AiLocalEditorFragment: failed to encode chat message", ignored);
+                android.util.Log.d("Ascode", "AiLocalEditorFragment: failed to encode chat message", ignored);
             }
         }
         chatPrefs.edit().putString(resolveChatScopeKey(), array.toString()).apply();

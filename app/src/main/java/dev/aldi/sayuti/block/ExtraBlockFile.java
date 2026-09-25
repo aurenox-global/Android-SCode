@@ -10,14 +10,14 @@ import java.util.HashMap;
 
 import mod.hey.studios.util.Helper;
 import mod.hilal.saif.blocks.BlocksHandler;
-import pro.sketchware.utility.FileUtil;
+import com.ascode.android.utility.FileUtil;
 
 public class ExtraBlockFile {
 
     public static final File EXTRA_BLOCKS_DATA_FILE = new File(Environment.getExternalStorageDirectory(),
-            ".sketchware/resources/block/My Block/block.json");
+            ".ascode/resources/block/My Block/block.json");
     public static final File EXTRA_BLOCKS_PALETTE_FILE = new File(Environment.getExternalStorageDirectory(),
-            ".sketchware/resources/block/My Block/palette.json");
+            ".ascode/resources/block/My Block/palette.json");
 
     public static ArrayList<HashMap<String, Object>> buildInBlocks = new ArrayList<>();
 

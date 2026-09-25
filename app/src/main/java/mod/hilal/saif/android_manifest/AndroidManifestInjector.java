@@ -1,6 +1,6 @@
 package mod.hilal.saif.android_manifest;
 
-import static pro.sketchware.utility.GsonUtils.getGson;
+import static com.ascode.android.utility.GsonUtils.getGson;
 
 import android.os.Environment;
 
@@ -12,33 +12,33 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import mod.hey.studios.util.Helper;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.SketchwareUtil;
-import pro.sketchware.xml.XmlBuilder;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.AscodeUtil;
+import com.ascode.android.xml.XmlBuilder;
 
 public class AndroidManifestInjector {
 
     public static File getPathAndroidManifestAttributeInjection(String sc_id) {
         return new File(Environment.getExternalStorageDirectory(),
-                ".sketchware" + File.separator + "data" + File.separator + sc_id + File.separator +
+                ".ascode" + File.separator + "data" + File.separator + sc_id + File.separator +
                         "Injection" + File.separator + "androidmanifest" + File.separator + "attributes.json");
     }
 
     public static File getPathAndroidManifestLauncherActivity(String sc_id) {
         return new File(Environment.getExternalStorageDirectory(),
-                ".sketchware" + File.separator + "data" + File.separator + sc_id + File.separator +
+                ".ascode" + File.separator + "data" + File.separator + sc_id + File.separator +
                         "Injection" + File.separator + "androidmanifest" + File.separator + "activity_launcher.txt");
     }
 
     public static File getPathAndroidManifestActivitiesComponents(String sc_id) {
         return new File(Environment.getExternalStorageDirectory(),
-                ".sketchware" + File.separator + "data" + File.separator + sc_id + File.separator +
+                ".ascode" + File.separator + "data" + File.separator + sc_id + File.separator +
                         "Injection" + File.separator + "androidmanifest" + File.separator + "activities_components.json");
     }
 
     public static File getPathAndroidManifestAppComponents(String sc_id) {
         return new File(Environment.getExternalStorageDirectory(),
-                ".sketchware" + File.separator + "data" + File.separator + sc_id + File.separator +
+                ".ascode" + File.separator + "data" + File.separator + sc_id + File.separator +
                         "Injection" + File.separator + "androidmanifest" + File.separator + "app_components.txt");
     }
 
@@ -70,7 +70,7 @@ public class AndroidManifestInjector {
             }
 
             attributes = new ArrayList<>();
-            SketchwareUtil.toastError("Failed to parse AndroidManifest attribute injections; Reason: " + errorMessage);
+            AscodeUtil.toastError("Failed to parse AndroidManifest attribute injections; Reason: " + errorMessage);
         }
 
         return attributes;
@@ -93,10 +93,10 @@ public class AndroidManifestInjector {
                         nx.addChildNode(usesPermissionTag);
                     }
                 } else {
-                    SketchwareUtil.toastError("Invalid AndroidManifest attribute injection value in attribute #" + (i + 1));
+                    AscodeUtil.toastError("Invalid AndroidManifest attribute injection value in attribute #" + (i + 1));
                 }
             } else {
-                SketchwareUtil.toastError("Invalid AndroidManifest attribute injection name in attribute #" + (i + 1));
+                AscodeUtil.toastError("Invalid AndroidManifest attribute injection name in attribute #" + (i + 1));
             }
         }
     }
@@ -119,7 +119,7 @@ public class AndroidManifestInjector {
                     return true;
                 }
             } else {
-                SketchwareUtil.toastError("Invalid AndroidManifest attribute injection name in attribute #" + (i + 1));
+                AscodeUtil.toastError("Invalid AndroidManifest attribute injection name in attribute #" + (i + 1));
             }
         }
 
@@ -159,11 +159,11 @@ public class AndroidManifestInjector {
                             return true;
                         }
                     } else {
-                        SketchwareUtil.toastError("Invalid AndroidManifest attribute injection value in attribute #" + (i + 1));
+                        AscodeUtil.toastError("Invalid AndroidManifest attribute injection value in attribute #" + (i + 1));
                     }
                 }
             } else {
-                SketchwareUtil.toastError("Invalid AndroidManifest attribute injection name in attribute #" + (i + 1));
+                AscodeUtil.toastError("Invalid AndroidManifest attribute injection name in attribute #" + (i + 1));
             }
         }
 
@@ -276,11 +276,11 @@ public class AndroidManifestInjector {
                             themeInjected = true;
                         }
                     } else {
-                        SketchwareUtil.toastError("Invalid AndroidManifest attribute injection value in attribute #" + (i + 1));
+                        AscodeUtil.toastError("Invalid AndroidManifest attribute injection value in attribute #" + (i + 1));
                     }
                 }
             } else {
-                SketchwareUtil.toastError("Invalid AndroidManifest attribute injection name in attribute #" + (i + 1));
+                AscodeUtil.toastError("Invalid AndroidManifest attribute injection name in attribute #" + (i + 1));
             }
         }
 
@@ -304,11 +304,11 @@ public class AndroidManifestInjector {
                     if (value instanceof String) {
                         nx.addAttributeValue((String) value);
                     } else {
-                        SketchwareUtil.toastError("Invalid AndroidManifest attribute injection value in attribute #" + (i + 1));
+                        AscodeUtil.toastError("Invalid AndroidManifest attribute injection value in attribute #" + (i + 1));
                     }
                 }
             } else {
-                SketchwareUtil.toastError("Invalid AndroidManifest attribute injection name in attribute #" + (i + 1));
+                AscodeUtil.toastError("Invalid AndroidManifest attribute injection name in attribute #" + (i + 1));
             }
         }
     }

@@ -5,8 +5,8 @@ import android.widget.LinearLayout;
 import com.besome.sketch.beans.ProjectLibraryBean;
 import com.besome.sketch.editor.manage.library.firebase.FirebaseActivity;
 
-import pro.sketchware.R;
-import pro.sketchware.databinding.ManageLibraryFirebaseStorageUrlSettingsBinding;
+import com.ascode.android.R;
+import com.ascode.android.databinding.ManageLibraryFirebaseStorageUrlSettingsBinding;
 
 public class mv extends LinearLayout implements nv {
 
@@ -44,7 +44,7 @@ public class mv extends LinearLayout implements nv {
     //todo: Update docs url
     @Override
     public String getDocUrl() {
-        return "https://docs.sketchware.io/docs/firebase-storage.html";
+        return "https://docs.ascode.io/docs/firebase-storage.html";
     }
 
     @Override

@@ -30,12 +30,12 @@ import java.util.Locale;
 import mod.hey.studios.util.Helper;
 import mod.jbk.util.AudioMetadata;
 import mod.jbk.util.SoundPlayingAdapter;
-import pro.sketchware.R;
-import pro.sketchware.databinding.FrManageSoundListBinding;
-import pro.sketchware.databinding.ManageSoundBinding;
-import pro.sketchware.databinding.ManageSoundListItemBinding;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.databinding.FrManageSoundListBinding;
+import com.ascode.android.databinding.ManageSoundBinding;
+import com.ascode.android.databinding.ManageSoundListItemBinding;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.AscodeUtil;
 
 public class ow extends qA {
 
@@ -105,14 +105,14 @@ public class ow extends qA {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 269 && resultCode == Activity.RESULT_OK) {
             sounds.add(data.getParcelableExtra("project_resource"));
-            SketchwareUtil.toast(Helper.getResString(R.string.design_manager_message_add_complete));
+            AscodeUtil.toast(Helper.getResString(R.string.design_manager_message_add_complete));
 
             adapter.notifyDataSetChanged();
             updateNoSoundsTextVisibility();
             ((ManageSoundActivity) requireActivity()).collectionSounds.loadProjectSounds();
         } else if (requestCode == 270 && resultCode == Activity.RESULT_OK) {
             sounds.set(adapter.lastSelectedSound, data.getParcelableExtra("project_resource"));
-            SketchwareUtil.toast(Helper.getResString(R.string.design_manager_message_edit_complete));
+            AscodeUtil.toast(Helper.getResString(R.string.design_manager_message_edit_complete));
             adapter.notifyDataSetChanged();
             updateNoSoundsTextVisibility();
             ((ManageSoundActivity) requireActivity()).collectionSounds.loadProjectSounds();
@@ -140,7 +140,7 @@ public class ow extends qA {
 
         actBinding.btnDelete.setOnClickListener(view -> {
             if (sounds.isEmpty()) {
-                SketchwareUtil.toast(Helper.getResString(R.string.common_message_no_item_delete));
+                AscodeUtil.toast(Helper.getResString(R.string.common_message_no_item_delete));
             } else if (!mB.a() && isSelecting) {
                 for (int i = sounds.size() - 1; i >= 0; i--) {
                     ProjectResourceBean projectResourceBean = sounds.get(i);
@@ -151,7 +151,7 @@ public class ow extends qA {
                 }
                 adapter.notifyDataSetChanged();
                 adapter.stopPlayback();
-                SketchwareUtil.toast(Helper.getResString(R.string.common_message_complete_delete));
+                AscodeUtil.toast(Helper.getResString(R.string.common_message_complete_delete));
             }
             setSelecting(false);
             updateNoSoundsTextVisibility();
@@ -281,9 +281,9 @@ public class ow extends qA {
                 }
                 unavailableNames.append(name);
             }
-            SketchwareUtil.toast(Helper.getResString(R.string.common_message_name_unavailable) + "\n[" + unavailableNames + "]");
+            AscodeUtil.toast(Helper.getResString(R.string.common_message_name_unavailable) + "\n[" + unavailableNames + "]");
         } else {
-            SketchwareUtil.toast(Helper.getResString(R.string.design_manager_message_import_complete));
+            AscodeUtil.toast(Helper.getResString(R.string.design_manager_message_import_complete));
             sounds.addAll(newResources);
             adapter.notifyDataSetChanged();
         }

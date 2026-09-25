@@ -22,7 +22,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:shapeAppearance="@style/ShapeAppearance.SketchwarePro.AsymmetricCard"
+        app:shapeAppearance="@style/ShapeAppearance.Ascode.AsymmetricCard"
         app:strokeWidth="0.5dp">
 
         <RelativeLayout
@@ -36,7 +36,7 @@
                 android:contentDescription="@null"
                 android:foreground="@drawable/shadow_gradient_bottom_top"
                 android:scaleType="centerCrop"
-                android:src="@drawable/sketch_app_icon" />
+                android:src="@drawable/ascode_app_icon" />
 
             <TextView
                 android:id="@+id/tv_published"
@@ -76,7 +76,7 @@
             android:layout_height="wrap_content"
             android:gravity="end"
             android:textAppearance="?attr/textAppearanceBodyLargeEmphasized"
-            tools:text="Sketchware Pro Demo" />
+            tools:text="Android SCode Demo" />
 
         <TextView
             android:id="@+id/app_name"

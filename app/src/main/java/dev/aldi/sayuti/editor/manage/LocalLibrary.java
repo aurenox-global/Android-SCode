@@ -1,7 +1,7 @@
 package dev.aldi.sayuti.editor.manage;
 
-import static pro.sketchware.utility.FileUtil.formatFileSize;
-import static pro.sketchware.utility.FileUtil.getFileSize;
+import static com.ascode.android.utility.FileUtil.formatFileSize;
+import static com.ascode.android.utility.FileUtil.getFileSize;
 
 import java.io.File;
 

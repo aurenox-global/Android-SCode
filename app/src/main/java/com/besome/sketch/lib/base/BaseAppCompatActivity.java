@@ -30,9 +30,9 @@ import java.util.ArrayList;
 import a.a.a.MA;
 import a.a.a.lC;
 import dev.chrisbanes.insetter.Insetter;
-import pro.sketchware.ui.layout.AdaptiveLayoutPolicy;
-import pro.sketchware.ui.layout.AdaptiveLayoutSnapshot;
-import pro.sketchware.dialogs.ProgressDialog;
+import com.ascode.android.ui.layout.AdaptiveLayoutPolicy;
+import com.ascode.android.ui.layout.AdaptiveLayoutSnapshot;
+import com.ascode.android.dialogs.ProgressDialog;
 
 public abstract class BaseAppCompatActivity extends AppCompatActivity {
 

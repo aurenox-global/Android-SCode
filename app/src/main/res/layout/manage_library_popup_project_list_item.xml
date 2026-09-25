@@ -71,7 +71,7 @@
                         android:layout_height="wrap_content"
                         android:textColor="?attr/colorOnSurfaceVariant"
                         android:textSize="12sp"
-                        tools:text="Sketchware Pro Demo" />
+                        tools:text="Android SCode Demo" />
 
                     <TextView
                         android:id="@+id/project_version"

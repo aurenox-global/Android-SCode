@@ -30,7 +30,7 @@ import a.a.a.bB;
 import a.a.a.gB;
 import a.a.a.wB;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
+import com.ascode.android.R;
 
 public class TestDevicesStepView extends LinearLayout implements Uu, View.OnClickListener {
     private TestDeviceAdapter adapter;
@@ -48,7 +48,7 @@ public class TestDevicesStepView extends LinearLayout implements Uu, View.OnClic
 
     @Override
     public String getDocUrl() {
-        return "https://docs.sketchware.io/docs/admob-adding-test-device.html";
+        return "https://docs.ascode.io/docs/admob-adding-test-device.html";
     }
 
     @Override

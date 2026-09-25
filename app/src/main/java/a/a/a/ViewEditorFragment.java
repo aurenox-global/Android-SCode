@@ -28,9 +28,9 @@ import com.besome.sketch.editor.view.palette.PaletteWidget;
 import java.util.ArrayList;
 
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
-import pro.sketchware.utility.SketchwareUtil;
-import pro.sketchware.widgets.WidgetsCreatorManager;
+import com.ascode.android.R;
+import com.ascode.android.utility.AscodeUtil;
+import com.ascode.android.widgets.WidgetsCreatorManager;
 
 public class ViewEditorFragment extends qA {
 
@@ -77,7 +77,7 @@ public class ViewEditorFragment extends qA {
             if (requireActivity() instanceof DesignActivity designActivity) {
                 designActivity.hideViewPropertyView();
             }
-            SketchwareUtil.toast(Helper.getResString(R.string.common_word_deleted));
+            AscodeUtil.toast(Helper.getResString(R.string.common_word_deleted));
         });
         viewProperty.setOnEventClickListener(eventBean -> toLogicEditorActivity(eventBean.targetId, eventBean.eventName, eventBean.eventName));
         viewProperty.setOnPropertyTargetChangeListener(viewEditor::updateSelection);

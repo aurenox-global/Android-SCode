@@ -1,6 +1,6 @@
 package mod.hey.studios.code;
 
-import static pro.sketchware.utility.GsonUtils.getGson;
+import static com.ascode.android.utility.GsonUtils.getGson;
 
 import android.app.Activity;
 import android.content.ClipData;
@@ -74,28 +74,28 @@ import mod.jbk.code.JavaDiagnosticsAnalyzer;
 import mod.jbk.code.ProjectDartLanguage;
 import mod.jbk.code.ProjectJavaLanguage;
 import mod.jbk.code.ProjectKotlinLanguage;
-import pro.sketchware.lsp.LocalSymbolNavigationProvider;
-import pro.sketchware.lsp.LspLanguage;
-import pro.sketchware.lsp.LspNavigationCoordinator;
-import pro.sketchware.lsp.LspNavigationLocation;
-import pro.sketchware.lsp.LspNavigationRequest;
-import pro.sketchware.lsp.LspNavigationResult;
-import pro.sketchware.lsp.LspSessionConfig;
-import pro.sketchware.lsp.ProjectSymbolNavigationProvider;
-import pro.sketchware.R;
-import pro.sketchware.activities.ai.LocalAiManagerActivity;
-import pro.sketchware.ai.LocalAiConfig;
-import pro.sketchware.ai.LocalAiPromptFactory;
-import pro.sketchware.ai.LocalAiService;
-import pro.sketchware.ai.rag.LocalAiRagRegistry;
-import pro.sketchware.ai.rag.LocalAiSemanticContext;
-import pro.sketchware.activities.preview.LayoutPreviewActivity;
-import pro.sketchware.databinding.CodeEditorHsBinding;
-import pro.sketchware.utility.EditorUtils;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.SketchwareUtil;
-import pro.sketchware.utility.ThemeUtils;
-import pro.sketchware.utility.UI;
+import com.ascode.android.lsp.LocalSymbolNavigationProvider;
+import com.ascode.android.lsp.LspLanguage;
+import com.ascode.android.lsp.LspNavigationCoordinator;
+import com.ascode.android.lsp.LspNavigationLocation;
+import com.ascode.android.lsp.LspNavigationRequest;
+import com.ascode.android.lsp.LspNavigationResult;
+import com.ascode.android.lsp.LspSessionConfig;
+import com.ascode.android.lsp.ProjectSymbolNavigationProvider;
+import com.ascode.android.R;
+import com.ascode.android.activities.ai.LocalAiManagerActivity;
+import io.ascode.android.LocalAiConfig;
+import io.ascode.android.LocalAiPromptFactory;
+import io.ascode.android.LocalAiService;
+import io.ascode.android.rag.LocalAiRagRegistry;
+import io.ascode.android.rag.LocalAiSemanticContext;
+import com.ascode.android.activities.preview.LayoutPreviewActivity;
+import com.ascode.android.databinding.CodeEditorHsBinding;
+import com.ascode.android.utility.EditorUtils;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.AscodeUtil;
+import com.ascode.android.utility.ThemeUtils;
+import com.ascode.android.utility.UI;
 
 public class SrcCodeEditor extends BaseAppCompatActivity {
     public static final String FLAG_FROM_ANDROID_MANIFEST = "from_android_manifest";
@@ -340,7 +340,7 @@ public class SrcCodeEditor extends BaseAppCompatActivity {
         binding.editor.setTextSize(16);
 
         if (fromAndroidManifest) {
-            String filePath = FileUtil.getExternalStorageDir() + "/.sketchware/data/" + scId + "/Injection/androidmanifest/activities_components.json";
+            String filePath = FileUtil.getExternalStorageDir() + "/.ascode/data/" + scId + "/Injection/androidmanifest/activities_components.json";
             if (FileUtil.isExistFile(filePath)) {
                 ArrayList<HashMap<String, Object>> arrayList = getGson()
                         .fromJson(FileUtil.readFile(filePath), Helper.TYPE_MAP_LIST);
@@ -403,7 +403,7 @@ public class SrcCodeEditor extends BaseAppCompatActivity {
         beforeContent = binding.editor.getText().toString();
 
         if (fromAndroidManifest) {
-            String filePath = FileUtil.getExternalStorageDir() + "/.sketchware/data/" + scId + "/Injection/androidmanifest/activities_components.json";
+            String filePath = FileUtil.getExternalStorageDir() + "/.ascode/data/" + scId + "/Injection/androidmanifest/activities_components.json";
             if (FileUtil.isExistFile(filePath)) {
                 ArrayList<HashMap<String, Object>> activitiesComponents = getGson()
                         .fromJson(FileUtil.readFile(filePath), Helper.TYPE_MAP_LIST);
@@ -411,7 +411,7 @@ public class SrcCodeEditor extends BaseAppCompatActivity {
                     if (activitiesComponents.get(i).get("name").equals(activityName)) {
                         activitiesComponents.get(i).put("value", beforeContent);
                         FileUtil.writeFile(filePath, getGson().toJson(activitiesComponents));
-                        SketchwareUtil.toast("Saved");
+                        AscodeUtil.toast("Saved");
                         return;
                     }
                 }
@@ -430,7 +430,7 @@ public class SrcCodeEditor extends BaseAppCompatActivity {
             }
         } else FileUtil.writeFile(getIntent().getStringExtra("content"), beforeContent);
 
-        SketchwareUtil.toast("Saved");
+        AscodeUtil.toast("Saved");
     }
 
     @Override
@@ -521,7 +521,7 @@ public class SrcCodeEditor extends BaseAppCompatActivity {
                                 ss = Lx.j(ss, true);
                             } catch (Exception e) {
                                 err = true;
-                                SketchwareUtil.toastError("Your code contains incorrectly nested parentheses");
+                                AscodeUtil.toastError("Your code contains incorrectly nested parentheses");
                             }
 
                             if (!err) binding.editor.setText(ss);
@@ -532,10 +532,10 @@ public class SrcCodeEditor extends BaseAppCompatActivity {
                             if (format != null) {
                                 binding.editor.setText(format);
                             } else {
-                                SketchwareUtil.toastError("Failed to format XML file", Toast.LENGTH_LONG);
+                                AscodeUtil.toastError("Failed to format XML file", Toast.LENGTH_LONG);
                             }
                         } else {
-                            SketchwareUtil.toast("Only Java and XML files can be formatted");
+                            AscodeUtil.toast("Only Java and XML files can be formatted");
                         }
                         break;
 
@@ -679,7 +679,7 @@ public class SrcCodeEditor extends BaseAppCompatActivity {
 
             @Override
             public void onError(Throwable throwable) {
-                SketchwareUtil.showAnErrorOccurredDialog(SrcCodeEditor.this, throwable.getMessage());
+                AscodeUtil.showAnErrorOccurredDialog(SrcCodeEditor.this, throwable.getMessage());
             }
 
             @Override
@@ -729,7 +729,7 @@ public class SrcCodeEditor extends BaseAppCompatActivity {
 
     private LocalAiPromptFactory.Role getLocalAiRole(LocalAiPromptFactory.Action action) {
         return switch (action) {
-            case EXPLAIN_CODE -> LocalAiPromptFactory.Role.SKETCHWARE_ARCHITECT;
+            case EXPLAIN_CODE -> LocalAiPromptFactory.Role.ASCODE_ARCHITECT;
             case FIX_CODE -> LocalAiPromptFactory.Role.BUILD_DEBUGGER;
             case GENERATE_FROM_COMMENT -> LocalAiPromptFactory.Role.JAVA_KOTLIN_ENGINEER;
         };
@@ -751,7 +751,7 @@ public class SrcCodeEditor extends BaseAppCompatActivity {
     private void showLocalAiResult(LocalAiPromptFactory.Action action, String response) {
         android.widget.ScrollView scrollView = new android.widget.ScrollView(this);
         android.widget.TextView resultView = new android.widget.TextView(this);
-        int padding = SketchwareUtil.dpToPx(20);
+        int padding = AscodeUtil.dpToPx(20);
         resultView.setPadding(padding, padding, padding, padding);
         resultView.setText(response == null || response.trim().isEmpty() ? "The model returned an empty response." : response);
         resultView.setTextIsSelectable(true);

@@ -40,11 +40,11 @@ import a.a.a.MA;
 import a.a.a.mB;
 import mod.hey.studios.build.BuildSettings;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
-import pro.sketchware.databinding.ManageLocallibrariesBinding;
-import pro.sketchware.databinding.ViewItemLocalLibBinding;
-import pro.sketchware.databinding.ViewItemLocalLibSearchBinding;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.databinding.ManageLocallibrariesBinding;
+import com.ascode.android.databinding.ViewItemLocalLibBinding;
+import com.ascode.android.databinding.ViewItemLocalLibSearchBinding;
+import com.ascode.android.utility.AscodeUtil;
 
 public class ManageLocalLibraryActivity extends BaseAppCompatActivity {
     private final LibraryAdapter adapter = new LibraryAdapter();
@@ -177,7 +177,7 @@ public class ManageLocalLibraryActivity extends BaseAppCompatActivity {
                     deleteSelectedLocalLibraries(scId, adapter.getLocalLibraries(), projectUsedLibs);
                     runOnUiThread(() -> {
                         h();
-                        SketchwareUtil.toast("Deleted successfully");
+                        AscodeUtil.toast("Deleted successfully");
                         adapter.isSelectionModeEnabled = false;
                         adapter.notifyDataSetChanged();
                         collapseContextualToolbar();

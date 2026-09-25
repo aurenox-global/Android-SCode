@@ -355,7 +355,7 @@ public class Hx {
             String[] listeners = oq.getListenersForClass(classInfo);
             if (listeners.length > 0) {
                 for (String listener : listeners) {
-                    /* Found functionally same instructions in vanilla Sketchware, keep it this way */
+                    /* Found functionally same instructions in vanilla Android SCode, keep it this way */
                     if (!this.listeners.contains(listener)) {
                         this.listeners.add(new ComponentEvents(listener));
                     }

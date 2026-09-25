@@ -5,7 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import pro.sketchware.databinding.CommonSpinnerItemBinding;
+import com.ascode.android.databinding.CommonSpinnerItemBinding;
 
 public class CommonSpinnerItem extends LinearLayout {
 

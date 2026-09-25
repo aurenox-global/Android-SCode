@@ -34,15 +34,15 @@ import dev.pranav.filepicker.FilePickerDialogFragment;
 import dev.pranav.filepicker.FilePickerOptions;
 import mod.hey.studios.util.Helper;
 import mod.jbk.util.AddMarginOnApplyWindowInsetsListener;
-import pro.sketchware.R;
-import pro.sketchware.databinding.DialogCreateNewFileLayoutBinding;
-import pro.sketchware.databinding.DialogInputLayoutBinding;
-import pro.sketchware.databinding.ManageFileBinding;
-import pro.sketchware.databinding.ManageJavaItemHsBinding;
-import pro.sketchware.utility.FilePathUtil;
-import pro.sketchware.utility.FileResConfig;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.databinding.DialogCreateNewFileLayoutBinding;
+import com.ascode.android.databinding.DialogInputLayoutBinding;
+import com.ascode.android.databinding.ManageFileBinding;
+import com.ascode.android.databinding.ManageJavaItemHsBinding;
+import com.ascode.android.utility.FilePathUtil;
+import com.ascode.android.utility.FileResConfig;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.AscodeUtil;
 
 public class ManageNativelibsActivity extends BaseAppCompatActivity implements View.OnClickListener {
     private FilePickerDialogFragment filePicker;
@@ -214,7 +214,7 @@ public class ManageNativelibsActivity extends BaseAppCompatActivity implements V
 
                 FileUtil.makeDir(path);
                 handleAdapter(nativeLibrariesPath);
-                SketchwareUtil.toast("Created folder successfully");
+                AscodeUtil.toast("Created folder successfully");
 
                 dialog.dismiss();
             });
@@ -242,7 +242,7 @@ public class ManageNativelibsActivity extends BaseAppCompatActivity implements V
                     try {
                         FileUtil.copyDirectory(file, new File(nativeLibrariesPath + File.separator + Uri.fromFile(file).getLastPathSegment()));
                     } catch (IOException e) {
-                        SketchwareUtil.toastError("Couldn't import library! [" + e.getMessage() + "]");
+                        AscodeUtil.toastError("Couldn't import library! [" + e.getMessage() + "]");
                     }
                 }
 
@@ -266,14 +266,14 @@ public class ManageNativelibsActivity extends BaseAppCompatActivity implements V
                     String newName = Helper.getText(inputText);
                     if (!newName.isEmpty()) {
                         if (FileUtil.renameFile(path, path.substring(0, path.lastIndexOf(File.separator)) + File.separator + newName)) {
-                            SketchwareUtil.toast("Renamed successfully");
+                            AscodeUtil.toast("Renamed successfully");
                         } else {
-                            SketchwareUtil.toastError("Renaming failed");
+                            AscodeUtil.toastError("Renaming failed");
                         }
                         handleAdapter(nativeLibrariesPath);
                         handleFab();
                     } else {
-                        SketchwareUtil.toast("Nothing changed");
+                        AscodeUtil.toast("Nothing changed");
                     }
                     dialogInterface.dismiss();
                 })
@@ -282,7 +282,7 @@ public class ManageNativelibsActivity extends BaseAppCompatActivity implements V
         try {
             inputText.setText(path.substring(path.lastIndexOf("/") + 1));
         } catch (Exception ignored) {
-            android.util.Log.d("SketchwarePro", "ManageNativelibsActivity: Exception ignored", ignored);
+            android.util.Log.d("Ascode", "ManageNativelibsActivity: Exception ignored", ignored);
         }
 
         dialog.setView(dialogBinding.getRoot());
@@ -353,7 +353,7 @@ public class ManageNativelibsActivity extends BaseAppCompatActivity implements V
                     menu.setOnMenuItemClickListener(item -> {
                         FileUtil.deleteFile(frc.listFileNativeLibs.get(position));
                         handleAdapter(nativeLibrariesPath);
-                        SketchwareUtil.toast("Deleted");
+                        AscodeUtil.toast("Deleted");
 
                         return true;
                     });

@@ -183,7 +183,7 @@ public final class JavaIncrementalBuildAnalyzer {
         }
 
         try (FileOutputStream outputStream = new FileOutputStream(hashFile, false)) {
-            properties.store(outputStream, "Sketchware incremental Java source hashes");
+            properties.store(outputStream, "Android SCode incremental Java source hashes");
         }
     }
 

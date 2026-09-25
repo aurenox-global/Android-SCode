@@ -12,10 +12,10 @@ import java.util.List;
 import a.a.a.ProjectBuilder;
 import mod.jbk.build.BuiltInLibraries;
 import mod.pranav.dependency.resolver.DependencyResolver;
-import pro.sketchware.flutter.FlutterPluginCompiler;
-import pro.sketchware.flutter.FlutterPluginSupport;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.FilePathUtil;
+import com.ascode.android.flutter.FlutterPluginCompiler;
+import com.ascode.android.flutter.FlutterPluginSupport;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.FilePathUtil;
 
 /**
  * Empaquetado de la **parte Android de los plugins** de Flutter (carril I, Fase 8).
@@ -28,7 +28,7 @@ import pro.sketchware.utility.FilePathUtil;
  *       <code>io/flutter/plugins/GeneratedPluginRegistrant.java</code>) — antes el registrant se
  *       generaba y <b>no</b> entraba a la compilación;</li>
  *   <li><b>manifests</b> de los plugins fusionados con
- *       {@link pro.sketchware.flutter.FlutterPackagingSupport#mergePluginManifests(File, List)};</li>
+ *       {@link com.ascode.android.flutter.FlutterPackagingSupport#mergePluginManifests(File, List)};</li>
  *   <li><b>dependencias</b> de Gradle del plugin resueltas a AAR con el
  *       {@link DependencyResolver} del fork y registradas como <i>local libraries</i> del proyecto
  *       (que es como el build ya lleva jars + dex + res + packageName);</li>
@@ -147,7 +147,7 @@ public final class FlutterPluginPackager {
         }
 
         /* 7) Manifest(s) de los plugins. */
-        int merged = pro.sketchware.flutter.FlutterPackagingSupport.mergePluginManifests(
+        int merged = com.ascode.android.flutter.FlutterPackagingSupport.mergePluginManifests(
                 new File(builder.yq.androidManifestPath), pluginManifests);
         log.append("[ok] manifest de plugins: ").append(merged).append(" entradas fusionadas\n");
 
@@ -164,7 +164,7 @@ public final class FlutterPluginPackager {
      * fork y los registra como <i>local libraries</i> del proyecto.
      *
      * <p>El resolvedor baja el AAR (y sus transitivas) a
-     * <code>&lt;external&gt;/.sketchware/libs/local_libs/&lt;artifactId&gt;-v&lt;version&gt;/</code>,
+     * <code>&lt;external&gt;/.ascode/libs/local_libs/&lt;artifactId&gt;-v&lt;version&gt;/</code>,
      * lo descomprime (<code>classes.jar</code>, <code>res/</code>…) y lo dexa (<code>classes.dex</code>),
      * que es exactamente el contrato de {@code ManageLocalLibrary}: con esos datos el jar entra al
      * classpath, la res al merge de recursos y el dex al APK.
@@ -193,7 +193,7 @@ public final class FlutterPluginPackager {
             return jars;
         }
 
-        File localLibsDir = new File(FileUtil.getExternalStorageDir() + "/.sketchware/libs/local_libs");
+        File localLibsDir = new File(FileUtil.getExternalStorageDir() + "/.ascode/libs/local_libs");
         for (String coordinate : coordinates) {
             String[] parts = coordinate.split(":");
             if (parts.length < 3) {

@@ -64,12 +64,12 @@ android {
     }
 
     defaultConfig {
-        applicationId = "pro.sketchware"
-        namespace = "pro.sketchware"
+        applicationId = "com.ascode.android"
+        namespace = "com.ascode.android"
       targetSdk = 35
         minSdk = 26
-        versionCode = 176
-        versionName = "v7.0.14.0"
+        versionCode = 1
+        versionName = "v1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "GIT_HASH", "\"${gitCommitHash}\"")
@@ -82,31 +82,30 @@ android {
 
     signingConfigs {
         debug {
-            storeFile = file("../testkey.keystore")
-            storePassword = "testkey"
-            keyAlias = "testkey"
-            keyPassword = "testkey"
+            storeFile = file("../ascode.keystore")
+            storePassword = "androidscode"
+            keyAlias = "ascode"
+            keyPassword = "androidscode"
         }
         release {
-            // Credenciales fuera del repositorio: variables de entorno o ~/.gradle/gradle.properties.
-            def releaseStoreFile = System.getenv("RELEASE_STORE_FILE") ?: project.findProperty("RELEASE_STORE_FILE")
-            def releaseStorePassword = System.getenv("RELEASE_STORE_PASSWORD") ?: project.findProperty("RELEASE_STORE_PASSWORD")
-            def releaseKeyAlias = System.getenv("RELEASE_KEY_ALIAS") ?: project.findProperty("RELEASE_KEY_ALIAS")
-            def releaseKeyPassword = System.getenv("RELEASE_KEY_PASSWORD") ?: project.findProperty("RELEASE_KEY_PASSWORD")
+            // Firma propia de Android SCode: ascode.keystore, incluida en el repositorio.
+            // Solo se puede sobrescribir con variables de ENTORNO (no con gradle.properties,
+            // para que la configuracion global de otras builds no la pise por accidente).
+            storeFile = file("../ascode.keystore")
+            storePassword = "androidscode"
+            keyAlias = "ascode"
+            keyPassword = "androidscode"
 
-            def hasReleaseCredentials = [releaseStoreFile, releaseStorePassword, releaseKeyAlias, releaseKeyPassword].every { it != null && !it.toString().isEmpty() }
-            if (hasReleaseCredentials) {
-                storeFile = file(releaseStoreFile)
-                storePassword = releaseStorePassword
-                keyAlias = releaseKeyAlias
-                keyPassword = releaseKeyPassword
-            } else {
-                logger.lifecycle("AVISO: no hay credenciales de release (RELEASE_STORE_FILE/RELEASE_STORE_PASSWORD/RELEASE_KEY_ALIAS/RELEASE_KEY_PASSWORD).")
-                logger.lifecycle("AVISO: se firma con ../testkey.keystore, cuyo password es publico. NO publiques esa APK.")
-                storeFile = file("../testkey.keystore")
-                storePassword = "testkey"
-                keyAlias = "testkey"
-                keyPassword = "testkey"
+            def envStoreFile = System.getenv("RELEASE_STORE_FILE")
+            def envStorePassword = System.getenv("RELEASE_STORE_PASSWORD")
+            def envKeyAlias = System.getenv("RELEASE_KEY_ALIAS")
+            def envKeyPassword = System.getenv("RELEASE_KEY_PASSWORD")
+            if (envStoreFile) {
+                storeFile = file(envStoreFile)
+                storePassword = envStorePassword
+                keyAlias = envKeyAlias
+                keyPassword = envKeyPassword
+                logger.lifecycle("Firma de release: usando RELEASE_STORE_FILE del entorno (${envStoreFile}).")
             }
         }
     }
@@ -132,12 +131,12 @@ android {
     }
 
     splits {
-        // Un APK por ABI: cada dispositivo deja de descargarse las otras arquitecturas.
+        // Un APK por ABI + un APK universal (todas las arquitecturas en un solo fichero).
         abi {
             enable true
             reset()
             include "arm64-v8a", "armeabi-v7a", "x86_64", "x86"
-            universalApk false
+            universalApk true
         }
     }
 

@@ -8,8 +8,8 @@ import android.widget.LinearLayout;
 
 import androidx.core.content.ContextCompat;
 
-import pro.sketchware.R;
-import pro.sketchware.databinding.VarIdSpinnerItemBinding;
+import com.ascode.android.R;
+import com.ascode.android.databinding.VarIdSpinnerItemBinding;
 
 public class ViewIdSpinnerItem extends LinearLayout {
 

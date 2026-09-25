@@ -102,19 +102,19 @@ import mod.agus.jcoderz.editor.view.item.ItemTimePicker;
 import mod.agus.jcoderz.editor.view.item.ItemVideoView;
 import mod.bobur.VectorDrawableLoader;
 import mod.hey.studios.util.ProjectFile;
-import pro.sketchware.R;
-import pro.sketchware.activities.resourceseditor.components.utils.ColorsEditorManager;
-import pro.sketchware.activities.resourceseditor.components.utils.StringsEditorManager;
-import pro.sketchware.managers.inject.InjectRootLayoutManager;
-import pro.sketchware.utility.FilePathUtil;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.InjectAttributeHandler;
-import pro.sketchware.utility.InvokeUtil;
-import pro.sketchware.utility.PropertiesUtil;
-import pro.sketchware.utility.ResourceUtil;
-import pro.sketchware.utility.ScaleTypeCompat;
-import pro.sketchware.utility.SvgUtils;
-import pro.sketchware.utility.ThemeUtils;
+import com.ascode.android.R;
+import com.ascode.android.activities.resourceseditor.components.utils.ColorsEditorManager;
+import com.ascode.android.activities.resourceseditor.components.utils.StringsEditorManager;
+import com.ascode.android.managers.inject.InjectRootLayoutManager;
+import com.ascode.android.utility.FilePathUtil;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.InjectAttributeHandler;
+import com.ascode.android.utility.InvokeUtil;
+import com.ascode.android.utility.PropertiesUtil;
+import com.ascode.android.utility.ResourceUtil;
+import com.ascode.android.utility.ScaleTypeCompat;
+import com.ascode.android.utility.SvgUtils;
+import com.ascode.android.utility.ThemeUtils;
 
 public class ViewPane extends RelativeLayout {
     private final String stringsStart = "@string/";
@@ -241,7 +241,7 @@ public class ViewPane extends RelativeLayout {
         // El editor de diseno (isPreviewMode=false) mantiene su aspecto de siempre.
         if (isPreviewMode) {
             setBackgroundColor(ThemeUtils.getColor(getContext(), R.attr.colorSurface));
-        } else if (viewEditorThemeOverlay == R.style.ThemeOverlay_SketchwarePro_ViewEditor) {
+        } else if (viewEditorThemeOverlay == R.style.ThemeOverlay_Ascode_ViewEditor) {
             setBackgroundColor(Color.WHITE);
         } else {
             setBackground(AppCompatResources.getDrawable(context, R.drawable.bg_view_pane));

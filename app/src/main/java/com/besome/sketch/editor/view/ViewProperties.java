@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import a.a.a.Jw;
 import a.a.a.wB;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
+import com.ascode.android.R;
 
 public class ViewProperties extends RelativeLayout implements AdapterView.OnItemSelectedListener {
 

@@ -7,12 +7,12 @@
     android:orientation="vertical">
 
     <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/anim_sketchware"
+        android:id="@+id/anim_ascode"
         android:layout_width="82dp"
         android:layout_height="82dp"
         android:layout_gravity="center"
         app:lottie_autoPlay="true"
-        app:lottie_fileName="anim/sketchware_logo.json"
+        app:lottie_fileName="anim/ascode_logo.json"
         app:lottie_loop="true" />
 
     <TextView

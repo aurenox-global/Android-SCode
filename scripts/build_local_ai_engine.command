@@ -81,12 +81,12 @@ for abi in $ABIS; do
     -DANDROID_PLATFORM="$ANDROID_PLATFORM" \
     -DLLAMA_CPP_DIR="$LLAMA_DIR"
 
-  cmake --build "$build_dir" --config Release --target sketchware_llama
-  cp "$build_dir/libsketchware_llama.so" "$output_dir/libsketchware_llama.so"
+  cmake --build "$build_dir" --config Release --target ascode_llama
+  cp "$build_dir/libascode_llama.so" "$output_dir/libascode_llama.so"
   if [[ -n "$strip_tool" ]]; then
-    "$strip_tool" --strip-unneeded "$output_dir/libsketchware_llama.so" || true
+    "$strip_tool" --strip-unneeded "$output_dir/libascode_llama.so" || true
   fi
-  echo "Installed $output_dir/libsketchware_llama.so"
+  echo "Installed $output_dir/libascode_llama.so"
 done
 
-echo "Local AI native engine build complete. Rebuild Sketchware Pro to package the new .so files."
+echo "Local AI native engine build complete. Rebuild Android SCode to package the new .so files."

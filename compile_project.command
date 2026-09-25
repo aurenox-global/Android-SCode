@@ -8,7 +8,7 @@ if [ ! -x "./gradlew" ]; then
   chmod +x ./gradlew
 fi
 
-echo "==> Compilando Sketchware Pro (Debug APK)..."
+echo "==> Compilando Android SCode (Debug APK)..."
 ./gradlew --no-daemon :app:assembleDebug
 
 echo

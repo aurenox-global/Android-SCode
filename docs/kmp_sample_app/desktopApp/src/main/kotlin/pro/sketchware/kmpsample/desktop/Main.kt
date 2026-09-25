@@ -1,6 +1,6 @@
-package pro.sketchware.kmpsample.desktop
+package com.ascode.android.kmpsample.desktop
 
-import pro.sketchware.kmpsample.Platform
+import com.ascode.android.kmpsample.Platform
 
 fun main() {
     println(Platform.name())

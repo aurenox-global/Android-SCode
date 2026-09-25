@@ -30,8 +30,8 @@ import a.a.a.GB;
 import a.a.a.bB;
 import a.a.a.mB;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
-import pro.sketchware.databinding.ManageLibraryManageAdmobBinding;
+import com.ascode.android.R;
+import com.ascode.android.databinding.ManageLibraryManageAdmobBinding;
 
 public class ManageAdmobActivity extends BaseAppCompatActivity implements View.OnClickListener {
 
@@ -118,7 +118,7 @@ public class ManageAdmobActivity extends BaseAppCompatActivity implements View.O
             A.a("P1I16", true);
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.setData(Uri.parse("https://docs.sketchware.io/docs/admob-getting-started.html"));
+            intent.setData(Uri.parse("https://docs.ascode.io/docs/admob-getting-started.html"));
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);

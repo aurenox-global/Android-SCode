@@ -18,10 +18,10 @@ import dev.aldi.sayuti.block.ExtraBlockFile;
 import mod.agus.jcoderz.editor.manage.block.palette.PaletteSelector;
 import mod.hey.studios.editor.manage.block.ExtraBlockInfo;
 import mod.jbk.util.LogUtil;
-import pro.sketchware.R;
-import pro.sketchware.SketchApplication;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.AscodeApplication;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.AscodeUtil;
 
 /**
  * An optimized Custom Blocks loader.
@@ -55,7 +55,7 @@ public class BlockLoader {
 
     public static ExtraBlockInfo getBlockFromProject(String sc_id, String block_name) {
         File customBlocksConfig = new File(Environment.getExternalStorageDirectory(),
-                ".sketchware/data/" + sc_id + "/custom_blocks");
+                ".ascode/data/" + sc_id + "/custom_blocks");
         if (customBlocksConfig.exists()) {
             try {
                 ArrayList<ExtraBlockInfo> extraBlocks = new Gson().fromJson(
@@ -70,7 +70,7 @@ public class BlockLoader {
                 }
 
             } catch (Exception e) {
-                SketchwareUtil.toastError("Failed to get Custom Blocks for project " + sc_id + ": " + e.getMessage());
+                AscodeUtil.toastError("Failed to get Custom Blocks for project " + sc_id + ": " + e.getMessage());
             }
         }
 
@@ -102,7 +102,7 @@ public class BlockLoader {
                 info.setName((String) name);
             } else {
                 info.setName("");
-                SketchwareUtil.toastError("Invalid name entry in Custom Block #" + (i + 1));
+                AscodeUtil.toastError("Invalid name entry in Custom Block #" + (i + 1));
                 continue;
             }
 
@@ -135,11 +135,11 @@ public class BlockLoader {
 
                 if (color instanceof String) {
                     try {
-                        Context context = new ContextThemeWrapper(SketchApplication.getContext(), R.style.Theme_SketchwarePro);
+                        Context context = new ContextThemeWrapper(AscodeApplication.getContext(), R.style.Theme_Ascode);
                         int harmonizedColor = harmonizeWithPrimary(context, Color.parseColor((String) color));
                         info.setColor(harmonizedColor);
                     } catch (IllegalArgumentException e) {
-                        SketchwareUtil.toastError("Invalid color in Custom Block #" + (i + 1));
+                        AscodeUtil.toastError("Invalid color in Custom Block #" + (i + 1));
                         continue;
                     }
                 }
@@ -166,22 +166,22 @@ public class BlockLoader {
                                             try {
                                                 info.setPaletteColor((Integer) paletteColor);
                                             } catch (IllegalArgumentException e) {
-                                                SketchwareUtil.toastError("Invalid color in Custom Block palette #" + (j + 1));
+                                                AscodeUtil.toastError("Invalid color in Custom Block palette #" + (j + 1));
                                             }
                                         } else {
-                                            SketchwareUtil.toastError("Invalid color value type in Custom Block palette #" + (j + 1));
+                                            AscodeUtil.toastError("Invalid color value type in Custom Block palette #" + (j + 1));
                                         }
                                     }
                                 } else {
-                                    SketchwareUtil.toastError("Invalid palette index value type in Custom Block palette #" + (j + 1));
+                                    AscodeUtil.toastError("Invalid palette index value type in Custom Block palette #" + (j + 1));
                                 }
                             }
                         } catch (NumberFormatException e) {
-                            SketchwareUtil.toastError("Invalid palette number in Custom Block #" + (i + 1));
+                            AscodeUtil.toastError("Invalid palette number in Custom Block #" + (i + 1));
                             continue;
                         }
                     } else {
-                        SketchwareUtil.toastError("Invalid palette number value type in Custom Block #" + (i + 1));
+                        AscodeUtil.toastError("Invalid palette number value type in Custom Block #" + (i + 1));
                         continue;
                     }
                 }

@@ -58,7 +58,7 @@ public final class JarCheck {
                     }
                 }
             } catch (EOFException ignored) {
-                android.util.Log.d("SketchwarePro", "JarCheck: unexpected end of zip while reading class versions", ignored);
+                android.util.Log.d("Ascode", "JarCheck: unexpected end of zip while reading class versions", ignored);
             }
 
             zip.close();

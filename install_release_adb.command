@@ -83,7 +83,7 @@ else
 fi
 
 echo "==> APK: $APK_PATH"
-echo "==> Instalando Sketchware Pro via adb..."
+echo "==> Instalando Android SCode via adb..."
 "$ADB_BIN" "${ADB_TARGET[@]}" install -r -d "$APK_PATH"
 
 echo

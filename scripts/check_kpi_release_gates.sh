@@ -10,10 +10,10 @@ VIOLATIONS=0
 WARNINGS=0
 
 required_suites=(
-  "TEST-pro.sketchware.metrics.KpiDashboardReleaseGatesEvaluatorTest.xml"
-  "TEST-pro.sketchware.metrics.StartupRegressionPolicyTest.xml"
-  "TEST-pro.sketchware.accessibility.AccessibilityChecksEngineTest.xml"
-  "TEST-pro.sketchware.accessibility.AccessibilityCheckersTest.xml"
+  "TEST-com.ascode.android.metrics.KpiDashboardReleaseGatesEvaluatorTest.xml"
+  "TEST-com.ascode.android.metrics.StartupRegressionPolicyTest.xml"
+  "TEST-com.ascode.android.accessibility.AccessibilityChecksEngineTest.xml"
+  "TEST-com.ascode.android.accessibility.AccessibilityCheckersTest.xml"
 )
 
 extract_attr() {

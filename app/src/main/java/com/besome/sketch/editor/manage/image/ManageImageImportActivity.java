@@ -31,7 +31,7 @@ import a.a.a.bB;
 import a.a.a.mB;
 import a.a.a.uq;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
+import com.ascode.android.R;
 
 public class ManageImageImportActivity extends BaseAppCompatActivity implements View.OnClickListener {
     private ImageView img;

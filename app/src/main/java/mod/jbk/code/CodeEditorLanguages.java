@@ -7,7 +7,7 @@ import io.github.rosemoe.sora.langs.textmate.registry.FileProviderRegistry;
 import io.github.rosemoe.sora.langs.textmate.registry.GrammarRegistry;
 import io.github.rosemoe.sora.langs.textmate.registry.provider.AssetsFileResolver;
 import mod.jbk.util.LogUtil;
-import pro.sketchware.SketchApplication;
+import com.ascode.android.AscodeApplication;
 
 public class CodeEditorLanguages {
     public static final String SCOPE_NAME_KOTLIN = "source.kotlin";
@@ -17,7 +17,7 @@ public class CodeEditorLanguages {
     private static final String TAG = "CodeEditorLanguages";
 
     static {
-        FileProviderRegistry.getInstance().addFileProvider(new AssetsFileResolver(SketchApplication.getContext().getAssets()));
+        FileProviderRegistry.getInstance().addFileProvider(new AssetsFileResolver(AscodeApplication.getContext().getAssets()));
         Throwable t;
         try {
             GrammarRegistry.getInstance().loadGrammars("textmate/languages.json");

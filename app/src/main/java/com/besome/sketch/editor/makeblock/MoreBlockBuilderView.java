@@ -27,9 +27,9 @@ import mod.hey.studios.moreblock.MoreblockValidator;
 import mod.hey.studios.moreblock.ReturnMoreblockManager;
 import mod.hey.studios.util.Helper;
 import mod.jbk.util.BlockUtil;
-import pro.sketchware.R;
-import pro.sketchware.databinding.MakeBlockLayoutBinding;
-import pro.sketchware.lib.base.BaseTextWatcher;
+import com.ascode.android.R;
+import com.ascode.android.databinding.MakeBlockLayoutBinding;
+import com.ascode.android.lib.base.BaseTextWatcher;
 
 @SuppressLint("ViewConstructor")
 public class MoreBlockBuilderView extends LinearLayout {

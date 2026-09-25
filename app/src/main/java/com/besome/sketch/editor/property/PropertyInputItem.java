@@ -61,16 +61,16 @@ import a.a.a.uq;
 import a.a.a.wB;
 import a.a.a.yB;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
-import pro.sketchware.activities.resourceseditor.components.utils.StringsEditorManager;
-import pro.sketchware.databinding.PropertyInputItemBinding;
-import pro.sketchware.databinding.PropertyPopupHybridBinding;
-import pro.sketchware.databinding.PropertyPopupInputTextBinding;
-import pro.sketchware.databinding.PropertyPopupParentAttrBinding;
-import pro.sketchware.lib.base.BaseTextWatcher;
-import pro.sketchware.lib.highlighter.SyntaxScheme;
-import pro.sketchware.lib.validator.PropertyNameValidator;
-import pro.sketchware.utility.FileUtil;
+import com.ascode.android.R;
+import com.ascode.android.activities.resourceseditor.components.utils.StringsEditorManager;
+import com.ascode.android.databinding.PropertyInputItemBinding;
+import com.ascode.android.databinding.PropertyPopupHybridBinding;
+import com.ascode.android.databinding.PropertyPopupInputTextBinding;
+import com.ascode.android.databinding.PropertyPopupParentAttrBinding;
+import com.ascode.android.lib.base.BaseTextWatcher;
+import com.ascode.android.lib.highlighter.SyntaxScheme;
+import com.ascode.android.lib.validator.PropertyNameValidator;
+import com.ascode.android.utility.FileUtil;
 
 @SuppressLint("ViewConstructor")
 public class PropertyInputItem extends RelativeLayout implements View.OnClickListener {
@@ -599,7 +599,7 @@ public class PropertyInputItem extends RelativeLayout implements View.OnClickLis
     }
 
     private void loadStringsListMap() {
-        String filePath = FileUtil.getExternalStorageDir().concat("/.sketchware/data/").concat(sc_id.concat("/files/resource/values/strings.xml"));
+        String filePath = FileUtil.getExternalStorageDir().concat("/.ascode/data/").concat(sc_id.concat("/files/resource/values/strings.xml"));
         StringsEditorManager stringsEditorManager = new StringsEditorManager();
         stringsEditorManager.convertXmlStringsToListMap(FileUtil.readFileIfExist(filePath), stringsListMap);
 
@@ -1061,7 +1061,7 @@ public class PropertyInputItem extends RelativeLayout implements View.OnClickLis
                 eventType = parser.next();
             }
         } catch (XmlPullParserException | IOException | RuntimeException ignored) {
-            android.util.Log.d("SketchwarePro", "PropertyInputItem: XmlPullParserException | IOException | RuntimeException ignored", ignored);
+            android.util.Log.d("Ascode", "PropertyInputItem: XmlPullParserException | IOException | RuntimeException ignored", ignored);
         }
 
         return attributes;

@@ -8,7 +8,7 @@ import com.besome.sketch.lib.base.BaseAppCompatActivity;
 
 import a.a.a.oB;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.databinding.ActivityOssLibrariesBinding;
+import com.ascode.android.databinding.ActivityOssLibrariesBinding;
 
 public class LicenseActivity extends BaseAppCompatActivity {
 

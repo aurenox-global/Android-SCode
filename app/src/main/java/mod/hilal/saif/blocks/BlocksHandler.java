@@ -8,9 +8,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import mod.hilal.saif.activities.tools.ConfigActivity;
-import pro.sketchware.R;
-import pro.sketchware.blocks.ExtraBlocks;
-import pro.sketchware.utility.ThemeUtils;
+import com.ascode.android.R;
+import com.ascode.android.blocks.ExtraBlocks;
+import com.ascode.android.utility.ThemeUtils;
 
 public class BlocksHandler {
 
@@ -318,7 +318,7 @@ public class BlocksHandler {
         hashMap = new HashMap<>();
         hashMap.put("name", "imageCrop");
         hashMap.put("type", " ");
-        hashMap.put("code", "SketchwareUtil.CropImage(this, %s, (int) %s);");
+        hashMap.put("code", "AscodeUtil.CropImage(this, %s, (int) %s);");
         hashMap.put("color", "#2CA5E2");
         hashMap.put("palette", "-1");
         hashMap.put("spec", "CropImageView fromFilePath %s RequestCode %d");
@@ -327,7 +327,7 @@ public class BlocksHandler {
         hashMap = new HashMap<>();
         hashMap.put("name", "isConnected");
         hashMap.put("type", " ");
-        hashMap.put("code", "SketchwareUtil.isConnected(getApplicationContext())");
+        hashMap.put("code", "AscodeUtil.isConnected(getApplicationContext())");
         hashMap.put("color", "#2CA5E2");
         hashMap.put("palette", "-1");
         hashMap.put("spec", "isConnected");
@@ -356,8 +356,8 @@ public class BlocksHandler {
         hashMap.put("type", " ");
         hashMap.put(
                 "code",
-                "SketchwareUtil.CustomToast(getApplicationContext(), %s, %s, %s, %s, %s,"
-                        + " SketchwareUtil.%s);");
+                "AscodeUtil.CustomToast(getApplicationContext(), %s, %s, %s, %s, %s,"
+                        + " AscodeUtil.%s);");
         hashMap.put("color", "#8A55D7");
         hashMap.put("palette", "-1");
         hashMap.put(
@@ -371,8 +371,8 @@ public class BlocksHandler {
         hashMap.put("type", " ");
         hashMap.put(
                 "code",
-                "SketchwareUtil.CustomToastWithIcon(getApplicationContext(), %s, %s, %s, %s, %s,"
-                        + " SketchwareUtil.%s, R.drawable.%s);");
+                "AscodeUtil.CustomToastWithIcon(getApplicationContext(), %s, %s, %s, %s, %s,"
+                        + " AscodeUtil.%s, R.drawable.%s);");
         hashMap.put("color", "#8A55D7");
         hashMap.put("palette", "-1");
         hashMap.put(
@@ -396,7 +396,7 @@ public class BlocksHandler {
         hashMap = new HashMap<>();
         hashMap.put("name", "hideKeyboard");
         hashMap.put("type", " ");
-        hashMap.put("code", "SketchwareUtil.hideKeyboard(getApplicationContext());");
+        hashMap.put("code", "AscodeUtil.hideKeyboard(getApplicationContext());");
         hashMap.put("color", "#2CA5E2");
         hashMap.put("palette", "-1");
         hashMap.put("spec", "Hide keyboard");
@@ -405,7 +405,7 @@ public class BlocksHandler {
         hashMap = new HashMap<>();
         hashMap.put("name", "showKeyboard");
         hashMap.put("type", " ");
-        hashMap.put("code", "SketchwareUtil.showKeyboard(getApplicationContext());");
+        hashMap.put("code", "AscodeUtil.showKeyboard(getApplicationContext());");
         hashMap.put("color", "#2CA5E2");
         hashMap.put("palette", "-1");
         hashMap.put("spec", "Show keyboard");
@@ -669,7 +669,7 @@ public class BlocksHandler {
         hashMap = new HashMap<>();
         hashMap.put("name", "copyAssetFile");
         hashMap.put("type", "s");
-        hashMap.put("code", "SketchwareUtil.copyFromInputStream(%s)");
+        hashMap.put("code", "AscodeUtil.copyFromInputStream(%s)");
         hashMap.put("color", "#A1887F");
         hashMap.put("palette", "-1");
         hashMap.put("spec", "%m.inputstream to String");
@@ -678,7 +678,7 @@ public class BlocksHandler {
         hashMap = new HashMap<>();
         hashMap.put("name", "sortListmap");
         hashMap.put("type", " ");
-        hashMap.put("code", "SketchwareUtil.sortListMap(%s, %s, %s, %s);");
+        hashMap.put("code", "AscodeUtil.sortListMap(%s, %s, %s, %s);");
         hashMap.put("color", "#CC5B21");
         hashMap.put("palette", "-1");
         hashMap.put("spec", "sort %m.listMap key %s isNumber %b isAscending %b");
@@ -2541,7 +2541,7 @@ public class BlocksHandler {
                 "if (%1$s != null) {\r\n"
                         + "%1$s.show(%2$s.this);\r\n"
                         + "} else {\r\n"
-                        + "SketchwareUtil.showMessage(getApplicationContext(), \"Error: InterstitialAd"
+                        + "AscodeUtil.showMessage(getApplicationContext(), \"Error: InterstitialAd"
                         + " %1$s hasn't been loaded yet!\");\r\n"
                         + "}");
         hashMap.put("color", "#2aa4e2");

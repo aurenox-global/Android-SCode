@@ -18,8 +18,8 @@ import java.util.List;
 
 import mod.hey.studios.util.Helper;
 import mod.jbk.util.OldResourceIdMapper;
-import pro.sketchware.databinding.DialogIconSelectorBinding;
-import pro.sketchware.databinding.ItemIconSelectorBinding;
+import com.ascode.android.databinding.DialogIconSelectorBinding;
+import com.ascode.android.databinding.ItemIconSelectorBinding;
 
 public class IconSelectorDialog {
     private final Activity activity;

@@ -29,12 +29,12 @@ import dev.pranav.filepicker.FilePickerCallback;
 import dev.pranav.filepicker.FilePickerDialogFragment;
 import dev.pranav.filepicker.FilePickerOptions;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
-import pro.sketchware.activities.main.activities.MainActivity;
-import pro.sketchware.activities.main.fragments.projects.ProjectsFragment;
-import pro.sketchware.databinding.ProgressMsgBoxBinding;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.activities.main.activities.MainActivity;
+import com.ascode.android.activities.main.fragments.projects.ProjectsFragment;
+import com.ascode.android.databinding.ProgressMsgBoxBinding;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.AscodeUtil;
 
 public class BackupRestoreManager {
 
@@ -81,7 +81,7 @@ public class BackupRestoreManager {
         checkboxContainer.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT));
-        int dip = (int) SketchwareUtil.getDip(8);
+        int dip = (int) AscodeUtil.getDip(8);
         checkboxContainer.setPadding(dip, dip, dip, dip);
 
         CompoundButton.OnCheckedChangeListener listener = (buttonView, isChecked) -> {
@@ -182,7 +182,7 @@ public class BackupRestoreManager {
         }
 
         if (fragmentManager == null) {
-            SketchwareUtil.toastError("Couldn't open backup picker", Toast.LENGTH_LONG);
+            AscodeUtil.toastError("Couldn't open backup picker", Toast.LENGTH_LONG);
             return;
         }
 
@@ -206,7 +206,7 @@ public class BackupRestoreManager {
     }
 
     private void notifyStorageAccessRequired() {
-        SketchwareUtil.toastError("Storage access is required to restore backups", Toast.LENGTH_LONG);
+        AscodeUtil.toastError("Storage access is required to restore backups", Toast.LENGTH_LONG);
         if (act instanceof MainActivity) {
             ((MainActivity) act).s();
         }
@@ -256,9 +256,9 @@ public class BackupRestoreManager {
             dlg.dismiss();
 
             if (bm.getOutFile() != null) {
-                SketchwareUtil.toast("Successfully created backup to: " + bm.getOutFile().getAbsolutePath());
+                AscodeUtil.toast("Successfully created backup to: " + bm.getOutFile().getAbsolutePath());
             } else {
-                SketchwareUtil.toastError("Error: " + bm.error, Toast.LENGTH_LONG);
+                AscodeUtil.toastError("Error: " + bm.error, Toast.LENGTH_LONG);
             }
         }
     }
@@ -322,12 +322,12 @@ public class BackupRestoreManager {
             dlg.dismiss();
 
             if (!bm.isRestoreSuccess() || error) {
-                SketchwareUtil.toastError("Couldn't restore: " + bm.error, Toast.LENGTH_LONG);
+                AscodeUtil.toastError("Couldn't restore: " + bm.error, Toast.LENGTH_LONG);
             } else {
                 if (refreshProjectsList()) {
-                    SketchwareUtil.toast("Restored successfully");
+                    AscodeUtil.toast("Restored successfully");
                 } else {
-                    SketchwareUtil.toast("Restored successfully. Open Projects to refresh", Toast.LENGTH_LONG);
+                    AscodeUtil.toast("Restored successfully. Open Projects to refresh", Toast.LENGTH_LONG);
                 }
             }
         }

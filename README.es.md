@@ -1,14 +1,14 @@
 <p align="center">
-  <img src="assets/Sketchware-Pro.png" width="220" alt="Sketchware Pro">
+  <img src="assets/Android-SCode.png" width="220" alt="Android SCode">
 </p>
 
-<h1 align="center">Sketchware Pro</h1>
+<h1 align="center">Android SCode</h1>
 
 <p align="center">
   <b>Crea apps Android reales desde tu móvil.</b><br>
   <a href="README.md">🇬🇧 Read in English</a> ·
-  <a href="https://aurenox-global.github.io/Sketchware-Pro/es.html">Sitio web</a> ·
-  <a href="https://github.com/aurenox-global/Sketchware-Pro/releases">Descargar</a>
+  <a href="https://aurenox-global.github.io/Android-SCode/es.html">Sitio web</a> ·
+  <a href="https://github.com/aurenox-global/Android-SCode/releases">Descargar</a>
 </p>
 
 <p align="center">
@@ -21,15 +21,15 @@
 
 ---
 
-Sketchware Pro es un IDE de Android que funciona sobre Android. Arrastra bloques visuales, escribe Java o
+Android SCode es un IDE de Android que funciona sobre Android. Arrastra bloques visuales, escribe Java o
 Kotlin, compila en el propio dispositivo y obtén un APK instalable — sin necesidad de ordenador.
 
-Sketchware era una app que permitía crear aplicaciones Android de forma visual, directamente en el teléfono.
-El desarrollo se detuvo hace años. **Sketchware Pro** es un mod de la comunidad que lo mantiene vivo, arregla
+Android SCode era una app que permitía crear aplicaciones Android de forma visual, directamente en el teléfono.
+El desarrollo se detuvo hace años. **Android SCode** es un mod de la comunidad que lo mantiene vivo, arregla
 lo que estaba roto y añade lo que el original nunca tuvo.
 
 > 🔗 **La documentación completa, en inglés y español, está aquí:**
-> **https://aurenox-global.github.io/Sketchware-Pro/es.html**
+> **https://aurenox-global.github.io/Android-SCode/es.html**
 
 ## Índice
 
@@ -70,7 +70,7 @@ Todo lo que haces es Android de verdad: fuentes Java reales, recursos reales y A
 
 No hay versión en tiendas — el APK lo instalas tú.
 
-1. Descarga el APK que corresponda a tu dispositivo desde la [página de releases](https://github.com/aurenox-global/Sketchware-Pro/releases):
+1. Descarga el APK que corresponda a tu dispositivo desde la [página de releases](https://github.com/aurenox-global/Android-SCode/releases):
    - `app-arm64-v8a-release.apk` — prácticamente todos los móviles modernos (recomendado)
    - `app-armeabi-v7a-release.apk` — dispositivos antiguos de 32 bits
    - `app-x86_64-release.apk` / `app-x86-release.apk` — emuladores
@@ -122,17 +122,17 @@ Requisitos:
 | `a.a.a.qq` | Registro de dependencias de librerías integradas |
 | `a.a.a.tq` | Pasos del diálogo de compilación |
 | `a.a.a.yq` | Rutas de archivos de los proyectos |
-| `pro.sketchware.*` | Donde deben ir las funciones nuevas, respetando la estructura |
+| `com.ascode.android.*` | Donde deben ir las funciones nuevas, respetando la estructura |
 | `mod.*` | Aquí vive la mayoría de aportes de la comunidad |
 
 > [!TIP]
-> Las funciones nuevas que no necesiten tocar otros paquetes van en `pro.sketchware`, respetando la estructura
+> Las funciones nuevas que no necesiten tocar otros paquetes van en `com.ascode.android`, respetando la estructura
 > de directorios y nombres. Prefiere Java antes que Kotlin salvo que Kotlin sea realmente necesario.
 
 ## Cambios de este fork
 
 Este repositorio es un fork personal. Cada mejora se añade aquí según entra, y el
-[sitio web](https://aurenox-global.github.io/Sketchware-Pro/es.html) se actualiza a la vez.
+[sitio web](https://aurenox-global.github.io/Android-SCode/es.html) se actualiza a la vez.
 
 ### 2026-09-24 — Ronda A: firma con tu propio keystore, y elegir APK o AAB en un solo dialogo
 
@@ -141,7 +141,7 @@ Este repositorio es un fork personal. Cada mejora se añade aquí según entra, 
   herramienta *Sign an APK file* de Ajustes **nunca miraba tu keystore** — sus dos llamadas pasaban
   `useTestkey=true` hardcodeado, asi que firmaba siempre con la **testkey de AOSP** (`apksigner verify` →
   `a40da80a…`, no tu certificado); el dialogo de firma asumia una **ruta fija**
-  (`/storage/emulated/0/sketchware/keystore/release_key.jks`) con **un solo campo de contrasena**, asi que la misma
+  (`/storage/emulated/0/ascode/keystore/release_key.jks`) con **un solo campo de contrasena**, asi que la misma
   contrasena tenia que ser la del store y la del alias (`GetKeyStoreCredentialsDialog` construia
   `new Credentials(alg, etPassword, etAlias, etPassword)`), y la rama APK de `ExportProjectActivity` **ignoraba la
   ruta del dialogo y reutilizaba la contrasena de alias como contrasena de store**. **Gestor de keystores nuevo**
@@ -175,13 +175,13 @@ Este repositorio es un fork personal. Cada mejora se añade aquí según entra, 
   contra `bundletool`/Play (en esta maquina no hay `bundletool`), los modos *keystore file* y *testkey* del dialogo
   **no** se ejecutaron en release (solo UI), y la conversion de proyectos de Android Studio/GitHub sigue
   **pendiente** (siguiente ronda: viabilidad + MVP). Pagina de la release:
-  [v7.0.14.0](https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.14.0). Todos los detalles:
+  [v7.0.14.0](https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.14.0). Todos los detalles:
   [docs/preview-fix.md](docs/preview-fix.md) (ronda A).
 
 ### 2026-09-24 — Vista previa, ronda 12: los colores que eliges se escribian transparentes en el XML
 
 - **v7.0.13.0 (versionCode 175) — los colores que eliges en el editor salian transparentes, en la vista previa *y*
-  en la app compilada.** Un bug **heredado del Sketchware Pro original**, y **determinista**, no un caso raro:
+  en la app compilada.** Un bug **heredado del Android SCode original**, y **determinista**, no un caso raro:
   **cualquier color de fondo elegido desde la paleta hexadecimal** se escribia en el XML como `#00RRGGBB` — alfa
   **00, totalmente transparente** — asi que la vista se dibujaba sin color y la app no avisaba de nada (*"Preview
   OK"*). Reproducido en el **flujo real** (editor → `Ox` → preview), no solo inyectando XML: con `button1` =
@@ -198,7 +198,7 @@ Este repositorio es un fork personal. Cada mejora se añade aquí según entra, 
   pixel** (356.400 px, mismo bbox). Y el layout que compila el IDE (`mysc/601/…/res/layout/main.xml`) ya lleva
   `#2196F3`, `#4CAF50`, `#802196F3` y `#F44336` en vez de `#00…`. **Honesto:** el enlazado `aapt2` del propio IDE
   sigue fallando despues por un problema **preexistente** de recursos AppCompat de ese proyecto, ajeno a estas 4
-  lineas. Pagina de la release: [v7.0.13.0](https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.13.0).
+  lineas. Pagina de la release: [v7.0.13.0](https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.13.0).
   Todos los detalles: [docs/preview-fix.md](docs/preview-fix.md) (ronda 12).
 
 ### 2026-09-24 — Vista previa, ronda 11: copiar el aviso completo, el permiso de almacenamiento y los colores que solo estaban en el `res` generado
@@ -226,7 +226,7 @@ Este repositorio es un fork personal. Cada mejora se añade aquí según entra, 
   **identicos pixel a pixel** (purpura 18.933, verde 11.764, azul 90.564, cian 21.428, magenta 18.896). **Honesto:**
   al recrear los fixtures cambio el *texto* del informe (1.627 vs 1.869 caracteres), y el portapapeles solo se puede
   verificar con un pegado real (API 34 no lo expone por shell). Pagina de la release:
-  [v7.0.12.0](https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.12.0). Todos los detalles:
+  [v7.0.12.0](https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.12.0). Todos los detalles:
   [docs/preview-fix.md](docs/preview-fix.md) (ronda 11).
 
 ### 2026-09-23 — Flutter, experimental: release/AOT en el dispositivo, assets completos y pub real (fase 8)
@@ -259,7 +259,7 @@ Este repositorio es un fork personal. Cada mejora se añade aquí según entra, 
   R8 borraba.** Tres piezas de la vista previa de diseños y una del toolchain de Flutter. (A) **Los iconos estaban
   dentro del APK desde el principio.** El set Material del IDE vive en `assets/icons/icon_pack.zip` (5.335.950 B:
   **2.191 nombres × 5 estilos = 10.955 SVG**, `svg/<nombre>/<estilo>.svg`), y el icono que eliges se convierte a vector
-  XML y se guarda en el **almacen de imagenes del proyecto** `.sketchware/resources/images/<sc_id>/`, **no** en
+  XML y se guarda en el **almacen de imagenes del proyecto** `.ascode/resources/images/<sc_id>/`, **no** en
   `files/resource/drawable`. La vista previa no miraba ni lo uno ni lo otro, asi que los iconos salian en **rojo**.
   Ahora resuelve de ambos **y** del `res` generado del build. **Medido:** antes, **2 recursos no encontrados** (barra
   roja, 33.087 px rojos); despues los 2 dibujados y **rojo=0**, con una nota ambar que dice de donde sale cada uno
@@ -283,7 +283,7 @@ Este repositorio es un fork personal. Cada mejora se añade aquí según entra, 
   bloqueo de ABI se sustituye por `abiHasAotBackend` (`arm64-v8a` | `x86_64`) y `armeabi-v7a`/`x86` siguen avisando.
   Coste: **+4,34 MB solo en x86_64** (release 112.136.131 -> 116.476.809); arm64 identico. **Honesto:** la ejecucion
   real en x86_64 **no** esta verificada (no hay imagen x86_64 disponible; inviable en Apple Silicon). Pagina de la
-  release: [v7.0.11.0](https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.11.0). Todos los detalles:
+  release: [v7.0.11.0](https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.11.0). Todos los detalles:
   [docs/preview-fix.md](docs/preview-fix.md) (ronda 10) y [docs/flutter-consent.md](docs/flutter-consent.md) (toolchain
   x86_64).
 - **v7.0.10.5 (versionCode 172) — rojo solo si la vista no se puede dibujar, y los `@style` y el tema del proyecto
@@ -316,7 +316,7 @@ Este repositorio es un fork personal. Cada mejora se añade aquí según entra, 
   del proyecto **no tienen resId** (no estan compilados en el APK del editor), asi que su tema se **emula** (base
   del framework + items mapeados); las referencias `?attr/` del framework en `tabTextAppearance` se dejan al tema;
   `popupTheme` y `actionBarTheme` siguen sin aplicarse. Pagina de la release:
-  [v7.0.10.5](https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.10.5). Todos los detalles:
+  [v7.0.10.5](https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.10.5). Todos los detalles:
   [docs/preview-fix.md](docs/preview-fix.md) (ronda 9).
 - **v7.0.10.4 (versionCode 171) — "los colores no se ven en ninguno", y la causa era una lista blanca de 19
   atributos.** La vista previa resolvia los atributos `app:*`/`android:*` con un `switch` fijo de **19 nombres** y
@@ -325,7 +325,7 @@ Este repositorio es un fork personal. Cada mejora se añade aquí según entra, 
   camino (`tryInflateRealLayout`). Por eso ningun color configurado en un widget — indicador de tab, borde del
   circulo, stroke del card, tinte de la barra, divider del spinner — llegaba a verse. **Que ha cambiado:** los
   appliers de `TabLayout`, `CircleImageView`, `MaterialButton` y `CardView` se extraen del editor a un unico helper
-  compartido (`pro.sketchware.utility.WidgetInjectApplier`) para que los dos motores apliquen lo mismo, y el resto
+  compartido (`com.ascode.android.utility.WidgetInjectApplier`) para que los dos motores apliquen lo mismo, y el resto
   pasa por un **aplicador generico por tipo de vista** (TextView, ImageView, Progress/Seek/Rating, CompoundButton,
   List/Grid/Spinner, BottomNavigationView, TextInputLayout, Calendar/Date/TimePicker, SearchView, LinearLayout…) con
   **ultimo recurso por reflexion** (`app:loQueSea` -> `setLoQueSea`); y lo que no se puede aplicar sale ahora en la
@@ -346,7 +346,7 @@ Este repositorio es un fork personal. Cada mejora se añade aquí según entra, 
   APK; el "antes" es la release previa y el "despues" el debug de esta ronda; los widgets cuya clase no esta en el
   editor (Library/Google/ads/map/lottie) conservan fondo y tamano pero no sus atributos propios (se listan); y no se
   han medido grosores ni radios por pixel, solo colores. Pagina de la release:
-  [v7.0.10.4](https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.10.4). Todos los detalles:
+  [v7.0.10.4](https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.10.4). Todos los detalles:
   [docs/preview-fix.md](docs/preview-fix.md) (ronda 8).
 - **v7.0.10.3 (versionCode 170) — el `CircleImageView` que rompia la vista previa ya no puede romper tampoco la app
   que compilas.** El aviso era `CircleImageView: scaleType CENTER no admitido`, con
@@ -374,7 +374,7 @@ Este repositorio es un fork personal. Cada mejora se añade aquí según entra, 
   la vista previa (antes caia a `FIT_CENTER`), ahora coinciden con la app. **Pendientes honestos:** no se ha probado
   la app que compila el usuario ni una compilacion completa on-device, no se ha recorrido a mano el dialogo del
   selector para un `CircleImageView`, y la evidencia sale del proyecto de pruebas 601. Pagina de la release:
-  [v7.0.10.3](https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.10.3). Todos los detalles:
+  [v7.0.10.3](https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.10.3). Todos los detalles:
   [docs/preview-fix.md](docs/preview-fix.md) (ronda 7).
 - **v7.0.10.2 (versionCode 169) — las diez vistas que el editor no podia instanciar vuelven a funcionar, y una vista
   que aun no se pueda crear ya no es un hueco rojo mudo.** La vista previa avisaba `Preview PARCIAL: 10 vistas no
@@ -399,7 +399,7 @@ Este repositorio es un fork personal. Cada mejora se añade aquí según entra, 
   **Pendiente honesto:** el generador escribe `android:scaleType="center"` por defecto para cualquier imagen y
   `CircleImageView` solo admite `CENTER_CROP`/`CENTER_INSIDE`, asi que ese layout puede seguir fallando en la app que
   compile el usuario. Pagina de la release:
-  [v7.0.10.2](https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.10.2). Todos los detalles:
+  [v7.0.10.2](https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.10.2). Todos los detalles:
   [docs/preview-fix.md](docs/preview-fix.md) (ronda 6).
 - **v7.0.10.1 (versionCode 168) — el toolchain ya no dice "no instalado", y los nombres heredados de iconos se
   distinguen.** El fallo del toolchain de Flutter era nuestro, no tuyo: la app comprobaba la instalacion **ejecutando**
@@ -427,7 +427,7 @@ Este repositorio es un fork personal. Cada mejora se añade aquí según entra, 
   no hay fallos reales, y log. Medido: el caso real pasa de **2 bloques rojos (2.080 px) a 1 (1.040 px)** y la barra
   dice `1 recurso no encontrado · 1 nombre heredado resuelto`; regresion intacta. Honesto: cubre los nombres cuyo
   concepto sigue existiendo (~19/44 de las familias probadas); typos, mipmaps y conceptos sin icono actual siguen en
-  rojo. Pagina de la release: [v7.0.10.1](https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.10.1).
+  rojo. Pagina de la release: [v7.0.10.1](https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.10.1).
   Todos los detalles: [docs/flutter-consent.md](docs/flutter-consent.md) (estado/instalacion del toolchain) y
   [docs/preview-fix.md](docs/preview-fix.md) (ronda 5).
 - **v7.0.10.0 (versionCode 167) — la descarga de Dart que no encontrabas, y la ronda 4 de la vista previa.** La queja
@@ -451,7 +451,7 @@ Este repositorio es un fork personal. Cada mejora se añade aquí según entra, 
   `MaterialButton`+WebView, layout real). Aclaracion honesta: **`ic_tune_white` no existe en ninguna fuente de este
   IDE** (el APK trae `ic_tune_24`/`ic_mtrl_tune`, era un nombre heredado), asi que ese nombre concreto no se puede
   dibujar — y ahora se dice claro, sin marcar la vista entera. Pagina de la release:
-  [v7.0.10.0](https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.10.0). Todos los detalles:
+  [v7.0.10.0](https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.10.0). Todos los detalles:
   [docs/preview-fix.md](docs/preview-fix.md) (ronda 4) y [docs/flutter-consent.md](docs/flutter-consent.md).
 - **v7.0.9.0 (versionCode 166) — ronda 3 de la vista previa, y la descarga de Dart la decides tu.** Los cuatro
   sintomas que reportaste eran **cuatro causas raiz distintas**, todas medidas pixel a pixel en un emulador arm64
@@ -474,7 +474,7 @@ Este repositorio es un fork personal. Cada mejora se añade aquí según entra, 
   componentes que faltan **con su tamano**, "Descarga necesaria: ~307.2 MB", el aviso de Wi-Fi, donde se guarda y que
   despues funciona sin conexion, con **Descargar ahora / Borrar toolchain (liberar X MB, con confirmacion) / Cancelar**;
   "Compilar y ejecutar" pide el mismo consentimiento y, al cancelar, aborta con un mensaje claro y sin escribir nada en
-  disco. Pagina de la release: [v7.0.9.0](https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.9.0).
+  disco. Pagina de la release: [v7.0.9.0](https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.9.0).
   Todos los detalles: [docs/preview-fix.md](docs/preview-fix.md) (ronda 3) y
   [docs/flutter-consent.md](docs/flutter-consent.md).
 - **v7.0.8.3 (versionCode 165) — tres arreglos mas en la vista previa, medidos pixel a pixel.** Ya se **resuelven
@@ -488,7 +488,7 @@ Este repositorio es un fork personal. Cada mejora se añade aquí según entra, 
   pixel a pixel en un emulador arm64 API 34, en claro y en oscuro: raiz magenta `(255,0,255)`, `MaterialButton`
   visible y texto por defecto de `TextView`/`Button` legible en ambos temas — `(68,71,79)` sobre `(250,249,253)` en
   claro, `(196,198,208)` sobre `(18,19,22)` en oscuro. Pagina de la release:
-  [v7.0.8.3](https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.8.3). Todos los detalles:
+  [v7.0.8.3](https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.8.3). Todos los detalles:
   [docs/preview-fix.md](docs/preview-fix.md).
 - **v7.0.8.2 (versionCode 164) — la vista previa de diseños vuelve a pintar.** La vista previa de los diseños hechos
   con elementos View (la de HTML/WebView siempre ha funcionado) mostraba la zona del diseño vacía — en blanco o en negro
@@ -505,7 +505,7 @@ Este repositorio es un fork personal. Cada mejora se añade aquí según entra, 
   255,255,255 con 0 glifos antes) y la vista previa con HTML/WebView sigue funcionando
   (`Preview OK · vistas: 3 · WebViews: 1`). Dicho con honestidad: los componentes Material, los proyectos con Material3 y
   los temas personalizados del proyecto **no** están verificados en pantalla, y nada se ha probado en móvil físico.
-  Página de la release: [v7.0.8.2](https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.8.2). Todos los
+  Página de la release: [v7.0.8.2](https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.8.2). Todos los
   detalles: [docs/preview-fix.md](docs/preview-fix.md).
 - **v7.0.8.1 (versionCode 163) — hotfix de la release minificada.** R8 (el minificado de release) rompía la
   compilación de **cualquier** proyecto dentro de la app: renombraba los campos de `javax.lang.model.SourceVersion`,
@@ -513,9 +513,9 @@ Este repositorio es un fork personal. Cada mejora se añade aquí según entra, 
   encadenados, todos alcanzados por reflexión que R8 no puede ver. Se arregla con tres reglas `keep` en
   `app/proguard-rules.pro`; verificado en un emulador arm64 API 34 (ECJ → dx → empaquetado → APK firmado V3.0,
   `ExceptionInInitializerError` 0 veces en logcat). Página de la release:
-  [v7.0.8.1](https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.8.1).
+  [v7.0.8.1](https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.8.1).
 - Version **v7.0.8.0** (versionCode 162), pagina de la release:
-  [v7.0.8.0](https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.8.0). Todos los detalles, los
+  [v7.0.8.0](https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.8.0). Todos los detalles, los
   comandos, los numeros medidos y lo que queda pendiente: [docs/flutter-fase8.md](docs/flutter-fase8.md).
 
 ### 2026-09-23 — soporte de Flutter, experimental: ficheros Dart y compilacion en el dispositivo (fase 7)
@@ -540,7 +540,7 @@ Este repositorio es un fork personal. Cada mejora se añade aquí según entra, 
   FlutterActivity en RESUMED, UI Material renderizada y el contador respondiendo a toques reales. **No** se ha
   probado en movil fisico, ni con ABIs distintas de `arm64-v8a`, ni con hot reload, ni con resolucion real de pub.
 - Version **v7.0.7.0** (versionCode 161), pagina de la release:
-  [v7.0.7.0](https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.7.0). Todos los detalles, los numeros
+  [v7.0.7.0](https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.7.0). Todos los detalles, los numeros
   medidos, los comandos y lo que queda pendiente: [docs/flutter-fase7.md](docs/flutter-fase7.md).
 
 ### 2026-09-22 — arreglada la vista previa de layouts con elementos View
@@ -553,7 +553,7 @@ Este repositorio es un fork personal. Cada mejora se añade aquí según entra, 
 - Ahora **todos** los layouts se construyen con el constructor de vistas reales (que trabaja solo con el XML), con el
   renderizador nativo como reserva y un mensaje visible si ambos fallan, en vez de una pantalla en blanco muda.
 - Version **v7.0.6.0** (versionCode 160), publicada como
-  [v7.0.6.0](https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.6.0).
+  [v7.0.6.0](https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.6.0).
 
 ### 2026-09-22 — soporte de Kotlin: autocompletado en ficheros .kt (fase 6 del IDE)
 
@@ -583,7 +583,7 @@ Este repositorio es un fork personal. Cada mejora se añade aquí según entra, 
   simbolo bajo el cursor en **todas las fuentes del proyecto** (no solo el fichero abierto) y abren el resultado;
   si hay varias coincidencias, sale un selector con fichero, linea y vista previa.
 - El indice de simbolos guarda ahora la **ubicacion** de cada declaracion (fichero + linea) y la navegacion pasa
-  por el andamiaje LSP que ya tenia el repo (`pro.sketchware.lsp`): proveedor nuevo de ambito proyecto con el
+  por el andamiaje LSP que ya tenia el repo (`com.ascode.android.lsp`): proveedor nuevo de ambito proyecto con el
   buscador de un solo fichero como reserva, ademas de timeout y ejecucion en segundo plano.
 - Version **v7.0.5.7** (versionCode 157).
 
@@ -596,7 +596,7 @@ Este repositorio es un fork personal. Cada mejora se añade aquí según entra, 
 - El indice se lee una vez, se cachea en memoria y en disco (se invalida cuando cambia el jar) y se precalienta al
   abrir un `.java`. Orden: primero los simbolos de tu proyecto, luego palabras clave y al final SDK/librerias.
 - Version **v7.0.5.6** (versionCode 156), publicada como
-  [v7.0.5.6](https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.5.6).
+  [v7.0.5.6](https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.5.6).
 
 ### 2026-09-22 — diagnosticos de Java en vivo (fase 2 del IDE)
 
@@ -607,7 +607,7 @@ Este repositorio es un fork personal. Cada mejora se añade aquí según entra, 
 - El analisis corre fuera del hilo de la interfaz, nunca se acumula (uno en vuelo; los resultados obsoletos se
   descartan) y falla en silencio: si algo va mal no se subraya nada y el editor sigue igual.
 - Version **v7.0.5.5** (versionCode 155), publicada como
-  [v7.0.5.5](https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.5.5).
+  [v7.0.5.5](https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.5.5).
 
 ### 2026-09-22 — primera pieza del IDE dentro de la app: autocompletado con los simbolos del proyecto
 
@@ -619,17 +619,17 @@ Este repositorio es un fork personal. Cada mejora se añade aquí según entra, 
 - El lenguaje del editor delega todo lo demas en el `JavaLanguage` de sora-editor, asi que resaltado, indentado
   y emparejado de simbolos siguen igual. En el peor caso, simplemente no aparece la lista de sugerencias.
 - Version **v7.0.5.4** (versionCode 154), publicada como
-  [v7.0.5.4](https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.5.4). Siguientes: diagnosticos
+  [v7.0.5.4](https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.5.4). Siguientes: diagnosticos
   en vivo con ECJ, ir a definicion y consola de build integrada.
 
 ### 2026-09-21 — los enlaces de GitHub de la app apuntan a este fork
 
 - **Los enlaces de GitHub dentro de la app redirigen ahora aquí** en vez de al upstream: el enlace del
   repositorio, el de releases y la API de commits que alimenta la pantalla de cambios apuntan a
-  `aurenox-global/Sketchware-Pro`, así que el aviso de actualizaciones consulta las releases de este fork.
+  `aurenox-global/Android-SCode`, así que el aviso de actualizaciones consulta las releases de este fork.
   `_Mod_README.txt` también menciona el fork.
 - Verificado dentro del APK compilado: `resources.arsc` lleva las tres URLs nuevas. Versión subida a
-  **v7.0.5.3** (versionCode 153) y publicada como [v7.0.5.3](https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.5.3).
+  **v7.0.5.3** (versionCode 153) y publicada como [v7.0.5.3](https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.5.3).
 
 ### 2026-09-21 — CI en verde, y por qué R8 solo fallaba allí
 
@@ -641,7 +641,7 @@ Este repositorio es un fork personal. Cada mejora se añade aquí según entra, 
   construir AABs), así que **el CI compila con `-PskipMinify`** y el build local de release mantiene R8 activo.
 - Por el camino: mock de `google-services.json` para la variante release, la testkey pública subida para que el
   CI firme con la misma clave, ABI splits en el workflow, baseline de lint regenerado y un error de lint real corregido.
-- **Publicada la [v7.0.5.2](https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.5.2)** con los APK de R8 (~106 MB por arquitectura).
+- **Publicada la [v7.0.5.2](https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.5.2)** con los APK de R8 (~106 MB por arquitectura).
 
 ### 2026-09-21 — el repositorio estaba incompleto (y por eso el CI no compilaba)
 
@@ -659,7 +659,7 @@ Este repositorio es un fork personal. Cada mejora se añade aquí según entra, 
 ### 2026-09-21 — reducción de código con R8 (builds de release)
 
 - **R8 activado en el build de release**, bajando cada APK de ~129 MB a ~106 MB. Hicieron falta tres cosas:
-  reempaquetar dos jars en tiempo de build (`kotlinc-for-sketchware` trae clases `dalvik/**` y `kxml2` trae
+  reempaquetar dos jars en tiempo de build (`kotlinc-for-ascode` trae clases `dalvik/**` y `kxml2` trae
   `org/xmlpull/**`, ambos ya los aporta Android), las reglas `-dontwarn` que R8 genera para referencias a clases
   que no existen en Android, y desactivar la subida del mapping a Crashlytics (el build local usa un
   `google-services.json` mock). La clave de firma original sigue intacta.
@@ -670,7 +670,7 @@ Este repositorio es un fork personal. Cada mejora se añade aquí según entra, 
 - **ABI splits activados.** `assembleRelease` genera ahora un APK por arquitectura en lugar de uno universal,
   así que el dispositivo deja de descargar los otros tres juegos de librerías nativas. Verificado: cada APK lleva
   solo su propio `lib/<abi>/`, incluido el `aapt2` incluido.
-- **Publicado como [v7.0.5.1](https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.5.1)**, firmado con
+- **Publicado como [v7.0.5.1](https://github.com/aurenox-global/Android-SCode/releases/tag/v7.0.5.1)**, firmado con
   la clave original para que se instale encima de versiones anteriores.
 
 ### 2026-09-21 — firma: se mantiene la clave original
@@ -679,7 +679,7 @@ Este repositorio es un fork personal. Cada mejora se añade aquí según entra, 
   actualizarse encima de las instalaciones existentes, así que el build de release se firma con la
   `testkey.keystore` del propio proyecto (SHA-256 `a40da80a…`), la misma identidad que usa la v7.0.5 publicada.
   Verificado con `apksigner`: los cuatro APK por arquitectura llevan exactamente esa huella.
-- Se generó una keystore privada de 4096 bits y se guardó en `~/.android-keys/sketchware-pro/release.jks`
+- Se generó una keystore privada de 4096 bits y se guardó en `~/.android-keys/ascode-pro/release.jks`
   para el día en que se quiera una identidad de distribución real. Cambiar a ella obligaría a desinstalar y reinstalar.
 
 ### 2026-09-21 — primera versión versionada (v7.0.5)
@@ -691,7 +691,7 @@ Este repositorio es un fork personal. Cada mejora se añade aquí según entra, 
 - **Firma del release fuera del árbol de código.** Las credenciales salen de `RELEASE_STORE_*` / `RELEASE_KEY_*`
   (entorno o `~/.gradle/gradle.properties`), con aviso explícito si faltan.
 - **64 bloques `catch` vacíos anotados.** 44 archivos se tragaban las excepciones en silencio; ahora registran
-  con `Log.d("SketchwarePro", …)`.
+  con `Log.d("Ascode", …)`.
 - **Builds más rápidas.** Activados `org.gradle.parallel` y `org.gradle.caching`.
 - **Repositorio publicado y versionado.** Historial git, `.gitignore` auditado, repo público y primera release
   con el APK adjunto.
@@ -725,7 +725,7 @@ Este repositorio es un fork personal. Cada mejora se añade aquí según entra, 
 
 Bloqueos conocidos, con detalle:
 
-- **R8** — `minifyReleaseWithR8` falla porque `kotlinc-for-sketchware` incluye clases `dalvik/**` que R8 se
+- **R8** — `minifyReleaseWithR8` falla porque `kotlinc-for-ascode` incluye clases `dalvik/**` que R8 se
   niega a tratar como clases de programa. Hay que reempaquetar ese jar primero.
 - **Reducción de recursos** — hay 29 usos de `getIdentifier()`, así que se borrarían recursos que parecen
   sin usar. Antes hay que escribir un `res/raw/keep.xml`.
@@ -756,11 +756,11 @@ Los mensajes de commit usan prefijo de tipo: `feat:`, `fix:`, `style:`, `refacto
 
 ## Aviso legal
 
-**Sketchware Pro no es open source.** Es *source-available*: puedes leer el código y enviar cambios, pero no es
-tuyo. Parte del código puede infringir el copyright de Sketchware.
+**Android SCode no es open source.** Es *source-available*: puedes leer el código y enviar cambios, pero no es
+tuyo. Parte del código puede infringir el copyright de Android SCode.
 
-Es un mod de la comunidad hecho para mantener Sketchware vivo, por la comunidad y para la comunidad, sin
-ninguna intención dañina hacia los desarrolladores originales. **Publicar Sketchware Pro, sin modificar o
+Es un mod de la comunidad hecho para mantener Android SCode vivo, por la comunidad y para la comunidad, sin
+ninguna intención dañina hacia los desarrolladores originales. **Publicar Android SCode, sin modificar o
 modificado, en Google Play o en cualquier otra tienda no está permitido.** Úsalo bajo tu propio criterio.
 
 Dos módulos, `kotlinc` y `build-logic`, vienen de [CodeAssist](https://github.com/tyron12233/CodeAssist) y
@@ -768,9 +768,9 @@ están bajo licencia GPL-3.0.
 
 ## Créditos
 
-- Proyecto upstream: [Sketchware-Pro/Sketchware-Pro](https://github.com/Sketchware-Pro/Sketchware-Pro)
+- Proyecto upstream: [Android-SCode/Android-SCode](https://github.com/Android-SCode/Android-SCode)
 - Comunidad: [Discord](http://discord.gg/kq39yhT4rX)
-- Sketchware original, de sus desarrolladores, que hicieron todo esto posible
+- Android SCode original, de sus desarrolladores, que hicieron todo esto posible
 
 ---
 

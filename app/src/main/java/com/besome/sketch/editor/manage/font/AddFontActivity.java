@@ -20,11 +20,11 @@ import a.a.a.uq;
 import a.a.a.yy;
 import mod.hey.studios.util.Helper;
 import mod.jbk.util.LogUtil;
-import pro.sketchware.R;
-import pro.sketchware.databinding.ManageFontAddBinding;
-import pro.sketchware.lib.validator.FontNameValidator;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.databinding.ManageFontAddBinding;
+import com.ascode.android.lib.validator.FontNameValidator;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.AscodeUtil;
 
 public class AddFontActivity extends BaseDialogActivity implements View.OnClickListener {
 
@@ -128,17 +128,17 @@ public class AddFontActivity extends BaseDialogActivity implements View.OnClickL
             Uri intentData = data.getData();
 
 
-            String filenameExtension = FileUtil.getFileExtension(SketchwareUtil.getSafDocumentDisplayName(intentData).orElse(".ttf"));
-            SketchwareUtil.copySafDocumentToTempFile(intentData, this, filenameExtension, tempFontFile -> {
+            String filenameExtension = FileUtil.getFileExtension(AscodeUtil.getSafDocumentDisplayName(intentData).orElse(".ttf"));
+            AscodeUtil.copySafDocumentToTempFile(intentData, this, filenameExtension, tempFontFile -> {
                 fontUri = Uri.fromFile(tempFontFile);
                 try {
                     Typeface typeface = Typeface.createFromFile(tempFontFile);
                     if (typeface.equals(Typeface.DEFAULT)) {
-                        SketchwareUtil.toastError("Warning: Font doesn't seem to be valid");
+                        AscodeUtil.toastError("Warning: Font doesn't seem to be valid");
                         return;
                     }
                     validFontPicked = true;
-                    String extractedFontName = SketchwareUtil.getSafDocumentDisplayName(intentData).orElse("invalid.tff").toLowerCase();
+                    String extractedFontName = AscodeUtil.getSafDocumentDisplayName(intentData).orElse("invalid.tff").toLowerCase();
                     extractedFontName = extractedFontName.replaceAll("^[a-z0-9]", "").replace("ttf", "");
 
                     binding.edInput.requestFocus();
@@ -149,11 +149,11 @@ public class AddFontActivity extends BaseDialogActivity implements View.OnClickL
                     e.printStackTrace();
                     validFontPicked = false;
                     binding.fontPreviewView.setVisibility(View.GONE);
-                    SketchwareUtil.toast("Couldn't load font: " + e.getMessage());
+                    AscodeUtil.toast("Couldn't load font: " + e.getMessage());
                     LogUtil.e("AddFontActivity", "Failed to load font", e);
                 }
             }, e -> {
-                SketchwareUtil.toastError("Error while loading font: " + e.getMessage());
+                AscodeUtil.toastError("Error while loading font: " + e.getMessage());
                 e.printStackTrace();
                 LogUtil.e("AddFontActivity", "Failed to load font", e);
             });

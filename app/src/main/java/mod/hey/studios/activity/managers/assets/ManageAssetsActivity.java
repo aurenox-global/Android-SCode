@@ -36,14 +36,14 @@ import dev.pranav.filepicker.FilePickerOptions;
 import dev.pranav.filepicker.SelectionMode;
 import mod.hey.studios.code.SrcCodeEditor;
 import mod.hey.studios.util.Helper;
-import pro.sketchware.R;
-import pro.sketchware.databinding.DialogCreateNewFileLayoutBinding;
-import pro.sketchware.databinding.DialogInputLayoutBinding;
-import pro.sketchware.databinding.ManageFileBinding;
-import pro.sketchware.databinding.ManageJavaItemHsBinding;
-import pro.sketchware.utility.FilePathUtil;
-import pro.sketchware.utility.FileUtil;
-import pro.sketchware.utility.SketchwareUtil;
+import com.ascode.android.R;
+import com.ascode.android.databinding.DialogCreateNewFileLayoutBinding;
+import com.ascode.android.databinding.DialogInputLayoutBinding;
+import com.ascode.android.databinding.ManageFileBinding;
+import com.ascode.android.databinding.ManageJavaItemHsBinding;
+import com.ascode.android.utility.FilePathUtil;
+import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.AscodeUtil;
 
 public class ManageAssetsActivity extends BaseAppCompatActivity {
 
@@ -131,7 +131,7 @@ public class ManageAssetsActivity extends BaseAppCompatActivity {
                 String editable = Helper.getText(inputText).trim();
 
                 if (editable.isEmpty()) {
-                    SketchwareUtil.toastError("Invalid name");
+                    AscodeUtil.toastError("Invalid name");
                     return;
                 }
 
@@ -141,12 +141,12 @@ public class ManageAssetsActivity extends BaseAppCompatActivity {
                 } else if (checkedChipId == R.id.chip_folder) {
                     FileUtil.makeDir(new File(current_path, editable).getAbsolutePath());
                 } else {
-                    SketchwareUtil.toast("Select a file type");
+                    AscodeUtil.toast("Select a file type");
                     return;
                 }
 
                 refresh();
-                SketchwareUtil.toast("File was created successfully");
+                AscodeUtil.toast("File was created successfully");
                 dialogInterface.dismiss();
             });
         });
@@ -175,7 +175,7 @@ public class ManageAssetsActivity extends BaseAppCompatActivity {
                         FileUtil.copyDirectory(file, new File(current_path, file.getName()));
                         refresh();
                     } catch (IOException e) {
-                        SketchwareUtil.toastError("Couldn't import file! [" + e.getMessage() + "]");
+                        AscodeUtil.toastError("Couldn't import file! [" + e.getMessage() + "]");
                     }
                 }
             }
@@ -197,7 +197,7 @@ public class ManageAssetsActivity extends BaseAppCompatActivity {
                     if (!Helper.getText(inputText).isEmpty()) {
                         FileUtil.renameFile(assetsAdapter.getItem(position), new File(current_path, Helper.getText(inputText)).getAbsolutePath());
                         refresh();
-                        SketchwareUtil.toast("Renamed successfully");
+                        AscodeUtil.toast("Renamed successfully");
                     }
                     dialogInterface.dismiss();
                 })
@@ -219,7 +219,7 @@ public class ManageAssetsActivity extends BaseAppCompatActivity {
                 .setPositiveButton(R.string.common_word_delete, (dialog, which) -> {
                     FileUtil.deleteFile(assetsAdapter.getItem(position));
                     refresh();
-                    SketchwareUtil.toast("Deleted successfully");
+                    AscodeUtil.toast("Deleted successfully");
                 })
                 .setNegativeButton(R.string.common_word_cancel, null)
                 .create()

@@ -8,7 +8,7 @@ import com.google.gson.annotations.Expose;
 
 import a.a.a.Gx;
 import mod.hilal.saif.components.ComponentsHandler;
-import pro.sketchware.R;
+import com.ascode.android.R;
 
 public class ComponentBean extends CollapsibleBean implements Parcelable {
     public static final Parcelable.Creator<ComponentBean> CREATOR = new Parcelable.Creator<>() {
@@ -113,39 +113,39 @@ public class ComponentBean extends CollapsibleBean implements Parcelable {
 
     public static String getComponentDocsUrlByTypeName(int type) {
         return switch (type) {
-            case COMPONENT_TYPE_INTENT -> "https://docs.sketchware.io/docs/component-intent.html";
+            case COMPONENT_TYPE_INTENT -> "https://docs.ascode.io/docs/component-intent.html";
             case COMPONENT_TYPE_SHAREDPREF ->
-                    "https://docs.sketchware.io/docs/component-shared-preference.html";
+                    "https://docs.ascode.io/docs/component-shared-preference.html";
             case COMPONENT_TYPE_CALENDAR ->
-                    "https://docs.sketchware.io/docs/component-calendar.html";
+                    "https://docs.ascode.io/docs/component-calendar.html";
             case COMPONENT_TYPE_VIBRATOR ->
-                    "https://docs.sketchware.io/docs/component-vibrator.html";
-            case COMPONENT_TYPE_TIMERTASK -> "https://docs.sketchware.io/docs/component-timer.html";
+                    "https://docs.ascode.io/docs/component-vibrator.html";
+            case COMPONENT_TYPE_TIMERTASK -> "https://docs.ascode.io/docs/component-timer.html";
             case COMPONENT_TYPE_FIREBASE ->
-                    "https://docs.sketchware.io/docs/component-firebase-database.html";
-            case COMPONENT_TYPE_DIALOG -> "https://docs.sketchware.io/docs/component-dialog.html";
+                    "https://docs.ascode.io/docs/component-firebase-database.html";
+            case COMPONENT_TYPE_DIALOG -> "https://docs.ascode.io/docs/component-dialog.html";
             case COMPONENT_TYPE_MEDIAPLAYER ->
-                    "https://docs.sketchware.io/docs/component-mediaplayer.html";
+                    "https://docs.ascode.io/docs/component-mediaplayer.html";
             case COMPONENT_TYPE_SOUNDPOOL ->
-                    "https://docs.sketchware.io/docs/component-soundpool.html";
+                    "https://docs.ascode.io/docs/component-soundpool.html";
             case COMPONENT_TYPE_OBJECTANIMATOR ->
-                    "https://docs.sketchware.io/docs/component-object-animator.html";
+                    "https://docs.ascode.io/docs/component-object-animator.html";
             case COMPONENT_TYPE_GYROSCOPE ->
-                    "https://docs.sketchware.io/docs/component-gyroscope.html";
+                    "https://docs.ascode.io/docs/component-gyroscope.html";
             case COMPONENT_TYPE_FIREBASE_AUTH ->
-                    "https://docs.sketchware.io/docs/component-firebase-auth.html";
+                    "https://docs.ascode.io/docs/component-firebase-auth.html";
             case COMPONENT_TYPE_FIREBASE_CLOUD_MESSAGE ->
-                    "https://sketchware-pro.vercel.app/docs/components/Firebase/cloud-messaging";
+                    "https://ascode-pro.vercel.app/docs/components/Firebase/cloud-messaging";
             case COMPONENT_TYPE_INTERSTITIAL_AD, COMPONENT_TYPE_REQUEST_NETWORK,
                  COMPONENT_TYPE_TEXT_TO_SPEECH, COMPONENT_TYPE_SPEECH_TO_TEXT,
                  COMPONENT_TYPE_BLUETOOTH_CONNECT, COMPONENT_TYPE_LOCATION_MANAGER ->
                 // sad :c
                     "";
             case COMPONENT_TYPE_FIREBASE_STORAGE ->
-                    "https://docs.sketchware.io/docs/component-firebase-storage.html";
-            case COMPONENT_TYPE_CAMERA -> "https://docs.sketchware.io/docs/component-camera.html";
+                    "https://docs.ascode.io/docs/component-firebase-storage.html";
+            case COMPONENT_TYPE_CAMERA -> "https://docs.ascode.io/docs/component-camera.html";
             case COMPONENT_TYPE_FILE_PICKER ->
-                    "https://docs.sketchware.io/docs/component-filepicker.html";
+                    "https://docs.ascode.io/docs/component-filepicker.html";
             default -> ComponentsHandler.docs(type);
         };
     }

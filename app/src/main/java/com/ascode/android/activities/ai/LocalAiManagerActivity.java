@@ -289,7 +289,7 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
     private void applyQwenSamplingPreset(boolean thinking) {
         LocalAiConfig current = LocalAiConfig.load(this);
         if (thinking) {
-            current.setTemperature(1.0f);
+            current.setTemperature(0.6f);
             current.setTopP(0.95f);
             binding.thinkModeSummary.setText(Helper.getResString(R.string.ai_think_mode_visible));
         } else {

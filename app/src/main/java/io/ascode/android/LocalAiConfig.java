@@ -20,10 +20,10 @@ public class LocalAiConfig {
     public static final int DEFAULT_CONTEXT_SIZE = 8192;
     public static final int DEFAULT_MAX_TOKENS = 512;
     // Qwen3.5 non-thinking (instruct) recommended settings (Unsloth).
-    public static final float DEFAULT_TEMPERATURE = 0.5f;
-    public static final float DEFAULT_TOP_P = 0.85f;
+    public static final float DEFAULT_TEMPERATURE = 0.6f;
+    public static final float DEFAULT_TOP_P = 0.95f;
     public static final int DEFAULT_TOP_K = 20;
-    public static final float DEFAULT_PRESENCE_PENALTY = 1.5f;
+    public static final float DEFAULT_PRESENCE_PENALTY = 0.0f;
     public static final int MAX_CONTEXT_SIZE = 262144;
     public static final int MAX_MAX_TOKENS = 262144;
     public static final int MAX_THREADS = 16;

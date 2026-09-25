@@ -2388,7 +2388,7 @@ Please try again later"</string>
     <string name="ai_label_top_k">Top K: %1$d</string>
     <string name="ai_label_presence_penalty">Presence penalty: %1$.2f</string>
     <string name="ai_think_mode">Think mode</string>
-    <string name="ai_think_mode_visible">Reasoning on (Qwen3.5: temp 1.0, top_p 0.95)</string>
+    <string name="ai_think_mode_visible">Reasoning on — precise coding (Qwen3.5: temp 0.6, top_p 0.95, top_k 20)</string>
     <string name="ai_think_mode_hidden">Reasoning off (Qwen3.5: temp 0.7, top_p 0.8)</string>
     <string name="ai_engine_recommended">Recommended</string>
     <string name="ai_engine_reset">Restore defaults</string>

@@ -24,6 +24,7 @@ public class ProgramInfoActivity extends BaseAppCompatActivity {
 
     private static final int ITEM_SYSTEM_INFORMATION = 1;
     private static final int ITEM_DOCS_LOG = 4;
+    private static final int ITEM_TELEGRAM_GROUP = 9;
 
     private ProgramInfoBinding binding;
 
@@ -108,6 +109,7 @@ public class ProgramInfoActivity extends BaseAppCompatActivity {
                 key = ((PropertyTwoLineItem) v).getKey();
                 switch (key) {
                     case ITEM_DOCS_LOG -> openUrl(Helper.getResString(R.string.link_docs_url));
+                    case ITEM_TELEGRAM_GROUP -> openUrl(Helper.getResString(R.string.link_telegram_invite));
                 }
             }
         }
@@ -129,6 +131,7 @@ public class ProgramInfoActivity extends BaseAppCompatActivity {
         });
 
         addTwoLineItem(ITEM_DOCS_LOG, R.string.program_information_title_docs, R.string.link_docs_url);
+        addTwoLineItem(ITEM_TELEGRAM_GROUP, R.string.title_telegram_community, R.string.link_telegram_invite);
         addSingleLineItem(ITEM_SYSTEM_INFORMATION, R.string.program_information_title_system_information, true);
         addCreditFooter();
     }

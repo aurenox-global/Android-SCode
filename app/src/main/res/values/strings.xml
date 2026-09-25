@@ -2238,7 +2238,7 @@ Please try again later"</string>
     <string name="link_docs_url">https://aurenox-global.github.io/Android-SCode/</string>
     <string name="link_ideas_url">https://github.com/aurenox-global/Android-SCode/issues</string>
     <string name="link_discord_invite">https://aurenox-global.github.io/Android-SCode/</string>
-    <string name="link_telegram_invite">https://aurenox-global.github.io/Android-SCode/</string>
+    <string name="link_telegram_invite">https://t.me/AndroidSCode</string>
     <string name="link_about_team">https://ascode-pro.github.io/Android-SCode/about.json</string>
     <string name="link_github_commits_url"><![CDATA[https://api.github.com/repos/aurenox-global/Android-SCode/commits?per_page=%s&page=%s]]></string>
     <string name="github_api_error_message">Something went wrong. Please wait and try again.</string>

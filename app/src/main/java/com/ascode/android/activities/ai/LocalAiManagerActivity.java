@@ -826,7 +826,23 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
         AscodeUtil.toast(Helper.getResString(R.string.ai_copied));
     }
 
+    /** Migra una sola vez los ajustes antiguos al preset de codigo preciso (Qwen3.5). */
+    private void migrateToPreciseCodingPreset() {
+        android.content.SharedPreferences prefs = getSharedPreferences("ascode_prefs", MODE_PRIVATE);
+        if (prefs.getBoolean("ai_preset_coding_v1", false)) {
+            return;
+        }
+        LocalAiConfig config = LocalAiConfig.load(this);
+        config.setTemperature(LocalAiConfig.DEFAULT_TEMPERATURE);
+        config.setTopP(LocalAiConfig.DEFAULT_TOP_P);
+        config.setTopK(LocalAiConfig.DEFAULT_TOP_K);
+        config.setPresencePenalty(LocalAiConfig.DEFAULT_PRESENCE_PENALTY);
+        config.save(this);
+        prefs.edit().putBoolean("ai_preset_coding_v1", true).apply();
+    }
+
     private void refreshUi() {
+        migrateToPreciseCodingPreset();
         LocalAiConfig config = LocalAiConfig.load(this);
 
         binding.modelPathText.setText(config.getModelPath().isEmpty() ? Helper.getResString(R.string.ai_no_model_selected) : config.getModelPath());

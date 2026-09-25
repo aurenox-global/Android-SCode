@@ -22,7 +22,7 @@ public class ImageFactory {
      * @return A File object of the saved bitmap.
      */
     public static File saveBitmap(View view, String imageName) {
-        File saveToDirectory = new File(FileUtil.getExternalStorageDir(), "ascode/saved_block");
+        File saveToDirectory = new File(FileUtil.getExternalStorageDir(), ".AndroidSCode/saved_block");
         if (!saveToDirectory.exists()) {
             FileUtil.makeDir(saveToDirectory.getAbsolutePath());
         }

@@ -9,11 +9,11 @@ import com.ascode.android.AscodeApplication;
 
 public class wq {
 
-    public static final String A = "ascode" + File.separator + "localization" + File.separator + "strings_provided.xml";
-    public static final String B = "ascode" + File.separator + "signed_apk";
-    public static final String C = "ascode" + File.separator + "keystore";
-    public static final String D = "ascode" + File.separator + "keystore" + File.separator + "release_key.jks";
-    public static final String E = "ascode" + File.separator + "service_account";
+    public static final String A = ".AndroidSCode" + File.separator + "localization" + File.separator + "strings_provided.xml";
+    public static final String B = ".AndroidSCode" + File.separator + "signed_apk";
+    public static final String C = ".AndroidSCode" + File.separator + "keystore";
+    public static final String D = ".AndroidSCode" + File.separator + "keystore" + File.separator + "release_key.jks";
+    public static final String E = ".AndroidSCode" + File.separator + "service_account";
     public static final String F = ".AndroidSCode" + File.separator + "upload";
     public static final String[] G = {"subs_year_01", "subs_50_year_01", "subs_30_year_01", "subs_20_year_01", "subs_month_06", "subs_month_03", "subs_month_01", "subs_50_month_01", "subs_30_month_01", "subs_20_month_01"};
     public static final long[] H = {32140800000L, 32140800000L, 32140800000L, 32140800000L, 16070400000L, 8035200000L, 2678400000L, 2678400000L, 2678400000L, 2678400000L};
@@ -44,8 +44,8 @@ public class wq {
     public static final String v = ".AndroidSCode" + File.separator + "tutorial" + File.separator + "fonts";
     public static final String w = ".AndroidSCode" + File.separator + "tutorial" + File.separator + "proj";
     public static final String x = ".AndroidSCode" + File.separator + "collection";
-    public static final String y = "ascode" + File.separator + "localization";
-    public static final String z = "ascode" + File.separator + "localization" + File.separator + "strings.xml";
+    public static final String y = ".AndroidSCode" + File.separator + "localization";
+    public static final String z = ".AndroidSCode" + File.separator + "localization" + File.separator + "strings.xml";
 
     public static final String EXTRA_SYSTEM_DATA = ".AndroidSCode" + File.separator + "data" + File.separator + "system";
     public static final String CUSTOM_COMPONENT_FILE = EXTRA_SYSTEM_DATA + File.separator + "component.json";
@@ -233,7 +233,7 @@ public class wq {
     }
 
     public static String s() {
-        return getAbsolutePathOf("ascode");
+        return getAbsolutePathOf(".AndroidSCode");
     }
 
     public static String t() {

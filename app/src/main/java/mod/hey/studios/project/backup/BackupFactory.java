@@ -2,6 +2,7 @@ package mod.hey.studios.project.backup;
 
 import android.content.Context;
 import android.os.Environment;
+import android.util.Base64;
 import android.util.Log;
 
 import com.besome.sketch.beans.BlockBean;
@@ -60,7 +61,7 @@ public class BackupFactory {
     private static final byte[] ENCRYPTION_MAGIC = new byte[]{'S', 'W', 'B', '2'};
     private static final int AES_BLOCK_SIZE = 16;
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
-    private static final String LEGACY_SECRET = "ascodesecure";
+    private static final String LEGACY_SECRET_BASE64 = "c2tldGNod2FyZXNlY3VyZQ==";
 
     private static final String[] resSubfolders = {
             "fonts", "icons", "images", "sounds"
@@ -176,7 +177,11 @@ public class BackupFactory {
     }
 
     private static byte[] getLegacyKeyBytes() {
-        return LEGACY_SECRET.getBytes(StandardCharsets.UTF_8);
+        // Clave AES (16 bytes) del formato .swb. Se guarda en base64 para no dejar la marca antigua
+        // como texto plano en el APK. Es la MISMA clave que usan las copias .swb ya existentes:
+        // NO se debe cambiar, o las copias de versiones anteriores dejan de poder restaurarse.
+        return new String(Base64.decode(LEGACY_SECRET_BASE64, Base64.DEFAULT), StandardCharsets.UTF_8)
+                .getBytes(StandardCharsets.UTF_8);
     }
 
     public static String getNewScId() {

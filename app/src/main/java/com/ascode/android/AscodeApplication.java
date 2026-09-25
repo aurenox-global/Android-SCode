@@ -76,8 +76,20 @@ public class AscodeApplication extends Application {
             if (hasProjects(currentData)) return;
 
             new Thread(() -> {
-                boolean ok = copyDirectory(legacyDir, new File(Environment.getExternalStorageDirectory(), ".AndroidSCode"));
-                Log.i("AscodeApplication", "Importacion de .sketchware: " + (ok ? "completada" : "fallida"));
+                File currentDir = new File(Environment.getExternalStorageDirectory(), ".AndroidSCode");
+                boolean ok = copyDirectory(legacyDir, currentDir);
+                // La instalacion anterior guardaba en /sdcard/sketchware/ artefactos propios del
+                // usuario (clave de firma, traducciones y cuenta de servicio). Se copian aqui.
+                File legacyArtifacts = new File(Environment.getExternalStorageDirectory(), "sketchware");
+                if (legacyArtifacts.isDirectory()) {
+                    for (String folder : new String[]{"keystore", "localization", "service_account"}) {
+                        File source = new File(legacyArtifacts, folder);
+                        if (source.isDirectory()) {
+                            ok &= copyDirectory(source, new File(currentDir, folder));
+                        }
+                    }
+                }
+                Log.i("AscodeApplication", "Importacion de datos anteriores: " + (ok ? "completada" : "fallida"));
                 if (ok) prefs.edit().putBoolean("legacy_import_done", true).apply();
             }, "ascode-legacy-import").start();
         } catch (Throwable t) {

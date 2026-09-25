@@ -239,7 +239,7 @@ public class AppSettings extends BaseAppCompatActivity {
                 MaterialAlertDialogBuilder confirmOverwrite = new MaterialAlertDialogBuilder(this);
                 confirmOverwrite.setIcon(R.drawable.color_save_as_new_96);
                 confirmOverwrite.setTitle("File exists");
-                confirmOverwrite.setMessage("An APK named " + output_apk_file_name + " already exists at /ascode/signed_apk/.  Overwrite it?");
+                confirmOverwrite.setMessage("An APK named " + output_apk_file_name + " already exists at /.AndroidSCode/signed_apk/.  Overwrite it?");
 
                 confirmOverwrite.setNegativeButton(Helper.getResString(R.string.common_word_cancel), null);
                 confirmOverwrite.setPositiveButton("Overwrite", (view, which1) -> {

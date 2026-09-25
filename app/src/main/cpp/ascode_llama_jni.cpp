@@ -201,7 +201,7 @@ static std::string generate_locked(JNIEnv * env,
                                    const std::string & grammar);
 
 extern "C" JNIEXPORT jlong JNICALL
-Java_pro_ascode_ai_LocalAiBridge_nativeLoadModel(JNIEnv * env, jclass, jstring model_path, jint context_size, jint threads) {
+Java_io_ascode_android_LocalAiBridge_nativeLoadModel(JNIEnv * env, jclass, jstring model_path, jint context_size, jint threads) {
     ensure_backend_ready();
     g_load_cancel_requested.store(false);
 
@@ -272,7 +272,7 @@ Java_pro_ascode_ai_LocalAiBridge_nativeLoadModel(JNIEnv * env, jclass, jstring m
 }
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_pro_ascode_ai_LocalAiBridge_nativeGenerate(JNIEnv * env, jclass, jlong native_handle, jstring prompt_text, jint max_tokens, jfloat temperature, jfloat top_p, jfloat presence_penalty, jfloat repeat_penalty, jint top_k, jstring grammar_text) {
+Java_io_ascode_android_LocalAiBridge_nativeGenerate(JNIEnv * env, jclass, jlong native_handle, jstring prompt_text, jint max_tokens, jfloat temperature, jfloat top_p, jfloat presence_penalty, jfloat repeat_penalty, jint top_k, jstring grammar_text) {
     auto * handle = reinterpret_cast<LlamaHandle *>(native_handle);
     if (handle == nullptr || handle->model == nullptr || handle->context == nullptr) {
         throw_local_ai_exception(env, "Local AI model is not loaded.");
@@ -394,7 +394,7 @@ static std::string generate_locked(JNIEnv * env,
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_pro_ascode_ai_LocalAiBridge_nativeCancel(JNIEnv *, jclass, jlong native_handle) {
+Java_io_ascode_android_LocalAiBridge_nativeCancel(JNIEnv *, jclass, jlong native_handle) {
     auto * handle = reinterpret_cast<LlamaHandle *>(native_handle);
     if (handle != nullptr) {
         handle->cancel_requested.store(true);
@@ -404,7 +404,7 @@ Java_pro_ascode_ai_LocalAiBridge_nativeCancel(JNIEnv *, jclass, jlong native_han
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_pro_ascode_ai_LocalAiBridge_nativeRelease(JNIEnv *, jclass, jlong native_handle) {
+Java_io_ascode_android_LocalAiBridge_nativeRelease(JNIEnv *, jclass, jlong native_handle) {
     auto * handle = reinterpret_cast<LlamaHandle *>(native_handle);
     if (handle == nullptr) {
         return;

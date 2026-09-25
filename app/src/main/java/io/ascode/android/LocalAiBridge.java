@@ -33,14 +33,21 @@ public class LocalAiBridge implements AutoCloseable {
             loadAttempted = true;
             try {
                 System.loadLibrary(LocalAiConfig.NATIVE_LIBRARY_NAME);
+                // Comprobacion real del enlace JNI: si la libreria instalada es de otra version
+                // (simbolos JNI que no coinciden con esta clase) se detecta aqui y se avisa con
+                // claridad, en lugar de fallar a mitad de una generacion de texto.
+                nativeRelease(0L);
             } catch (Throwable throwable) {
                 loadError = throwable;
             }
         }
         if (loadError != null) {
-            throw new LocalAiException("Missing llama.cpp native engine. Add lib"
-                    + LocalAiConfig.NATIVE_LIBRARY_NAME
-                    + ".so for this device ABI, then rebuild/install Android SCode.", loadError);
+            String detail = loadError instanceof UnsatisfiedLinkError
+                    ? "The installed native engine does not match this version of Android SCode "
+                    + "(JNI symbol mismatch). Reinstall the app from the official APK."
+                    : "Missing llama.cpp native engine. Add lib" + LocalAiConfig.NATIVE_LIBRARY_NAME
+                    + ".so for this device ABI, then rebuild/install Android SCode.";
+            throw new LocalAiException(detail, loadError);
         }
     }
 

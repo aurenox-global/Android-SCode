@@ -1,0 +1,9 @@
+# CODEOWNERS
+#
+# Todas las rutas del repositorio: las revisiones de los pull requests las debe aprobar el
+# mantenedor del proyecto. Ningun PR se fusiona sin su aprobacion.
+# All paths: pull request reviews must be approved by the project maintainer. No PR is merged
+# without their approval.
+#
+# Mantenedor / Maintainer:
+* @aurenox-global

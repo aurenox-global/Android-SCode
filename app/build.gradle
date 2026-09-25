@@ -68,8 +68,8 @@ android {
         namespace = "com.ascode.android"
       targetSdk = 35
         minSdk = 26
-        versionCode = 14
-        versionName = "v1.0.13"
+        versionCode = 15
+        versionName = "v1.0.14"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "GIT_HASH", "\"${gitCommitHash}\"")
@@ -107,6 +107,8 @@ android {
                 keyPassword = envKeyPassword
                 logger.lifecycle("Firma de release: usando RELEASE_STORE_FILE del entorno (${envStoreFile}).")
             }
+            enableV1Signing = true
+            enableV3Signing = true
         }
     }
 

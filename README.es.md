@@ -137,6 +137,13 @@ Dudas, ideas y avisos de errores:
 - **Grupo de Telegram:** https://t.me/AndroidSCode
 - **Issues:** https://github.com/aurenox-global/Android-SCode/issues
 
+## Reconocimiento
+
+Android SCode es un **trabajo derivado de Sketchware** (y de sus forks de la comunidad),
+mantenido de forma independiente. **No está afiliado, patrocinado ni respaldado** por el proyecto
+original. Todas las marcas pertenecen a sus respectivos titulares y se conservan los avisos y
+atribuciones que exige la licencia original — ver [LICENSE.md](LICENSE.md).
+
 ## Créditos
 
 Creado y mantenido por **Andrés Mag**.

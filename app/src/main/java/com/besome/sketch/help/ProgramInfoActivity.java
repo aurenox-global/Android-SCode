@@ -137,13 +137,21 @@ public class ProgramInfoActivity extends BaseAppCompatActivity {
     }
 
     private void addCreditFooter() {
+        int padding = (int) (16 * getResources().getDisplayMetrics().density);
+
         TextView credit = new TextView(this);
         credit.setText(R.string.app_credit);
         credit.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodySmall);
         credit.setAlpha(0.75f);
-        int padding = (int) (16 * getResources().getDisplayMetrics().density);
-        credit.setPadding(padding, padding, padding, padding / 2);
+        credit.setPadding(padding, padding, padding, 0);
         binding.content.addView(credit);
+
+        TextView derived = new TextView(this);
+        derived.setText(R.string.app_derived_from);
+        derived.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodySmall);
+        derived.setAlpha(0.6f);
+        derived.setPadding(padding, padding / 4, padding, padding / 2);
+        binding.content.addView(derived);
     }
 
     private void toSystemInfoActivity() {

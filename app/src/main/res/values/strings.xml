@@ -1562,9 +1562,14 @@ But, components should be added manually for working correctly."</string>
     <string name="myprojects_customize_icon">Customize icon</string>
 
     <string name="myprojects_export_project_actionbar_title">Export Project</string>
+    <string name="myprojects_export_project_button_export_flutter">Export Flutter Project (ZIP)</string>
     <string name="myprojects_export_project_button_export_src">Export Source Code</string>
+    <string name="myprojects_export_project_button_send_flutter_zip">Send Flutter Zip File</string>
     <string name="myprojects_export_project_button_send_src_zip">Send Source Code Zip File</string>
     <string name="myprojects_export_project_button_sign_apk">Sign APK</string>
+    <string name="myprojects_export_flutter_title_email_subject">%s, Flutter project ready for flutter run</string>
+    <string name="myprojects_export_flutter_title_email_body">attached file : %s</string>
+    <string name="myprojects_export_project_title_export_flutter">Flutter project (flutter run)</string>
     <string name="myprojects_export_project_title_export_src">Source Code for Android Studio</string>
     <string name="myprojects_export_project_title_local_path">Local Path</string>
     <string name="myprojects_export_project_title_sign_apk">Sign APK</string>

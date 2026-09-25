@@ -108,6 +108,16 @@ public class ExportProjectActivity extends BaseAppCompatActivity {
     private com.airbnb.lottie.LottieAnimationView sign_apk_loading_anim;
     private com.airbnb.lottie.LottieAnimationView export_source_loading_anim;
 
+    /**
+     * "Export Project -> Flutter project (.zip)".
+     */
+    private Button export_flutter_button;
+    private Button export_flutter_send_button;
+    private TextView export_flutter_output_path;
+    private LinearLayout export_flutter_output_stage;
+    private com.airbnb.lottie.LottieAnimationView export_flutter_loading_anim;
+    private String export_flutter_filename = "";
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -129,6 +139,11 @@ public class ExportProjectActivity extends BaseAppCompatActivity {
         export_source_send_button = findViewById(R.id.export_source_send_button);
         export_source_output_stage = findViewById(R.id.export_source_output_stage);
         export_source_loading_anim = findViewById(R.id.export_source_loading_anim);
+        export_flutter_button = findViewById(R.id.export_flutter_button);
+        export_flutter_send_button = findViewById(R.id.export_flutter_send_button);
+        export_flutter_output_path = findViewById(R.id.export_flutter_output_path);
+        export_flutter_output_stage = findViewById(R.id.export_flutter_output_stage);
+        export_flutter_loading_anim = findViewById(R.id.export_flutter_loading_anim);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -150,6 +165,7 @@ public class ExportProjectActivity extends BaseAppCompatActivity {
         initializeOutputDirectories();
         initializeSignApkViews();
         initializeExportSrcViews();
+        initializeExportFlutterViews();
         initializeAppBundleExportViews();
 
         if (savedInstanceState == null && getIntent().getBooleanExtra(EXTRA_AUTO_COMPILE, false)) {
@@ -375,6 +391,91 @@ public class ExportProjectActivity extends BaseAppCompatActivity {
 
     private void initializeAppBundleExportViews() {
         export_aab_button.setOnClickListener(view -> showCompileDialog(GetKeyStoreCredentialsDialog.Format.AAB));
+    }
+
+    /**
+     * Initialize "Export Project as Flutter project" views.
+     */
+    private void initializeExportFlutterViews() {
+        export_flutter_loading_anim.setVisibility(View.GONE);
+        export_flutter_output_stage.setVisibility(View.GONE);
+        export_flutter_button.setOnClickListener(v -> {
+            export_flutter_button.setVisibility(View.GONE);
+            export_flutter_output_stage.setVisibility(View.GONE);
+            export_flutter_loading_anim.setVisibility(View.VISIBLE);
+            export_flutter_loading_anim.playAnimation();
+            new Thread(this::exportFlutter).start();
+        });
+        export_flutter_send_button.setOnClickListener(v -> shareExportedFlutterProject());
+    }
+
+    /**
+     * Generates the Flutter project (.zip with pubspec.yaml, lib/... and README.md) from the
+     * project data. Runs on a background thread; the zip is written directly to
+     * {@code /sdcard/ascode/export_src}. The report printed by the generator (screen/block
+     * mappings and TODOs) goes to logcat for reference.
+     */
+    private void exportFlutter() {
+        try {
+            com.besome.sketch.export.flutter.FlutterProjectExporter exporter =
+                    new com.besome.sketch.export.flutter.FlutterProjectExporter(getApplicationContext(),
+                            sc_id, project_metadata.projectName, project_metadata.applicationName,
+                            project_metadata.packageName);
+            File exported = exporter.export(new File(export_src_full_path));
+            for (String mapping : exporter.getScreenMappings()) {
+                Log.i("FlutterExporter", "screen " + mapping);
+            }
+            for (String todo : exporter.getTodos()) {
+                Log.i("FlutterExporter", "TODO " + todo);
+            }
+            runOnUiThread(() -> initializeAfterExportedFlutterViews(exported.getName()));
+        } catch (Throwable throwable) {
+            Log.e("FlutterExporter", "While trying to export the project as Flutter project: "
+                    + throwable.getMessage(), throwable);
+            runOnUiThread(() -> {
+                AscodeUtil.showAnErrorOccurredDialog(this, Log.getStackTraceString(throwable));
+                export_flutter_output_stage.setVisibility(View.GONE);
+                export_flutter_loading_anim.setVisibility(View.GONE);
+                export_flutter_button.setVisibility(View.VISIBLE);
+            });
+        }
+    }
+
+    /**
+     * Set content of the exported Flutter project views.
+     */
+    private void initializeAfterExportedFlutterViews(String exportedFilename) {
+        export_flutter_filename = exportedFilename;
+        if (export_flutter_loading_anim.isAnimating()) {
+            export_flutter_loading_anim.cancelAnimation();
+        }
+        export_flutter_loading_anim.setVisibility(View.GONE);
+        export_flutter_output_stage.setVisibility(View.VISIBLE);
+        export_flutter_output_path.setText(export_src_postfix + File.separator + export_flutter_filename);
+    }
+
+    /**
+     * Shares the generated Flutter project zip.
+     */
+    private void shareExportedFlutterProject() {
+        if (export_flutter_filename.isEmpty()) {
+            return;
+        }
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("application/zip");
+        intent.putExtra(Intent.EXTRA_SUBJECT, Helper.getResString(
+                R.string.myprojects_export_flutter_title_email_subject, export_flutter_filename));
+        intent.putExtra(Intent.EXTRA_TEXT, Helper.getResString(
+                R.string.myprojects_export_flutter_title_email_body, export_flutter_filename));
+        String filePath = export_src_full_path + File.separator + export_flutter_filename;
+        intent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(getApplicationContext(),
+                getApplicationContext().getPackageName() + ".provider", new File(filePath)));
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(Intent.createChooser(intent, Helper.getResString(
+                R.string.myprojects_export_src_chooser_title_email)));
     }
 
     /**

@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sketchware Pro — crea apps Android desde tu móvil</title>
+<meta name="description" content="Sketchware Pro: crea apps Android reales desde el móvil con bloques o código. Características, instalación, compilación desde el código y los cambios de este fork.">
+<link rel="icon" href="assets/logo.png">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <a class="brand" href="es.html">
+      <img src="assets/logo.png" alt="Sketchware Pro">
+      <span>Sketchware Pro</span>
+    </a>
+    <nav class="main">
+      <a href="#que-es">Qué es</a>
+      <a href="#caracteristicas">Características</a>
+      <a href="#cambios">Cambios</a>
+      <a href="#instalar">Instalar</a>
+      <a href="#compilar">Compilar</a>
+      <a href="#roadmap">Roadmap</a>
+      <a href="#faq">FAQ</a>
+      <a href="https://github.com/aurenox-global/Sketchware-Pro" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+    <div class="lang">
+      <a href="index.html">EN</a>
+      <a class="on" href="es.html">ES</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============================================================ hero -->
+  <section class="hero" style="border-top:none">
+    <div class="tag">● v7.0.14.0 · versionCode 176 · source-available</div>
+    <h1>Crea apps Android reales<br><span class="accent">desde tu móvil.</span></h1>
+    <p class="lead">
+      Sketchware Pro es un IDE de Android que funciona sobre Android: arrastra bloques, escribe Java o Kotlin,
+      compila en el propio dispositivo y obtén un APK instalable — sin necesidad de ordenador.
+    </p>
+    <div class="btns">
+      <a class="btn primary" href="https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.14.0" target="_blank" rel="noopener">⬇ Descargar APK</a>
+      <a class="btn ghost" href="https://github.com/aurenox-global/Sketchware-Pro" target="_blank" rel="noopener">Ver el código en GitHub</a>
+    </div>
+
+    <div class="codewin">
+      <div class="bar">
+        <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+        <span class="file">MainActivity.java — generado por Sketchware Pro</span>
+      </div>
+<pre><span class="cm">// Diseña en pantalla, exporta código real.</span>
+<span class="kw">public class</span> <span class="ty">MainActivity</span> <span class="kw">extends</span> <span class="ty">Activity</span> {
+  <span class="kw">private</span> <span class="ty">TextView</span> saludo;
+
+  <span class="kw">@Override</span>
+  <span class="kw">protected void</span> <span class="fn">onCreate</span>(<span class="ty">Bundle</span> savedInstanceState) {
+    <span class="kw">super</span>.<span class="fn">onCreate</span>(savedInstanceState);
+    <span class="fn">setContentView</span>(R.layout.main);
+    saludo = <span class="fn">findViewById</span>(R.id.saludo);
+    saludo.<span class="fn">setText</span>(<span class="st">"Hola desde mi móvil"</span>);
+  }
+}</pre>
+    </div>
+  </section>
+
+  <!-- ========================================================== que es -->
+  <section id="que-es">
+    <h2><span class="hash">#</span>¿Qué es Sketchware Pro?</h2>
+    <p class="sub">
+      Sketchware era una app que permitía crear aplicaciones Android de forma visual, con bloques, directamente
+      en el teléfono. El desarrollo se detuvo hace años. <strong>Sketchware Pro</strong> es un mod de la comunidad
+      que lo mantiene vivo, arregla lo que estaba roto y añade lo que el original nunca tuvo.
+    </p>
+    <div class="grid c2">
+      <div class="card">
+        <div class="ico">🧩</div>
+        <h3>Bloques, pero código real</h3>
+        <p>Diseña con bloques visuales y Sketchware Pro genera Java de verdad. Nada queda encerrado en un formato propietario: puedes leer, editar y exportar el código.</p>
+      </div>
+      <div class="card">
+        <div class="ico">📱</div>
+        <h3>Un IDE completo en Android</h3>
+        <p>Editor de layouts, editor de lógica, recursos, librerías, manifest, firma y compilación — todo corriendo en el propio dispositivo.</p>
+      </div>
+      <div class="card">
+        <div class="ico">🧱</div>
+        <h3>Catálogo de proyectos</h3>
+        <p>Empieza desde una plantilla, un proyecto en blanco o un archivo <em>.swb</em> compartido. Todo vive en tu almacenamiento y es tuyo.</p>
+      </div>
+      <div class="card">
+        <div class="ico">🔓</div>
+        <h3>Hecho por la comunidad</h3>
+        <p>De la comunidad para la comunidad. Gratis, sin suscripciones y sin telemetría propia.</p>
+      </div>
+    </div>
+    <div class="note">
+      <strong>Importante:</strong> este proyecto es un mod de Sketchware. Es <em>source-available</em>, no open source,
+      y <strong>no está permitido en Google Play ni en ninguna otra tienda</strong>. Se instala por sideload.
+      Ver el <a href="#legal">aviso legal</a>.
+    </div>
+  </section>
+
+  <!-- =================================================== caracteristicas -->
+  <section id="caracteristicas">
+    <h2><span class="hash">#</span>Características principales</h2>
+    <p class="sub">Lo que encontrarás dentro de la app.</p>
+    <div class="grid c3">
+      <div class="card"><h3>Editor visual de layouts</h3><p>Arrastra widgets al lienzo, edita propiedades, previsualiza y genera el XML.</p></div>
+      <div class="card"><h3>Editor de lógica (bloques)</h3><p>Eventos, condiciones, bucles, variables y funciones, con paleta de bloques con buscador.</p></div>
+      <div class="card"><h3>Editor de código</h3><p>Resaltado de sintaxis, autocompletado y árbol de archivos de las fuentes generadas.</p></div>
+      <div class="card"><h3>Java y Kotlin</h3><p>La compilación de Kotlin está soportada mediante el <code>kotlinc</code> incluido.</p></div>
+      <div class="card"><h3>Gestor de librerías</h3><p>Firebase, Material Components, Glide, Retrofit y muchas más, listas para añadir.</p></div>
+      <div class="card"><h3>Compilador en el dispositivo</h3><p>Genera el APK en el teléfono, con <code>aapt2</code> por arquitectura incluido.</p></div>
+      <div class="card"><h3>Editor de recursos</h3><p>Imágenes, colores, fuentes, sonidos y textos sin salir de la app.</p></div>
+      <div class="card"><h3>Bloques personalizados</h3><p>Crea tus propios bloques y compártelos con la comunidad.</p></div>
+      <div class="card"><h3>Depurador integrado</h3><p>Logcat, informes de error y, en versiones recientes, depuración real en desarrollo.</p></div>
+    </div>
+  </section>
+
+  <!-- ========================================================== cambios -->
+  <section id="cambios">
+    <h2><span class="hash">#</span>Cambios de este fork</h2>
+    <p class="sub">
+      Este repositorio es un fork personal de Sketchware Pro. Cada mejora se va añadiendo aquí según se implementa:
+      esta lista es el registro de lo hecho y la hoja de ruta de lo que falta.
+    </p>
+
+    <div class="hits">
+      <span class="k">Hitos destacados</span>
+      <p>
+        <a href="https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.8.0">Flutter corriendo en el dispositivo, release/AOT incluido</a> &middot;
+        <a href="https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.14.0">firmar con tu propio keystore, rondas 1 a 12 + ronda A</a> &middot;
+        <a href="https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.10.1">la descarga del toolchain de Dart ahora la decides tú, y el toolchain ya no dice "no instalado"</a> &middot;
+        <a href="https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.5.9">soporte de Kotlin en el IDE de la app</a>.
+      </p>
+    </div>
+    <div class="log" id="change-log">
+      <div class="item done featured">
+        <span class="when">2026-09-24 · build y firma</span>
+        <h3>Firmar con <em>tu</em> keystore, y compilar APK o AAB desde un solo diálogo  <span class="pill feat">destacado</span> <span class="pill ok">arreglado</span></h3>
+        <ul class="clean">
+          <li><strong>El IDE ya firma con tu propio keystore, y compilar es un solo diálogo: APK o AAB × keystore
+          guardado / fichero de keystore / testkey / sin firmar.</strong> De dónde se partía, <strong>medido</strong> y
+          no supuesto: la herramienta <em>Sign an APK file</em> de Ajustes <strong>nunca miraba tu keystore</strong> —
+          sus dos llamadas pasaban <code>useTestkey=true</code> hardcodeado, así que firmaba siempre con la
+          <strong>testkey de AOSP</strong> (<code>apksigner verify</code> → <code>a40da80a…</code>, no tu
+          certificado). El diálogo de firma asumía una <strong>ruta fija</strong>
+          (<code>/storage/emulated/0/sketchware/keystore/release_key.jks</code>) y tenía <strong>un solo campo de
+          contraseña</strong>, así que la misma contraseña tenía que ser la del store y la del alias, y la rama APK
+          de <code>ExportProjectActivity</code> ignoraba la ruta del diálogo <strong>y reutilizaba la contraseña de
+          alias como contraseña de store</strong> — un <code>.jks</code> real (el caso normal de
+          <code>keytool</code>, con dos contraseñas distintas) era directamente inusable.</li>
+          <li><strong>Gestor de keystores nuevo</strong> (Ajustes → <em>General</em>): importa <code>.jks</code> /
+          <code>.keystore</code> / <code>.bks</code> / <code>.p12</code> validando las credenciales antes de guardar,
+          copia el fichero al <strong>almacenamiento privado de la app</strong> (<code>filesDir/keystores/</code>, no
+          <code>/sdcard</code>, que es legible por cualquiera), guarda alias + contraseñas de store y de clave
+          <strong>cifradas</strong> y muestra el certificado de cada uno — el SHA-256 que pinta es <strong>idéntico al
+          de <code>keytool</code></strong> (<code>B1:46:48:5F:…:C4</code>). El diálogo de firma compartido ya tiene
+          <strong>ruta explícita de keystore</strong>, <strong>contraseña de store separada de la de alias</strong>,
+          selector de keystore guardado que rellena todo y <strong>ya no se cierra cuando la validación falla</strong>
+          (antes perdías lo escrito). Ese JKS lo lee con un cargador agnóstico de tipo, porque en Android
+          <code>KeyStore.getInstance("JKS")</code> resuelve a <strong>BKS</strong> y un JKS de verdad no se puede
+          abrir. Y Ajustes → <em>Sign an APK file</em> por fin pregunta <strong>con qué clave</strong> firmar (testkey
+          o cada keystore guardado) y <strong>muestra el certificado resultante</strong>, en vez de firmar en
+          silencio con una clave que no elegiste.</li>
+          <li><strong>El build on-device bloqueaba todo esto, y eran bugs reales del IDE, no los proyectos de
+          prueba.</strong> <code>DexMerger</code> (el dx del fork) reventaba con
+          <strong><code>java.nio.BufferOverflowException</code></strong> en <em>cualquier</em> build release/AAB — los
+          dex de librería que inyecta el IDE <strong>comparten un mismo <code>debug_info_item</code> entre hasta 116
+          métodos</strong> mientras el merger escribía una copia nueva por <code>code_item</code> y reservaba el
+          hueco con los bytes ya deduplicados; arreglado deduplicando por (dex de entrada, offset): debug info items
+          <strong>2.297 → 361</strong> (reproducido offline con los dos dex reales, mismo stack que el dispositivo).
+          El <strong><code>Export AAB</code> estaba roto por R8</strong> — protobuf resuelve los getters generados
+          <strong>por reflexión</strong>, así que <code>getBundletool</code> había desaparecido del dex release (0 → 7
+          ocurrencias tras el <code>-keep</code>). El <strong>APK release era V1-only</strong> y no se instalaba en
+          Android 11+ (<code>INSTALL_PARSE_FAILED_NO_CERTIFICATES</code>), ahora <strong>apksig V1+V2+V3</strong>; y el
+          <strong>AAB llevaba digests SHA-1</strong> (<code>jarsigner</code> lo trataba como no firmado) →
+          <strong>SHA-256</strong>, <code>jar verified.</code></li>
+          <li><strong>Otros dos bloqueos arreglados de paso.</strong> Un XML de recurso escrito <strong>solo con la
+          cabecera</strong> (<code>NONE.xml</code>, salido tal cual del diálogo "Create a new file") tumbaba el build
+          <strong>entero</strong> en aapt2 (<code>no element found</code>) → plantillas válidas por carpeta, validación
+          de nombre y una guardia que aparta los XML sin raíz a <code>.invalid-xml-skipped/</code> con aviso
+          (recuperable, no se borra nada). Y R8 borraba el <strong><code>&lt;init&gt;</code> de sus propios
+          proveedores de threading</strong>, que ese mismo R8 embebido instancia <strong>por reflexión</strong> (el
+          nombre de la clase sobrevive en un String, por eso el fallo era <code>NoSuchMethodException</code> y
+          determinista): <em>"Failure creating provider for the threading module"</em> → <code>-keep class
+          com.android.tools.r8.threading.** { *; }</code> (<strong>+1.196 B</strong>, ~0,001 % del APK), probado
+          antes/después en el dispositivo con un probe que replica esa misma factory.</li>
+          <li><strong>Verificado en el APK release (R8):</strong> un APK release firmado con <strong>tu</strong>
+          certificado (<code>apksigner verify</code>: <code>Verifies</code>, V1+V2+V3, <code>b146485f…</code>) e
+          <strong>instalado desde el botón Install del propio diálogo</strong> (el instalador del sistema ofreció
+          actualizar la app); un AAB con la estructura de bundle completa (<code>BundleConfig.pb</code>,
+          <code>base/manifest</code>, <code>base/dex</code>, <code>base/res/*</code>, <code>base/resources.pb</code>)
+          y <code>jarsigner -verify</code> → <em>jar verified</em>; <code>Run ▶</code> intacto (debug, testkey
+          <code>a40da80a…</code>); el modo sin firmar escribe <code>.unsigned</code>. También se arreglaron 5 bugs de
+          UI encontrados midiendo: el selector de formato era invisible, la etiqueta de firma mentía, <code>NEXT</code>
+          se salía de la pantalla, <code>Install</code> mataba la app (el <code>FileProvider</code> no exponía
+          <code>sketchware/signed_apk/</code>) y ofrecía instalar un APK sin firmar.</li>
+        </ul>
+        <p><img src="assets/preview-a-dialog.png" alt="El diálogo unificado Compile project con formato y modo de firma" style="width:100%;max-width:200px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)"> <img src="assets/preview-a-keystore.png" alt="El gestor de keystores mostrando el SHA-256 del certificado" style="width:100%;max-width:200px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)"> <img src="assets/preview-a-result.png" alt="El diálogo de resultado del AAB con la ruta y el certificado" style="width:100%;max-width:200px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)"></p>
+        <p><strong>Honesto:</strong> el AAB <strong>no</strong> se ha probado contra <code>bundletool</code> ni
+        Play (en esta máquina no hay <code>bundletool</code>), los modos <em>keystore file</em> y <em>testkey</em> del
+        diálogo no se ejecutaron en release (solo UI), y la conversión de proyectos de Android Studio/GitHub sigue
+        pendiente (siguiente ronda: viabilidad + MVP). Versión <strong>v7.0.14.0</strong> (versionCode 176). El detalle
+        de la ronda A está al final de <a href="preview-fix.md">docs/preview-fix.md</a>.</p>
+      </div>
+
+      <div class="item done featured">
+        <span class="when">2026-09-24 · vista previa</span>
+        <h3>Los colores que eliges ya no se escriben transparentes en el XML  <span class="pill feat">destacado</span> <span class="pill ok">arreglado</span></h3>
+        <ul class="clean">
+          <li><strong>Los colores que eliges en el editor salian transparentes — en la vista previa <em>y</em> en la app
+          compilada.</strong> Un bug <strong>heredado del Sketchware Pro original</strong>, y <strong>determinista</strong>,
+          no un caso raro: <strong>cualquier color de fondo elegido desde la paleta hexadecimal</strong> se escribia en
+          el XML como <code>#00RRGGBB</code> — alfa <strong>00, totalmente transparente</strong> — asi que la vista se
+          dibujaba sin color y la app no avisaba de nada (<em>"Preview OK"</em>). Reproducido en el <strong>flujo
+          real</strong> (editor → <code>Ox</code> → preview), no solo inyectando XML: con <code>button1</code> =
+          <code>#2196F3</code> y <code>linear1</code> = <code>#4CAF50</code> la preview real mostraba <strong>0 px
+          azules y 0 px verdes</strong>, y <strong>ese mismo XML inyectado lo reproducia identicamente</strong>; con el
+          alfa corregido paso a <strong>30.524 / 593.519 px</strong>.</li>
+          <li><strong>Causa raiz, una linea.</strong> <code>a/a/a/Ox.java</code> hacia
+          <code>int color = backgroundColor &amp; 0xffffff</code> <strong>antes</strong> de formatear, y
+          <code>formatColor</code> imprime 8 digitos cuando el alfa no es <code>0xFF</code> — asi que
+          <code>0xFF2196F3</code> quedaba en <code>0x002196F3</code> → <code>"#002196F3"</code>. La misma mascara
+          afectaba tambien a <code>backgroundTint</code>, <code>cardBackgroundColor</code> y <code>contentScrim</code>,
+          y a las rutas de texto (<code>textColor</code>, <code>textColorHint</code>).</li>
+          <li><strong>El arreglo: dejar de enmascarar el alfa en esos 4 sitios</strong> (<code>Ox.java:201, 418, 824,
+          847</code>; no se toco <code>formatColor</code>). <strong>Medido en el APK release (R8)</strong> con el flujo
+          real: azul <strong>0 → 30.398 px</strong>, verde <strong>0 → 333.317 px</strong>, texto rojo <strong>0 →
+          577 px</strong>. El XML ya lleva <code>#2196F3</code> / <code>#4CAF50</code> / <code>#F44336</code> (6
+          digitos), y el <strong>translucido</strong> <code>#802196F3</code> conserva su alfa (8 digitos,
+          <code>0x80</code> intacto, que la mascara vieja habria puesto a cero). El layout que compila el IDE
+          (<code>mysc/601/…/res/layout/main.xml</code>) lleva ya los colores correctos. <strong>Regresion exacta:</strong>
+          r8 <code>caseA</code>/<code>caseC</code> y r11 <code>caseE</code> identicos pixel a pixel (356.400 px, mismo
+          bbox). <strong>Honesto:</strong> el enlazado <code>aapt2</code> del propio IDE sigue fallando despues por un
+          problema <strong>preexistente</strong> de recursos AppCompat de ese proyecto, ajeno a estas 4 lineas.</li>
+        </ul>
+        <p><img src="assets/preview-r12-before.png" alt="La preview real antes del arreglo: el Button y el LinearLayout se dibujan sin color" style="width:100%;max-width:200px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)"> <img src="assets/preview-r12-after.png" alt="La preview real despues del arreglo: boton azul, columna verde y texto rojo" style="width:100%;max-width:200px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)"></p>
+        <p>Versión <strong>v7.0.13.0</strong> (versionCode 175). El detalle de la ronda 12 está al final de
+        <a href="preview-fix.md">docs/preview-fix.md</a>.</p>
+      </div>
+
+      <div class="item done featured">
+        <span class="when">2026-09-24 · vista previa</span>
+        <h3>Copiar el aviso completo, el permiso de almacenamiento y los colores del proyecto que define el <code>res</code> generado  <span class="pill feat">destacado</span> <span class="pill ok">arreglado</span></h3>
+        <ul class="clean">
+          <li><strong>El dialogo de avisos tiene un boton neutro "Copiar"</strong> — en la barra parcial <em>y</em> en el
+          dialogo <code>OK</code> — con el toast <em>"Aviso copiado"</em>. Lo que copia es el <strong>informe completo,
+          sin truncar</strong>: el dialogo corta cada grupo a <strong>12 lineas</strong> (<code>…y N mas</code>), el
+          copiado no — <strong>1.119</strong> caracteres con 2 recursos rotos, <strong>1.869</strong> con 20 colores
+          rotos, <strong>572</strong> en el caso de estilos/iconos. El texto es <strong>autosuficiente</strong>: la
+          linea de estado, cada grupo con su recuento, cada elemento con su motivo y su <code>buscado en:</code>, y la
+          firma final. Verificado de punta a punta pegandolo de verdad en un campo de texto.</li>
+          <li><strong>Causa uno, confirmada con prueba: el permiso de almacenamiento.</strong> Sin
+          <code>MANAGE_EXTERNAL_STORAGE</code> la app no puede leer los ficheros del proyecto y <strong>todo cae a
+          valores por defecto en silencio</strong>: el azul del proyecto pasa de <strong>373.070 px a ausente</strong>,
+          logcat muestra <code>EACCES (Permission denied)</code> y el icono desaparece tambien. Arreglado en tres
+          piezas: una linea <strong>ambar</strong> explicita en el dialogo (<code>0xFFB26A00</code>), un dialogo
+          <strong>"Permiso de almacenamiento"</strong> que abre <em>Acceso a todos los archivos</em> si falta, y una
+          <strong>relectura</strong> del proyecto al volver (verificada por log). Con el permiso concedido la
+          regresion es exacta: <strong>373.070 px</strong>, mismo bbox.</li>
+          <li><strong>Causa dos, la que mas probablemente era la tuya: <code>colors.xml</code> solo se leia de
+          <code>values/</code>.</strong> Los colores definidos en el <code>res</code> que genera el build
+          (<code>@color/colorPrimary</code>, <code>colorAccent</code>, …) salian <em>no encontrados</em>, asi que la
+          banda seguia blanca y la barra en rojo. Ahora se leen <strong>ambas</strong> ubicaciones, igual que ya se
+          hacia con <code>styles.xml</code>: <strong>359.604 px blancos → 356.400 px con su color, cero
+          rojo</strong>.</li>
+          <li><strong>Recomprobado en el APK release (R8).</strong> Los cuatro puntos se comportan <strong>igual que
+          en debug</strong>: Copiar (toast + <strong>1.627</strong> caracteres + pegado real), permiso (ambar
+          <code>0xFFB26A00</code> <strong>15.488 px</strong>, <strong>0 rojo</strong>; con el, teal
+          <strong>356.400 px</strong> y <code>Preview OK</code>), <code>@color/colorPrimary</code> con
+          <strong>356.400 px</strong> y el bbox exacto, y la regresion r8/r5 con recuentos y bboxes
+          <strong>identicos pixel a pixel</strong> (purpura 18.933, verde 11.764, azul 90.564, cian 21.428, magenta
+          18.896). <strong>Honesto:</strong> al recrear los fixtures cambio el <em>texto</em> del informe (1.627 vs
+          1.869 caracteres), y el portapapeles solo se puede verificar con un pegado real (API 34 no lo expone por
+          shell).</li>
+        </ul>
+        <p><img src="assets/preview-r11-copy.png" alt="El dialogo de avisos con el boton neutro Copiar abajo a la izquierda y OK abajo a la derecha, listando 20 recursos @color rotos" style="width:100%;max-width:200px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)"> <img src="assets/preview-r11-permission.png" alt="El dialogo de avisos con la linea ambar: no se pueden leer los ficheros del proyecto porque falta el permiso de almacenamiento" style="width:100%;max-width:200px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)"></p>
+        <p>Versión <strong>v7.0.12.0</strong> (versionCode 174). El detalle de la ronda 11 está al final de
+        <a href="preview-fix.md">docs/preview-fix.md</a>.</p>
+      </div>
+
+      <div class="item done featured">
+        <span class="when">2026-09-24 · vista previa + Flutter</span>
+        <h3>Los iconos que trae el IDE, el <code>styles.xml</code> de tu proyecto y los constructores que R8 borraba  <span class="pill feat">destacado</span> <span class="pill ok">arreglado</span></h3>
+        <ul class="clean">
+          <li><strong>Los iconos estaban dentro del APK desde el principio.</strong> El set Material del IDE vive en
+          <code>assets/icons/icon_pack.zip</code> (<strong>5.335.950 B</strong>: <strong>2.191 nombres × 5 estilos =
+          10.955 SVG</strong>, <code>svg/&lt;nombre&gt;/&lt;estilo&gt;.svg</code>), y el icono que eliges se convierte a
+          vector XML y se guarda en el <strong>almacen de imagenes del proyecto</strong>
+          <code>.sketchware/resources/images/&lt;sc_id&gt;/</code> — <em>no</em> en
+          <code>files/resource/drawable</code>. La vista previa no miraba ni lo uno ni lo otro, asi que los iconos
+          salian en <strong>rojo</strong> (<code>2 recursos no encontrados</code>). Ahora resuelve de ambos
+          <strong>y</strong> del <code>res</code> generado del build. <strong>Medido:</strong> una barra roja con
+          <strong>2 recursos no encontrados</strong> y <strong>33.087 px rojos</strong> pasa a <strong>los 2 iconos
+          dibujados, rojo=0</strong>, con una nota <strong>ambar</strong> que dice de donde sale cada uno
+          (<code>icon_miscellaneous_services_round -&gt; svg/miscellaneous_services/round.svg</code>).</li>
+          <li><strong>El <code>styles.xml</code> de tu proyecto se lee entero.</strong> El lector no reconocia las
+          etiquetas <strong>autocerradas</strong> <code>&lt;style ... /&gt;</code> — justo como el IDE genera
+          <code>AppTheme.AppBarOverlay</code>/<code>PopupOverlay</code> — asi que se perdia ese estilo <strong>y se
+          tragaba el siguiente</strong>: se leian <strong>3 de 5</strong> estilos. Ahora lee <strong>5 de 5</strong>,
+          tambien mira en <code>value/</code>, <code>values-v21</code>, <code>values-night</code> y el <code>res</code>
+          generado del build, y un estilo autocerrado sin items envuelve el contexto con la base del framework de su
+          cadena de padres. Resultado: <strong>cero avisos</strong> de estilo y el tema del proyecto se aplica de
+          verdad.</li>
+          <li><strong>La release perdia constructores de vistas.</strong> Con R8, <strong>62 clases</strong> pierden
+          <code>&lt;init&gt;(Context)</code> y varias vistas de libreria (el <code>SignInButton</code> de Google,
+          <code>FlexboxLayout</code>, <code>LottieAnimationView</code>, <code>SVGImageView</code>) pierden <strong>los
+          tres</strong>, asi que se dibujaban como contenedor aproximado. Arreglado con <strong>5 reglas
+          <code>-keepclassmembers</code> acotadas</strong> mas <strong>sustitucion de la reflexion por mapeo
+          explicito</strong>; lo no mapeado va al aviso ambar. Delta: <strong>+9.892 B</strong>. Verificado en release:
+          el boton real de Google se dibuja y los <strong>7/7 casos en claro y 7/7 en oscuro</strong> mantienen sus
+          colores (caso A <code>#123456</code> 162.773 px, <code>#EE2222</code> 111.016 px).</li>
+          <li><strong>Correccion honesta.</strong> La sospecha inicial — <em>"la reflexion no funciona en release"</em>
+          — era <strong>falsa</strong>: el aplicador por reflexion nunca llegaba a dispararse (0 coincidencias en los
+          logs), y los colores de la ronda 8 <strong>si</strong> funcionaban en release. Lo que fallaba era la
+          construccion de las vistas de libreria. El mapeo explicito elimina igualmente ese camino fragil, pero no
+          porque la reflexion estuviera rota.</li>
+          <li><strong>Toolchain de Flutter para x86_64.</strong> <code>jniLibs/x86_64/</code> trae ya
+          <code>libdartaotruntime.so</code> (5.873.176 B, el ELF real del <code>.deb</code> x86_64 de Termux, que esta
+          en <code>lib/dart-sdk/bin/</code>) y <code>libfluttergensnapshot.so</code> (5.123.768 B, compilado) con
+          <code>--arch x64c --mode product --os android</code> (Android x64 exige compressed pointers); el bloqueo de
+          ABI se sustituye por <code>abiHasAotBackend</code> (<code>arm64-v8a</code> | <code>x86_64</code>) y
+          <code>armeabi-v7a</code>/<code>x86</code> siguen avisando. Coste: <strong>+4,34 MB solo en x86_64</strong>
+          (release 112.136.131 → 116.476.809); arm64 identico. <strong>Honesto:</strong> la ejecucion real en x86_64
+          <strong>no</strong> esta verificada (no hay imagen x86_64 disponible; inviable en Apple Silicon).</li>
+        </ul>
+        <p><img src="assets/preview-r10-icons-before.png" alt="Antes: la barra roja dice Preview PARCIAL: 2 recursos no encontrados y faltan los dos iconos" style="width:100%;max-width:200px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)"> <img src="assets/preview-r10-icons-after.png" alt="Despues: los dos iconos Material se dibujan y la barra es ambar, 2 nombres heredados resueltos" style="width:100%;max-width:200px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)"> <img src="assets/preview-r10-signin.png" alt="Despues: el boton real de Google (logo G + Sign in with Google) se dibuja en la release" style="width:100%;max-width:200px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)"></p>
+        <p>Versión <strong>v7.0.11.0</strong> (versionCode 173). El detalle de la ronda 10 está al final de
+        <a href="preview-fix.md">docs/preview-fix.md</a> (y la nota del toolchain x86_64 en
+        <a href="flutter-consent.md">docs/flutter-consent.md</a>).</p>
+      </div>
+
+      <div class="item done featured">
+        <span class="when">2026-09-24 · vista previa</span>
+        <h3>Rojo significa ahora "no se puede dibujar": las referencias de <code>@style</code>/tema no resolubles son ambar con motivo, y el tema del proyecto pinta de verdad  <span class="pill feat">destacado</span> <span class="pill ok">arreglado</span></h3>
+        <ul class="clean">
+          <li><strong>El rojo mentia.</strong> Referencias que no impiden dibujar se pintaban en <strong>rojo</strong>.
+          Un <code>@style/...</code> que llegaba a <code>resolveDimen</code> respondia
+          <em>"referencia de medida no resoluble"</em>, y un <code>@dimen</code>/<code>@android:dimen</code> ausente,
+          un <code>?attr</code> de tema no resoluble o un <code>@style</code> usado como
+          <code>android:background</code> salian en rojo aunque la vista se dibuja bien con su valor por defecto.
+          Ahora <strong>el rojo se reserva a lo que de verdad impide dibujar</strong> (una imagen que no existe, una
+          clase sin reserva): toda referencia de estilo/medida/tema que no se pueda <em>aplicar</em> pasa al
+          <strong>grupo ambar</strong> <em>"No aplicado / ajustado · estilos y medidas (no impide dibujar)"</em>,
+          siempre con su motivo; el texto <em>"referencia de medida"</em> ya no existe (0 ocurrencias) y la barra
+          solo se pinta roja cuando hay recursos no encontrados.</li>
+          <li><strong>Los <code>@style/...</code> de tu proyecto se resuelven de verdad.</strong> Se leen de
+          <code>files/resource/values/styles.xml</code> (<code>parent</code> explicito + herencia implicita por
+          puntos + encadenado hasta 6 niveles; API nueva
+          <code>resolveStyle()</code>/<code>isStyleReference()</code>, con respaldo en estilos de
+          app/material/appcompat/android), asi que <code>@style/AppTheme.AppBarOverlay</code> y
+          <code>@style/AppTheme.PopupOverlay</code> dejan de salir como no resueltos y un estilo inexistente sale
+          ambar, <strong>nunca rojo</strong>.</li>
+          <li><strong>El tema se aplica, no solo se resuelve.</strong> <code>android:theme</code> crea ahora la vista
+          <em>dentro</em> del tema (<code>ContextThemeWrapper</code> en
+          <code>createRealView(bean, contextoDelPadre)</code>, los hijos heredan el contexto del padre): un estilo
+          <strong>con resId</strong> es un tema real, y un estilo <strong>solo del proyecto</strong> (sin resId, no
+          esta compilado en el APK del editor) usa una base del framework mas sus items mapeados a la vista — y
+          desaparece el falso ambar <em>"un tema no se aplica"</em>.
+          <code>app:tabTextAppearance</code> se aplica a los <code>TextView</code> de las pestañas (incluidas las 3
+          de ejemplo): <code>textSize</code>, <code>textColor</code> (color y <code>ColorStateList</code>),
+          <code>textStyle</code>, <code>textAllCaps</code>, <code>fontFamily</code>, con el estilo del framework
+          leido del tema y guarda de tipo.</li>
+          <li><strong>Medido.</strong> Antes la barra decia <strong>en rojo</strong>
+          <code>Preview PARCIAL: 1 recurso no encontrado · 2 atributos no aplicados</code>; despues, <strong>ningun
+          bloque rojo</strong> y barra ambar. Un <code>AppBarLayout</code> con
+          <code>theme="@style/AppTheme.AppBarOverlay"</code> pasa de estar <strong>sin fondo</strong> a tomar el
+          color del tema <code>#FF112233</code>; las pestañas con un <code>tabTextAppearance</code> del proyecto
+          salen en <strong>magenta 24sp negrita</strong> (9 ajustes);
+          <code>@android:style/TextAppearance.Widget.TabWidget</code> se resuelve por resId 16973901 (3 ajustes) —
+          <strong>red=0 amber=0</strong> en las 6 capturas.</li>
+          <li><strong>Regresion y honestidad.</strong> Las rondas 1-7 (15 XML) mantienen los 11
+          <code>Preview OK</code> y <code>caseR4_mixed</code> baja de 4 a 3 recursos rojos (uno pasa a ambar); las
+          rondas 5-8 (23 XML) no pierden ningun <code>Preview OK</code>. <strong>Honesto:</strong> los estilos del
+          proyecto <strong>no tienen resId</strong> (no estan compilados en el APK del editor), asi que su tema se
+          <em>emula</em> (base del framework + items mapeados); las referencias <code>?attr/</code> del framework
+          en <code>tabTextAppearance</code> se dejan al tema; <code>popupTheme</code> y
+          <code>actionBarTheme</code> siguen sin aplicarse.</li>
+        </ul>
+        <p><img src="assets/preview-r9-before.png" alt="Antes: la barra roja dice Preview PARCIAL: 1 recurso no encontrado · 2 atributos no aplicados" style="width:100%;max-width:200px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)"> <img src="assets/preview-r9-after.png" alt="Despues: la barra dice Preview OK y el AppBarLayout toma el color azul marino del tema #FF112233" style="width:100%;max-width:200px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)"></p>
+        <p>Versión <strong>v7.0.10.5</strong> (versionCode 172). El detalle de la ronda 9 está al final de
+        <a href="preview-fix.md">docs/preview-fix.md</a>.</p>
+      </div>
+
+      <div class="item done featured">
+        <span class="when">2026-09-24 · vista previa</span>
+        <h3>Los colores que "no se ven en ninguno": una lista blanca de 19 atributos los tiraba  <span class="pill feat">destacado</span> <span class="pill ok">arreglado</span></h3>
+        <ul class="clean">
+          <li><strong>La queja:</strong> <em>"los colores no se ven en ninguno"</em>. La vista previa resolvía los
+          atributos <code>app:*</code>/<code>android:*</code> con un <code>switch</code> fijo de
+          <strong>19 nombres</strong> y <strong>descartaba el resto en silencio</strong> — ni aviso ni log — mientras
+          el editor de diseño (<code>ViewPane</code>) sí los aplicaba con handlers propios. El motor bueno era el del
+          editor y la vista previa usaba casi siempre el otro camino (<code>tryInflateRealLayout</code>), así que
+          ningún color configurado en un widget llegaba a verse.</li>
+          <li><strong>Appliers compartidos + aplicador genérico + reflexión.</strong> Los appliers de
+          <code>TabLayout</code>, <code>CircleImageView</code>, <code>MaterialButton</code> y <code>CardView</code>
+          se extraen del editor de diseño a un único helper compartido
+          (<code>pro.sketchware.utility.WidgetInjectApplier</code>) para que los dos motores apliquen lo mismo, y el
+          resto pasa por un <strong>aplicador genérico por tipo de vista</strong> (TextView, ImageView,
+          Progress/Seek/Rating, CompoundButton, List/Grid/Spinner, BottomNavigationView, TextInputLayout,
+          Calendar/Date/TimePicker, SearchView, LinearLayout…) con <strong>último recurso por reflexión</strong>
+          (<code>app:loQueSea</code> → <code>setLoQueSea</code>). Lo que no se puede aplicar sale ahora en la
+          <strong>barra ámbar con su motivo</strong> — nunca más en silencio.</li>
+          <li><strong>Encontrado por el camino.</strong> Soporte de <code>@dimen</code> (nuevo
+          <code>resolveDimen</code>), <code>@drawable</code>/<code>@color</code> en esos atributos,
+          <code>&lt;size&gt;</code> de un shape con solo alto (el divider invisible),
+          <code>textColor</code>/<code>textSize</code> de <code>AnalogClock</code>/<code>DigitalClock</code> (el
+          parser los tiraba), un <code>TabLayout</code> sin pestañas (se añaden 3 de ejemplo, exactamente como hace
+          el editor) y <code>ProgressBar</code> horizontal cuando el XML lo pide.</li>
+          <li><strong>Medido (PIL/numpy, 7 casos, uno por familia, en claro y en oscuro), antes → después:</strong>
+          stroke del card <strong>0 → 19.988 px</strong>; indicador de tab <strong>0 → 1.496</strong>; texto
+          seleccionado del tab <strong>0 → 689</strong>; borde del círculo <strong>0 → 11.924</strong>; fondo del
+          círculo <strong>0 → 90.660</strong>; <code>progressTint</code> <strong>0 → 18.907</strong>; un
+          <code>divider</code> con <code>@drawable</code> del proyecto <strong>0 → 11.880</strong>;
+          <code>DigitalClock</code> <code>#CC0000</code> <strong>0 → 3.060</strong> — <strong>7/7 casos en claro y
+          7/7 en oscuro</strong>. La barra ámbar dice <code>Preview OK</code> sin atributos pendientes en los casos
+          A/B/C/D/G, en E lista solo los cinco atributos de librería que una clase ausente no puede recibir (con el
+          motivo) y en F no queda ningún atributo pendiente.</li>
+          <li><strong>Regresión y honestidad.</strong> Las rondas 1-7 salen <strong>17/17 iguales</strong> al resumen
+          del baseline (incluidos el <code>CircleImageView</code> de la ronda 7 y las diez vistas de la ronda 6), y
+          de paso se corrige un <strong>aviso falso de <code>fontFamily</code></strong> que desviaba dos casos; el
+          editor de diseño queda intacto (<code>ViewPane.java</code> sin tocar, <code>DesignActivity</code> abre sin
+          crash). <strong>Pendientes honestos:</strong> no se ha probado con <em>tu</em> proyecto ni tu APK; el
+          "antes" es la release previa y el "después" el debug de esta ronda; los widgets cuya clase no está en el
+          editor (Library/Google/ads/map/lottie) conservan fondo y tamaño pero no sus atributos propios (se listan);
+          y no se han medido grosores ni radios por píxel, solo colores.</li>
+        </ul>
+        <p><img src="assets/preview-r8-before.png" alt="Antes: el CircleImageView sin borde ni fondo de círculo y el ProgressBar como círculo indeterminado" style="width:100%;max-width:200px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)"> <img src="assets/preview-r8-after.png" alt="Después: el CircleImageView con borde verde y fondo azul y el ProgressBar como barra horizontal magenta" style="width:100%;max-width:200px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)"></p>
+        <p>Versión <strong>v7.0.10.4</strong> (versionCode 171). El detalle de la ronda 8 está al final de
+        <a href="preview-fix.md">docs/preview-fix.md</a>.</p>
+      </div>
+      <div class="item done featured">
+        <span class="when">2026-09-24 · vista previa</span>
+        <h3>El <code>CircleImageView</code> que mataba la vista previa ya no puede matar la app que compilas  <span class="pill feat">destacado</span> <span class="pill ok">arreglado</span></h3>
+        <ul class="clean">
+          <li><strong>El aviso.</strong> <code>CircleImageView: scaleType CENTER no admitido</code>, con
+          <code>java.lang.IllegalArgumentException: ScaleType FIT_CENTER not supported</code> y la barra diciendo
+          <code>Preview PARCIAL: 1 atributo no aplicado</code>. La ronda 6 lo capturaba para que no abortara toda la
+          vista previa; la ronda 7 lo arregla de raíz — en el generador y en los proyectos ya existentes, no solo en la
+          vista previa.</li>
+          <li><strong>Tres causas a la vez.</strong> (1) <strong>Mayúsculas:</strong> el bean guarda
+          <code>scaleType="CENTER"</code> — el nombre del enum, en mayúsculas — mientras el XML usa
+          <code>center</code>/<code>centerCrop</code>, y el traductor de la vista previa era <strong>sensible a
+          mayúsculas</strong>: <code>"CENTER"</code> no coincidía con ningún <code>case</code> y caía al valor por
+          defecto <code>FIT_CENTER</code>, por eso la excepción dice <code>FIT_CENTER</code> y no <code>CENTER</code>.
+          (2) <strong>El generador:</strong> para el <code>CircleImageView</code> el XML <strong>no llevaba
+          <code>android:scaleType</code></strong> (el filtro de <code>Ox</code> descarta el atributo en todo widget cuyo
+          nombre de clase lleve punto), pero un bean antiguo o importado con el nombre corto sí pasa ese filtro y
+          <code>Ox</code> escribía <code>android:scaleType="center"</code> — justo el valor que <strong>peta también en
+          la app compilada</strong>, no solo en la vista previa. (3) <strong>La librería es más estricta de lo
+          esperado:</strong> <code>de.hdodenhof:circleimageview:3.1.0</code> admite <strong>solo
+          <code>CENTER_CROP</code></strong> — comprobado con <code>dexdump</code> sobre el APK release, el método compara
+          contra un único campo estático y <code>CENTER_INSIDE</code> también lanza excepción — así que el arreglo
+          <strong>no</strong> conserva <code>CENTER_INSIDE</code>.</li>
+          <li><strong>Cinco cambios.</strong> (1) El generador escribe siempre <code>centerCrop</code> para un
+          <code>CircleImageView</code> <strong>y sanea un <code>scaleType</code> no soportado escrito a mano en
+          <code>inject</code></strong>, dejando igual el resto de widgets de imagen. (2) Una clase nueva y pura,
+          <code>ScaleTypeCompat</code>, concentra la lógica (XML ↔ enum, valor soportado, ajuste, saneado) y está
+          probada en JVM: <strong>60 comprobaciones, 0 fallos</strong>, idempotente. (3) Los proyectos ya existentes se
+          normalizan en <strong>cuatro</strong> puntos — compilar/generar, leer el XML, abrir el editor de diseño y
+          previsualizar — así un <code>CENTER</code>/<code>FIT_CENTER</code>/<code>CENTER_INSIDE</code> viejo acaba
+          corregido sin tocar ningún otro widget. (4) La vista previa aplica el respaldo soportado y el aviso ámbar ya
+          <strong>dice el valor</strong>:
+          <code>scaleType MATRIX -&gt; ajustado a CENTER_CROP (el widget solo admite CENTER_CROP)</code>. (5) El
+          selector de propiedades ofrece para un <code>CircleImageView</code> <strong>solo <code>CENTER_CROP</code></strong>
+          (antes ofrecía los siete valores).</li>
+          <li><strong>Verificado.</strong> El XML generado del proyecto real lleva <code>android:scaleType="centerCrop"</code>
+          y el mismo layout cierra con <code>Preview OK · vistas: 5</code> sin ningún aviso, mientras el
+          <code>ImageView</code> normal conserva <code>center</code>; en el emulador RV_API34 con el release R8 el
+          círculo se dibuja con <strong>fracción de área 0.768</strong> (≈ π/4; un cuadrado daría 1.000) y las esquinas
+          con el fondo del padre; la regresión de las rondas 1-6 sale idéntica (9 casos más los cuatro
+          <code>caseR6_*</code>).</li>
+          <li><strong>Una diferencia intencionada:</strong> las <code>ImageView</code> normales con <code>CENTER</code>
+          ya no se dibujan estiradas en la vista previa (antes caía a <code>FIT_CENTER</code>) — ahora coinciden con la
+          app. <strong>Pendientes honestos:</strong> no se ha probado la app que compila el usuario ni una compilación
+          completa on-device, no se ha recorrido a mano el diálogo del selector para un <code>CircleImageView</code>, y
+          la evidencia sale del proyecto de pruebas 601.</li>
+        </ul>
+        <p><img src="assets/preview-r7-circle.png" alt="Después: el CircleImageView se dibuja como círculo llenando su caja y la barra cierra con Preview OK · vistas: 4" style="width:100%;max-width:200px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)"></p>
+        <p>Versión <strong>v7.0.10.3</strong> (versionCode 170). El detalle de la ronda 7 está al final de
+        <a href="preview-fix.md">docs/preview-fix.md</a>.</p>
+      </div>
+
+      <div class="item done featured">
+        <span class="when">2026-09-24 · vista previa</span>
+        <h3>Las diez vistas que el editor no podía instanciar vuelven a funcionar, y una vista que aún no se pueda crear ya no es un hueco rojo mudo  <span class="pill feat">destacado</span> <span class="pill ok">arreglado</span></h3>
+        <ul class="clean">
+          <li><strong>La barra decía <code>Preview PARCIAL: 10 vistas no instanciables</code>.</strong>
+          <code>CoordinatorLayout</code>, <code>AppBarLayout</code>, <code>CollapsingToolbarLayout</code>,
+          <code>MaterialToolbar</code>, <code>MaterialButton</code>, <code>CircleImageView</code>,
+          <code>SwipeRefreshLayout</code>, <code>TabLayout</code>, <code>BottomNavigationView</code> y
+          <code>CardView</code> salían como diez cajas rojas idénticas (“no disponible en el editor”, 58.716 px de
+          rojo) y la barra de estado también estaba en rojo.</li>
+          <li><strong>Las clases estaban; el constructor no.</strong> Las diez están en el dex de
+          <strong>release</strong> con el nombre intacto (<code>mapping.txt</code> mapea cada una a sí misma), y lo que
+          R8 había borrado era el constructor que la vista previa pide <strong>por reflexión</strong>:
+          <code>&lt;init&gt;(Context)</code> había desaparecido en <strong>9 de las 10</strong> — solo sobrevivía el de
+          inflado <code>&lt;init&gt;(Context, AttributeSet)</code>, porque lo piden las propias librerías — y el logcat
+          lo dice tal cual:
+          <code>java.lang.NoSuchMethodException: androidx.coordinatorlayout.widget.CoordinatorLayout.&lt;init&gt; [class android.content.Context]</code>
+          (×9). En la décima, <code>CircleImageView</code>, la optimización de jerarquía hacía que el constructor de un
+          argumento lanzara <code>ClassCastException: CircleImageView cannot be cast to …ItemCircleImageView</code>. En
+          debug nunca se vio: sin R8 las diez conservan sus tres constructores, por eso el fallo solo aparece en
+          releases.</li>
+          <li><strong>Arreglo 1 — la vista previa deja de depender de un constructor concreto.</strong>
+          <code>InvokeUtil</code> prueba <code>(Context)</code> → <code>(Context, AttributeSet)</code> →
+          <code>(Context, AttributeSet, int)</code> y devuelve el <strong>motivo exacto</strong> en vez de un
+          <code>null</code> mudo (y deja trazado el log cuando cae al constructor de inflado), y tres reglas
+          <code>-keepclassmembers</code> acotadas en <code>app/proguard-rules.pro</code> — <code>androidx.**</code>,
+          <code>com.google.android.material.**</code> y <code>de.hdodenhof.**</code>, siempre
+          <code>extends android.view.View</code> — devuelven el constructor de un argumento. Medido en release:
+          <strong>10/10 instanciables</strong> (antes 0/10) por <strong>+49,7 KB, +0,04 %</strong> de APK, y
+          <strong>debug y release ya se comportan igual</strong>.</li>
+          <li><strong>Arreglo 2 — degradación útil.</strong> Cuando una clase de verdad no está en el APK del editor ya
+          no hay hueco rojo mudo: un <code>FrameLayout</code> genérico conserva el fondo, el padding y el tamaño
+          declarados y <strong>dibuja los hijos</strong> (antes, al no ser <code>ViewGroup</code>, se perdían) —
+          medido: hijos <strong>0 px → 1.418 + 1.915 px</strong> — con un <strong>borde ámbar</strong> fino y una
+          pastilla <code>≈ Clase</code> en vez de rojo de alarma, y el motivo en el diálogo de detalle. Arreglado
+          también: un <strong>solo</strong> atributo no admitido abortaba toda la vista previa nativa; ahora se captura
+          y se anota en ámbar (“la vista SI se ha dibujado”).</li>
+          <li><strong>Regresión de las rondas 1-5 bien, en release:</strong> HTML/WebView idéntico, colores de texto
+          4.665/6.025 px, fondos de proyecto/tema 356.400 px, imágenes 10/10, <code>MaterialButton</code>+WebView
+          698.570 px, y los casos vivos que decían “no instanciable” ahora dicen “aproximada” con los mismos
+          recuentos.</li>
+          <li><strong>Pendiente honesto:</strong> el generador de layouts escribe <code>android:scaleType="center"</code>
+          por defecto para cualquier imagen y <code>CircleImageView</code> solo admite <code>CENTER_CROP</code>/
+          <code>CENTER_INSIDE</code>, así que ese layout puede seguir fallando en la app que compile el usuario — es
+          cosa del generador, no de la vista previa, y aquí no se ha tocado.</li>
+        </ul>
+        <p>
+          <img src="assets/preview-r6-before.png" alt="Antes: las diez clases salen como cajas rojas idénticas diciendo no disponible en el editor, con la barra en rojo" style="width:100%;max-width:200px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)">
+          <img src="assets/preview-r6-after.png" alt="Después: los diez widgets reales se dibujan con sus hijos, incluidos MaterialButton, CircleImageView y CardView, y la barra es ámbar" style="width:100%;max-width:200px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)">
+        </p>
+        <p>Versión <strong>v7.0.10.2</strong> (versionCode 169). El detalle de la ronda 6 está al final de
+        <a href="preview-fix.md">docs/preview-fix.md</a>.</p>
+      </div>
+
+      <div class="item done featured">
+        <span class="when">2026-09-24 · Flutter + vista previa</span>
+        <h3>El toolchain ya no dice "no instalado", y los nombres heredados de iconos  <span class="pill feat">destacado</span> <span class="pill ok">arreglado</span></h3>
+        <ul class="clean">
+          <li><strong>El "no instalado" era nuestra comprobación, no tu instalación.</strong> El instalador
+          verificaba el SDK de Dart <strong>ejecutando</strong>
+          <code>&lt;filesDir&gt;/flutter-toolchain/dart/bin/dart --version</code>, y SELinux prohíbe ejecutar un ELF que
+          vive en el directorio de datos de la app
+          (<code>execute_no_trans</code>, <code>error=13</code>, <code>untrusted_app</code>). La sonda devolvía
+          <code>null</code>, la instalación abortaba <strong>antes de bajar los artefactos del engine</strong> y la UI
+          acababa en <code>Toolchain de Flutter no instalado</code> después de 91 MB — un bug de nuestra
+          comprobación, con los datos del SDK ya en disco.</li>
+          <li><strong>Ahora "instalado" es un criterio de datos.</strong> Lo deciden el marcador
+          <code>installed.properties</code>, los snapshots AOT <code>gen_kernel_aot.dart.snapshot</code> y
+          <code>dartdev_aot.dart.snapshot</code> y <code>lib/_internal/vm_platform.dill</code>; un
+          <code>bin/dart</code> que no arranca ya no puede convertir una extracción correcta en "no instalado".
+          "Puede compilar" añade una sonda de <strong>ejecución real</strong> lanzada desde el directorio de
+          librerías nativas (<code>nativeLibraryDir/libdartaotruntime.so</code>), así que <code>bin/dart</code>
+          no se vuelve a ejecutar y todos los mensajes dicen <strong>la pieza, la ruta y la causa</strong>, además de
+          un estado intermedio honesto (<code>SDK Dart … extraido … pero NO listo para compilar</code>) en vez de culpar
+          a W^X.</li>
+          <li><strong>Un segundo bug, pre-existente, arreglado.</strong> Las dependencias de pub se extraían con el
+          prefijo <code>&lt;paquete&gt;-&lt;version&gt;/</code> que los tarballs de pub.dev <strong>no</strong> llevan,
+          así que se escribían 0 ficheros y la instalación moría con <em>El paquete characters 1.4.1 no se
+          extrajo bien</em>; ahora reintenta sin prefijo. El diálogo de consentimiento además avisa del espacio
+          real en disco: la descarga son ~307 MB, pero al extraerlo el toolchain ocupa ~800 MB.</li>
+          <li><strong>Verificado en un emulador arm64 API 34:</strong> la instalación completa acaba en
+          <code>Toolchain Flutter: instalado (Dart 3.13.4) · 813.7 MB</code> y el log del instalador muestra la app
+          ejecutando <code>nativeLibraryDir/lib/arm64/libdartaotruntime.so</code> dentro de su propio proceso.
+          <strong>Honesto:</strong> la compilación completa (pub get + build) dentro de la app no se pudo automatizar
+          en el emulador y no se afirma; lo que sí está probado es que el binario empaquetado se ejecuta en el
+          proceso de la app.</li>
+          <li><strong>Nombres heredados de iconos.</strong> <code>ic_tune_white</code> no existe en <strong>ninguna</strong>
+          fuente de este IDE — se volcaron 2.382 drawables y el equivalente actual es
+          <code>ic_tune_24</code>/<code>ic_mtrl_tune</code> —, así que la vista previa ahora resuelve esos nombres
+          viejos como <strong>último recurso</strong>, solo después de proyecto, assets, librerías e IDE,
+          normalizando prefijos (<code>ic_</code>, <code>img_</code>, <code>icon_</code>) y sufijos de color/tamaño;
+          si hay coincidencia <strong>única</strong> la usa y si hay varias lo considera ambiguo y sigue en rojo. Y
+          <strong>nada en silencio</strong>: grupo propio en el diálogo de detalle
+          (<code>Nombre heredado resuelto -&gt; @drawable/ic_tune_white -&gt; @drawable/ic_tune_24</code>), una
+          <strong>barra ámbar</strong> informativa cuando no hay fallos reales, y log.</li>
+          <li><strong>Medido:</strong> el caso real pasa de <strong>2 bloques rojos (2.080 px) a 1 (1.040 px)</strong> y la
+          barra dice <code>1 recurso no encontrado · 1 nombre heredado resuelto</code>; el detalle agrupado de la ronda
+          4 y todos los casos anteriores de la vista previa siguen bien. <strong>Pendiente honesto:</strong> cubre los
+          nombres cuyo concepto sigue existiendo (~19/44 de las familias probadas); typos, mipmaps y conceptos sin
+          icono actual siguen en rojo.</li>
+        </ul>
+        <p>
+          <img src="assets/flutter-toolchain-installed.png" alt="Ajustes del proyecto: la tarjeta Flutter (Dart) con Toolchain Flutter: instalado (Dart 3.13.4) · 813.7 MB" style="width:100%;max-width:200px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)">
+          <img src="assets/preview-r5-before.png" alt="Antes: ic_tune_white y un nombre inexistente salen con marcador rojo, 2 recursos no encontrados" style="width:100%;max-width:200px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)">
+          <img src="assets/preview-r5-after.png" alt="Después: ic_tune_white dibuja el icono tune del IDE y solo queda un marcador rojo" style="width:100%;max-width:200px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)">
+        </p>
+        <p>Versión <strong>v7.0.10.1</strong> (versionCode 168). El detalle de la ronda 5 está al final de
+        <a href="preview-fix.md">docs/preview-fix.md</a>; el arreglo del estado/instalación del toolchain, en
+        <a href="flutter-consent.md">docs/flutter-consent.md</a>.</p>
+      </div>
+
+      <div class="item done featured">
+        <span class="when">2026-09-24 · Flutter + vista previa</span>
+        <h3>La descarga de Dart que no encontrabas, y la ronda 4 de la vista previa  <span class="pill feat">destacado</span> <span class="pill ok">arreglado</span></h3>
+        <ul class="clean">
+          <li><strong>El toolchain ya no está escondido.</strong> <code>FLUTTER_EXPERIMENTAL_ENABLE</code> ahora viene
+          <strong>activado por defecto</strong> (quien ya lo haya cambiado conserva su valor), una <strong>tarjeta
+          "Flutter (Dart)"</strong> en los ajustes del proyecto muestra el estado real
+          (<code>Toolchain Flutter: no instalado (~307.2 MB)</code> o <code>instalado (Dart &lt;v&gt;) · &lt;N MB&gt;</code>)
+          y abre el diálogo de estado/descarga/borrado, y el <strong>drawer</strong> de la pantalla de diseño tiene un
+          ítem nuevo (<code>Flutter: estado del toolchain</code>) que abre ese mismo diálogo. Si el flag está apagado,
+          las dos entradas siguen visibles y explican cómo activarlo, con un botón que abre Feature flags — nada
+          desaparece en silencio.</li>
+          <li><strong>El "32" eran vistas dibujadas, no rotas.</strong> El antiguo
+          <code>Preview PARCIAL · vistas: 32 · no disponibles: @drawable/ic_tune_white</code> se leía como "32 vistas
+          rotas" cuando las 32 eran las vistas que <strong>sí</strong> se dibujaron; ahora el aviso es un resumen
+          corto y agrupado (<code>Preview PARCIAL: N recursos no encontrados · M vistas no instanciables</code>) con un
+          <strong>diálogo de detalle</strong> al pulsar la barra — grupos por causa, recuento, motivo y dónde se buscó,
+          tope de 12 por grupo — y el detalle completo en logcat.</li>
+          <li><strong>El fallo real: no se miraban las librerías del proyecto.</strong> La vista previa ignoraba los
+          AAR locales que descomprime <code>DependencyResolver</code>/<code>ManageLocalLibrary</code> y las librerías
+          integradas ya extraídas, que el compilador <em>sí</em> enlaza con <code>aapt2</code>. Ahora las indexa:
+          medido con un fixture de librería local, <code>@drawable/ic_tune_white</code> pasa de marcador rojo
+          (2.076 px) a icono dibujado (6.174 px) y el caso pasa de PARCIAL a <code>Preview OK · vistas: 32</code>. Las
+          fuentes rotas ya no cuentan como vistas y la barra ya no queda tapada por la barra de navegación.</li>
+          <li><strong>Aclaración honesta:</strong> <code>ic_tune_white</code> no existe en <strong>ninguna
+          fuente</strong> de este IDE — el APK trae <code>ic_tune_24</code>/<code>ic_mtrl_tune</code> y era un nombre
+          heredado de Sketchware —, así que ese nombre concreto no se puede dibujar y ahora se dice claro, sin marcar
+          la vista entera. Regresión bien: <code>colorPrimary</code>, fondos, estilos, imágenes/vectores/gif,
+          <code>MaterialButton</code>+WebView y un layout real.</li>
+          <li><strong>Pendiente honesto:</strong> verificado en un emulador arm64 API 34 con <code>uiautomator</code> y
+          capturas y sin descargar nada; la línea <em>instalado</em> no llegó a verse renderizada (no había toolchain
+          y no se descargaron los 307 MB).</li>
+        </ul>
+        <p>
+          <img src="assets/flutter-where.png" alt="Ajustes del proyecto: la tarjeta Flutter (Dart) con Toolchain Flutter: no instalado (~307.2 MB)" style="width:100%;max-width:200px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)">
+          <img src="assets/preview-r4-before.png" alt="Antes: los drawables de la librería salen con marcador rojo y la barra enumera todos los nombres" style="width:100%;max-width:200px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)">
+          <img src="assets/preview-r4-after.png" alt="Después: el drawable de la librería se dibuja y la barra es un resumen corto y agrupado" style="width:100%;max-width:200px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)">
+        </p>
+        <p>Versión <strong>v7.0.10.0</strong> (versionCode 167). El detalle de la ronda 4 está al final de
+        <a href="preview-fix.md">docs/preview-fix.md</a>; dónde encontrar el toolchain de Dart, en
+        <a href="flutter-consent.md">docs/flutter-consent.md</a>.</p>
+      </div>
+
+      <div class="item done featured">
+        <span class="when">2026-09-23 · arreglo</span>
+        <h3>Vista previa ronda 3: color de texto, estilos, lineales e imágenes  <span class="pill feat">destacado</span> <span class="pill ok">arreglado</span></h3>
+        <ul class="clean">
+          <li><strong>Color de texto desde la paleta Material.</strong> El selector del editor guarda
+          <code>"?" + attr</code> (p. ej. <code>?colorPrimary</code>) y la vista previa solo entendía
+          <code>?attr/...</code>, así que el texto caía al color por defecto del tema. Ahora se resuelve cualquier
+          expresión que empiece por <code>?</code> — medido <code>(68,71,79)</code> → <code>(68,94,145)</code>.</li>
+          <li><strong>Los lineales se pintaban blancos.</strong> El mismo fallo de resolución, pero el respaldo era el
+          marcador blanco opaco <code>0xFFFFFFFF</code> ("pendiente") del propio IDE, así que un fondo
+          <code>?colorPrimary</code> salía blanco — <code>(255,255,255)</code> → <code>(68,94,145)</code>. La vista
+          previa ya no cae a ese color literal cuando el recurso no se pudo resolver.</li>
+          <li><strong>Estilos de texto.</strong> Solo se aplicaba negrita; ahora también cursiva, negrita+cursiva,
+          monoespaciada y las fuentes TTF del proyecto (<code>@font/...</code>), y una fuente inexistente da aviso en
+          vez de silencio.</li>
+          <li><strong>Imágenes.</strong> Solo se buscaba <code>drawable/&lt;n&gt;.{xml,png,jpg}</code> y un fallo era un
+          hueco mudo; ahora también resuelven webp/jpeg/gif/bmp, carpetas de densidad y subcarpetas,
+          <code>files/assets</code>, <code>app:srcCompat</code>, los <strong>vectores</strong> (dibujados con el
+          <code>PathParser</code> propio de la vista previa) y la imagen por defecto del IDE, y lo irresoluble muestra
+          un <strong>marcador rojo</strong> y el motivo en la barra de estado.</li>
+          <li><strong>Encontrado por el camino.</strong> Los atributos internos se comparaban con el prefijo
+          <code>android:</code> contra nombres locales, así que <strong>no coincidían nunca</strong>:
+          <code>fontFamily</code>, <code>srcCompat</code>, <code>alpha</code>, <code>gravity</code>, paddings… ya
+          funcionan. Regresión comprobada: un proyecto real en claro y oscuro, HTML/WebView, <code>@color/</code> del
+          proyecto y <code>MaterialButton</code> siguen bien.</li>
+          <li><strong>Pendiente honesto:</strong> selector/ripple/layer-list se aproximan con su última forma, los
+          vectores con transformaciones de grupo no se soportan, los <code>.9.png</code> van sin parches, los
+          <code>?atributo</code> se resuelven con el tema del IDE (no el del proyecto) y nada está probado en móvil
+          físico.</li>
+        </ul>
+        <p>
+          <img src="assets/preview-r3-before.png" alt="Antes: solo se ven dos de las ocho imágenes" style="width:100%;max-width:200px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)">
+          <img src="assets/preview-r3-after.png" alt="Después: se ven las ocho imágenes" style="width:100%;max-width:200px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)">
+        </p>
+        <p>Versión <strong>v7.0.9.0</strong> (versionCode 166). El detalle de la ronda 3 está al final de
+        <a href="preview-fix.md">docs/preview-fix.md</a>.</p>
+      </div>
+
+      <div class="item done featured">
+        <span class="when">2026-09-23 · Flutter (experimental)</span>
+        <h3>Toolchain de Dart: descarga visible y decidida por ti  <span class="pill feat">destacado</span> <span class="pill ok">arreglado</span></h3>
+        <ul class="clean">
+          <li><strong>Se acabaron las descargas silenciosas.</strong> <code>ensureInstalled</code> — la que usan todos
+          los caminos de build — ya no toca la red: solo deja el mensaje para instalarlo desde el menú. Solo la
+          variante nueva <code>allowDownload = true</code>, tras el consentimiento, descarga.</li>
+          <li><strong>El diálogo</strong> (menú → Flutter: estado del toolchain) muestra el estado, los componentes que
+          faltan <strong>con su tamaño</strong>, <code>Descarga necesaria: ~307.2 MB</code>, aviso de Wi-Fi, dónde se
+          guarda (<code>/data/user/0/pro.sketchware/files/flutter-toolchain</code>) y que después funciona sin
+          conexión, con <strong>Descargar ahora</strong> / <strong>Borrar toolchain (liberar X MB, con
+          confirmación)</strong> / <strong>Cancelar</strong>.</li>
+          <li><strong>Compilar y ejecutar</strong> pide el mismo consentimiento y, al cancelar, aborta con un mensaje
+          claro y sin escribir nada en disco. La información del proyecto muestra si el toolchain está instalado, lo
+          que falta y el espacio ocupado.</li>
+          <li><strong>Honesto:</strong> la descarga real de los 307 MB <strong>no</strong> se ejecutó en la prueba (era
+          opcional); el diálogo, el aborto del build y el borrado (con 5 MB simulados) se verificaron en un emulador
+          con <code>uiautomator</code> y capturas.</li>
+        </ul>
+        <p><img src="assets/flutter-consent.png" alt="Diálogo de consentimiento: estado, componentes que faltan con su tamaño, ~307.2 MB necesarios, aviso de Wi-Fi, ruta de guardado y los botones Descargar ahora / Borrar toolchain / Cancelar" style="width:100%;max-width:200px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)"></p>
+        <p>Versión <strong>v7.0.9.0</strong> (versionCode 166). Todo el detalle:
+        <a href="flutter-consent.md">docs/flutter-consent.md</a>.</p>
+      </div>
+
+      <div class="item done featured">
+        <span class="when">2026-09-23 · arreglo</span>
+        <h3>Vista previa: colores del proyecto, arranque en frío y extra <code>xml</code>  <span class="pill feat">destacado</span> <span class="pill ok">arreglado</span></h3>
+        <ul class="clean">
+          <li><strong>Los recursos de color del proyecto ya se resuelven.</strong> Un fondo escrito como
+          <code>@color/...</code> se guardaba como el marcador <code>0xFFFFFFFF</code> ("pendiente") del parser y la
+          vista previa lo pintaba <strong>blanco</strong>; ahora se resuelven los <code>@color/...</code> y
+          <code>?attr/...</code> del proyecto — verificado con azul puro, <code>(0,0,255)</code>.</li>
+          <li><strong>El arranque en frío ya no crashea.</strong> Abrir la vista previa sin pasar por el editor de diseño
+          moría con un <code>NullPointerException</code> — <code>ColorsEditorManager</code> lee el
+          <code>DesignActivity.sc_id</code> global, que es <code>null</code> en un proceso nuevo — y dejaba una pantalla
+          muerta sin mensaje. Ahora se fija el proyecto antes y un <code>try/catch</code> muestra el error en pantalla.</li>
+          <li><strong>Se honra el extra <code>xml</code>.</strong> Abrir la vista previa desde el editor de XML de vistas
+          muestra exactamente lo que estás editando, sin guardar.</li>
+          <li><strong>Verificado pixel a pixel</strong> en un emulador arm64 API 34: raíz magenta <code>(255,0,255)</code>,
+          azul del color del proyecto <code>(0,0,255)</code>, un <code>MaterialButton</code> visible, HTML/WebView
+          intacto y texto por defecto de <code>TextView</code>/<code>Button</code> legible en ambos temas —
+          <code>(68,71,79)</code> sobre <code>(250,249,253)</code> en claro, <code>(196,198,208)</code> sobre
+          <code>(18,19,22)</code> en oscuro.</li>
+          <li><strong>Pendiente honesto:</strong> Material más allá de <code>MaterialButton</code>, proyectos con
+          Material3, temas personalizados del proyecto, móvil físico y una regresión formal del editor de diseño.</li>
+        </ul>
+        <p><img src="assets/preview-colors.png" alt="Vista previa en claro: raíz magenta, caja azul del color del proyecto, MaterialButton, HTML/WebView y texto por defecto legible" style="width:100%;max-width:200px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)"></p>
+        <p>Versión <strong>v7.0.8.3</strong> (versionCode 165). El detalle de la ronda 2 está al final de
+        <a href="preview-fix.md">docs/preview-fix.md</a>.</p>
+      </div>
+
+      <div class="item done featured">
+        <span class="when">2026-09-23 · arreglo</span>
+        <h3>La vista previa de diseños vuelve a pintar  <span class="pill feat">destacado</span> <span class="pill ok">arreglado</span></h3>
+        <ul class="clean">
+          <li><strong>El síntoma.</strong> La vista previa de los diseños hechos con elementos View (la de HTML/WebView
+          siempre ha funcionado) mostraba la zona del diseño vacía — en blanco o en negro según el tema — y solo se veían
+          los widgets que se pintan solos (SeekBar, Switch, iconos) y el HTML del WebView.</li>
+          <li><strong>La causa era un centinela.</strong> El modelo de datos del propio IDE guarda <code>0xffffff</code>
+          como "sin color elegido" (<code>TextBean.textColor</code>/<code>hintColor</code>,
+          <code>LayoutBean.backgroundColor</code>), y <code>LayoutPreviewActivity</code> lo aplicaba como color real:
+          como <code>int</code>, <code>0xffffff</code> es <code>0x00FFFFFF</code> — alfa 0 — así que dejaba el texto
+          totalmente transparente y borraba el fondo que el tema del widget habría pintado. <code>ViewPane</code> lo
+          agravaba forzando un lienzo <strong>blanco</strong> en modo vista previa mientras las vistas se inflaban con el
+          tema del IDE: de ahí el contraste roto según el tema.</li>
+          <li><strong>El arreglo.</strong> <code>0xffffff</code> (y cualquier color con alfa 0) ahora significa "sin
+          definir" y decide el tema; el lienzo de la vista previa usa el <code>colorSurface</code> del mismo tema que
+          infla las vistas; la raíz inflada mantiene las dimensiones declaradas en el XML; y una vista que el IDE no
+          puede instanciar muestra un <strong>marcador rojo</strong> y un aviso de "preview parcial" en vez de un hueco
+          mudo.</li>
+          <li><strong>Verificado</strong> en un emulador arm64 API 34: el mismo diseño, en claro y en oscuro, ya pinta el
+          botón — su zona medía 255,255,255 con 0 glifos antes — y la vista previa con HTML/WebView sigue funcionando
+          (<code>Preview OK · vistas: 3 · WebViews: 1</code>).</li>
+          <li><strong>Pendiente honesto:</strong> los componentes Material (MaterialButton, CardView), los proyectos con
+          Material3 y los temas personalizados del proyecto <strong>no</strong> están verificados en pantalla, y nada se
+          ha probado en móvil físico.</li>
+        </ul>
+        <p>
+          <img src="assets/preview-before.png" alt="Antes: la zona del botón sale vacía en tema oscuro, solo se ve el HTML del WebView" style="width:100%;max-width:200px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)">
+          <img src="assets/preview-after.png" alt="Después: el botón vuelve a pintarse junto al HTML del WebView" style="width:100%;max-width:200px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)">
+        </p>
+        <p>Versión <strong>v7.0.8.2</strong> (versionCode 164). La causa raíz, el arreglo fichero por fichero y la
+        evidencia medida están en <a href="preview-fix.md">docs/preview-fix.md</a>.</p>
+      </div>
+
+      <div class="item done featured">
+        <span class="when">2026-09-23 · Flutter (experimental)</span>
+        <h3>Release/AOT en el dispositivo, assets completos y pub real  <span class="pill feat">destacado</span> <span class="pill info">experimental</span></h3>
+        <ul class="clean">
+          <li><strong>El release/AOT en el dispositivo esta desbloqueado.</strong> El Dart SDK para Android se compilo
+          para este fork con <strong>compressed pointers</strong> — el flag lo activa el <strong>nombre de la
+          arquitectura</strong> (<code>arm64c</code>), no una opcion de linea de comandos — y en modo
+          <strong>product</strong>, porque el primer token del feature string del snapshot se decide en tiempo de
+          compilacion (<code>product</code>, no <code>release</code>). Su <code>gen_snapshot</code> (4.991.592 B,
+          sha256 <code>9921983f…</code>) va empaquetado dentro del APK y con el <strong>el propio telefono genera un
+          <code>libapp.so</code> que el engine oficial acepta</strong>. Probado: un APK <strong>release</strong> arranca
+          en un emulador arm64 Android 14, el contador pasa de 0 a 3 con toques reales y <strong>no hay cinta
+          DEBUG</strong>. Control A/B: el mismo APK con el <code>gen_snapshot</code> del SDK de Termux falla con
+          <em>the snapshot requires 'no-compressed-pointers' but the VM has 'compressed-pointers'</em>; solo faltaban
+          los compressed pointers.</li>
+          <li><strong>La app puede ejecutar sus propias herramientas.</strong> Con <code>targetSdk 34</code> SELinux
+          deniega <code>execute_no_trans</code> para los binarios de <code>filesDir</code> y de
+          <code>/data/local/tmp</code>, pero <strong><code>nativeLibraryDir</code> si funciona</strong>: el runtime y el
+          <code>gen_snapshot</code> van empaquetados como <code>lib/arm64-v8a/libdartaotruntime.so</code> y
+          <code>libfluttergensnapshot.so</code>. La app hizo el AOT completo desde su propio proceso, como app sin
+          privilegios y sin root, en 3,9 s y con el mismo sha256.</li>
+          <li><strong>El bundle de assets esta completo.</strong> Fuente Material (el pin real es
+          <code>bin/internal/material_fonts.version</code> → <code>fonts.zip</code>, no un artefacto del engine), los
+          shaders <code>ink_sparkle.frag</code> y <code>stretch_effect.frag</code> precompilados en el host y
+          embebidos, <code>AssetManifest.bin</code> (<code>StandardMessageCodec</code>), <code>FontManifest.json</code>
+          y <code>NOTICES.Z</code>. Verificado en el dispositivo: el icono <code>+</code> se dibuja y el error del
+          shader desaparece.</li>
+          <li><strong>pub real.</strong> <code>dart pub get</code> ya corre en el dispositivo (el cliente de pub viene
+          en el propio SDK) y resuelve paquetes de pub.dev de verdad, y el kernel se compila con el
+          <code>package_config.json</code> autentico resultante.</li>
+          <li><strong>Plugins: a medias, y se dice.</strong> El fork tiene compilador de plugins Kotlin/Java propio
+          (ECJ mas el <code>K2JVMCompiler</code> del fork) que genera el <code>GeneratedPluginRegistrant</code>,
+          fusiona manifests y resuelve dependencias AAR; <strong>todavia no se ha compilado ni arrancado ningun plugin
+          en un dispositivo</strong> — es el primer pendiente.</li>
+          <li><strong>Coste y limites.</strong> Los dos ejecutables empaquetados suman <strong>10,18 MB</strong> al APK
+          <code>arm64-v8a</code>; las otras ABIs no tienen backend AOT y lo dicen, en vez de fallar en silencio. El
+          modo por defecto sigue siendo <strong>debug/JIT</strong>, esto continua siendo experimental y todavia no hay
+          hot reload.</li>
+        </ul>
+        <p><img src="assets/flutter-aot-release.png" alt="App Flutter en modo release/AOT en el dispositivo, contador en 3 y sin cinta DEBUG" style="width:100%;max-width:300px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)"></p>
+        <p>Version <strong>v7.0.8.0</strong> (versionCode 162). Los comandos, los numeros medidos y lo que queda
+        pendiente estan en <a href="flutter-fase8.md">docs/flutter-fase8.md</a>.</p>
+        <p><strong>Hotfix v7.0.8.1 (versionCode 163).</strong> La release minificada rompía la compilación de
+        <strong>cualquier</strong> proyecto dentro de la app: R8 renombraba los campos de <code>SourceVersion</code>
+        y la tabla <code>Messages</code> de ECJ, y borraba las clases de <code>apksig</code> que firman el APK —
+        tres fallos encadenados, todos alcanzados por reflexión. Se arregla con tres reglas <code>keep</code> en
+        <code>app/proguard-rules.pro</code> y se verificó en un emulador arm64 API 34: un proyecto real compila y
+        se firma, con <code>ExceptionInInitializerError</code> ya ausente del logcat.</p>
+      </div>
+
+      <div class="item done featured">
+        <span class="when">2026-09-23 · Flutter (experimental)</span>
+        <h3>Soporte de Flutter: editor de Dart y compilacion en el dispositivo  <span class="pill feat">destacado</span> <span class="pill info">experimental</span></h3>
+        <ul class="clean">
+          <li><strong>El editor entiende Dart.</strong> Los <code>.dart</code> reciben la gramatica TextMate de Dart (del
+          proyecto Dart-Code, licencia MIT), su configuracion de lenguaje, emparejado de llaves y autocompletado, mas un
+          icono de Flutter en los menus.</li>
+          <li><strong>Un tipo de proyecto Flutter.</strong> Detras del flag <code>FLUTTER_EXPERIMENTAL_ENABLE</code>
+          (<strong>apagado por defecto</strong>, en Ajustes › Feature flags), al guardar un proyecto se siembra
+          <code>files/flutter/</code> con <code>pubspec.yaml</code>, un <code>lib/main.dart</code> Material 3 con contador,
+          <code>assets/</code> y <code>android/</code>. El editor muestra un menu Flutter para compilar y ejecutar,
+          ver el estado del toolchain o la informacion del proyecto.</li>
+          <li><strong>El toolchain se baja al propio movil</strong> (Dart SDK para Android 3.13.4 y artefactos del engine de
+          Flutter 3.47.5) y todo se ejecuta en el telefono: la unica red que se usa es esa primera descarga. No hay
+          servicio en la nube y no participa Gradle.</li>
+          <li><strong>Limitacion honesta: el release/AOT en el dispositivo esta bloqueado.</strong> El
+          <code>gen_snapshot</code> del SDK de Dart esta compilado <strong>sin compressed pointers</strong> y el engine
+          oficial los exige (<em>Snapshot not compatible: the snapshot requires arm64 android
+          no-compressed-pointers but the VM has compressed-pointers</em>), y un <code>gen_snapshot</code> compatible solo
+          se publica para hosts linux-x64/darwin-x64/windows-x64 (404 para arm64/android). <strong>Hoy el unico modo
+          usable es debug/JIT</strong>, y la interfaz lo dice. Tampoco hay hot reload, ni resolucion real de pub, ni
+          plugins.</li>
+          <li><strong>Probado en un dispositivo real.</strong> En un emulador Android 14 arm64 el Dart del propio telefono
+          compilo el kernel y un APK armado a mano con <code>aapt2</code> + <code>d8</code> + <code>zipalign</code> +
+          <code>apksigner</code> arranco: FlutterActivity en RESUMED, UI Material renderizada y el contador respondiendo a
+          toques reales. No se ha probado en movil fisico ni con ABIs distintas de <code>arm64-v8a</code>.</li>
+        </ul>
+        <p><img src="assets/flutter-e2e.png" alt="App Flutter compilada y ejecutada en el dispositivo, con el contador en 3" style="width:100%;max-width:300px;border-radius:10px;border:1px solid rgba(120,170,220,0.35)"></p>
+        <p>Version <strong>v7.0.7.0</strong> (versionCode 161). Los numeros medidos, los comandos reales y lo que queda
+        pendiente estan en <a href="flutter-fase7.md">docs/flutter-fase7.md</a>.</p>
+      </div>
+
+      <div class="item done">
+        <span class="when">2026-09-22 · arreglo</span>
+        <h3>La vista previa de layouts ya no sale en blanco <span class="pill ok">arreglado</span></h3>
+        <p>Los disenos hechos con elementos View (AndroidX, widgets) mostraban la vista previa en blanco: iban por el
+        renderizador del editor de diseno, que devolvia una raiz vacia cuando el nombre del layout no aparecia en los
+        datos del proyecto. Ahora todos los layouts se construyen con el constructor de vistas reales (solo necesita
+        el XML), con el renderizador nativo como reserva y un mensaje visible si ambos fallan. Version
+        <strong>v7.0.6.0</strong>.</p>
+      </div>
+
+      <div class="item done featured">
+        <span class="when">2026-09-22 · editor</span>
+        <h3>Autocompletado de Kotlin  <span class="pill feat">destacado</span> <span class="pill ok">hecho</span></h3>
+        <p>Los ficheros <code>.kt</code> reciben el mismo trato que Java: sugerencias con los simbolos Kotlin de tu
+        proyecto (clases, objetos, <code>fun</code>, <code>val</code>/<code>var</code>), palabras clave de Kotlin y
+        clases del SDK y de las librerias. El resaltado y el indentado siguen delegando en el lenguaje TextMate de
+        Kotlin. Los diagnosticos de Kotlin necesitan el compilador de Kotlin y llegaran en una fase aparte. Version
+        <strong>v7.0.5.9</strong>.</p>
+      </div>
+
+      <div class="item done">
+        <span class="when">2026-09-22 · editor</span>
+        <h3>Quick fix: importar la clase que falta <span class="pill ok">hecho</span></h3>
+        <p>Los diagnosticos ya arreglan lo que avisan: cuando un tipo no se resuelve, el diagnostico ofrece
+        <strong>"Importar android.widget.Button"</strong> (o la clase que coincida en el SDK y tus librerias) y al
+        elegirla se inserta el <code>import</code> despues de la linea del <code>package</code>. Las acciones rapidas van
+        ligadas a la version del documento, asi que las obsoletas se descartan solas. Version <strong>v7.0.5.8</strong>.</p>
+      </div>
+
+      <div class="item done">
+        <span class="when">2026-09-22 · editor</span>
+        <h3>Ir a definicion y buscar usos <span class="pill ok">hecho</span></h3>
+        <p>El editor ya salta entre ficheros: "Go to definition" y "Find usages" resuelven el simbolo bajo el cursor
+        en <strong>todas las fuentes del proyecto</strong> y abren el resultado, con selector cuando hay varias
+        coincidencias. El indice guarda fichero y linea de cada declaracion, y la navegacion corre sobre el
+        andamiaje LSP que ya tenia el repo. Version <strong>v7.0.5.7</strong>.</p>
+      </div>
+
+      <div class="item done">
+        <span class="when">2026-09-22 · editor</span>
+        <h3>Completado del SDK y de las librerias <span class="pill ok">hecho</span></h3>
+        <p>Las sugerencias ya no se limitan a tu codigo: incluyen las <strong>clases del SDK de Android</strong>
+        (<code>android.jar</code>) y las de las <strong>librerias que usa tu proyecto</strong>. Se inserta el nombre
+        simple y en la descripcion va el nombre completo. El indice se lee una vez, se cachea en memoria y en disco,
+        y se precalienta al abrir un <code>.java</code>. Version <strong>v7.0.5.6</strong>.</p>
+      </div>
+
+      <div class="item done">
+        <span class="when">2026-09-22 · editor</span>
+        <h3>Diagnosticos de Java en vivo <span class="pill ok">hecho</span></h3>
+        <p>Los errores y avisos se subrayan mientras escribes: 1,2 s despues de parar, la app compila solo el
+        fichero que editas con el compilador de Eclipse que ya lleva dentro (classpath del proyecto y
+        <code>files/java</code> como sourcepath) y muestra el mensaje al tocar la marca. Corre fuera del hilo de la
+        interfaz, descarta resultados obsoletos y falla en silencio. Version <strong>v7.0.5.5</strong>.</p>
+      </div>
+
+      <div class="item done">
+        <span class="when">2026-09-22 · editor</span>
+        <h3>Autocompletado con tus propios simbolos <span class="pill ok">hecho</span></h3>
+        <p>Primera pieza del IDE dentro de la app: el editor de Java sugiere ahora las <strong>clases, metodos y
+        campos de tu proyecto</strong> mientras escribes, ademas de las palabras clave. El indice se construye
+        leyendo las fuentes del proyecto (sin compilador), cacheado y refrescado solo cuando cambian. El resto del
+        editor sigue delegando en sora-editor. Version <strong>v7.0.5.4</strong>.</p>
+      </div>
+
+      <div class="item done">
+        <span class="when">2026-09-21 · app</span>
+        <h3>Los enlaces de GitHub de la app apuntan aquí <span class="pill ok">hecho</span></h3>
+        <p>Los enlaces del repositorio, de releases y de commits dentro de la app abren ahora
+        <code>aurenox-global/Sketchware-Pro</code> en vez del upstream, así que el aviso de actualizaciones consulta
+        las releases de este fork. Verificado dentro del APK compilado (<code>resources.arsc</code>).
+        Versión <strong>v7.0.5.3</strong>.</p>
+      </div>
+
+      <div class="item done">
+        <span class="when">2026-09-21 · tamaño</span>
+        <h3>Un APK por arquitectura <span class="pill ok">hecho</span></h3>
+        <p>ABI splits activados: <code>assembleRelease</code> genera un APK por arquitectura en lugar de uno
+        universal, así que el dispositivo deja de descargar los otros tres juegos de librerías nativas. Verificado:
+        cada APK lleva solo su propio <code>lib/&lt;abi&gt;/</code>, incluido el <code>aapt2</code> incluido. Publicado como
+        <a href="https://github.com/aurenox-global/Sketchware-Pro/releases/tag/v7.0.5.1">v7.0.5.1</a>, firmado con la clave original.</p>
+      </div>
+
+      <div class="item done">
+        <span class="when">2026-09-21 · firma</span>
+        <h3>Se mantiene la clave de firma original <span class="pill ok">hecho</span></h3>
+        <p>El build de release conserva la <code>testkey.keystore</code> del propio proyecto (SHA-256
+        <code>a40da80a…</code>) a propósito, para que los APK nuevos se instalen encima de los existentes.
+        Verificado con <code>apksigner</code>: los cuatro APK por arquitectura llevan esa huella. La keystore
+        privada de 4096 bits queda guardada en <code>~/.android-keys/sketchware-pro/release.jks</code> para el día
+        en que se quiera una identidad de distribución real.</p>
+      </div>
+
+      <div class="item done">
+        <span class="when">2026-09-21 · build v7.0.5 publicado</span>
+        <h3>Primera versión versionada <span class="pill ok">hecho</span></h3>
+        <ul class="clean">
+          <li><strong>La build ya no necesita un repo git</strong> — <code>git rev-parse</code> se ejecutaba al configurar y ensuciaba <code>BuildConfig.GIT_HASH</code>. Ahora lee <code>GIT_HASH</code> / <code>GIT_SHORT_HASH</code> del entorno y solo usa git si existe <code>.git</code>.</li>
+          <li><strong>Default de <code>SKETCHUB_API_KEY</code></strong> — sin la variable de entorno, <code>BuildConfig</code> contenía el literal <code>"null"</code>. Ahora es cadena vacía.</li>
+          <li><strong>Firma del release fuera del repositorio</strong> — las credenciales salen de <code>RELEASE_STORE_*</code> / <code>RELEASE_KEY_*</code> (entorno o <code>~/.gradle/gradle.properties</code>), con aviso explícito si faltan.</li>
+          <li><strong>64 bloques <code>catch</code> vacíos anotados</strong> — 44 archivos se tragaban las excepciones en silencio; ahora registran con <code>Log.d("SketchwarePro", …)</code>.</li>
+          <li><strong>Builds más rápidas</strong> — activados <code>org.gradle.parallel</code> y <code>org.gradle.caching</code>.</li>
+          <li><strong>Repositorio publicado y versionado</strong> — historial git, <code>.gitignore</code> auditado y primera release pública con el APK adjunto.</li>
+        </ul>
+      </div>
+
+      <div class="item done">
+        <span class="when">2026-09-21 · CI</span>
+        <h3>El CI está en verde <span class="pill ok">hecho</span></h3>
+        <p>Android CI y Verification Baseline ya pasan. El último bloqueo era sutil: el jar de <code>bundletool</code>
+        que descarga GitHub Actions incluye ficheros <code>classes.dex</code> embebidos junto al bytecode, y R8
+        rechaza un archive con ambos — la caché local tiene esa misma versión sin ellos. Filtrarlo no es seguro
+        (se pierde <code>aapt2-proto</code> y esos dex son los que bundletool usa para construir AABs), así que el
+        CI compila con <code>-PskipMinify</code> y el build local de release mantiene R8 activo.</p>
+      </div>
+
+      <div class="item done">
+        <span class="when">2026-09-21 · repo fix</span>
+        <h3>El repositorio estaba incompleto <span class="pill ok">hecho</span></h3>
+        <p>Un fallo del <code>.gitignore</code>: el patrón <code>build/</code> coincidía con <em>cualquier</em>
+        carpeta llamada <code>build</code> a cualquier profundidad, así que tres paquetes de código fuente reales —
+        <code>mod/hey/studios/build/</code>, <code>mod/jbk/build/</code> y <code>mod/pranav/build/</code> — nunca se
+        subieron. Faltaban ocho ficheros del repo público, y por eso el CI no compilaba y un clon limpio tampoco
+        podía compilar. Las reglas están ahora acotadas con excepciones explícitas. Además el CI ya compila sin
+        secretos (<code>google-services.json</code> mock + la testkey pública subida) y el workflow soporta los ABI splits.</p>
+      </div>
+
+      <div class="item done">
+        <span class="when">2026-09-21 · tamaño</span>
+        <h3>Reducción de código con R8 <span class="pill ok">hecho</span></h3>
+        <p>R8 activado en el build de release: cada APK baja de ~129 MB a ~106 MB. Hicieron falta dos jars
+        reempaquetados en tiempo de build (<code>kotlinc-for-sketchware</code> trae <code>dalvik/**</code>,
+        <code>kxml2</code> trae <code>org/xmlpull/**</code> — Android ya aporta ambos), las reglas
+        <code>-dontwarn</code> que R8 genera, y desactivar la subida del mapping a Crashlytics (el build local usa un
+        <code>google-services.json</code> mock).</p>
+      </div>
+
+      <div class="item pending">
+        <span class="when">siguiente · tamaño</span>
+        <h3>Reducción de recursos <span class="pill warn">bloqueado</span></h3>
+        <p><code>shrinkResources</code> borraría recursos que se obtienen por nombre — hay 29 usos de <code>getIdentifier()</code>. Antes hay que escribir un <code>res/raw/keep.xml</code>.</p>
+      </div>
+
+      <div class="item pending">
+        <span class="when">siguiente · calidad</span>
+        <h3>Traducciones, deprecaciones y tests <span class="pill info">planificado</span></h3>
+        <ul class="clean">
+          <li><strong>i18n</strong> — 2.239 strings y ni una sola carpeta <code>values-&lt;idioma&gt;</code>.</li>
+          <li><strong>APIs deprecadas</strong> — <code>getColor()</code> ×126, <code>onActivityResult</code> ×63, <code>startActivityForResult</code> ×47, <code>getExternalStorageDirectory</code> ×43.</li>
+          <li><strong>Deuda de lint</strong> — un baseline de 24.169 líneas que solo detecta drift, nunca reduce.</li>
+          <li><strong>God classes</strong> — <code>LogicEditorActivity</code> (3.031 líneas), <code>BlocksHandler</code> (2.837 líneas).</li>
+          <li><strong>Permisos de almacenamiento</strong> — <code>MANAGE_EXTERNAL_STORAGE</code> y <code>requestLegacyExternalStorage</code> son un problema en Android moderno.</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="log-foot">
+      <button type="button" class="btn ghost log-toggle" id="log-toggle"
+              aria-controls="change-log" aria-expanded="false"
+              data-more="Ver todas las mejoras" data-less="Ver solo las 5 últimas" hidden>
+        Ver todas las mejoras
+      </button>
+      <span class="log-hint">Más recientes primero.</span>
+    </div>
+
+    <script>
+    (function () {
+      var log = document.getElementById('change-log');
+      var btn = document.getElementById('log-toggle');
+      if (!log || !btn) return;
+      var items = log.querySelectorAll('.item');
+      var total = items.length;
+      var lead = 5;
+      if (total <= lead) return;
+      var collapsed = true;
+      var more = btn.getAttribute('data-more') || 'Ver todas';
+      var less = btn.getAttribute('data-less') || 'Ver menos';
+      function render() {
+        for (var i = 0; i < total; i++) {
+          items[i].hidden = collapsed && i >= lead;
+        }
+        btn.textContent = collapsed ? more + ' (' + total + ')' : less;
+        btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+      }
+      btn.addEventListener('click', function () {
+        collapsed = !collapsed;
+        render();
+      });
+      btn.hidden = false;
+      render();
+    })();
+    </script>
+  </section>
+
+  <!-- ========================================================= instalar -->
+  <section id="instalar">
+    <h2><span class="hash">#</span>Instalar</h2>
+    <p class="sub">No hay versión en tiendas. El APK lo instalas tú.</p>
+    <ol class="steps">
+      <li><strong>Descarga el APK que corresponda</strong> desde la <a href="https://github.com/aurenox-global/Sketchware-Pro/releases" target="_blank" rel="noopener">página de releases</a>: <code>app-arm64-v8a-release.apk</code> para casi todos los móviles modernos, <code>app-armeabi-v7a-release.apk</code> para dispositivos antiguos de 32 bits, <code>x86_64</code>/<code>x86</code> para emuladores.</li>
+      <li><strong>Permite instalar desde orígenes desconocidos</strong> para tu navegador o gestor de archivos (Android te lo pedirá al abrir el archivo).</li>
+      <li><strong>Abre el APK e instala.</strong> La clave de firma no cambia, así que se instala encima de versiones anteriores.</li>
+      <li><strong>Opcional:</strong> instala por ADB, que además conserva tus datos.</li>
+    </ol>
+<pre class="code">adb install -r app-arm64-v8a-release.apk</pre>
+    <div class="note">
+      <strong>Requisitos:</strong> Android 8.0 (API 26) o superior. Se recomienda un dispositivo ARM64 — el compilador
+      y el toolchain incluidos funcionan mejor ahí.
+    </div>
+  </section>
+
+  <!-- ======================================================== compilar -->
+  <section id="compilar">
+    <h2><span class="hash">#</span>Compílalo tú mismo</h2>
+    <p class="sub">Del código al APK. La primera vez tarda, después es rápido.</p>
+    <ul class="clean">
+      <li><strong>JDK 17</strong> — <code>java -version</code> debe reportar 17.x.</li>
+      <li><strong>Android SDK</strong> — plataforma 36 y build-tools 35 instalados; apunta <code>local.properties</code> a él (<code>sdk.dir=/ruta/al/android-sdk</code>).</li>
+      <li><strong>Google Services</strong> — <code>app/google-services.json</code> es opcional; los scripts crean un placeholder temporal desde <code>app/src/debug/google-services.json</code> si hace falta.</li>
+    </ul>
+<pre class="code"><span class="cm"># build de debug</span>
+./gradlew :app:assembleDebug
+
+<span class="cm"># build de release (firmado)</span>
+./gradlew :app:assembleRelease
+
+<span class="cm"># o usa los scripts de ayuda</span>
+./compile_project.command
+./compile_release.command</pre>
+    <div class="note danger">
+      <strong>Aviso de firma.</strong> Si no defines <code>RELEASE_STORE_FILE</code>, <code>RELEASE_STORE_PASSWORD</code>,
+      <code>RELEASE_KEY_ALIAS</code> y <code>RELEASE_KEY_PASSWORD</code>, la build cae a la <code>testkey.keystore</code>
+      incluida en el repositorio — una clave de test <em>pública</em> de AOSP. El APK sirve para pruebas locales, pero
+      cualquiera podría firmar una actualización que Android aceptaría como tuya. Nunca publiques un APK firmado con ella.
+    </div>
+  </section>
+
+  <!-- ======================================================= estructura -->
+  <section id="estructura">
+    <h2><span class="hash">#</span>Dónde está cada cosa</h2>
+    <p class="sub">Mapa rápido del código, útil antes de tocar nada.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Clase</th><th>Función</th></tr></thead>
+        <tbody>
+          <tr><td><code>a.a.a.ProjectBuilder</code></td><td>Ayudante para compilar un proyecto completo</td></tr>
+          <tr><td><code>a.a.a.Ix</code></td><td>Genera el <code>AndroidManifest.xml</code></td></tr>
+          <tr><td><code>a.a.a.Jx</code></td><td>Genera el código fuente de las activities</td></tr>
+          <tr><td><code>a.a.a.Lx</code></td><td>Genera código de componentes: listeners, helpers, etc.</td></tr>
+          <tr><td><code>a.a.a.Ox</code></td><td>Genera los archivos XML de layout</td></tr>
+          <tr><td><code>a.a.a.qq</code></td><td>Registro de dependencias de librerías integradas</td></tr>
+          <tr><td><code>a.a.a.tq</code></td><td>Pasos del diálogo de compilación</td></tr>
+          <tr><td><code>a.a.a.yq</code></td><td>Rutas de archivos de los proyectos</td></tr>
+          <tr><td><code>pro.sketchware.*</code></td><td>Donde deben ir las funciones nuevas, respetando la estructura</td></tr>
+          <tr><td><code>mod.*</code></td><td>Aquí vive la mayoría de aportes de la comunidad</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ========================================================= roadmap -->
+  <section id="roadmap">
+    <h2><span class="hash">#</span>Estado y hoja de ruta</h2>
+    <p class="sub">Dónde está este fork ahora mismo.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Punto</th><th>Estado</th></tr></thead>
+        <tbody>
+          <tr><td>Build sin git, default de la API key, catches silenciados</td><td><span class="pill ok">hecho</span></td></tr>
+          <tr><td>Credenciales de release fuera del código</td><td><span class="pill ok">hecho</span></td></tr>
+          <tr><td>Historial git, repo público, primera release</td><td><span class="pill ok">hecho</span></td></tr>
+          <tr><td>Firma de release: se mantiene la clave original (por decisión)</td><td><span class="pill ok">hecho</span></td></tr>
+          <tr><td>Reducción de código con R8 (builds de release)</td><td><span class="pill ok">hecho</span></td></tr>
+          <tr><td>Reducción de recursos (<code>keep.xml</code>)</td><td><span class="pill warn">bloqueado</span></td></tr>
+          <tr><td>Documentación bilingüe y este sitio</td><td><span class="pill ok">hecho</span></td></tr>
+          <tr><td>Repositorio completo: recuperados los paquetes ocultos por <code>.gitignore</code></td><td><span class="pill ok">hecho</span></td></tr>
+          <tr><td>CI en verde: Android CI + Verification Baseline</td><td><span class="pill ok">hecho</span></td></tr>
+          <tr><td>Los enlaces de GitHub de la app apuntan a este fork</td><td><span class="pill ok">hecho</span></td></tr>
+          <tr><td>IDE dentro de la app: autocompletado con simbolos del proyecto (fase 1)</td><td><span class="pill ok">hecho</span></td></tr>
+          <tr><td>IDE dentro de la app: diagnosticos en vivo con ECJ (fase 2)</td><td><span class="pill ok">hecho</span></td></tr>
+          <tr><td>IDE dentro de la app: completado del SDK y librerias (fase 3)</td><td><span class="pill ok">hecho</span></td></tr>
+          <tr><td>IDE dentro de la app: navegacion, ir a definicion / buscar usos (fase 4)</td><td><span class="pill ok">hecho</span></td></tr>
+          <tr><td>IDE dentro de la app: quick fixes sobre los diagnosticos (fase 5)</td><td><span class="pill ok">hecho</span></td></tr>
+          <tr><td>IDE dentro de la app: soporte de Kotlin (fase 6)</td><td><span class="pill ok">hecho</span></td></tr>
+          <tr><td>IDE dentro de la app: diagnosticos de Kotlin (fase 7)</td><td><span class="pill warn">siguiente</span></td></tr>
+          <tr><td>Soporte de Flutter, experimental: editor Dart, compilacion en el dispositivo y release/AOT (arm64-v8a)</td><td><span class="pill info">experimental</span></td></tr>
+          <tr><td>R8 funcionando en CI (bloqueado por el jar de <code>bundletool</code>)</td><td><span class="pill warn">bloqueado</span></td></tr>
+          <tr><td>ABI splits (un APK por arquitectura)</td><td><span class="pill ok">hecho</span></td></tr>
+          <tr><td>Traducciones, APIs deprecadas, cobertura de tests</td><td><span class="pill info">planificado</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============================================================= faq -->
+  <section id="faq">
+    <h2><span class="hash">#</span>Preguntas frecuentes</h2>
+    <details class="faq"><summary>¿Es gratis?</summary><p>Sí. Sin suscripción, sin anuncios y sin pagos. El proyecto upstream acepta apoyo por Patreon solo para mantener el desarrollo.</p></details>
+    <details class="faq"><summary>¿Puedo publicarlo en Google Play?</summary><p>No. Sketchware Pro es un mod de Sketchware y publicarlo — original o modificado — en cualquier tienda está expresamente prohibido.</p></details>
+    <details class="faq"><summary>¿Necesita ordenador?</summary><p>No. Todo el IDE y el compilador funcionan en el teléfono. El ordenador solo hace falta para compilar este repositorio desde el código.</p></details>
+    <details class="faq"><summary>¿Las apps que hago son mías?</summary><p>Sí. Sketchware Pro genera fuentes y recursos Android estándar, y los APK que compilas son tuyos. Lo que no es tuyo es el código de Sketchware Pro.</p></details>
+    <details class="faq"><summary>¿Por qué el APK pesa tanto?</summary><p>Incluye el compilador en el dispositivo, cuatro binarios <code>aapt2</code>, un jar de Android, archivos de librerías y el toolchain de Kotlin. Los ABI splits ya lo bajaron de 141 MB a unos 129 MB por dispositivo; la reducción de código y recursos sigue en la hoja de ruta.</p></details>
+    <details class="faq"><summary>¿Por qué la release usa una test key?</summary><p>A propósito: es la identidad de firma original, así las actualizaciones se instalan encima de lo que ya tengas. Al ser una clave pública, trátalos como builds de sideload y prueba, y cambia a la keystore privada solo si aceptas reinstalar desde cero.</p></details>
+  </section>
+
+  <!-- =========================================================== legal -->
+  <section id="legal">
+    <h2><span class="hash">#</span>Aviso legal</h2>
+    <div class="note danger">
+      <p><strong>Sketchware Pro no es open source.</strong> Es <em>source-available</em>: puedes leer el código y enviar
+      cambios, pero no es tuyo. Parte del código puede infringir el copyright de Sketchware.</p>
+      <p>Es un mod de la comunidad hecho para mantener Sketchware vivo, sin ninguna intención dañina hacia los
+      desarrolladores originales. Publicar Sketchware Pro, sin modificar o modificado, en Google Play o en cualquier
+      otra tienda no está permitido. Úsalo bajo tu propio criterio.</p>
+      <p>Dos módulos, <code>kotlinc</code> y <code>build-logic</code>, vienen de
+      <a href="https://github.com/tyron12233/CodeAssist" target="_blank" rel="noopener">CodeAssist</a> y están bajo licencia GPL-3.0.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>
+      <strong>Sketchware Pro</strong> · fork mantenido por
+      <a href="https://github.com/aurenox-global" target="_blank" rel="noopener">aurenox-global</a> ·
+      upstream: <a href="https://github.com/Sketchware-Pro/Sketchware-Pro" target="_blank" rel="noopener">Sketchware-Pro/Sketchware-Pro</a> ·
+      comunidad: <a href="http://discord.gg/kq39yhT4rX" target="_blank" rel="noopener">Discord</a>
+    </p>
+    <p>
+      <a href="index.html">English</a> · <a href="es.html">Español</a> ·
+      <a href="https://github.com/aurenox-global/Sketchware-Pro">Código</a> ·
+      <a href="https://github.com/aurenox-global/Sketchware-Pro/releases">Releases</a>
+    </p>
+    <p>Última actualización: 2026-09-21 · La documentación se amplía con cada mejora que entra.</p>
+  </div>
+</footer>
+
+</body>
+</html>

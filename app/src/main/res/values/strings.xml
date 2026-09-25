@@ -2350,4 +2350,5 @@ Please try again later"</string>
     <string name="flutter_discoverability_entry_subtitle">Descargar, actualizar o borrar el toolchain de Dart</string>
 
 
+    <string name="app_credit">Created by Andrés Mag</string>
 </resources>

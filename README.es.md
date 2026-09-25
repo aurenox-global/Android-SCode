@@ -33,6 +33,10 @@ La firma de release es la del proyecto (`ascode.keystore`). Solo se sobrescribe 
 entorno `RELEASE_STORE_FILE`, `RELEASE_STORE_PASSWORD`, `RELEASE_KEY_ALIAS` y
 `RELEASE_KEY_PASSWORD`.
 
+## Créditos
+
+Creado por **Andrés Mag**.
+
 ## Licencia
 
 Ver [LICENSE.md](LICENSE.md). Se conservan los avisos y atribuciones exigidos por la licencia de la
@@ -41,5 +45,5 @@ base de código original.
 ## Aviso
 
 Al cambiar el nombre de paquete y la firma, esta app se instala como una **aplicación nueva**: no
-actualiza por encima de instalaciones antiguas de otros paquetes. Además, los proyectos guardados
-en la carpeta antigua `.sketchware` no aparecen automáticamente; se pueden copiar a `.ascode`.
+actualiza por encima de instalaciones antiguas de otros paquetes. Los proyectos de la carpeta
+antigua `.sketchware` se importan automáticamente la primera vez que abres la app.

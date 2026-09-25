@@ -47,7 +47,6 @@ import mod.hilal.saif.activities.tools.ConfigActivity;
 import mod.tyron.backup.SingleCopyTask;
 import com.ascode.android.R;
 import com.ascode.android.activities.main.fragments.projects.ProjectsFragment;
-import com.ascode.android.activities.main.fragments.projects_store.ProjectsStoreFragment;
 import com.ascode.android.accessibility.runtime.AccessibilityRuntimeReporter;
 import com.ascode.android.databinding.MainBinding;
 import com.ascode.android.lib.base.BottomSheetDialogView;
@@ -59,7 +58,6 @@ import com.ascode.android.utility.UI;
 
 public class MainActivity extends BasePermissionAppCompatActivity {
     private static final String PROJECTS_FRAGMENT_TAG = "projects_fragment";
-    private static final String PROJECTS_STORE_FRAGMENT_TAG = "projects_store_fragment";
     private ActionBarDrawerToggle drawerToggle;
     private DB u;
     private Snackbar storageAccessDenied;
@@ -72,7 +70,6 @@ public class MainActivity extends BasePermissionAppCompatActivity {
         }
     };
     private ProjectsFragment projectsFragment;
-    private ProjectsStoreFragment projectsStoreFragment;
     private Fragment activeFragment;
     @IdRes
     private int currentNavItemId = R.id.item_projects;
@@ -260,22 +257,16 @@ public class MainActivity extends BasePermissionAppCompatActivity {
             if (id == R.id.item_projects) {
                 navigateToProjectsFragment();
                 return true;
-            } else if (id == R.id.item_sketchub) {
-                navigateToSketchubFragment();
-                return true;
             }
             return false;
         });
 
         if (savedInstanceState != null) {
             projectsFragment = (ProjectsFragment) getSupportFragmentManager().findFragmentByTag(PROJECTS_FRAGMENT_TAG);
-            projectsStoreFragment = (ProjectsStoreFragment) getSupportFragmentManager().findFragmentByTag(PROJECTS_STORE_FRAGMENT_TAG);
             currentNavItemId = savedInstanceState.getInt("selected_tab_id");
             Fragment current = getFragmentForNavId(currentNavItemId);
             if (current instanceof ProjectsFragment) {
                 navigateToProjectsFragment();
-            } else if (current instanceof ProjectsStoreFragment) {
-                navigateToSketchubFragment();
             }
 
             return;
@@ -287,8 +278,6 @@ public class MainActivity extends BasePermissionAppCompatActivity {
     private Fragment getFragmentForNavId(int navItemId) {
         if (navItemId == R.id.item_projects) {
             return projectsFragment;
-        } else if (navItemId == R.id.item_sketchub) {
-            return projectsStoreFragment;
         }
         throw new IllegalArgumentException();
     }
@@ -319,28 +308,6 @@ public class MainActivity extends BasePermissionAppCompatActivity {
 
         activeFragment = projectsFragment;
         currentNavItemId = R.id.item_projects;
-    }
-
-    private void navigateToSketchubFragment() {
-        if (projectsStoreFragment == null) {
-            projectsStoreFragment = new ProjectsStoreFragment();
-        }
-
-        boolean shouldShow = true;
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction transaction = fm.beginTransaction();
-
-        binding.createNewProject.hide();
-        if (activeFragment != null) transaction.hide(activeFragment);
-        if (fm.findFragmentByTag(PROJECTS_STORE_FRAGMENT_TAG) == null) {
-            shouldShow = false;
-            transaction.add(binding.container.getId(), projectsStoreFragment, PROJECTS_STORE_FRAGMENT_TAG);
-        }
-        if (shouldShow) transaction.show(projectsStoreFragment);
-        transaction.commit();
-
-        activeFragment = projectsStoreFragment;
-        currentNavItemId = R.id.item_sketchub;
     }
 
     @Override

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 
 import com.besome.sketch.lib.base.BaseAppCompatActivity;
 import com.besome.sketch.lib.ui.PropertyOneLineItem;
@@ -129,6 +130,17 @@ public class ProgramInfoActivity extends BaseAppCompatActivity {
 
         addTwoLineItem(ITEM_DOCS_LOG, R.string.program_information_title_docs, R.string.link_docs_url);
         addSingleLineItem(ITEM_SYSTEM_INFORMATION, R.string.program_information_title_system_information, true);
+        addCreditFooter();
+    }
+
+    private void addCreditFooter() {
+        TextView credit = new TextView(this);
+        credit.setText(R.string.app_credit);
+        credit.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodySmall);
+        credit.setAlpha(0.75f);
+        int padding = (int) (16 * getResources().getDisplayMetrics().density);
+        credit.setPadding(padding, padding, padding, padding / 2);
+        binding.content.addView(credit);
     }
 
     private void toSystemInfoActivity() {

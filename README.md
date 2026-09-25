@@ -48,7 +48,11 @@ La firma por defecto usa `ascode.keystore` (alias `ascode`). Para firmar con otr
 - `docs/` — notas de desarrollo y web del proyecto.
 - `gradle/libs.versions.toml` — catálogo de versiones y dependencias.
 
-## Licencia
+## Credits
+
+Created by **Andrés Mag**.
+
+## License
 
 Ver [LICENSE.md](LICENSE.md). Este proyecto deriva de una base de código abierta; se conservan
 los avisos de licencia y las atribuciones exigidas por la misma.

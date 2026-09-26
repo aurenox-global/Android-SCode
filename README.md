@@ -35,7 +35,7 @@ your phone.
 
 ## Features
 
-- **Visual design editor** — drag & drop widgets, edit the XML directly and preview screens.
+- **Visual design editor** — drag & drop widgets, edit the XML directly and preview screens, with editable corner radius, stroke and gravity (LinearLayout/ImageView) that render the same in the canvas, the preview and the built app.
 - **Logic editor** — blocks for fast prototyping, plus raw Java/Kotlin when you need full control.
 - **Resource manager** — images, sounds, fonts, icons, collections and custom blocks per project.
 - **Local libraries & dependencies** — bundle your own `.jar`/`.aar` or resolve Maven artifacts.

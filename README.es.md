@@ -35,7 +35,7 @@ firmado**, todo sin salir del teléfono.
 
 ## Características
 
-- **Editor de diseño visual** — arrastra widgets, edita el XML y previsualiza las pantallas.
+- **Editor de diseño visual** — arrastra widgets, edita el XML y previsualiza las pantallas, con esquinas, borde y gravity editables (LinearLayout/ImageView) que se ven igual en el lienzo, la vista previa y la app compilada.
 - **Editor de lógica** — bloques para prototipar rápido y Java/Kotlin cuando necesitas control
   total.
 - **Gestor de recursos** — imágenes, sonidos, fuentes, iconos, colecciones y bloques propios por

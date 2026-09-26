@@ -575,6 +575,265 @@ public class DartBlocks {
                 break;
             }
 
+            // --- listas (Fase 2) ---
+            case "addListInt":
+                code.append("Sk.list(").append(widget(param(params, 1))).append(").add(Sk.toNumber(")
+                        .append(param(params, 0)).append("));");
+                break;
+            case "insertListInt":
+                code.append("Sk.list(").append(widget(param(params, 2))).append(").insert(Sk.toNumber(")
+                        .append(param(params, 1)).append(").toInt(), Sk.toNumber(")
+                        .append(param(params, 0)).append("));");
+                break;
+            case "getAtListInt":
+                code.append("Sk.toNumber(Sk.list(").append(widget(param(params, 1))).append(")[Sk.toNumber(")
+                        .append(param(params, 0)).append(").toInt()])");
+                break;
+            case "indexListInt":
+                code.append("Sk.list(").append(widget(param(params, 1))).append(").indexOf(Sk.toNumber(")
+                        .append(param(params, 0)).append("))");
+                break;
+            case "containListInt":
+                code.append("Sk.list(").append(widget(param(params, 0))).append(").contains(Sk.toNumber(")
+                        .append(param(params, 1)).append("))");
+                break;
+            case "addListStr":
+            case "addMapToList":
+                code.append("Sk.list(").append(widget(param(params, 1))).append(").add(")
+                        .append(param(params, 0)).append(");");
+                break;
+            case "insertListStr":
+                code.append("Sk.list(").append(widget(param(params, 2))).append(").insert(Sk.toNumber(")
+                        .append(param(params, 1)).append(").toInt(), ")
+                        .append(param(params, 0)).append(");");
+                break;
+            case "getAtListStr":
+                code.append("Sk.list(").append(widget(param(params, 1))).append(")[Sk.toNumber(")
+                        .append(param(params, 0)).append(").toInt()]");
+                break;
+            case "indexListStr":
+                code.append("Sk.list(").append(widget(param(params, 1))).append(").indexOf(")
+                        .append(param(params, 0)).append(")");
+                break;
+            case "containListStr":
+                code.append("Sk.list(").append(widget(param(params, 0))).append(").contains(")
+                        .append(param(params, 1)).append(")");
+                break;
+            case "deleteList":
+                code.append("Sk.list(").append(widget(param(params, 1))).append(").removeAt(Sk.toNumber(")
+                        .append(param(params, 0)).append(").toInt());");
+                break;
+            case "lengthList":
+                code.append("Sk.list(").append(widget(param(params, 0))).append(").length");
+                break;
+            case "clearList":
+                code.append("Sk.list(").append(widget(param(params, 0))).append(").clear();");
+                break;
+            case "addListMap":
+                code.append("{\n")
+                        .append("  final Map<String, dynamic> _item = <String, dynamic>{};\n")
+                        .append("  _item[Sk.toText(").append(param(params, 0)).append(")] = ")
+                        .append(param(params, 1)).append(";\n")
+                        .append("  Sk.list(").append(widget(param(params, 2))).append(").add(_item);\n")
+                        .append("}");
+                break;
+            case "insertListMap":
+                code.append("{\n")
+                        .append("  final Map<String, dynamic> _item = <String, dynamic>{};\n")
+                        .append("  _item[Sk.toText(").append(param(params, 0)).append(")] = ")
+                        .append(param(params, 1)).append(";\n")
+                        .append("  Sk.list(").append(widget(param(params, 3))).append(").insert(Sk.toNumber(")
+                        .append(param(params, 2)).append(").toInt(), _item);\n")
+                        .append("}");
+                break;
+            case "getAtListMap":
+                code.append("Sk.toText((Sk.list(").append(widget(param(params, 2)))
+                        .append(")[Sk.toNumber(").append(param(params, 0))
+                        .append(").toInt()] as Map)[Sk.toText(").append(param(params, 1))
+                        .append(")])");
+                break;
+            case "setListMap":
+                code.append("(Sk.list(").append(widget(param(params, 3)))
+                        .append(")[Sk.toNumber(").append(param(params, 2))
+                        .append(").toInt()] as Map)[Sk.toText(").append(param(params, 0))
+                        .append(")] = ").append(param(params, 1)).append(";");
+                break;
+            case "containListMap":
+                code.append("(Sk.list(").append(widget(param(params, 0)))
+                        .append(")[Sk.toNumber(").append(param(params, 1))
+                        .append(").toInt()] as Map).containsKey(Sk.toText(")
+                        .append(param(params, 2)).append("))");
+                break;
+            case "insertMapToList":
+                code.append("Sk.list(").append(widget(param(params, 2))).append(").insert(Sk.toNumber(")
+                        .append(param(params, 1)).append(").toInt(), ")
+                        .append(param(params, 0)).append(");");
+                break;
+            case "getMapInList":
+                code.append("Sk.setVar(").append(widget(param(params, 2))).append(", Sk.list(")
+                        .append(widget(param(params, 1))).append(")[Sk.toNumber(")
+                        .append(param(params, 0)).append(").toInt()]);");
+                break;
+
+            // --- mapas (Fase 2) ---
+            case "mapCreateNew":
+                code.append("Sk.setVar(").append(widget(param(params, 0)))
+                        .append(", <String, dynamic>{});");
+                break;
+            case "mapPut":
+                code.append("Sk.map(").append(widget(param(params, 0))).append(")[Sk.toText(")
+                        .append(param(params, 1)).append(")] = ").append(param(params, 2)).append(";");
+                break;
+            case "mapGet":
+                code.append("Sk.toText(Sk.map(").append(widget(param(params, 0)))
+                        .append(")[Sk.toText(").append(param(params, 1)).append(")])");
+                break;
+            case "mapContainKey":
+                code.append("Sk.map(").append(widget(param(params, 0)))
+                        .append(").containsKey(Sk.toText(").append(param(params, 1)).append("))");
+                break;
+            case "mapRemoveKey":
+                code.append("Sk.map(").append(widget(param(params, 0))).append(").remove(Sk.toText(")
+                        .append(param(params, 1)).append("));");
+                break;
+            case "mapSize":
+                code.append("Sk.map(").append(widget(param(params, 0))).append(").length");
+                break;
+            case "mapIsEmpty":
+                code.append("Sk.map(").append(widget(param(params, 0))).append(").isEmpty");
+                break;
+            case "mapClear":
+                code.append("Sk.map(").append(widget(param(params, 0))).append(").clear();");
+                break;
+            case "mapGetAllKeys":
+                code.append("Sk.setKeys(").append(widget(param(params, 1))).append(", Sk.map(")
+                        .append(widget(param(params, 0))).append("));");
+                break;
+
+            // --- JSON <-> mapas/listas (Fase 2) ---
+            case "strToMap":
+                code.append("Sk.setVar(").append(widget(param(params, 1))).append(", Sk.jsonToMap(")
+                        .append(param(params, 0)).append("));");
+                break;
+            case "strToListMap":
+                code.append("Sk.setVar(").append(widget(param(params, 1))).append(", Sk.jsonToListMap(")
+                        .append(param(params, 0)).append("));");
+                break;
+            case "mapToStr":
+            case "listMapToStr":
+                code.append("Sk.jsonEncode(").append(param(params, 0)).append(")");
+                break;
+
+            // --- persistencia: SharedPreferences (Fase 2) ---
+            case "fileSetFileName":
+                code.append("Sk.setPrefFileName(").append(widget(param(params, 0))).append(", ")
+                        .append(param(params, 1)).append(");");
+                break;
+            case "fileGetData":
+                code.append("Sk.getPrefString(").append(widget(param(params, 0))).append(", ")
+                        .append(param(params, 1)).append(")");
+                break;
+            case "fileSetData":
+                code.append("Sk.setPrefString(").append(widget(param(params, 0))).append(", ")
+                        .append(param(params, 1)).append(", ").append(param(params, 2)).append(");");
+                break;
+            case "fileRemoveData":
+                code.append("Sk.removePref(").append(widget(param(params, 0))).append(", ")
+                        .append(param(params, 1)).append(");");
+                break;
+
+            // --- timers (Fase 2) ---
+            case "timerAfter":
+                code.append("Sk.timerAfter(").append(widget(param(params, 0))).append(", ")
+                        .append(param(params, 1)).append(", () {\n")
+                        .append(indent(generateSubStack(bean.subStack1), 1)).append("\n});");
+                break;
+            case "timerEvery":
+                code.append("Sk.timerEvery(").append(widget(param(params, 0))).append(", ")
+                        .append(param(params, 1)).append(", ").append(param(params, 2))
+                        .append(", () {\n")
+                        .append(indent(generateSubStack(bean.subStack1), 1)).append("\n});");
+                break;
+            case "timerCancel":
+                code.append("Sk.timerCancel(").append(widget(param(params, 0))).append(");");
+                break;
+
+            // --- dialogos (Fase 2) ---
+            case "dialogSetTitle":
+                code.append("Sk.dialogSetTitle(").append(widget(param(params, 0))).append(", ")
+                        .append(param(params, 1)).append(");");
+                break;
+            case "dialogSetMessage":
+                code.append("Sk.dialogSetMessage(").append(widget(param(params, 0))).append(", ")
+                        .append(param(params, 1)).append(");");
+                break;
+            case "dialogShow":
+                code.append("Sk.dialogShow(context, ").append(widget(param(params, 0))).append(");");
+                break;
+            case "dialogDismiss":
+                code.append("Sk.dialogDismiss(context);");
+                break;
+            case "dialogOkButton":
+                code.append(dialogButton(param(params, 0), "okText", "onOk", param(params, 1),
+                        generateSubStack(bean.subStack1)));
+                break;
+            case "dialogCancelButton":
+                code.append(dialogButton(param(params, 0), "cancelText", "onCancel", param(params, 1),
+                        generateSubStack(bean.subStack1)));
+                break;
+            case "dialogNeutralButton":
+                code.append(dialogButton(param(params, 0), "neutralText", "onNeutral", param(params, 1),
+                        generateSubStack(bean.subStack1)));
+                break;
+
+            // --- cadenas/fecha extra (Fase 2) ---
+            case "toStringFormat":
+                code.append("Sk.decimalFormat(").append(param(params, 1)).append(", ")
+                        .append(param(params, 0)).append(")");
+                break;
+            case "currentTime":
+                code.append("DateTime.now().millisecondsSinceEpoch");
+                break;
+
+            // --- ListView/Spinner con datos (Fase 2) ---
+            case "listSetData":
+                code.append("Sk.setListData(").append(widget(param(params, 0))).append(", ")
+                        .append(param(params, 1)).append(");");
+                break;
+            case "listRefresh":
+                code.append("Sk.refreshList(").append(widget(param(params, 0))).append(");");
+                break;
+            case "listSetItemChecked":
+                code.append("Sk.setListItemChecked(").append(widget(param(params, 0)))
+                        .append(", Sk.toNumber(").append(param(params, 1))
+                        .append(").toInt(), Sk.toBool(").append(param(params, 2)).append("));");
+                break;
+            case "listGetCheckedPosition":
+                code.append("Sk.getCheckedPosition(").append(widget(param(params, 0))).append(")");
+                break;
+            case "listGetCheckedPositions":
+                code.append("Sk.setVar(").append(widget(param(params, 1)))
+                        .append(", Sk.getCheckedPositions(").append(widget(param(params, 0)))
+                        .append("));");
+                break;
+            case "listGetCheckedCount":
+                code.append("Sk.getCheckedCount(").append(widget(param(params, 0))).append(")");
+                break;
+            case "spnSetData":
+                code.append("Sk.setSpinnerData(").append(widget(param(params, 0))).append(", ")
+                        .append(param(params, 1)).append(");");
+                break;
+            case "spnRefresh":
+                code.append("Sk.refreshSpinner(").append(widget(param(params, 0))).append(");");
+                break;
+            case "spnSetSelection":
+                code.append("Sk.setSpinnerIndex(").append(widget(param(params, 0)))
+                        .append(", Sk.toNumber(").append(param(params, 1)).append(").toInt());");
+                break;
+            case "spnGetSelection":
+                code.append("Sk.getSpinnerIndex(").append(widget(param(params, 0))).append(")");
+                break;
+
             // --- variables declaradas / bloques personalizados de otros addons ---
             case "addCustomVariable":
                 code.append("// variable global: ").append(param(params, 0));
@@ -596,6 +855,18 @@ public class DartBlocks {
             code.setLength(0);
         }
         return code.toString();
+    }
+
+    /**
+     * @return codigo del boton de un dialogo de Sketchware ({@code dialogOkButton} y similares):
+     * asigna el texto del boton y engancha el cuerpo del evento como {@code void Function()}.
+     */
+    private String dialogButton(String dialogVariable, String textProperty, String callbackProperty,
+                                String text, String body) {
+        String dialog = "Sk.dialog(" + widget(dialogVariable) + ")";
+        return dialog + "." + textProperty + " = " + text + ";\n"
+                + dialog + "." + callbackProperty + " = () {\n"
+                + indent(body, 1) + "\n};";
     }
 
     private String mathCall(String function, ArrayList<String> params, int count) {

@@ -28,6 +28,9 @@ public class DartWidgets {
     private final Map<String, ViewBean> viewsById = new LinkedHashMap<>();
     private final Map<String, Map<String, String>> events;
     private final Set<String> dynamicTextIds;
+    private final Set<String> listDataIds;
+    private final Set<String> spinnerDataIds;
+    private FlutterAssets assets;
     private final ArrayList<String> todos = new ArrayList<>();
     /**
      * Comentario TODO que debe emitirse inmediatamente antes del widget que se esta generando
@@ -41,9 +44,14 @@ public class DartWidgets {
      * @param dynamicTextIds ids cuyo texto se modifica con bloques {@code setText}; se muestran con
      *                       {@code Sk.bindText} para que los cambios se reflejen.
      */
-    public DartWidgets(ArrayList<ViewBean> views, Map<String, Map<String, String>> events, Set<String> dynamicTextIds) {
+    public DartWidgets(ArrayList<ViewBean> views, Map<String, Map<String, String>> events,
+                       Set<String> dynamicTextIds, Set<String> listDataIds,
+                       Set<String> spinnerDataIds, FlutterAssets assets) {
         this.events = events;
         this.dynamicTextIds = dynamicTextIds;
+        this.listDataIds = listDataIds;
+        this.spinnerDataIds = spinnerDataIds;
+        this.assets = assets;
         if (views != null) {
             for (ViewBean view : views) {
                 viewsById.put(view.id, view);
@@ -253,8 +261,12 @@ public class DartWidgets {
         if (src.startsWith("http://") || src.startsWith("https://")) {
             return "Image.network(\n  '" + src + "',\n  key: const ValueKey('" + bean.id + "'),\n)";
         }
+        String asset = assets == null ? null : assets.imageAsset(src);
+        if (asset != null) {
+            return "Image.asset(\n  '" + asset + "',\n  key: const ValueKey('" + bean.id + "'),\n)";
+        }
         pendingComment = comment(bean.id + " ImageView (" + simpleName
-                + "): recurso '" + src + "' no copiado a assets");
+                + "): recurso '" + src + "' no encontrado o no soportado (assets)");
         return "Container(\n"
                 + "  key: const ValueKey('" + bean.id + "'),\n"
                 + "  child: const Icon(Icons.image, size: 48),\n"
@@ -280,6 +292,24 @@ public class DartWidgets {
     private String spinnerWidget(ViewBean bean) {
         String event = body(bean, "onItemSelected");
         String onChanged = event.isEmpty() ? "{}" : "() {\n" + indent(event, 1) + "\n}";
+        if (spinnerDataIds != null && spinnerDataIds.contains(bean.id)) {
+            String id = literal(bean.id);
+            String changed = event.isEmpty() ? "" : indent(event, 3);
+            return "Sk.bindSpinner(" + id + ", (context, items, selected) => DropdownButton<String>(\n"
+                    + "  key: const ValueKey('" + bean.id + "'),\n"
+                    + "  value: items.isEmpty\n"
+                    + "      ? null\n"
+                    + "      : Sk.toText(items[selected < 0 || selected >= items.length ? 0 : selected]),\n"
+                    + "  items: <DropdownMenuItem<String>>[\n"
+                    + "    for (final item in Sk.distinct(items))\n"
+                    + "      DropdownMenuItem<String>(value: Sk.toText(item), child: Text(Sk.toText(item))),\n"
+                    + "  ],\n"
+                    + "  onChanged: (value) {\n"
+                    + "    Sk.setSpinnerIndex(" + id + ", value == null ? -1 : items.indexOf(value));\n"
+                    + (changed.isEmpty() ? "" : changed + "\n")
+                    + "  },\n"
+                    + "))";
+        }
         pendingComment = comment(bean.id + " Spinner: falta `spnSetData`");
         return "DropdownButton<String>(\n"
                 + "  key: const ValueKey('" + bean.id + "'),\n"
@@ -292,6 +322,20 @@ public class DartWidgets {
         String event = body(bean, "onItemClick");
         if (event.isEmpty()) {
             event = body(bean, "onItemSelected");
+        }
+        if (listDataIds != null && listDataIds.contains(bean.id)) {
+            String id = literal(bean.id);
+            String tap = event.isEmpty() ? "" : indent(event, 4);
+            return "Sk.bindList(" + id + ", (context, items) => ListView.builder(\n"
+                    + "  key: const ValueKey('" + bean.id + "'),\n"
+                    + "  itemCount: items.length,\n"
+                    + "  itemBuilder: (context, index) {\n"
+                    + "    return ListTile(\n"
+                    + "      title: Text(Sk.toText(items[index])),\n"
+                    + (tap.isEmpty() ? "" : "      onTap: () {\n" + tap + "\n      },\n")
+                    + "    );\n"
+                    + "  },\n"
+                    + "))";
         }
         String onTap = event.isEmpty() ? "" : "  onTap: () {\n" + indent(event, 2) + "\n  },\n";
         pendingComment = comment(bean.id + " " + simpleName + ": falta `listSetData` (adapter)");
@@ -360,8 +404,13 @@ public class DartWidgets {
         if (text == null) {
             return "";
         }
+        String fontFamily = assets == null ? null : assets.fontFamily(text.textFont);
         StringBuilder sb = new StringBuilder("TextStyle(");
         boolean first = true;
+        if (fontFamily != null) {
+            sb.append("fontFamily: '").append(fontFamily).append("'");
+            first = false;
+        }
         if (text.textSize > 0) {
             sb.append("fontSize: ").append(text.textSize).append(".0");
             first = false;

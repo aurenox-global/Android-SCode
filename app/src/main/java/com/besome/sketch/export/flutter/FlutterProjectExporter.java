@@ -54,6 +54,7 @@ public class FlutterProjectExporter {
     private final ArrayList<String> screenMappings = new ArrayList<>();
     private final ArrayList<String> blockMappings = new ArrayList<>();
     private final ArrayList<String> todos = new ArrayList<>();
+    private final FlutterAssets assets;
 
     public FlutterProjectExporter(Context context, String scId, String projectName,
                                   String applicationName, String packageName) {
@@ -62,6 +63,7 @@ public class FlutterProjectExporter {
         this.projectName = projectName;
         this.applicationName = applicationName;
         this.packageName = packageName;
+        this.assets = new FlutterAssets(scId);
     }
 
     /**
@@ -140,12 +142,27 @@ public class FlutterProjectExporter {
         files.put("lib/main.dart", DartTemplates.mainDart(applicationName, homeScreen, screenImports));
         files.put("lib/theme.dart", DartTemplates.themeDart(0xFF008DCD));
         files.put("lib/runtime/sk.dart", DartTemplates.skRuntime());
-        files.put("pubspec.yaml", DartTemplates.pubspec(pubspecName(), applicationName));
+        files.put("pubspec.yaml", DartTemplates.pubspec(pubspecName(), applicationName,
+                assets.assetsYaml(), assets.fontsYaml()));
+        for (String copiedImage : assets.getCopiedImages()) {
+            blockMappings.add("recurso `" + copiedImage + "` copiado a `assets/`");
+        }
+        for (String missingImage : assets.getMissingImages()) {
+            if (!todos.contains("imagen `" + missingImage + "` no copiada (placeholder + TODO)")) {
+                todos.add("imagen `" + missingImage + "` no copiada (placeholder + TODO)");
+            }
+        }
+        for (String missingFont : assets.getMissingFonts()) {
+            if (!todos.contains("fuente `" + missingFont + "` no copiada (se usa la fuente por defecto)")) {
+                todos.add("fuente `" + missingFont + "` no copiada (se usa la fuente por defecto)");
+            }
+        }
         files.put("README.md", DartTemplates.readme(projectName, applicationName, packageName,
-                markdownList(screenMappings), markdownList(blockMappings), markdownList(todos)));
+                markdownList(screenMappings), markdownList(blockMappings), markdownList(todos),
+                markdownList(assets.getCopiedImages()), markdownList(assets.getCopiedFonts())));
 
         File output = new File(outputDirectory, projectName + "_flutter.zip");
-        writeZip(output, files);
+        writeZip(output, files, assets.getAssetFiles());
         return output;
     }
 
@@ -174,6 +191,8 @@ public class FlutterProjectExporter {
 
         Map<String, String> intentScreens = scanIntentScreens(logic);
         Set<String> dynamicTextIds = scanDynamicTextIds(logic);
+        Set<String> listDataIds = scanDataBindingIds(logic, "listSetData");
+        Set<String> spinnerDataIds = scanDataBindingIds(logic, "spnSetData");
         Set<String> viewIds = new LinkedHashSet<>();
         for (ViewBean view : views) {
             viewIds.add(view.id);
@@ -216,7 +235,8 @@ public class FlutterProjectExporter {
 
         InjectRootLayoutManager.Root root =
                 new InjectRootLayoutManager(scId).getLayoutByFileName(xmlName);
-        DartWidgets widgets = new DartWidgets(views, viewEvents, dynamicTextIds);
+        DartWidgets widgets = new DartWidgets(views, viewEvents, dynamicTextIds, listDataIds,
+                spinnerDataIds, assets);
         String layout = widgets.build(root.getClassName(), root.getAttributes());
         for (String todo : widgets.getTodos()) {
             if (!todos.contains(todo)) {
@@ -321,6 +341,22 @@ public class FlutterProjectExporter {
         return result;
     }
 
+    /**
+     * @return ids de vista usados por los bloques de datos de listas o spinners
+     * ({@code listSetData}/{@code spnSetData}) para pintarlos con datos en vez de vacios.
+     */
+    private Set<String> scanDataBindingIds(HashMap<String, ArrayList<BlockBean>> logic, String opcode) {
+        Set<String> result = new LinkedHashSet<>();
+        for (ArrayList<BlockBean> blocks : logic.values()) {
+            for (BlockBean block : blocks) {
+                if (opcode.equals(block.opCode) && !block.parameters.isEmpty()) {
+                    result.add(block.parameters.get(0));
+                }
+            }
+        }
+        return result;
+    }
+
     private String initialTextOf(ArrayList<ViewBean> views, String id) {
         for (ViewBean view : views) {
             if (id.equals(view.id) && view.text != null) {
@@ -332,7 +368,8 @@ public class FlutterProjectExporter {
 
     // ---------------------------------------------------------------- zip
 
-    private void writeZip(File output, LinkedHashMap<String, String> files) throws IOException {
+    private void writeZip(File output, LinkedHashMap<String, String> files,
+                          java.util.List<FlutterAssets.AssetFile> binaryFiles) throws IOException {
         File parent = output.getParentFile();
         if (parent != null && !parent.exists() && !parent.mkdirs()) {
             throw new IOException("No se pudo crear " + parent.getAbsolutePath());
@@ -344,6 +381,20 @@ public class FlutterProjectExporter {
                 entry.setTime(System.currentTimeMillis());
                 zip.putNextEntry(entry);
                 zip.write(file.getValue().getBytes(StandardCharsets.UTF_8));
+                zip.closeEntry();
+            }
+            for (FlutterAssets.AssetFile asset : binaryFiles) {
+                ZipEntry entry = new ZipEntry(asset.zipPath);
+                entry.setTime(System.currentTimeMillis());
+                zip.putNextEntry(entry);
+                try (java.io.InputStream input = new java.io.BufferedInputStream(
+                        new java.io.FileInputStream(asset.source))) {
+                    byte[] buffer = new byte[8192];
+                    int read;
+                    while ((read = input.read(buffer)) > 0) {
+                        zip.write(buffer, 0, read);
+                    }
+                }
                 zip.closeEntry();
             }
         }
@@ -453,7 +504,7 @@ public class FlutterProjectExporter {
         return sb.append('\'').toString();
     }
 
-    private static String markdownList(ArrayList<String> lines) {
+    private static String markdownList(java.util.List<String> lines) {
         if (lines.isEmpty()) {
             return "_ninguno_";
         }

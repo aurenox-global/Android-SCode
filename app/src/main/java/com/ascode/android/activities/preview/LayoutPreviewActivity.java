@@ -3127,13 +3127,22 @@ public class LayoutPreviewActivity extends BaseAppCompatActivity {
             android.widget.LinearLayout.LayoutParams params =
                     new android.widget.LinearLayout.LayoutParams(width, height, layout.weight);
             params.setMargins(dp(layout.marginLeft), dp(layout.marginTop), dp(layout.marginRight), dp(layout.marginBottom));
-            params.gravity = layout.layoutGravity;
+            // GRAVITY_NONE (0) NO es un "gravity" valido para el hijo: si se asigna, LinearLayout
+            // lo toma como valor propio del hijo y PISA la gravity del contenedor (un LinearLayout
+            // con android:gravity="center" dejaba al hijo a la izquierda). Solo se fija cuando el
+            // usuario eligio una; si no, se deja el -1 por defecto (= usar la del padre), igual que
+            // hace el lienzo y el XML compilado.
+            if (layout.layoutGravity != com.besome.sketch.beans.LayoutBean.GRAVITY_NONE) {
+                params.gravity = layout.layoutGravity;
+            }
             view.setLayoutParams(params);
             return;
         }
         if (parent instanceof android.widget.FrameLayout) {
             android.widget.FrameLayout.LayoutParams params =
-                    new android.widget.FrameLayout.LayoutParams(width, height, layout.layoutGravity);
+                    new android.widget.FrameLayout.LayoutParams(width, height,
+                            layout.layoutGravity != com.besome.sketch.beans.LayoutBean.GRAVITY_NONE
+                                    ? layout.layoutGravity : android.view.Gravity.TOP | android.view.Gravity.START);
             params.setMargins(dp(layout.marginLeft), dp(layout.marginTop), dp(layout.marginRight), dp(layout.marginBottom));
             view.setLayoutParams(params);
             return;

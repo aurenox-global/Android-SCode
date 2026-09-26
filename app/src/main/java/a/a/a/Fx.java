@@ -239,6 +239,14 @@ public class Fx {
 
     private String getBlockCode(BlockBean bean, ArrayList<String> params) {
         String opcode = "";
+        /*
+         * Los bloques de dibujo de la paleta View (setGravity, setCornerRadius*, setStroke*)
+         * se generan aqui de forma explicita y con tipos cualificados, y ademas NO deben pasar
+         * por el borrado generico de mas abajo (hasEmptySelectorParam) cuando lo unico que falta
+         * es un parametro secundario (color/gravity): antes eso hacia que el bloque no emitiera
+         * NADA de codigo, en silencio, y por eso "no hacia nada".
+         */
+        boolean handlesEmptySelectorParams = false;
         switch (bean.opCode) {
             case "definedFunc":
                 int space = bean.spec.indexOf(" ");
@@ -1402,6 +1410,47 @@ public class Fx {
             case "locationManagerRemoveUpdates":
                 opcode = params.get(0) + ".removeUpdates(_" + params.get(0) + "_location_listener);";
                 break;
+            case "setGravity": {
+                String target = paramOrEmpty(params, 0);
+                opcode = target.isEmpty()
+                        ? ""
+                        : String.format("%s.setGravity(%s);", target, gravityFlags(params));
+                handlesEmptySelectorParams = true;
+                break;
+            }
+            case "setCornerRadiusView":
+            case "setCornerRadius": {
+                // Nombres cualificados a proposito: el bloque no debe depender de imports comodines
+                // ni de que la definicion resuelta por nombre (BlockLoader) traiga el codigo bueno.
+                String target = paramOrEmpty(params, 0);
+                opcode = target.isEmpty()
+                        ? ""
+                        : String.format("%s.setBackground(new android.graphics.drawable.GradientDrawable() { public android.graphics.drawable.GradientDrawable getIns(int a, int b) { this.setCornerRadius(a); this.setColor(b); return this; } }.getIns((int)%s, %s));",
+                        target, paramOrEmpty(params, 1), colorOrTransparent(paramOrEmpty(params, 2)));
+                handlesEmptySelectorParams = true;
+                break;
+            }
+            case "setStrokeView":
+            case "setStroke": {
+                String target = paramOrEmpty(params, 0);
+                opcode = target.isEmpty()
+                        ? ""
+                        : String.format("%s.setBackground(new android.graphics.drawable.GradientDrawable() { public android.graphics.drawable.GradientDrawable getIns(int a, int b, int c) { this.setStroke(a, b); this.setColor(c); return this; } }.getIns((int)%s, %s, %s));",
+                        target, paramOrEmpty(params, 1), colorOrTransparent(paramOrEmpty(params, 2)),
+                        colorOrTransparent(paramOrEmpty(params, 3)));
+                handlesEmptySelectorParams = true;
+                break;
+            }
+            case "setRadiusAndStrokeView": {
+                String target = paramOrEmpty(params, 0);
+                opcode = target.isEmpty()
+                        ? ""
+                        : String.format("%s.setBackground(new android.graphics.drawable.GradientDrawable() { public android.graphics.drawable.GradientDrawable getIns(int a, int b, int c, int d) { this.setCornerRadius(a); this.setStroke(b, c); this.setColor(d); return this; } }.getIns((int)%s, (int)%s, %s, %s));",
+                        target, paramOrEmpty(params, 1), paramOrEmpty(params, 2),
+                        colorOrTransparent(paramOrEmpty(params, 3)), colorOrTransparent(paramOrEmpty(params, 4)));
+                handlesEmptySelectorParams = true;
+                break;
+            }
             default:
                 opcode = getCodeExtraBlock(bean, "\"\"");
         }
@@ -1411,10 +1460,48 @@ public class Fx {
           However, upon decompiling this class, it completely ignore this case.
           This is the solution for now to prevent errors during code generation.
          */
-        if (hasEmptySelectorParam(params, bean.spec)) {
+        if (!handlesEmptySelectorParams && hasEmptySelectorParam(params, bean.spec)) {
             opcode = "";
         }
         return opcode;
+    }
+
+    /**
+     * @return El parametro en esa posicion, o {@code ""} si el bloque no tiene tantos parametros.
+     */
+    private String paramOrEmpty(ArrayList<String> params, int index) {
+        if (index < 0 || index >= params.size()) {
+            return "";
+        }
+        String value = params.get(index);
+        return value == null ? "" : value;
+    }
+
+    /**
+     * @return El color indicado, o {@code android.graphics.Color.TRANSPARENT} si el usuario no lo
+     * ha seleccionado (mismo valor que muestra el selector de color del editor).
+     */
+    private String colorOrTransparent(String color) {
+        return color.isEmpty() ? "android.graphics.Color.TRANSPARENT" : color;
+    }
+
+    /**
+     * @return Una expresion Java con las banderas de gravedad presentes, unidas por {@code |}.
+     * Los parametros vacios se omiten (antes hacian que el bloque no emitiera codigo alguno).
+     */
+    private String gravityFlags(ArrayList<String> params) {
+        StringBuilder flags = new StringBuilder();
+        for (int i = 1; i <= 2; i++) {
+            String value = paramOrEmpty(params, i);
+            if (value.isEmpty()) {
+                continue;
+            }
+            if (flags.length() > 0) {
+                flags.append(" | ");
+            }
+            flags.append("android.view.Gravity.").append(value);
+        }
+        return flags.length() == 0 ? "android.view.Gravity.NO_GRAVITY" : flags.toString();
     }
 
     private String getCodeExtraBlock(BlockBean blockBean, String var2) {

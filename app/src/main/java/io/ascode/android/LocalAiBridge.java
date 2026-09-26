@@ -165,6 +165,14 @@ public class LocalAiBridge implements AutoCloseable {
         }
         int topK = config.getTopK() > 0 ? config.getTopK() : archTopK;
         float presence = presencePenalty >= 0f ? presencePenalty : config.getPresencePenalty();
+        // The native sampler only adds its penalties stage when a repeat penalty other
+        // than 1.0 or a positive presence penalty is requested. With the default preset
+        // (presence 0.0, repeat 1.0) that stage was missing entirely, so small local
+        // models fell into degenerate repetition loops (e.g. repeating the same clause).
+        // Enforce a mild anti-repetition floor so the penalties stage is always active.
+        if (repeatPenalty <= 1.0f && presence <= 0f) {
+            repeatPenalty = 1.1f;
+        }
         return new SamplingParams(temperature, topP, presence, repeatPenalty, topK);
     }
 

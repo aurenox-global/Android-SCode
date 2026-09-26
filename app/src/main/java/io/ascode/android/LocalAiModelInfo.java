@@ -77,7 +77,8 @@ public class LocalAiModelInfo {
             kvCount = Math.min(kvCount, 500L);
             for (long i = 0; i < kvCount; i++) {
                 String key = readString(data);
-                int type = data.readUnsignedByte();
+                // GGUF stores the value type as a little-endian uint32, not a single byte.
+                int type = (int) Integer.toUnsignedLong(data.readInt());
                 if ("general.architecture".equals(key) && type == 8) {
                     archHolder[0] = readString(data);
                     continue;
@@ -131,7 +132,8 @@ public class LocalAiModelInfo {
                 readString(data);
                 return null;
             case 9: // ARRAY
-                int elementType = data.readUnsignedByte();
+                // GGUF stores the array element type as a little-endian uint32 as well.
+                int elementType = (int) Integer.toUnsignedLong(data.readInt());
                 long elementCount = data.readLong();
                 elementCount = Math.min(elementCount, 100_000L);
                 for (long j = 0; j < elementCount; j++) {

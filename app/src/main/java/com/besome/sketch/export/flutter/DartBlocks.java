@@ -37,6 +37,16 @@ public class DartBlocks {
      * Variables de Intent -> nombre de la Activity a la que apuntan (bloques {@code intentSetScreen}).
      */
     private final Map<String, String> intentScreens;
+    /**
+     * Registro de componentes (Fase 3): los opcodes de componentes Android marcan que plugin de
+     * pub.dev hay que anadir al {@code pubspec.yaml} generado.
+     */
+    private final DartComponents components;
+    /**
+     * Cadenas del proyecto (Fase 3): los bloques {@code getResStr}/{@code getResString} registran
+     * aqui las claves que acaban en {@code lib/strings.dart}.
+     */
+    private final FlutterStrings strings;
     private final ArrayList<String> todoLines = new ArrayList<>();
 
     private Map<String, BlockBean> blockMap = new HashMap<>();
@@ -44,8 +54,15 @@ public class DartBlocks {
     private String parentOperator = "";
 
     public DartBlocks(ArrayList<BlockBean> eventBlocks, Map<String, String> intentScreens) {
+        this(eventBlocks, intentScreens, null, null);
+    }
+
+    public DartBlocks(ArrayList<BlockBean> eventBlocks, Map<String, String> intentScreens,
+                      DartComponents components, FlutterStrings strings) {
         this.eventBlocks = eventBlocks;
         this.intentScreens = intentScreens;
+        this.components = components;
+        this.strings = strings;
     }
 
     /**
@@ -289,6 +306,10 @@ public class DartBlocks {
     // ---------------------------------------------------------------- emisores
 
     private String getBlockCode(BlockBean bean, ArrayList<String> params) {
+        // Fase 3: cualquier opcode de componente marca su plugin para el pubspec generado.
+        if (components != null) {
+            components.useForOpcode(bean.opCode);
+        }
         StringBuilder code = new StringBuilder();
         switch (bean.opCode) {
             // --- variables ---
@@ -834,6 +855,315 @@ public class DartBlocks {
                 code.append("Sk.getSpinnerIndex(").append(widget(param(params, 0))).append(")");
                 break;
 
+            // ================================================================
+            // Fase 3: componentes Android -> plugins Flutter (open source)
+            // ================================================================
+
+            // --- WebView -> webview_flutter ---
+            case "webViewLoadUrl":
+                code.append("SkCWebView.loadUrl(").append(widget(param(params, 0))).append(", ")
+                        .append(param(params, 1)).append(");");
+                break;
+            case "webViewGoBack":
+                code.append("SkCWebView.goBack(").append(widget(param(params, 0))).append(");");
+                break;
+            case "webViewGoForward":
+                code.append("SkCWebView.goForward(").append(widget(param(params, 0))).append(");");
+                break;
+            case "webViewClearCache":
+                code.append("SkCWebView.clearCache(").append(widget(param(params, 0))).append(");");
+                break;
+            case "webViewGetUrl":
+            case "webViewCanGoBack":
+            case "webViewCanGoForward":
+            case "webViewSetCacheMode":
+            case "webViewClearHistory":
+            case "webViewStopLoading":
+            case "webViewZoomIn":
+            case "webViewZoomOut":
+                // En Flutter estas operaciones son asincronas o no existen: TODO compilable.
+                code.append(todo(bean, params));
+                break;
+
+            // --- Camara -> camera ---
+            case "camerastarttakepicture":
+                code.append("SkCCamera.takePicture(").append(widget(param(params, 0)))
+                        .append(", '');");
+                break;
+
+            // --- Galeria / selector de ficheros -> image_picker ---
+            case "filepickerstartpickfiles":
+                code.append("SkCPicker.pickFiles(").append(widget(param(params, 0)))
+                        .append(", '');");
+                break;
+
+            // --- Audio -> audioplayers ---
+            case "mediaplayerCreate":
+                code.append("SkCAudio.create(").append(widget(param(params, 0))).append(", ")
+                        .append(widget(param(params, 1))).append(");");
+                break;
+            case "mediaplayerStart":
+                code.append("SkCAudio.start(").append(widget(param(params, 0))).append(");");
+                break;
+            case "mediaplayerPause":
+                code.append("SkCAudio.pause(").append(widget(param(params, 0))).append(");");
+                break;
+            case "mediaplayerSeek":
+                code.append("SkCAudio.seek(").append(widget(param(params, 0))).append(", ")
+                        .append(param(params, 1)).append(");");
+                break;
+            case "mediaplayerReset":
+                code.append("SkCAudio.reset(").append(widget(param(params, 0))).append(");");
+                break;
+            case "mediaplayerRelease":
+                code.append("SkCAudio.release(").append(widget(param(params, 0))).append(");");
+                break;
+            case "mediaplayerSetLooping":
+                code.append("SkCAudio.setLooping(").append(widget(param(params, 0))).append(", ")
+                        .append(param(params, 1)).append(");");
+                break;
+            case "mediaplayerGetCurrent":
+            case "mediaplayerGetDuration":
+            case "mediaplayerIsPlaying":
+            case "mediaplayerIsLooping":
+            case "soundpoolCreate":
+            case "soundpoolLoad":
+            case "soundpoolStreamPlay":
+            case "soundpoolStreamStop":
+                // Los getters son asincronos en audioplayers y SoundPool no tiene equivalente
+                // directo: TODO compilable (la dependencia ya queda en el pubspec).
+                code.append(todo(bean, params));
+                break;
+
+            // --- Video -> video_player ---
+            case "videoviewSetVideoUri":
+                code.append("SkCVideo.setUri(").append(widget(param(params, 0))).append(", ")
+                        .append(param(params, 1)).append(");");
+                break;
+            case "videoviewStart":
+                code.append("SkCVideo.start(").append(widget(param(params, 0))).append(");");
+                break;
+            case "videoviewPause":
+                code.append("SkCVideo.pause(").append(widget(param(params, 0))).append(");");
+                break;
+            case "videoviewStop":
+                code.append("SkCVideo.stop(").append(widget(param(params, 0))).append(");");
+                break;
+            case "videoviewGetCurrentPosition":
+            case "videoviewGetDuration":
+            case "videoviewIsPlaying":
+            case "videoviewCanPause":
+            case "videoviewCanSeekBackward":
+            case "videoviewCanSeekForward":
+                code.append(todo(bean, params));
+                break;
+
+            // --- GPS / ubicacion -> geolocator ---
+            case "locationManagerRequestLocationUpdates":
+                code.append("SkCLocation.startUpdates(").append(widget(param(params, 0)))
+                        .append(", ").append(widget(param(params, 1))).append(", ")
+                        .append(param(params, 2)).append(", ").append(param(params, 3))
+                        .append(");");
+                break;
+            case "locationManagerRemoveUpdates":
+                code.append("SkCLocation.stopUpdates(").append(widget(param(params, 0)))
+                        .append(");");
+                break;
+
+            // --- Sensores -> sensors_plus ---
+            case "gyroscopeStartListen":
+                code.append("SkCSensors.startGyroscope(").append(widget(param(params, 0)))
+                        .append(");");
+                break;
+            case "gyroscopeStopListen":
+                code.append("SkCSensors.stopGyroscope(").append(widget(param(params, 0)))
+                        .append(");");
+                break;
+
+            // --- Bluetooth -> flutter_blue_plus ---
+            case "bluetoothConnectStartConnection":
+            case "bluetoothConnectStartConnectionToUuid":
+                code.append("SkCBluetooth.startConnection(").append(widget(param(params, 0)))
+                        .append(", ").append(param(params, 1)).append(", ")
+                        .append(param(params, 2)).append(");");
+                break;
+            case "bluetoothConnectReadyConnection":
+            case "bluetoothConnectReadyConnectionToUuid":
+                code.append("SkCBluetooth.startConnection(").append(widget(param(params, 0)))
+                        .append(", ").append(param(params, 1)).append(", ")
+                        .append(param(params, 2)).append(");");
+                break;
+            case "bluetoothConnectStopConnection":
+                code.append("SkCBluetooth.stopConnection(").append(widget(param(params, 0)))
+                        .append(", ").append(param(params, 1)).append(");");
+                break;
+            case "bluetoothConnectSendData":
+                code.append("SkCBluetooth.sendData(").append(widget(param(params, 0)))
+                        .append(", ").append(param(params, 1)).append(", ")
+                        .append(param(params, 2)).append(");");
+                break;
+            case "bluetoothConnectActivateBluetooth":
+                code.append("SkCBluetooth.activateBluetooth();");
+                break;
+            case "bluetoothConnectGetPairedDevices":
+                code.append("SkCBluetooth.getPairedDevices(").append(widget(param(params, 0)))
+                        .append(", ").append(widget(param(params, 1))).append(");");
+                break;
+            case "bluetoothConnectIsBluetoothEnabled":
+            case "bluetoothConnectIsBluetoothActivated":
+            case "bluetoothConnectGetRandomUuid":
+                // Devuelven un valor asincrono en Flutter: TODO compilable.
+                code.append(todo(bean, params));
+                break;
+
+            // --- MapView -> flutter_map (OpenStreetMap, libre) ---
+            case "mapViewMoveCamera":
+                code.append("SkCMap.state(").append(widget(param(params, 0))).append(").move(")
+                        .append(param(params, 1)).append(", ").append(param(params, 2))
+                        .append(", ").append(param(params, 3)).append(");");
+                break;
+            case "mapViewZoomTo":
+                code.append("SkCMap.state(").append(widget(param(params, 0))).append(").zoomTo(")
+                        .append(param(params, 1)).append(");");
+                break;
+            case "mapViewAddMarker":
+                code.append("SkCMap.state(").append(widget(param(params, 0))).append(").addMarker(")
+                        .append(param(params, 1)).append(", ").append(param(params, 2))
+                        .append(", ").append(param(params, 3)).append(");");
+                break;
+            case "mapViewZoomIn":
+            case "mapViewZoomOut":
+            case "mapViewSetMapType":
+            case "mapViewSetMarkerInfo":
+            case "mapViewSetMarkerPosition":
+            case "mapViewSetMarkerColor":
+            case "mapViewSetMarkerIcon":
+            case "mapViewSetMarkerVisible":
+                // flutter_map no expone estas operaciones igual que Google Maps: TODO compilable.
+                code.append(todo(bean, params));
+                break;
+
+            // --- Anuncios: SDK de pago/servicio -> TODO explicito ---
+            case "adViewLoadAd":
+            case "interstitialadCreate":
+            case "interstitialadLoadAd":
+            case "interstitialadShow":
+            case "rewardedVideoAdLoad":
+            case "rewardedVideoAdShow":
+                code.append("// TODO: anuncios en Flutter requieren un SDK de anuncios (p.ej. google_mobile_ads).\n");
+                code.append(todo(bean, params));
+                break;
+
+            // ================================================================
+            // Fase 3: patrones de UI
+            // ================================================================
+            case "isDrawerOpen":
+                code.append("Sk.isDrawerOpen(context)");
+                break;
+            case "openDrawer":
+                code.append("Sk.openDrawer(context);");
+                break;
+            case "closeDrawer":
+                code.append("Sk.closeDrawer(context);");
+                break;
+            case "fabIcon":
+                code.append("Sk.setFabIcon('_fab', ").append(widget(param(params, 0))).append(");");
+                break;
+            case "fabVisibility":
+                code.append("Sk.setFabVisible('_fab', Sk.toText(").append(widget(param(params, 0)))
+                        .append(") == 'visible');");
+                break;
+            case "fabSize":
+                code.append(todo(bean, params));
+                break;
+
+            // --- Menu de opciones -> PopupMenuButton en el AppBar ---
+            case "menuAddItem":
+            case "menuAddMenuItem":
+            case "menuAddSubmenu":
+            case "submenuAddItem":
+                code.append("Sk.addMenuItem(").append(lastTextParam(params)).append(");");
+                break;
+            case "menuInflater":
+                code.append("// TODO: menuInflater (menu XML) -> define las acciones con PopupMenuItem.\n");
+                code.append(todo(bean, params));
+                break;
+
+            // --- TabLayout -> TabBar ---
+            case "addTab":
+                code.append("Sk.addTab(").append(widget(param(params, 0))).append(", ")
+                        .append(param(params, 1)).append(");");
+                break;
+            case "setSelectedTabIndicatorColor":
+                code.append("Sk.setTabIndicatorColor(").append(widget(param(params, 0)))
+                        .append(", ").append(dartColor(param(params, 1))).append(");");
+                break;
+            case "setTabTextColors":
+                code.append("Sk.setTabTextColors(").append(widget(param(params, 0)))
+                        .append(", ").append(dartColor(param(params, 1))).append(", ")
+                        .append(dartColor(param(params, 2))).append(");");
+                break;
+            case "setupWithViewPager":
+                code.append("// TODO: TabLayout+ViewPager sincronizados (usa un TabController).\n");
+                code.append(todo(bean, params));
+                break;
+
+            // --- BottomNavigationView -> BottomNavigationBar ---
+            case "bottomMenuAddItem":
+                code.append("Sk.addBottomItem(").append(widget(param(params, 0))).append(", ")
+                        .append(param(params, 2)).append(", ").append(widget(param(params, 3)))
+                        .append(");");
+                break;
+
+            // --- ViewPager -> PageView ---
+            case "pagerSetCurrentItem":
+                code.append("Sk.setPage(").append(widget(param(params, 0))).append(", ")
+                        .append(param(params, 1)).append(");");
+                break;
+            case "pagerGetCurrentItem":
+                code.append("Sk.currentPage(").append(widget(param(params, 0))).append(")");
+                break;
+            case "pagerSetFragmentAdapter":
+                code.append("Sk.setPageCount(").append(widget(param(params, 0))).append(", ")
+                        .append(param(params, 2))
+                        .append("); // TODO: contenido de cada fragmento");
+                break;
+            case "pagerSetOffscreenPageLimit":
+            case "pagerGetOffscreenPageLimit":
+                code.append(todo(bean, params));
+                break;
+
+            // --- Adapters personalizados -> ListView.builder esbozado + TODO ---
+            case "listSetCustomViewData":
+            case "recyclerSetCustomViewData":
+            case "gridSetCustomViewData":
+            case "spnSetCustomViewData":
+            case "pagerSetCustomViewData": {
+                String target = widget(param(params, 0));
+                String data = param(params, 1);
+                code.append("// TODO: adapter personalizado -> el builder del widget esta esbozado;")
+                        .append(" enlaza aqui los campos del layout del item.\n");
+                code.append("Sk.setListData(").append(target).append(", ").append(data)
+                        .append(");");
+                break;
+            }
+
+            // --- Cadenas de recursos -> lib/strings.dart ---
+            case "getResStr": {
+                String key = bean.spec == null ? "" : bean.spec;
+                code.append(strings == null
+                        ? "Sk.resStr('" + escapeString(key) + "')"
+                        : strings.dart(key));
+                break;
+            }
+            case "getResString": {
+                String key = unquote(param(params, 0));
+                code.append(strings == null
+                        ? "Sk.resStr('" + escapeString(key) + "')"
+                        : strings.dart(key));
+                break;
+            }
+
             // --- variables declaradas / bloques personalizados de otros addons ---
             case "addCustomVariable":
                 code.append("// variable global: ").append(param(params, 0));
@@ -855,6 +1185,77 @@ public class DartBlocks {
             code.setLength(0);
         }
         return code.toString();
+    }
+
+    /**
+     * @return el parametro {@code index} como id de componente/vista sin comillas ({@code 'id'}).
+     */
+    private static String unquote(String value) {
+        String text = value == null ? "" : value;
+        if (text.length() >= 2 && text.charAt(0) == '"' && text.charAt(text.length() - 1) == '"') {
+            text = text.substring(1, text.length() - 1);
+        }
+        return text;
+    }
+
+    /**
+     * @return el ultimo parametro que parece un literal de texto Dart ({@code "titulo"}), o el
+     * ultimo parametro si ninguno lo parece. Los bloques de menu ponen el titulo al final y el
+     * numero de parametros varia entre versiones de Sketchware.
+     */
+    private static String lastTextParam(ArrayList<String> params) {
+        for (int i = params.size() - 1; i >= 0; i--) {
+            String value = params.get(i);
+            if (value != null && value.startsWith("\"")) {
+                return value;
+            }
+        }
+        return params.isEmpty() ? "\"\"" : params.get(params.size() - 1);
+    }
+
+    /**
+     * @return el color de un bloque ({@code #RRGGBB}, {@code 0xAARRGGBB}, numero ARGB o nombre de
+     * color de Sketchware) como {@code Color} de Dart.
+     */
+    private static String dartColor(String value) {
+        String text = unquote(value).trim();
+        if (text.startsWith("#")) {
+            String hex = text.substring(1).toUpperCase();
+            if (hex.length() == 6) {
+                return "Color(0xFF" + hex + ")";
+            }
+            if (hex.length() == 8) {
+                return "Color(0x" + hex + ")";
+            }
+        }
+        if (text.startsWith("0x") || text.startsWith("0X")) {
+            return "Color(" + text + ")";
+        }
+        if (text.matches("-?\\d+")) {
+            return "Color(0xFF000000 | (" + text + " & 0xFFFFFF))";
+        }
+        switch (text.toLowerCase()) {
+            case "black":
+                return "Colors.black";
+            case "white":
+                return "Colors.white";
+            case "red":
+                return "Colors.red";
+            case "green":
+                return "Colors.green";
+            case "blue":
+                return "Colors.blue";
+            case "yellow":
+                return "Colors.yellow";
+            case "gray", "grey":
+                return "Colors.grey";
+            case "orange":
+                return "Colors.orange";
+            case "purple":
+                return "Colors.purple";
+            default:
+                return "Colors.blueGrey";
+        }
     }
 
     /**

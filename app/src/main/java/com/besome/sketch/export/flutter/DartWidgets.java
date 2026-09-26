@@ -30,8 +30,20 @@ public class DartWidgets {
     private final Set<String> dynamicTextIds;
     private final Set<String> listDataIds;
     private final Set<String> spinnerDataIds;
+    /** Ids de vista que usan un adapter personalizado ({@code *SetCustomViewData}). */
+    private final Set<String> customViewDataIds;
+    /** Cadenas de recursos del proyecto (Fase 3). */
+    private final FlutterStrings strings;
+    /** Registro de componentes (Fase 3): marca los plugins que usa el layout. */
+    private final DartComponents components;
     private FlutterAssets assets;
     private final ArrayList<String> todos = new ArrayList<>();
+    /** Widget del FAB extraido del layout (va en {@code Scaffold.floatingActionButton}). */
+    private String fabWidget = "";
+    /** Widget de la barra de navegacion extraida (va en {@code Scaffold.bottomNavigationBar}). */
+    private String bottomNavWidget = "";
+    /** Widget del TabBar extraido (va en {@code AppBar.bottom}). */
+    private String tabBarWidget = "";
     /**
      * Comentario TODO que debe emitirse inmediatamente antes del widget que se esta generando
      * (nunca dentro de una expresion: rompe la sintaxis Dart).
@@ -47,10 +59,22 @@ public class DartWidgets {
     public DartWidgets(ArrayList<ViewBean> views, Map<String, Map<String, String>> events,
                        Set<String> dynamicTextIds, Set<String> listDataIds,
                        Set<String> spinnerDataIds, FlutterAssets assets) {
+        this(views, events, dynamicTextIds, listDataIds, spinnerDataIds,
+                java.util.Collections.emptySet(), null, null, assets);
+    }
+
+    public DartWidgets(ArrayList<ViewBean> views, Map<String, Map<String, String>> events,
+                       Set<String> dynamicTextIds, Set<String> listDataIds,
+                       Set<String> spinnerDataIds, Set<String> customViewDataIds,
+                       FlutterStrings strings, DartComponents components, FlutterAssets assets) {
         this.events = events;
         this.dynamicTextIds = dynamicTextIds;
         this.listDataIds = listDataIds;
         this.spinnerDataIds = spinnerDataIds;
+        this.customViewDataIds = customViewDataIds == null
+                ? java.util.Collections.emptySet() : customViewDataIds;
+        this.strings = strings;
+        this.components = components;
         this.assets = assets;
         if (views != null) {
             for (ViewBean view : views) {
@@ -59,6 +83,27 @@ public class DartWidgets {
                         key -> new ArrayList<>()).add(view);
             }
         }
+    }
+
+    /**
+     * @return el FAB del layout como widget (o cadena vacia si el layout no tiene FAB).
+     */
+    public String getFloatingActionButton() {
+        return fabWidget;
+    }
+
+    /**
+     * @return la barra de navegacion del layout (o cadena vacia).
+     */
+    public String getBottomNavigationBar() {
+        return bottomNavWidget;
+    }
+
+    /**
+     * @return el TabBar del layout (o cadena vacia).
+     */
+    public String getTabBar() {
+        return tabBarWidget;
     }
 
     /**
@@ -162,6 +207,22 @@ public class DartWidgets {
         pendingComment = "";
         String simpleName = simpleName(bean.convert.isEmpty()
                 ? bean.getClassInfo().getClassName() : bean.convert);
+
+        /* Patrones de UI (Fase 3): FAB, TabLayout y BottomNavigation no van en el cuerpo, sino
+         * en las ranuras del Scaffold (los extrae el generador de la pantalla). */
+        if (isFab(simpleName)) {
+            fabWidget = fabWidget(bean);
+            return "";
+        }
+        if ("BottomNavigationView".equals(simpleName)) {
+            bottomNavWidget = "Sk.bottomNav('" + bean.id + "')";
+            return "";
+        }
+        if ("TabLayout".equals(simpleName)) {
+            tabBarWidget = "Sk.tabBar('" + bean.id + "')";
+            return "";
+        }
+
         String inner;
         switch (simpleName) {
             case "LinearLayout" -> inner = containerWidget(simpleName, bean.layout.orientation,
@@ -178,6 +239,10 @@ public class DartWidgets {
             case "Switch", "SwitchCompat" -> inner = switchWidget(bean);
             case "Spinner" -> inner = spinnerWidget(bean);
             case "ListView", "RecyclerView", "GridView" -> inner = listWidget(bean, simpleName);
+            case "ViewPager" -> inner = "Sk.pageView('" + bean.id + "')";
+            case "WebView" -> inner = webViewWidget(bean);
+            case "VideoView" -> inner = videoWidget(bean);
+            case "MapView" -> inner = mapWidget(bean);
             case "ProgressBar" -> inner = progressWidget(bean);
             case "SeekBar" -> inner = seekBarWidget(bean);
             case "include" -> inner = todo(bean, "include de layout");
@@ -188,6 +253,69 @@ public class DartWidgets {
             result = pendingComment + "\n" + result;
         }
         return result;
+    }
+
+    private static boolean isFab(String simpleName) {
+        return "FloatingActionButton".equals(simpleName) || "FAB".equals(simpleName);
+    }
+
+    private String fabWidget(ViewBean bean) {
+        String onClick = body(bean, "onClick");
+        String key = "key: const ValueKey('" + bean.id + "')";
+        return "Sk.bindFab('_fab', FloatingActionButton(\n"
+                + "  " + key + ",\n"
+                + "  onPressed: () {\n" + indent(onClick, 2) + "\n  },\n"
+                + "  child: Sk.fabIcon('_fab'),\n"
+                + "))";
+    }
+
+    /**
+     * @return el nombre del recurso de icono del FAB del layout (o cadena vacia); el generador de
+     * la pantalla lo usa para sembrar el icono con {@code Sk.setFabIcon}.
+     */
+    public String getFabIconResource() {
+        for (ViewBean view : viewsById.values()) {
+            String simpleName = simpleName(view.convert.isEmpty()
+                    ? view.getClassInfo().getClassName() : view.convert);
+            if (isFab(simpleName)) {
+                if (view.image == null || view.image.resName == null
+                        || view.image.resName.isEmpty() || "NONE".equals(view.image.resName)) {
+                    return "";
+                }
+                return view.image.resName;
+            }
+        }
+        return "";
+    }
+
+    /**
+     * {@code WebView} -> {@code SkCWebView.build('id')} (plugin {@code webview_flutter}).
+     */
+    private String webViewWidget(ViewBean bean) {
+        if (components != null) {
+            components.use(DartComponents.WEBVIEW);
+        }
+        return "SkCWebView.build('" + bean.id + "')";
+    }
+
+    /**
+     * {@code VideoView} -> {@code SkCVideo.build('id')} (plugin {@code video_player}).
+     */
+    private String videoWidget(ViewBean bean) {
+        if (components != null) {
+            components.use(DartComponents.VIDEO);
+        }
+        return "SkCVideo.build('" + bean.id + "')";
+    }
+
+    /**
+     * {@code MapView} -> {@code SkCMap.build('id')} (plugin {@code flutter_map}, OpenStreetMap).
+     */
+    private String mapWidget(ViewBean bean) {
+        if (components != null) {
+            components.use(DartComponents.MAP);
+        }
+        return "SkCMap.build('" + bean.id + "')";
     }
 
     private String textWidget(ViewBean bean) {
@@ -203,12 +331,12 @@ public class DartWidgets {
         String eventCode = tapEvent(bean);
         if (!eventCode.isEmpty()) {
             return "GestureDetector(\n" + indent(eventCode, 1) + "\n  child: Text(\n"
-                    + "    " + literal(bean.text.text) + ",\n"
+                    + "    " + textLiteral(bean.text.text) + ",\n"
                     + "    " + key + ",\n"
                     + (style.isEmpty() ? "" : "    style: " + style + ",\n")
                     + "  ),\n)";
         }
-        return "Text(\n  " + literal(bean.text.text) + ",\n  " + key + ",\n"
+        return "Text(\n  " + textLiteral(bean.text.text) + ",\n  " + key + ",\n"
                 + (style.isEmpty() ? "" : "  style: " + style + ",\n") + ")";
     }
 
@@ -230,7 +358,7 @@ public class DartWidgets {
             sb.append("ElevatedButton(\n");
             sb.append("  onPressed: () {\n").append(indent(onClick, 2)).append("\n  },\n");
             sb.append("  ").append(key).append(",\n");
-            sb.append("  child: Text(").append(literal(bean.text.text)).append("),\n)");
+            sb.append("  child: Text(").append(textLiteral(bean.text.text)).append("),\n)");
         }
         if (!onLong.isEmpty()) {
             sb.append(",\n)");
@@ -243,7 +371,8 @@ public class DartWidgets {
         sb.append("  controller: Sk.controller('").append(bean.id).append("'),\n");
         sb.append("  key: const ValueKey('").append(bean.id).append("'),\n");
         if (bean.text.hint != null && !bean.text.hint.isEmpty()) {
-            sb.append("  decoration: InputDecoration(hintText: ").append(literal(bean.text.hint)).append("),\n");
+            sb.append("  decoration: InputDecoration(hintText: ")
+                    .append(textLiteral(bean.text.hint)).append("),\n");
         }
         String onChanged = body(bean, "onTextChanged");
         if (!onChanged.isEmpty()) {
@@ -332,6 +461,26 @@ public class DartWidgets {
                     + "  itemBuilder: (context, index) {\n"
                     + "    return ListTile(\n"
                     + "      title: Text(Sk.toText(items[index])),\n"
+                    + (tap.isEmpty() ? "" : "      onTap: () {\n" + tap + "\n      },\n")
+                    + "    );\n"
+                    + "  },\n"
+                    + "))";
+        }
+        if (customViewDataIds.contains(bean.id)) {
+            /* Adapter personalizado (Fase 3): `ListView.builder` esbozado + TODO explicito para
+             * enlazar los campos del layout del item. */
+            String id = literal(bean.id);
+            String tap = event.isEmpty() ? "" : indent(event, 4);
+            return "Sk.bindList(" + id + ", (context, items) => ListView.builder(\n"
+                    + "  key: const ValueKey('" + bean.id + "'),\n"
+                    + "  itemCount: items.length,\n"
+                    + "  itemBuilder: (context, index) {\n"
+                    + "    final dynamic item = items[index];\n"
+                    + "    // TODO: adapter personalizado: enlaza aqui los campos del layout del item\n"
+                    + "    // (item es la lista/mapa de datos: usa Sk.toText(item) o\n"
+                    + "    // Sk.map(...)[...] para leer cada campo).\n"
+                    + "    return ListTile(\n"
+                    + "      title: Text(Sk.toText(item)),\n"
                     + (tap.isEmpty() ? "" : "      onTap: () {\n" + tap + "\n      },\n")
                     + "    );\n"
                     + "  },\n"
@@ -612,6 +761,18 @@ public class DartWidgets {
             }
         }
         return sb.append('\'').toString();
+    }
+
+    /**
+     * @return el texto de una vista como expresion Dart: si es una referencia
+     * {@code @string/<clave>} se resuelve con {@code Sk.resStr(...)} y se registra en
+     * {@code strings.dart} (Fase 3).
+     */
+    private String textLiteral(String value) {
+        if (strings != null && strings.isReference(value)) {
+            return strings.dart(strings.referenceKey(value));
+        }
+        return literal(value);
     }
 
     /**

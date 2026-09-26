@@ -19,19 +19,22 @@ public final class DartTemplates {
     }
 
     public static String pubspec(String pubspecName, String description, String assetsYaml,
-                                 String fontsYaml) {
+                                 String fontsYaml, String extraDependencies) {
         String flutterSection = "flutter:\n  uses-material-design: true\n"
                 + (assetsYaml == null ? "" : assetsYaml)
                 + (fontsYaml == null ? "" : fontsYaml);
         String yaml = """
                 # pubspec.yaml generado por Android-SCode (Export Project -> Flutter project).
                 #
-                # El proyecto esta listo para `flutter run` desde la raiz del zip:
+                # El proyecto esta listo para compilarse EN LOCAL (no hace falta ningun servicio
+                # en la nube) desde la raiz del zip:
                 #   flutter pub get
+                #   flutter build apk --release
+                # o, en desarrollo:
                 #   flutter run
                 #
-                # Dependencia externa: shared_preferences (persistencia de los bloques
-                # `fileGetData`/`fileSetData`). `flutter pub get` la descarga de pub.dev.
+                # Dependencia fija: shared_preferences (persistencia de los bloques
+                # `fileGetData`/`fileSetData`).
                 name: __NAME__
                 description: __DESCRIPTION__
                 publish_to: "none"
@@ -44,7 +47,7 @@ public final class DartTemplates {
                   flutter:
                     sdk: flutter
                   shared_preferences: ^2.2.3
-
+                __DEPS__
                 dev_dependencies:
                   flutter_test:
                     sdk: flutter
@@ -53,8 +56,33 @@ public final class DartTemplates {
                 __FLUTTER__
                 """;
         yaml = fill(yaml, "__NAME__", pubspecName);
+        yaml = fill(yaml, "__DEPS__",
+                extraDependencies == null || extraDependencies.isEmpty() ? "" : extraDependencies);
         yaml = fill(yaml, "__DESCRIPTION__", description == null ? "" : description);
         return fill(yaml, "__FLUTTER__", flutterSection);
+    }
+
+    /**
+     * @return contenido de {@code lib/strings.dart}: mapa {@code clave -> valor} de las cadenas
+     * usadas por la logica/los layouts y la funcion {@code str()} que las resuelve.
+     */
+    public static String stringsDart(java.util.Map<String, String> values) {
+        StringBuilder sb = new StringBuilder(1024);
+        sb.append("// strings.dart generado por Android-SCode desde res/values/strings.xml.\n");
+        sb.append("//\n");
+        sb.append("// Solo se incluyen las cadenas que usa el codigo generado. Los bloques\n");
+        sb.append("// `getResStr`/`getResString` y las referencias `@string/...` de los layouts\n");
+        sb.append("// se resuelven con `Sk.resStr('clave')`.\n\n");
+        sb.append("/// Cadenas del proyecto Android original.\n");
+        sb.append("const Map<String, String> kStrings = <String, String>{\n");
+        for (java.util.Map.Entry<String, String> entry : values.entrySet()) {
+            sb.append("  '").append(FlutterStrings.escape(entry.getKey())).append("': '")
+                    .append(FlutterStrings.escape(entry.getValue())).append("',\n");
+        }
+        sb.append("};\n\n");
+        sb.append("/// Devuelve la cadena `key` (o la propia clave si no existe), como `getString()`.");
+        sb.append("\nString str(String key) => kStrings[key] ?? key;\n");
+        return sb.toString();
     }
 
     public static String mainDart(String title, String homeScreenClass, String imports) {
@@ -140,6 +168,8 @@ public final class DartTemplates {
 
                 import 'package:flutter/material.dart';
                 import 'package:shared_preferences/shared_preferences.dart';
+
+                import '../strings.dart';
 
                 /// Equivalente Dart del runtime de Android generado por Android-SCode.
                 class Sk {
@@ -612,6 +642,175 @@ public final class DartTemplates {
                   static num log10(num a) => math.log(a) / math.ln10;
                   static num toRadian(num a) => a * math.pi / 180;
                   static num toDegree(num a) => a * 180 / math.pi;
+
+                  // --- Cadenas de recursos: strings.xml (Fase 3) ---
+
+                  /// `getResStr`/`getResString` y `@string/...` -> `strings.dart`.
+                  static String resStr(String key) => str(key);
+
+                  // --- Drawer (Fase 3) ---
+
+                  static bool isDrawerOpen(BuildContext context) =>
+                      Scaffold.of(context).isDrawerOpen;
+
+                  static void openDrawer(BuildContext context) =>
+                      Scaffold.of(context).openDrawer();
+
+                  static void closeDrawer(BuildContext context) =>
+                      Scaffold.of(context).closeDrawer();
+
+                  // --- FAB: icono y visibilidad (Fase 3) ---
+
+                  static final Map<String, ValueNotifier<IconData>> _fabIcons =
+                      <String, ValueNotifier<IconData>>{};
+                  static final Map<String, ValueNotifier<bool>> _fabVisible =
+                      <String, ValueNotifier<bool>>{};
+
+                  static ValueNotifier<IconData> _fabIconValue(String id) =>
+                      _fabIcons.putIfAbsent(id, () => ValueNotifier<IconData>(Icons.add));
+
+                  static void setFabIcon(String id, dynamic name) {
+                    _fabIconValue(id).value = resolveIcon(toText(name));
+                  }
+
+                  /// `fabIcon` en el layout: icono que se puede cambiar con `setFabIcon`.
+                  static Widget fabIcon(String id) => ValueListenableBuilder<IconData>(
+                        valueListenable: _fabIconValue(id),
+                        builder: (context, icon, _) => Icon(icon),
+                      );
+
+                  static void setFabVisible(String id, dynamic visible) {
+                    _fabVisible
+                        .putIfAbsent(id, () => ValueNotifier<bool>(true))
+                        .value = toBool(visible);
+                  }
+
+                  /// Envuelve el FAB para que `fabVisibility` lo oculte/muestre.
+                  static Widget bindFab(String id, Widget fab) => ValueListenableBuilder<bool>(
+                        valueListenable: _fabVisible.putIfAbsent(
+                            id, () => ValueNotifier<bool>(true)),
+                        builder: (context, visible, _) =>
+                            visible ? fab : const SizedBox.shrink(),
+                      );
+
+                  /// Traduce el nombre de un `drawable` a un `IconData` de Material.
+                  static IconData resolveIcon(String name) {
+                    final String key = name.toLowerCase().replaceAll('-', '_');
+                    if (key.contains('add')) return Icons.add;
+                    if (key.contains('edit')) return Icons.edit;
+                    if (key.contains('delete')) return Icons.delete;
+                    if (key.contains('search')) return Icons.search;
+                    if (key.contains('settings')) return Icons.settings;
+                    if (key.contains('home')) return Icons.home;
+                    if (key.contains('menu')) return Icons.menu;
+                    if (key.contains('arrow_back')) return Icons.arrow_back;
+                    if (key.contains('check')) return Icons.check;
+                    if (key.contains('close') || key.contains('cancel')) return Icons.close;
+                    if (key.contains('favorite') || key.contains('star')) return Icons.favorite;
+                    if (key.contains('share')) return Icons.share;
+                    if (key.contains('call')) return Icons.call;
+                    if (key.contains('send')) return Icons.send;
+                    if (key.contains('next')) return Icons.arrow_forward;
+                    if (key.contains('previous')) return Icons.arrow_back;
+                    return Icons.add;
+                  }
+
+                  // --- Menu de opciones -> PopupMenuButton (Fase 3) ---
+
+                  static final List<String> menuItems = <String>[];
+
+                  static void addMenuItem(dynamic title) {
+                    menuItems.add(toText(title));
+                  }
+
+                  /// `onCreateOptionsMenu` + `menuAddItem` -> acciones del AppBar.
+                  static Widget menuButton(BuildContext context) => PopupMenuButton<int>(
+                        icon: const Icon(Icons.more_vert),
+                        onSelected: (int index) => todo('menu item seleccionado', <dynamic>[index]),
+                        itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
+                          for (int i = 0; i < menuItems.length; i++)
+                            PopupMenuItem<int>(value: i, child: Text(menuItems[i])),
+                        ],
+                      );
+
+                  // --- TabLayout -> TabBar (Fase 3) ---
+
+                  static final Map<String, ValueNotifier<List<String>>> _tabs =
+                      <String, ValueNotifier<List<String>>>{};
+                  static final Map<String, int> tabIndex = <String, int>{};
+
+                  static ValueNotifier<List<String>> tabValue(String id) => _tabs.putIfAbsent(
+                      id, () => ValueNotifier<List<String>>(<String>[]));
+
+                  static void addTab(String id, dynamic title) {
+                    tabValue(id).value = <String>[...tabValue(id).value, toText(title)];
+                  }
+
+                  /// `TabLayout` del layout -> `TabBar` alimentado por los bloques `addTab`.
+                  static Widget tabBar(String id) => _SkTabBar(id: id);
+
+                  static final Map<String, Color> _tabIndicator = <String, Color>{};
+                  static final Map<String, Color> _tabTextSelected = <String, Color>{};
+                  static final Map<String, Color> _tabTextNormal = <String, Color>{};
+
+                  static void setTabIndicatorColor(String id, Color color) {
+                    _tabIndicator[id] = color;
+                    tabValue(id).value = List<String>.from(tabValue(id).value);
+                  }
+
+                  static void setTabTextColors(String id, Color normal, Color selected) {
+                    _tabTextNormal[id] = normal;
+                    _tabTextSelected[id] = selected;
+                    tabValue(id).value = List<String>.from(tabValue(id).value);
+                  }
+
+                  // --- BottomNavigationView -> BottomNavigationBar (Fase 3) ---
+
+                  static final Map<String, ValueNotifier<List<String>>> _bottomItems =
+                      <String, ValueNotifier<List<String>>>{};
+                  static final Map<String, List<IconData>> _bottomIcons =
+                      <String, List<IconData>>{};
+                  static final Map<String, int> bottomIndex = <String, int>{};
+
+                  static ValueNotifier<List<String>> bottomValue(String id) => _bottomItems
+                      .putIfAbsent(id, () => ValueNotifier<List<String>>(<String>[]));
+
+                  static void addBottomItem(String id, dynamic title, dynamic icon) {
+                    bottomValue(id).value = <String>[...bottomValue(id).value, toText(title)];
+                    _bottomIcons
+                        .putIfAbsent(id, () => <IconData>[])
+                        .add(resolveIcon(toText(icon)));
+                  }
+
+                  /// `BottomNavigationView` del layout -> `BottomNavigationBar`.
+                  static Widget bottomNav(String id) => _SkBottomNav(id: id);
+
+                  // --- ViewPager -> PageView (Fase 3) ---
+
+                  static final Map<String, PageController> _pageControllers =
+                      <String, PageController>{};
+                  static final Map<String, ValueNotifier<int>> _pageCounts =
+                      <String, ValueNotifier<int>>{};
+
+                  static PageController pageController(String id) =>
+                      _pageControllers.putIfAbsent(id, () => PageController());
+
+                  static ValueNotifier<int> pageCountValue(String id) => _pageCounts.putIfAbsent(
+                      id, () => ValueNotifier<int>(1));
+
+                  static void setPageCount(String id, dynamic count) {
+                    pageCountValue(id).value = toNumber(count).toInt();
+                  }
+
+                  static void setPage(String id, dynamic index) {
+                    pageController(id).jumpToPage(toNumber(index).toInt());
+                  }
+
+                  static int currentPage(String id) =>
+                      pageController(id).page?.toInt() ?? 0;
+
+                  /// `ViewPager` del layout -> `PageView`.
+                  static Widget pageView(String id) => _SkPageView(id: id);
                 }
 
                 /// Estado de un dialogo de Sketchware (`dialogSetTitle`, `dialogOkButton`, ...).
@@ -625,6 +824,121 @@ public final class DartTemplates {
                   void Function()? onCancel;
                   void Function()? onNeutral;
                 }
+
+                /// `TabBar` de la Fase 3: sigue la lista de pestanas de `Sk.tabValue(id)`.
+                class _SkTabBar extends StatefulWidget {
+                  const _SkTabBar({required this.id});
+
+                  final String id;
+
+                  @override
+                  State<_SkTabBar> createState() => _SkTabBarState();
+                }
+
+                class _SkTabBarState extends State<_SkTabBar>
+                    with SingleTickerProviderStateMixin {
+                  TabController? _controller;
+                  int _length = -1;
+
+                  @override
+                  void dispose() {
+                    _controller?.dispose();
+                    super.dispose();
+                  }
+
+                  @override
+                  Widget build(BuildContext context) {
+                    return ValueListenableBuilder<List<String>>(
+                      valueListenable: Sk.tabValue(widget.id),
+                      builder: (context, items, _) {
+                        if (items.isEmpty) return const SizedBox.shrink();
+                        if (_controller == null || _length != items.length) {
+                          _controller?.dispose();
+                          _length = items.length;
+                          _controller = TabController(length: items.length, vsync: this);
+                          _controller!.addListener(() {
+                            Sk.tabIndex[widget.id] = _controller!.index;
+                          });
+                        }
+                        return TabBar(
+                          controller: _controller,
+                          indicatorColor: Sk._tabIndicator[widget.id],
+                          labelColor: Sk._tabTextSelected[widget.id],
+                          unselectedLabelColor: Sk._tabTextNormal[widget.id],
+                          isScrollable: true,
+                          tabs: <Widget>[
+                            for (final String item in items) Tab(text: item),
+                          ],
+                        );
+                      },
+                    );
+                  }
+                }
+
+                /// `BottomNavigationBar` de la Fase 3.
+                class _SkBottomNav extends StatefulWidget {
+                  const _SkBottomNav({required this.id});
+
+                  final String id;
+
+                  @override
+                  State<_SkBottomNav> createState() => _SkBottomNavState();
+                }
+
+                class _SkBottomNavState extends State<_SkBottomNav> {
+                  @override
+                  Widget build(BuildContext context) {
+                    return ValueListenableBuilder<List<String>>(
+                      valueListenable: Sk.bottomValue(widget.id),
+                      builder: (context, items, _) {
+                        if (items.isEmpty) return const SizedBox.shrink();
+                        final List<IconData> icons =
+                            Sk._bottomIcons[widget.id] ?? <IconData>[];
+                        int selected = Sk.bottomIndex[widget.id] ?? 0;
+                        if (selected < 0 || selected >= items.length) selected = 0;
+                        return BottomNavigationBar(
+                          items: <BottomNavigationBarItem>[
+                            for (int i = 0; i < items.length; i++)
+                              BottomNavigationBarItem(
+                                icon: Icon(
+                                    i < icons.length ? icons[i] : Icons.circle),
+                                label: items[i],
+                              ),
+                          ],
+                          currentIndex: selected,
+                          onTap: (int index) => Sk.bottomIndex[widget.id] = index,
+                        );
+                      },
+                    );
+                  }
+                }
+
+                /// `PageView` de la Fase 3 (una pagina por cada fragmento declarado;
+                /// el contenido de cada pagina queda como TODO).
+                class _SkPageView extends StatefulWidget {
+                  const _SkPageView({required this.id});
+
+                  final String id;
+
+                  @override
+                  State<_SkPageView> createState() => _SkPageViewState();
+                }
+
+                class _SkPageViewState extends State<_SkPageView> {
+                  @override
+                  Widget build(BuildContext context) {
+                    return ValueListenableBuilder<int>(
+                      valueListenable: Sk.pageCountValue(widget.id),
+                      builder: (context, count, _) => PageView(
+                        controller: Sk.pageController(widget.id),
+                        children: <Widget>[
+                          for (int i = 0; i < count; i++)
+                            Center(child: Text('Pagina ${i + 1}')),
+                        ],
+                      ),
+                    );
+                  }
+                }
                 """;
     }
 
@@ -635,32 +949,70 @@ public final class DartTemplates {
                                 String blockMappings,
                                 String todoSummary,
                                 String assetsSummary,
-                                String fontsSummary) {
+                                String fontsSummary,
+                                String componentDependencies,
+                                String componentsSummary,
+                                String patternsSummary,
+                                String adaptersSummary,
+                                String stringsSummary) {
         String template = """
                 # __APP__ - proyecto Flutter generado por Android-SCode
 
                 Exportado desde el proyecto Sketchware Pro **__PROJECT__** (paquete Android
-                `__PACKAGE__`). El zip contiene un proyecto Flutter autonomo, listo para:
+                `__PACKAGE__`). El zip contiene un proyecto Flutter autonomo y se compila
+                **en local** (no usa ningun servicio en la nube).
 
-                ```bash
-                flutter pub get
-                flutter run
-                ```
+                ## Como compilar en local (PC con Flutter)
+
+                1. Instala el SDK de Flutter (<https://docs.flutter.dev/get-started/install>) y
+                   comprueba que funciona:
+
+                   ```bash
+                   flutter --version
+                   flutter doctor
+                   ```
+
+                2. Descomprime el zip y, desde la carpeta del proyecto:
+
+                   ```bash
+                   flutter pub get
+                   ```
+
+                   Esto descarga de pub.dev las dependencias que aparecen en `pubspec.yaml`.
+
+                3. Para generar un APK de release:
+
+                   ```bash
+                   flutter build apk --release
+                   ```
+
+                   El APK queda en `build/app/outputs/flutter-apk/app-release.apk`.
+                   (Para probar rapido en un movil/emulador: `flutter run`.)
+
+                > Nota: `flutter build apk` necesita Android SDK + JDK 17; el proyecto Android
+                genera el `android/` la primera vez que compiles. Si pub.dev esta detras de un
+                proxy, configura `PUB_HOSTED_URL` antes de `flutter pub get`.
 
                 ## Estructura
 
                 | Ruta | Contenido |
                 | --- | --- |
-                | `pubspec.yaml` | nombre del proyecto, SDK de Dart/Flutter y assets/fuentes |
+                | `pubspec.yaml` | nombre del proyecto, SDK de Dart/Flutter, dependencias y assets/fuentes |
                 | `lib/main.dart` | `MaterialApp` + navegacion inicial |
                 | `lib/theme.dart` | tema Material 3 compartido |
+                | `lib/strings.dart` | cadenas de `res/values/strings.xml` usadas por el codigo |
                 | `lib/screens/<pantalla>.dart` | una pantalla por cada layout/Activity del proyecto |
-                | `lib/runtime/sk.dart` | runtime Dart propio (variables, listas/mapas, prefs, timers, dialogos, Toast, navegacion) |
+                | `lib/runtime/sk.dart` | runtime Dart propio (variables, listas/mapas, prefs, timers, dialogos, Toast, navegacion, drawer/FAB/menus/tabs/bottom-nav/pager) |
+                | `lib/runtime/sk_components.dart` | runtime de componentes con plugins (solo si el proyecto los usa) |
                 | `assets/images/...` | imagenes del proyecto usadas por los layouts |
                 | `assets/fonts/...` | fuentes `.ttf`/`.otf` usadas por los textos |
                 | `README.md` | este documento |
 
-                Unica dependencia externa: `shared_preferences` (persistencia).
+                Dependencias anadidas al `pubspec.yaml` (todas open source, de pub.dev):
+
+                __COMPDEPS__
+
+                Ademas se usa siempre `shared_preferences` (persistencia).
 
                 ## Mapeo de layouts (Android -> Flutter)
 
@@ -739,29 +1091,47 @@ public final class DartTemplates {
 
                 ## Limitaciones conocidas
 
-                - La traduccion cubre layouts + logica de bloques (Fases 1 y 2). Los componentes
-                  con plugin de plataforma (Firebase, camara, Bluetooth, media, sensores, GPS,
-                  `AdView`, `MapView`, `WebView`) siguen como `// TODO:`.
-                - `listSetCustomViewData`/adapters personalizados no se traducen: el `ListView`
-                  queda vacio + TODO.
+                - La traduccion cubre layouts + logica de bloques (Fases 1, 2 y 3). Los
+                  componentes con plugin se traducen a plugins open source (ver mas arriba);
+                  `AdView`/`InterstitialAd`/`RewardedVideoAd` quedan como `// TODO:` porque
+                  requieren un SDK de anuncios (no hay equivalente open source).
+                - Los adapters personalizados generan un `ListView.builder` esbozado con `TODO`
+                  explicito: hay que enlazar a mano los campos del layout del item.
                 - Un `SharedPreferences` se emula con un unico almacen de `shared_preferences`
                   prefijando las claves con el nombre de fichero; los datos previos de Android no
                   se migran automaticamente.
                 - `dialogDismiss` cierra el dialogo mostrado por `dialogShow` (no reproduce el
                   ciclo de vida exacto de `Dialog.dismiss()` de Android).
                 - `timerAfter`/`timerEvery` crean timers Dart (`Timer`); `timerCancel` los cancela.
-                - No se copian `.svg`/vectores `.xml` ni 9-patch a `assets/`; tampoco
-                  `Drawer`, `FAB`, `Toolbar`/menus, `TabLayout`/`BottomNavigation`, `ViewPager`,
-                  cadenas a `l10n`, ni `More Blocks` personalizados.
+                - Los bloques de los plugins que en Android devuelven un valor de forma **sincrona**
+                  (URL/estado del WebView, `mediaplayerGetCurrent`/`GetDuration`, duracion del
+                  video, `isBluetoothEnabled`) son **asincronos** en Flutter: se emiten como TODO
+                  para no romper la compilacion.
+                - No se copian `.svg`/vectores `.xml` ni 9-patch a `assets/`.
+                - `Menu` (opciones): se usa un `PopupMenuButton` en el AppBar; los submenus y el
+                  `menuInflater` (menu XML) quedan como TODO.
+                - `ViewPager`: `PageView` con una pagina por fragmento declarado; el contenido de
+                  cada fragmento queda como TODO.
+                - `More Blocks` personalizados y el codigo Java de `addSourceDirectly` no se
+                  traducen (se emiten como TODO).
 
-                ## Que queda pendiente (Fase 3)
+                ## Cobertura de la Fase 3
 
-                - Emisores de componentes: Firebase, camara/galeria, Bluetooth, media player,
-                  sensores, GPS, `AdView`, `MapView`.
-                - Adapters personalizados (`custom view data`) -> widgets propios.
-                - `.svg`/vectores y cadenas de recursos (`@string`, `getResStr`).
-                - `Drawer`, `FAB`, `Toolbar`/menus, `TabLayout`/`BottomNavigation`, `ViewPager`.
-                - `onCreate`/`initializeLogic` completos y `More Blocks` personalizados.
+                ### Componentes Android -> plugins Flutter (open source)
+
+                __COMPONENTS__
+
+                ### Patrones de UI
+
+                __PATTERNS__
+
+                ### Adapters personalizados
+
+                __ADAPTERS__
+
+                ### Cadenas y recursos
+
+                __STRINGS__
                 """;
         template = fill(template, "__APP__", applicationName);
         template = fill(template, "__PROJECT__", projectName);
@@ -770,6 +1140,11 @@ public final class DartTemplates {
         template = fill(template, "__BLOCKS__", blockMappings);
         template = fill(template, "__TODOS__", todoSummary);
         template = fill(template, "__ASSETS__", assetsSummary);
+        template = fill(template, "__COMPDEPS__", componentDependencies);
+        template = fill(template, "__COMPONENTS__", componentsSummary);
+        template = fill(template, "__PATTERNS__", patternsSummary);
+        template = fill(template, "__ADAPTERS__", adaptersSummary);
+        template = fill(template, "__STRINGS__", stringsSummary);
         return fill(template, "__FONTS__", fontsSummary);
     }
 }

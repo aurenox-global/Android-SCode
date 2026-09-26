@@ -466,7 +466,16 @@ public class Ox {
                     injectText = sanitized;
                 }
             }
-            widgetTag.addAttributeValue(injectText);
+            // Los atributos de forma de un widget sin soporte nativo se representan con el shape
+            // drawable (android:background): si se escribieran ademas como "app:..." romperian el
+            // link de recursos en proyectos sin la libreria Material.
+            if (com.ascode.android.utility.DesignShapeAttrs.supportsShapeBackgroundType(viewBean)
+                    && com.ascode.android.utility.DesignShapeAttrs.hasAnyShape(viewBean.inject)) {
+                injectText = com.ascode.android.utility.DesignShapeAttrs.stripShapeAttributes(injectText);
+            }
+            if (!injectText.isEmpty()) {
+                widgetTag.addAttributeValue(injectText);
+            }
         }
 
         if (!viewBean.parentAttributes.isEmpty()) {

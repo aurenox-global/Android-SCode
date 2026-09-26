@@ -112,6 +112,23 @@ public final class DesignShapeAttrs {
         set(bean, name, "");
     }
 
+    /**
+     * Quita del texto de "inject" los atributos de forma. Se usa al generar el XML: en un widget
+     * sin soporte nativo la forma se representa con el shape drawable (`android:background`), y
+     * escribir ademas `app:cornerRadius` / `app:strokeWidth` / `app:strokeColor` rompe el link de
+     * recursos en proyectos que no incluyen la libreria Material (donde esos atributos no existen).
+     */
+    public static String stripShapeAttributes(String inject) {
+        if (inject == null || inject.isEmpty()) {
+            return inject;
+        }
+        String result = inject;
+        for (String name : new String[]{ATTR_CORNER_RADIUS, ATTR_STROKE_WIDTH, ATTR_STROKE_COLOR}) {
+            result = pattern(name).matcher(result).replaceAll("");
+        }
+        return result.replaceAll("\n{2,}", "\n").trim();
+    }
+
     private static Pattern pattern(String name) {
         // "app:cornerRadius="..." o "android:cornerRadius="..." en cualquier posicion del inject.
         return Pattern.compile("(?:app|android)\\s*:\\s*" + Pattern.quote(name) + "\\s*=\\s*\"([^\"]*)\"");

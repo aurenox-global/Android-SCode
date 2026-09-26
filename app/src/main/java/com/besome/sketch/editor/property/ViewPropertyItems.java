@@ -1030,8 +1030,23 @@ public class ViewPropertyItems extends LinearLayout implements Kw, View.OnClickL
                 }
             }
         }
+        writeShapeDrawable(bean);
     }
 
+    /**
+     * Mantiene el shape drawable del proyecto sincronizado con el bean editado: la vista previa y
+     * el proyecto exportado leen ese fichero, asi que debe existir ya al editar la propiedad.
+     */
+    private void writeShapeDrawable(ViewBean bean) {
+        if (bean == null || sc_id == null || e == null) {
+            return;
+        }
+        try {
+            DesignShapeAttrs.syncProjectDrawable(sc_id, e.getXmlName(), bean);
+        } catch (Throwable ignored) {
+            // Un fallo al escribir el recurso no debe tumbar el editor de diseno.
+        }
+    }
 
     private int shapeSize(ViewBean bean, String attribute) {
         String raw = DesignShapeAttrs.get(bean, attribute).trim();

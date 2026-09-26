@@ -2,6 +2,7 @@ package com.ascode.android.utility;
 
 import android.graphics.Color;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.ImageView;
 
 import androidx.cardview.widget.CardView;

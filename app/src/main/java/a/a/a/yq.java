@@ -760,7 +760,7 @@ public class yq {
      * referenciarlos con {@code android:background}) y tambien en los recursos del proyecto (para
      * que sigan existiendo al exportar a Android Studio). Idempotente: sobrescribe por nombre.
      */
-    private void writeDesignShapeDrawables(java.util.List<ViewBean> views) {
+    private void writeDesignShapeDrawables(String layoutXmlName, java.util.List<ViewBean> views) {
         if (views == null || views.isEmpty()) {
             return;
         }
@@ -784,7 +784,7 @@ public class yq {
             if (xml == null) {
                 continue;
             }
-            String name = DesignShapeAttrs.drawableName(xmlName + "_" + bean.id) + ".xml";
+            String name = DesignShapeAttrs.drawableName(layoutXmlName + "_" + bean.id) + ".xml";
             if (buildDirReady) {
                 fileUtil.b(new File(buildDir, name).getAbsolutePath(), xml);
             }
@@ -843,7 +843,7 @@ public class yq {
             Ox ox = new Ox(N, layout);
             ArrayList<ViewBean> generatedViews = eC.a(projectDataManager.d(xmlName));
             ox.a(generatedViews, projectDataManager.h(xmlName));
-            writeDesignShapeDrawables(generatedViews);
+            writeDesignShapeDrawables(xmlName, generatedViews);
             var ogFile = new File(layoutDir + xmlName);
             if (!layoutFiles.contains(ogFile)) {
                 srcCodeBeans.add(new SrcCodeBean(xmlName, CommandBlock.applyCommands(xmlName, ox.b())));
@@ -866,7 +866,7 @@ public class yq {
             Ox ox = new Ox(N, customViewFile);
             ArrayList<ViewBean> generatedViews = eC.a(projectDataManager.d(xmlName));
             ox.a(generatedViews);
-            writeDesignShapeDrawables(generatedViews);
+            writeDesignShapeDrawables(xmlName, generatedViews);
             var ogFile = new File(layoutDir + xmlName);
             if (!layoutFiles.contains(ogFile)) {
                 srcCodeBeans.add(new SrcCodeBean(xmlName, CommandBlock.applyCommands(xmlName, ox.b())));

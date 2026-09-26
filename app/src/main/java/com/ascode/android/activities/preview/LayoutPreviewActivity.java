@@ -1561,15 +1561,26 @@ public class LayoutPreviewActivity extends BaseAppCompatActivity {
         // Forma generica (corner radius + stroke) para widgets sin soporte nativo (LinearLayout,
         // ImageView...). Es equivalente en memoria al shape drawable que se genera en el XML.
         if (com.ascode.android.utility.DesignShapeAttrs.supportsShapeBackground(view)
-                && com.ascode.android.utility.DesignShapeAttrs.hasAnyShape(bean.inject)
-                && (bean.layout == null || bean.layout.backgroundResource == null
-                        || bean.layout.backgroundResource.isEmpty()
-                        || "NONE".equalsIgnoreCase(bean.layout.backgroundResource))) {
-            if (com.ascode.android.utility.WidgetInjectApplier.applyShapeBackground(
-                    view, handler, resolver, shapeFillColor(view, bean))) {
-                handled.add("cornerRadius");
-                handled.add("strokeWidth");
-                handled.add("strokeColor");
+                && com.ascode.android.utility.DesignShapeAttrs.hasAnyShape(bean.inject)) {
+            String backgroundResource = bean.layout == null ? null : bean.layout.backgroundResource;
+            boolean generatedShapeBackground = backgroundResource != null
+                    && backgroundResource.startsWith("designshape_");
+            boolean userBackground = backgroundResource != null && !backgroundResource.isEmpty()
+                    && !"NONE".equalsIgnoreCase(backgroundResource) && !generatedShapeBackground;
+            if (!userBackground) {
+                if (generatedShapeBackground) {
+                    // El fondo ya es el shape drawable que genera el IDE: lo aplica applyBeanBackground
+                    // resolviendo el fichero del proyecto (el mismo que compila el proyecto). Aqui solo
+                    // se marcan los atributos como atendidos para no avisar de setters inexistentes.
+                    handled.add("cornerRadius");
+                    handled.add("strokeWidth");
+                    handled.add("strokeColor");
+                } else if (com.ascode.android.utility.WidgetInjectApplier.applyShapeBackground(
+                        view, handler, resolver, shapeFillColor(view, bean))) {
+                    handled.add("cornerRadius");
+                    handled.add("strokeWidth");
+                    handled.add("strokeColor");
+                }
             }
         }
     }

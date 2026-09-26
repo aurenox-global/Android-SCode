@@ -245,6 +245,40 @@ public final class DesignShapeAttrs {
         return sb.toString();
     }
 
+    /**
+     * Fichero del shape drawable en los recursos del PROYECTO (files/resource/drawable). Es el
+     * mismo nombre que genera el compilador en el res del build, de modo que la vista previa y el
+     * proyecto exportado usan exactamente el mismo fichero.
+     */
+    public static java.io.File projectDrawableFile(String scId, String layoutXmlName, ViewBean bean) {
+        return new java.io.File(new FilePathUtil().getPathResource(scId) + "/drawable/"
+                + drawableName(layoutXmlName + "_" + bean.id) + ".xml");
+    }
+
+    /**
+     * Mantiene sincronizado el shape drawable del proyecto con el estado del bean (lo escribe, o lo
+     * borra si el bean ya no tiene forma). Se llama al editar propiedades para que la vista previa
+     * vea el mismo drawable que compilara el proyecto.
+     */
+    public static void syncProjectDrawable(String scId, String layoutXmlName, ViewBean bean) {
+        if (bean == null || scId == null || layoutXmlName == null || !supportsShapeBackgroundType(bean)) {
+            return;
+        }
+        java.io.File file = projectDrawableFile(scId, layoutXmlName, bean);
+        String xml = hasAnyShape(bean.inject) ? buildShapeDrawableXml(bean) : null;
+        if (xml == null) {
+            if (file.exists()) {
+                file.delete();
+            }
+            return;
+        }
+        java.io.File dir = file.getParentFile();
+        if (dir != null && !dir.exists()) {
+            dir.mkdirs();
+        }
+        FileUtil.writeFile(file.getAbsolutePath(), xml);
+    }
+
     // ---------------------------------------------------------------- utilidades de formato
 
     /** "#RRGGBB" (o "#AARRGGBB" si lleva alfa) desde un color int del bean, igual que Ox.formatColor. */

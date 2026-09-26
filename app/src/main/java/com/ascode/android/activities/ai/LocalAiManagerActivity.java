@@ -1037,10 +1037,12 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
         }
 
         LocalAiConfig config = LocalAiConfig.load(this);
+        final StringBuilder streamBuffer = new StringBuilder();
         LocalAiService.Callback callback = new LocalAiService.Callback() {
             @Override
             public void onStarted() {
                 runningTest = true;
+                streamBuffer.setLength(0);
                 String providerLabel = config.isCloudProvider()
                         ? LocalAiConfig.getProviderDisplayName(config.getProviderId())
                         : "Local AI";
@@ -1052,6 +1054,19 @@ public class LocalAiManagerActivity extends BaseAppCompatActivity {
             public void onStatus(String status) {
                 setBusy(true, status);
                 binding.resultText.setText(status);
+            }
+
+            @Override
+            public void onToken(String token) {
+                if (token == null || token.isEmpty()) {
+                    return;
+                }
+                // Native tokens arrive on the generation thread: marshal to the UI thread
+                // and append so the text appears progressively instead of all at once.
+                runOnUiThread(() -> {
+                    streamBuffer.append(token);
+                    binding.resultText.setText(streamBuffer.toString());
+                });
             }
 
             @Override

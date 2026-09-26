@@ -65,10 +65,15 @@ public class LocalAiService {
                         + " | Max tokens: " + cfg.getMaxTokens()
                         + "\nEvaluating prompt..."));
                 String formattedPrompt = LocalAiPromptFormatter.format(prompt, cfg, reasoningEnabled);
-                String result = bridge.generate(formattedPrompt, cfg, cfg.getPresencePenalty(), "");
+                String result = bridge.generateStream(formattedPrompt, cfg, cfg.getPresencePenalty(), "", callback::onToken);
+                if (result == null || result.isEmpty()) {
+                    // Streaming produced nothing visible: fall back to the blocking path.
+                    result = bridge.generate(formattedPrompt, cfg, cfg.getPresencePenalty(), "");
+                }
                 success = true;
+                final String finalResult = result;
                 post(() -> callback.onStatus("Generation complete."));
-                post(() -> callback.onSuccess(result));
+                post(() -> callback.onSuccess(finalResult));
             } catch (Throwable throwable) {
                 post(() -> callback.onError(throwable));
             } finally {
@@ -259,6 +264,14 @@ public class LocalAiService {
         void onStarted();
 
         default void onStatus(String status) {
+        }
+
+        /**
+         * Called repeatedly with each generated piece of text while the model
+         * is still working. Default is a no-op, so existing callers keep the
+         * previous "all text at once" behaviour.
+         */
+        default void onToken(String token) {
         }
 
         void onSuccess(String response);

@@ -6,6 +6,7 @@
 #include <atomic>
 #include <cstdint>
 #include <cstring>
+#include <functional>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -14,6 +15,10 @@
 #include "llama.h"
 
 #define ASCODE_LLAMA_LOG_TAG "AscodeLocalAI"
+
+// Token sink used by the streaming generation path. Returning false stops the
+// generation loop (cancelled request or a Java-side callback failure).
+using TokenSink = std::function<bool(const std::string &)>;
 
 namespace {
 
@@ -51,6 +56,108 @@ private:
 std::once_flag backend_init_flag;
 
 std::atomic_bool g_load_cancel_requested{false};
+
+// JavaVM captured in JNI_OnLoad so the generation thread can always obtain a
+// valid JNIEnv (attaching itself if it ever runs on an unattached thread).
+JavaVM * g_java_vm = nullptr;
+
+// Forwards generated token pieces to a Java callback object that exposes
+// `void onToken(String)`. The object is kept alive with a global reference and
+// the thread is detached again if we had to attach it ourselves, so no JNI
+// call is ever made after the request has finished, been cancelled or released.
+class JavaTokenSink {
+public:
+    JavaTokenSink(JNIEnv * env, jobject callback) {
+        if (env == nullptr || callback == nullptr) {
+            return;
+        }
+        if (g_java_vm == nullptr) {
+            env->GetJavaVM(&g_java_vm);
+        }
+        jclass callback_class = env->GetObjectClass(callback);
+        if (callback_class == nullptr) {
+            env->ExceptionClear();
+            return;
+        }
+        method_ = env->GetMethodID(callback_class, "onToken", "(Ljava/lang/String;)V");
+        env->DeleteLocalRef(callback_class);
+        if (method_ == nullptr) {
+            env->ExceptionClear();
+            return;
+        }
+        global_ref_ = env->NewGlobalRef(callback);
+    }
+
+    ~JavaTokenSink() {
+        if (global_ref_ != nullptr) {
+            JNIEnv * env = env_for_current_thread();
+            if (env != nullptr) {
+                env->DeleteGlobalRef(global_ref_);
+            }
+            global_ref_ = nullptr;
+        }
+        detach_if_attached();
+    }
+
+    bool valid() const {
+        return global_ref_ != nullptr && method_ != nullptr;
+    }
+
+    bool emit(const std::string & text) {
+        if (!valid() || text.empty()) {
+            return true;
+        }
+        JNIEnv * env = env_for_current_thread();
+        if (env == nullptr) {
+            return false;
+        }
+        jstring payload = env->NewStringUTF(text.c_str());
+        if (payload == nullptr) {
+            env->ExceptionClear();
+            return false;
+        }
+        env->CallVoidMethod(global_ref_, method_, payload);
+        env->DeleteLocalRef(payload);
+        if (env->ExceptionCheck()) {
+            __android_log_write(ANDROID_LOG_ERROR, ASCODE_LLAMA_LOG_TAG,
+                    "Java token callback threw an exception; stopping generation.");
+            env->ExceptionClear();
+            return false;
+        }
+        return true;
+    }
+
+private:
+    JNIEnv * env_for_current_thread() {
+        if (g_java_vm == nullptr) {
+            return nullptr;
+        }
+        JNIEnv * env = nullptr;
+        jint result = g_java_vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6);
+        if (result == JNI_OK) {
+            return env;
+        }
+        if (result == JNI_EDETACHED) {
+            if (g_java_vm->AttachCurrentThread(&env, nullptr) != JNI_OK) {
+                return nullptr;
+            }
+            attached_ = true;
+            return env;
+        }
+        return nullptr;
+    }
+
+    void detach_if_attached() {
+        if (attached_ && g_java_vm != nullptr) {
+            g_java_vm->DetachCurrentThread();
+            attached_ = false;
+        }
+    }
+
+    jobject global_ref_ = nullptr;
+    jmethodID method_ = nullptr;
+    bool attached_ = false;
+};
 
 void local_ai_log_callback(enum ggml_log_level level, const char * text, void *) {
     if (level >= GGML_LOG_LEVEL_ERROR) {
@@ -198,7 +305,13 @@ static std::string generate_locked(JNIEnv * env,
                                    jfloat presence_penalty,
                                    jfloat repeat_penalty,
                                    jint top_k,
-                                   const std::string & grammar);
+                                   const std::string & grammar,
+                                   const TokenSink & on_token);
+
+extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void *) {
+    g_java_vm = vm;
+    return JNI_VERSION_1_6;
+}
 
 extern "C" JNIEXPORT jlong JNICALL
 Java_io_ascode_android_LocalAiBridge_nativeLoadModel(JNIEnv * env, jclass, jstring model_path, jint context_size, jint threads) {
@@ -287,11 +400,46 @@ Java_io_ascode_android_LocalAiBridge_nativeGenerate(JNIEnv * env, jclass, jlong 
     std::string grammar(grammar_chars.c_str());
 
     try {
-        std::string result = generate_locked(env, handle, prompt_text, max_tokens, temperature, top_p, presence_penalty, repeat_penalty, top_k, grammar);
+        std::string result = generate_locked(env, handle, prompt_text, max_tokens, temperature, top_p, presence_penalty, repeat_penalty, top_k, grammar, TokenSink());
         return env->NewStringUTF(result.c_str());
     } catch (const std::exception & e) {
         __android_log_print(ANDROID_LOG_ERROR, ASCODE_LLAMA_LOG_TAG,
                 "Local AI generation failed: %s", e.what());
+        throw_local_ai_exception(env, e.what());
+        return env->NewStringUTF("");
+    }
+}
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_io_ascode_android_LocalAiBridge_nativeGenerateStream(JNIEnv * env, jclass, jlong native_handle, jstring prompt_text, jint max_tokens, jfloat temperature, jfloat top_p, jfloat presence_penalty, jfloat repeat_penalty, jint top_k, jstring grammar_text, jobject callback) {
+    auto * handle = reinterpret_cast<LlamaHandle *>(native_handle);
+    if (handle == nullptr || handle->model == nullptr || handle->context == nullptr) {
+        throw_local_ai_exception(env, "Local AI model is not loaded.");
+        return env->NewStringUTF("");
+    }
+    if (g_load_cancel_requested.load()) {
+        throw_local_ai_exception(env, "Local AI request cancelled.");
+        return env->NewStringUTF("");
+    }
+
+    JniString grammar_chars(env, grammar_text);
+    std::string grammar(grammar_chars.c_str());
+
+    // Owns the callback global reference: it is released as soon as generation
+    // returns, so no Java callback can fire after cancel/release.
+    JavaTokenSink sink(env, callback);
+    if (!sink.valid()) {
+        throw_local_ai_exception(env, "Local AI streaming callback is not available.");
+        return env->NewStringUTF("");
+    }
+
+    try {
+        std::string result = generate_locked(env, handle, prompt_text, max_tokens, temperature, top_p, presence_penalty, repeat_penalty, top_k, grammar,
+                [&sink](const std::string & piece) { return sink.emit(piece); });
+        return env->NewStringUTF(result.c_str());
+    } catch (const std::exception & e) {
+        __android_log_print(ANDROID_LOG_ERROR, ASCODE_LLAMA_LOG_TAG,
+                "Local AI streaming generation failed: %s", e.what());
         throw_local_ai_exception(env, e.what());
         return env->NewStringUTF("");
     }
@@ -306,7 +454,8 @@ static std::string generate_locked(JNIEnv * env,
                                    jfloat presence_penalty,
                                    jfloat repeat_penalty,
                                    jint top_k,
-                                   const std::string & grammar) {
+                                   const std::string & grammar,
+                                   const TokenSink & on_token) {
 
     std::lock_guard<std::mutex> lock(handle->generation_mutex);
     handle->cancel_requested.store(false);
@@ -380,7 +529,16 @@ static std::string generate_locked(JNIEnv * env,
             break;
         }
 
-        response += token_to_piece(vocab, next_token);
+        const std::string piece = token_to_piece(vocab, next_token);
+        response += piece;
+        if (on_token && !piece.empty() && !on_token(piece)) {
+            if (handle->cancel_requested.load()) {
+                throw_local_ai_exception(env, "Local AI request cancelled.");
+                return "";
+            }
+            // The Java callback failed (or asked to stop): keep the partial text.
+            break;
+        }
 
         llama_batch batch = llama_batch_get_one(&next_token, 1);
         int decode_result = llama_decode(handle->context, batch);

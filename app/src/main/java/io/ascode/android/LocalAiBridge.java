@@ -5,6 +5,16 @@ import java.util.Locale;
 import java.util.Map;
 
 public class LocalAiBridge implements AutoCloseable {
+
+    /**
+     * Receives generated text incrementally while the model is still working.
+     * Called from the native generation thread, so implementations must not
+     * block and should hop to the UI thread before touching views.
+     */
+    public interface TokenCallback {
+        void onToken(String token);
+    }
+
     private static boolean loadAttempted;
     private static Throwable loadError;
     private static final Map<String, String> ARCHITECTURE_CACHE = new HashMap<>();
@@ -84,6 +94,50 @@ public class LocalAiBridge implements AutoCloseable {
         if (handle == 0L) {
             throw new LocalAiException("Model is not loaded.");
         }
+        SamplingParams params = resolveSamplingParams(config, presencePenalty, grammar);
+        String response = nativeGenerate(handle, prompt, config.getMaxTokens(),
+                params.temperature, params.topP, params.presence, params.repeatPenalty, params.topK,
+                grammar == null ? "" : grammar);
+        return response == null ? "" : response.trim();
+    }
+
+    /**
+     * Like {@link #generate(String, LocalAiConfig, float, String)} but reports
+     * every generated piece through {@code onToken} as soon as it is produced,
+     * instead of returning the whole response at the end. Returns the full text
+     * once generation finishes (so callers can keep a single code path).
+     */
+    public String generateStream(String prompt, LocalAiConfig config, float presencePenalty, String grammar, TokenCallback onToken) throws LocalAiException {
+        if (handle == 0L) {
+            throw new LocalAiException("Model is not loaded.");
+        }
+        if (onToken == null) {
+            return generate(prompt, config, presencePenalty, grammar);
+        }
+        SamplingParams params = resolveSamplingParams(config, presencePenalty, grammar);
+        String response = nativeGenerateStream(handle, prompt, config.getMaxTokens(),
+                params.temperature, params.topP, params.presence, params.repeatPenalty, params.topK,
+                grammar == null ? "" : grammar, onToken);
+        return response == null ? "" : response.trim();
+    }
+
+    private static final class SamplingParams {
+        final float temperature;
+        final float topP;
+        final float presence;
+        final float repeatPenalty;
+        final int topK;
+
+        SamplingParams(float temperature, float topP, float presence, float repeatPenalty, int topK) {
+            this.temperature = temperature;
+            this.topP = topP;
+            this.presence = presence;
+            this.repeatPenalty = repeatPenalty;
+            this.topK = topK;
+        }
+    }
+
+    private SamplingParams resolveSamplingParams(LocalAiConfig config, float presencePenalty, String grammar) {
         String architecture = getArchitecture(config.getModelPath());
         boolean isLiquid = architecture != null && architecture.toLowerCase(Locale.US).contains("liquid");
         boolean isQwen = architecture != null && architecture.toLowerCase(Locale.US).contains("qwen");
@@ -111,10 +165,7 @@ public class LocalAiBridge implements AutoCloseable {
         }
         int topK = config.getTopK() > 0 ? config.getTopK() : archTopK;
         float presence = presencePenalty >= 0f ? presencePenalty : config.getPresencePenalty();
-
-        String response = nativeGenerate(handle, prompt, config.getMaxTokens(),
-                temperature, topP, presence, repeatPenalty, topK, grammar == null ? "" : grammar);
-        return response == null ? "" : response.trim();
+        return new SamplingParams(temperature, topP, presence, repeatPenalty, topK);
     }
 
     private static String getArchitecture(String modelPath) {
@@ -158,6 +209,8 @@ public class LocalAiBridge implements AutoCloseable {
     private static native long nativeLoadModel(String modelPath, int contextSize, int threads);
 
     private static native String nativeGenerate(long handle, String prompt, int maxTokens, float temperature, float topP, float presencePenalty, float repeatPenalty, int topK, String grammar);
+
+    private static native String nativeGenerateStream(long handle, String prompt, int maxTokens, float temperature, float topP, float presencePenalty, float repeatPenalty, int topK, String grammar, TokenCallback onToken);
 
     private static native void nativeCancel(long handle);
 

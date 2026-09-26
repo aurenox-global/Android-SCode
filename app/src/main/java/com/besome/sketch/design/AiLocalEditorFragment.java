@@ -86,6 +86,13 @@ public class AiLocalEditorFragment extends Fragment {
     private int streamingCursor = 0;
     private String streamingText = "";
 
+    // Incremental painting of the local agent answer: while the local JSON streaming
+    // request is running, onToken delivers the visible reply so far (a snapshot) and we
+    // replace the bubble text. Cleared as soon as the final parse kicks in, so the
+    // incremental text never fights the final onSuccess rendering.
+    private boolean jsonStreamActive;
+    private int jsonStreamMessageIndex = -1;
+
     private Markwon markwon;
     private MaterialButton chatReasoningButton;
     private boolean reasoningEnabled = true;
@@ -267,7 +274,26 @@ public class AiLocalEditorFragment extends Fragment {
                 }
 
                 @Override
+                public void onToken(String token) {
+                    // Local JSON streaming: onToken already hops to the UI thread in
+                    // LocalAiService and carries the accumulated visible reply, so we
+                    // replace (not append) the bubble text to avoid duplicating it.
+                    if (!jsonStreamActive || token == null || token.isEmpty()) {
+                        return;
+                    }
+                    int index = jsonStreamMessageIndex;
+                    if (index < 0 || index >= chatMessages.size()) {
+                        return;
+                    }
+                    chatMessages.get(index).text = token;
+                    chatMessageAdapter.notifyItemChanged(index);
+                    chatMessagesRecycler.scrollToPosition(index);
+                }
+
+                @Override
                 public void onSuccess(String response) {
+                    jsonStreamActive = false;
+                    jsonStreamMessageIndex = -1;
                     String safeResponse = response == null ? "" : response.trim();
                     if (safeResponse.isEmpty()) {
                         updateChatMessage(assistantMessageIndex, "El agente no devolvió respuesta.", true);
@@ -279,6 +305,8 @@ public class AiLocalEditorFragment extends Fragment {
 
                 @Override
                 public void onError(Throwable throwable) {
+                    jsonStreamActive = false;
+                    jsonStreamMessageIndex = -1;
                     cancelStreamingAnimation();
                     String message = throwable == null ? "Unknown error" : throwable.getMessage();
                     updateChatMessage(assistantMessageIndex, "Error: " + (message == null ? "Unknown error" : message), true);
@@ -305,10 +333,14 @@ public class AiLocalEditorFragment extends Fragment {
             } else {
                 // Local agent: always grammar-constrained JSON (no thinking), with
                 // deterministic sampling so small models follow instructions reliably.
+                // The streaming variant keeps that exact grammar/sampling and the final
+                // JSON parsing, but paints the growing "reply" text token by token.
                 LocalAiConfig agentConfig = LocalAiConfig.load(requireContext());
                 agentConfig.setTemperature(0.5f);
                 agentConfig.setTopP(0.85f);
-                LocalAiService.getInstance().generateJsonWithConfig(requireContext(), effectivePrompt, agentConfig, callback);
+                jsonStreamActive = true;
+                jsonStreamMessageIndex = assistantMessageIndex;
+                LocalAiService.getInstance().generateJsonStreamWithConfig(requireContext(), effectivePrompt, agentConfig, callback);
             }
         };
 
@@ -611,6 +643,8 @@ public class AiLocalEditorFragment extends Fragment {
         if (streamRunnable != null) {
             uiHandler.removeCallbacks(streamRunnable);
         }
+        jsonStreamActive = false;
+        jsonStreamMessageIndex = -1;
         finishStreamingAnimation();
     }
 

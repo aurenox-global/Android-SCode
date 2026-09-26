@@ -192,6 +192,21 @@ public class Ox {
         String backgroundResource = viewBean.layout.backgroundResource;
         int type = viewBean.type;
 
+        // Forma generica (corner radius + stroke) para widgets sin soporte nativo (LinearLayout,
+        // ImageView...): el fondo pasa a ser un shape drawable generado en los recursos del
+        // proyecto (ver yq#writeDesignShapeDrawables) y se referencia aqui.
+        if (com.ascode.android.utility.DesignShapeAttrs.supportsShapeBackgroundType(viewBean)
+                && com.ascode.android.utility.DesignShapeAttrs.hasAnyShape(viewBean.inject)
+                && (backgroundResource == null || "NONE".equalsIgnoreCase(backgroundResource))
+                && !hasAttr("background", viewBean)
+                && !toNotAdd.contains("android:background")
+                && !injectHandler.contains("background")) {
+            nx.addAttribute("android", "background",
+                    "@drawable/" + com.ascode.android.utility.DesignShapeAttrs.drawableName(
+                            projectFile.getXmlName() + "_" + viewBean.id));
+            return;
+        }
+
         if (backgroundResource == null || "NONE".equalsIgnoreCase(backgroundResource)) {
             int backgroundColor = viewBean.layout.backgroundColor;
             String backgroundResColor = viewBean.layout.backgroundResColor;

@@ -212,6 +212,30 @@ public final class WidgetInjectApplier {
         }
     }
 
+    /**
+     * Forma generica (corner radius + stroke) para widgets SIN soporte nativo: construye el mismo
+     * {@code GradientDrawable} que el shape drawable del XML compilado.
+     *
+     * @param fillColor relleno ya resuelto por el motor que llama ({@code Color.TRANSPARENT} cuando
+     *                  el bean no define fondo). Nunca debe ser el centinela 0xffffff.
+     * @return {@code true} si aplico algun valor (para que el aplicador generico marque los nombres
+     *         como atendidos y no avise de setters inexistentes).
+     */
+    public static boolean applyShapeBackground(View view, InjectAttributeHandler handler,
+                                               ValueResolver resolver, int fillColor) {
+        if (view == null || handler == null || !DesignShapeAttrs.supportsShapeBackground(view)) {
+            return false;
+        }
+        if (!DesignShapeAttrs.hasAnyShape(handler.getBean() == null ? null : handler.getBean().inject)) {
+            return false;
+        }
+        int radius = resolver.dimension(handler.getAttributeValueOf(DesignShapeAttrs.ATTR_CORNER_RADIUS), 0);
+        int strokeWidth = resolver.dimension(handler.getAttributeValueOf(DesignShapeAttrs.ATTR_STROKE_WIDTH), 0);
+        int strokeColor = resolver.color(handler.getAttributeValueOf(DesignShapeAttrs.ATTR_STROKE_COLOR), 0);
+        view.setBackground(DesignShapeAttrs.buildDrawable(radius, strokeWidth, strokeColor, fillColor));
+        return true;
+    }
+
     // ---------------------------------------------------------------- utilidades
 
     /** ¿El bean define alguno de estos atributos? (evita tocar la vista si no hay nada que aplicar). */

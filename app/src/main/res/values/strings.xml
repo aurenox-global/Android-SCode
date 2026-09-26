@@ -1676,6 +1676,10 @@ ACTION_VIEW
     <string name="property_enabled">Enabled</string>
     <string name="property_first_day_of_week">firstDayOfWeek</string>
     <string name="property_gravity">Gravity</string>
+    <string name="property_header_shape">Shape</string>
+    <string name="property_corner_radius">Corner radius</string>
+    <string name="property_stroke_width">Stroke width</string>
+    <string name="property_stroke_color">Stroke color</string>
     <string name="property_group_basic">Basic</string>
     <string name="property_group_event">Event</string>
     <string name="property_group_recent">Recent</string>

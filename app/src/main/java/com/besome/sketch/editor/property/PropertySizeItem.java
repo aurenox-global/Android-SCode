@@ -68,7 +68,8 @@ public class PropertySizeItem extends RelativeLayout implements View.OnClickList
     @Override
     public void onClick(View v) {
         if (!mB.a()) {
-            if (key.equals("property_divider_height")) {
+            if (key.equals("property_divider_height") || key.equals("property_corner_radius")
+                    || key.equals("property_stroke_width")) {
                 showDialog();
             }
         }

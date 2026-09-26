@@ -1558,6 +1558,42 @@ public class LayoutPreviewActivity extends BaseAppCompatActivity {
         if (view instanceof com.google.android.gms.common.SignInButton signInButton) {
             applySignInButtonAttributes(signInButton, handler, handled);
         }
+        // Forma generica (corner radius + stroke) para widgets sin soporte nativo (LinearLayout,
+        // ImageView...). Es equivalente en memoria al shape drawable que se genera en el XML.
+        if (com.ascode.android.utility.DesignShapeAttrs.supportsShapeBackground(view)
+                && com.ascode.android.utility.DesignShapeAttrs.hasAnyShape(bean.inject)
+                && (bean.layout == null || bean.layout.backgroundResource == null
+                        || bean.layout.backgroundResource.isEmpty()
+                        || "NONE".equalsIgnoreCase(bean.layout.backgroundResource))) {
+            if (com.ascode.android.utility.WidgetInjectApplier.applyShapeBackground(
+                    view, handler, resolver, shapeFillColor(view, bean))) {
+                handled.add("cornerRadius");
+                handled.add("strokeWidth");
+                handled.add("strokeColor");
+            }
+        }
+    }
+
+    /**
+     * Relleno del shape generico: el fondo del bean si esta definido, si no transparente (para que
+     * un widget solo-borde no gane un fondo blanco inesperado).
+     */
+    private int shapeFillColor(View view, ViewBean bean) {
+        com.besome.sketch.beans.LayoutBean layout = bean.layout;
+        if (layout == null) {
+            return android.graphics.Color.TRANSPARENT;
+        }
+        if (layout.backgroundResColor != null && !layout.backgroundResColor.isEmpty()) {
+            String reference = layout.backgroundResColor;
+            int color = resourceResolver.resolveColor(view,
+                    reference.startsWith("#") || reference.startsWith("@") || reference.startsWith("?")
+                            ? reference : "@color/" + reference, 0);
+            return isColorNotSet(color) ? android.graphics.Color.TRANSPARENT : color;
+        }
+        if (!isColorNotSet(layout.backgroundColor)) {
+            return layout.backgroundColor;
+        }
+        return android.graphics.Color.TRANSPARENT;
     }
 
     /**

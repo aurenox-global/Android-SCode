@@ -36,7 +36,11 @@ import mod.agus.jcoderz.beans.ViewBeans;
 import mod.hey.studios.project.ProjectSettings;
 import mod.pranav.viewbinding.ViewBindingBuilder;
 import com.ascode.android.R;
+import com.ascode.android.utility.DesignShapeAttrs;
 import com.ascode.android.utility.ScaleTypeCompat;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ViewPropertyItems extends LinearLayout implements Kw, View.OnClickListener {
     private final boolean b = false;
@@ -99,6 +103,9 @@ public class ViewPropertyItems extends LinearLayout implements Kw, View.OnClickL
             case "property_weight_sum" -> b(property, String.valueOf(bean.layout.weightSum));
             case "property_gravity" -> b(property, bean.layout.gravity);
             case "property_layout_gravity" -> b(property, bean.layout.layoutGravity);
+            case "property_corner_radius" -> d(property, shapeSize(bean, DesignShapeAttrs.ATTR_CORNER_RADIUS));
+            case "property_stroke_width" -> d(property, shapeSize(bean, DesignShapeAttrs.ATTR_STROKE_WIDTH));
+            case "property_stroke_color" -> r(property, shapeResColor(bean), shapeColor(bean));
             case "property_weight" -> b(property, String.valueOf(bean.layout.weight));
             case "property_text" -> b(property, bean.text.text);
             case "property_text_size" -> c(property, bean.text.textSize);
@@ -703,6 +710,18 @@ public class ViewPropertyItems extends LinearLayout implements Kw, View.OnClickL
         a(bean, "property_translation_y");
         a(bean, "property_scale_x");
         a(bean, "property_scale_y");
+
+        // Forma (corner radius + stroke) para widgets sin soporte nativo. En la fase 1 se expone
+        // para LinearLayout e ImageView; el resto de familias (CardView/MaterialButton/...) ya
+        // tienen sus propios controles y appliers.
+        if (DesignShapeAttrs.isPhase1TargetType(bean)) {
+            if (getOrientation() == LinearLayout.VERTICAL) {
+                a(getContext().getString(R.string.property_header_shape));
+            }
+            a(bean, "property_corner_radius");
+            a(bean, "property_stroke_width");
+            a(bean, "property_stroke_color");
+        }
     }
 
     public void i(ViewBean bean) {
@@ -801,6 +820,17 @@ public class ViewPropertyItems extends LinearLayout implements Kw, View.OnClickL
                         bean.layout.backgroundResColor = colorItem.getResValue();
                         bean.layout.backgroundColor = colorItem.getValue();
                     }
+                    case "property_stroke_color" -> {
+                        String res = colorItem.getResValue();
+                        if (res != null && !res.isEmpty()) {
+                            DesignShapeAttrs.set(bean, DesignShapeAttrs.ATTR_STROKE_COLOR, res);
+                        } else {
+                            int value = colorItem.getValue();
+                            DesignShapeAttrs.set(bean, DesignShapeAttrs.ATTR_STROKE_COLOR,
+                                    (value == 0 || value == DesignShapeAttrs.COLOR_NOT_SET)
+                                            ? "" : DesignShapeAttrs.formatHex(value));
+                        }
+                    }
                 }
             } else if (view instanceof PropertyIndentItem indentItem) {
                 if (indentItem.getKey().equals("property_margin")) {
@@ -831,6 +861,12 @@ public class ViewPropertyItems extends LinearLayout implements Kw, View.OnClickL
             } else if (view instanceof PropertySizeItem sizeItem) {
                 if (sizeItem.getKey().equals("property_divider_height")) {
                     bean.dividerHeight = sizeItem.getValue();
+                } else if (sizeItem.getKey().equals("property_corner_radius")) {
+                    DesignShapeAttrs.set(bean, DesignShapeAttrs.ATTR_CORNER_RADIUS,
+                            sizeItem.getValue() > 0 ? sizeItem.getValue() + "dp" : "");
+                } else if (sizeItem.getKey().equals("property_stroke_width")) {
+                    DesignShapeAttrs.set(bean, DesignShapeAttrs.ATTR_STROKE_WIDTH,
+                            sizeItem.getValue() > 0 ? sizeItem.getValue() + "dp" : "");
                 }
             } else if (view instanceof PropertyAttributesItem item) {
                 if (item.getKey().equals("property_parent_attr")) {
@@ -996,6 +1032,41 @@ public class ViewPropertyItems extends LinearLayout implements Kw, View.OnClickL
         }
     }
 
+
+    private int shapeSize(ViewBean bean, String attribute) {
+        String raw = DesignShapeAttrs.get(bean, attribute).trim();
+        if (raw.isEmpty()) {
+            return 0;
+        }
+        Matcher matcher = Pattern.compile("-?\\d+").matcher(raw);
+        if (!matcher.find()) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(matcher.group());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    private String shapeResColor(ViewBean bean) {
+        String raw = DesignShapeAttrs.get(bean, DesignShapeAttrs.ATTR_STROKE_COLOR).trim();
+        return (raw.startsWith("@") || raw.startsWith("?")) ? raw : null;
+    }
+
+    private int shapeColor(ViewBean bean) {
+        String raw = DesignShapeAttrs.get(bean, DesignShapeAttrs.ATTR_STROKE_COLOR).trim();
+        if (raw.isEmpty() || raw.startsWith("@") || raw.startsWith("?")) {
+            // Sin definir: se usa el centinela para que el control muestre "NONE" (y no un
+            // transparente que se guardaria como color real).
+            return DesignShapeAttrs.COLOR_NOT_SET;
+        }
+        try {
+            return android.graphics.Color.parseColor(raw);
+        } catch (IllegalArgumentException e) {
+            return DesignShapeAttrs.COLOR_NOT_SET;
+        }
+    }
 
     public void setProjectSettings(ProjectSettings settings) {
         this.settings = settings;

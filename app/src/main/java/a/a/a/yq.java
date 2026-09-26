@@ -31,6 +31,7 @@ import mod.pranav.viewbinding.ViewBindingBuilder;
 import com.ascode.android.AscodeApplication;
 import com.ascode.android.util.library.BuiltInLibraryManager;
 import com.ascode.android.utility.FileUtil;
+import com.ascode.android.utility.DesignShapeAttrs;
 import com.ascode.android.xml.XmlBuilder;
 import com.ascode.android.xml.XmlBuilderHelper;
 
@@ -754,6 +755,46 @@ public class yq {
     }
 
     /**
+     * Escribe los shape drawables de los widgets que llevan corner radius + stroke (ver
+     * {@link DesignShapeAttrs}) en el RES generado (para que aapt2 los compile y el layout pueda
+     * referenciarlos con {@code android:background}) y tambien en los recursos del proyecto (para
+     * que sigan existiendo al exportar a Android Studio). Idempotente: sobrescribe por nombre.
+     */
+    private void writeDesignShapeDrawables(java.util.List<ViewBean> views) {
+        if (views == null || views.isEmpty()) {
+            return;
+        }
+        File buildDir = new File(resDirectoryPath, "drawable");
+        File projectDir = new File(wq.b(sc_id) + "/files/resource/drawable");
+        boolean buildDirReady = buildDir.exists() || buildDir.mkdirs();
+        boolean projectDirReady = projectDir.exists() || projectDir.mkdirs();
+        for (ViewBean bean : views) {
+            if (!DesignShapeAttrs.supportsShapeBackgroundType(bean)) {
+                continue;
+            }
+            if (!DesignShapeAttrs.hasAnyShape(bean.inject)) {
+                continue;
+            }
+            if (bean.layout != null && bean.layout.backgroundResource != null
+                    && !bean.layout.backgroundResource.isEmpty()
+                    && !"NONE".equalsIgnoreCase(bean.layout.backgroundResource)) {
+                continue;
+            }
+            String xml = DesignShapeAttrs.buildShapeDrawableXml(bean);
+            if (xml == null) {
+                continue;
+            }
+            String name = DesignShapeAttrs.drawableName(xmlName + "_" + bean.id) + ".xml";
+            if (buildDirReady) {
+                fileUtil.b(new File(buildDir, name).getAbsolutePath(), xml);
+            }
+            if (projectDirReady) {
+                fileUtil.b(new File(projectDir, name).getAbsolutePath(), xml);
+            }
+        }
+    }
+
+    /**
      * Get source code files that are viewable in SrcCodeViewer
      */
     public ArrayList<SrcCodeBean> a(hC projectFileManager, eC projectDataManager, BuiltInLibraryManager builtInLibraryManager) {
@@ -800,7 +841,9 @@ public class yq {
         for (ProjectFileBean layout : regularLayouts) {
             String xmlName = layout.getXmlName();
             Ox ox = new Ox(N, layout);
-            ox.a(eC.a(projectDataManager.d(xmlName)), projectDataManager.h(xmlName));
+            ArrayList<ViewBean> generatedViews = eC.a(projectDataManager.d(xmlName));
+            ox.a(generatedViews, projectDataManager.h(xmlName));
+            writeDesignShapeDrawables(generatedViews);
             var ogFile = new File(layoutDir + xmlName);
             if (!layoutFiles.contains(ogFile)) {
                 srcCodeBeans.add(new SrcCodeBean(xmlName, CommandBlock.applyCommands(xmlName, ox.b())));
@@ -821,7 +864,9 @@ public class yq {
         for (ProjectFileBean customViewFile : customViewFiles) {
             String xmlName = customViewFile.getXmlName();
             Ox ox = new Ox(N, customViewFile);
-            ox.a(eC.a(projectDataManager.d(xmlName)));
+            ArrayList<ViewBean> generatedViews = eC.a(projectDataManager.d(xmlName));
+            ox.a(generatedViews);
+            writeDesignShapeDrawables(generatedViews);
             var ogFile = new File(layoutDir + xmlName);
             if (!layoutFiles.contains(ogFile)) {
                 srcCodeBeans.add(new SrcCodeBean(xmlName, CommandBlock.applyCommands(xmlName, ox.b())));

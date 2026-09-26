@@ -106,6 +106,7 @@ import com.ascode.android.R;
 import com.ascode.android.activities.resourceseditor.components.utils.ColorsEditorManager;
 import com.ascode.android.activities.resourceseditor.components.utils.StringsEditorManager;
 import com.ascode.android.managers.inject.InjectRootLayoutManager;
+import com.ascode.android.utility.DesignShapeAttrs;
 import com.ascode.android.utility.FilePathUtil;
 import com.ascode.android.utility.FileUtil;
 import com.ascode.android.utility.InjectAttributeHandler;
@@ -115,6 +116,7 @@ import com.ascode.android.utility.ResourceUtil;
 import com.ascode.android.utility.ScaleTypeCompat;
 import com.ascode.android.utility.SvgUtils;
 import com.ascode.android.utility.ThemeUtils;
+import com.ascode.android.utility.WidgetInjectApplier;
 
 public class ViewPane extends RelativeLayout {
     private final String stringsStart = "@string/";
@@ -490,6 +492,7 @@ public class ViewPane extends RelativeLayout {
                 Log.e("DEBUG", e.getMessage(), e);
             }
         }
+        applyDesignShapeBackground(view, viewBean, injectHandler);
         Gx classInfo = viewBean.getClassInfo();
         if (classInfo.a("LinearLayout")) {
             LinearLayout linearLayout = (LinearLayout) view;
@@ -1355,6 +1358,45 @@ public class ViewPane extends RelativeLayout {
         } else {
             editText.setHintTextColor(PropertiesUtil.parseColor(colorsEditorManager.getColorValue(context, viewBean.text.resHintColor, 3, material3LibraryManager.canUseNightVariantColors())));
         }
+    }
+
+    /**
+     * Forma (corner radius + stroke) para widgets sin soporte nativo (LinearLayout, ImageView...).
+     * Es el equivalente en memoria del shape drawable que se genera en el XML compilado.
+     */
+    private void applyDesignShapeBackground(View view, ViewBean viewBean, InjectAttributeHandler handler) {
+        if (!DesignShapeAttrs.supportsShapeBackground(view)) {
+            return;
+        }
+        if (!DesignShapeAttrs.hasAnyShape(viewBean.inject)) {
+            return;
+        }
+        String backgroundResource = viewBean.layout.backgroundResource;
+        if (backgroundResource != null && !backgroundResource.isEmpty() && !"NONE".equalsIgnoreCase(backgroundResource)) {
+            // El usuario eligio un fondo grafico: no lo pisamos con el shape.
+            return;
+        }
+        int fill = Color.TRANSPARENT;
+        if (viewBean.layout.backgroundResColor == null) {
+            if (DesignShapeAttrs.isColorDefined(viewBean.layout.backgroundColor)) {
+                fill = viewBean.layout.backgroundColor;
+            }
+        } else {
+            int resolved = PropertiesUtil.parseColor(colorsEditorManager.getColorValue(context, viewBean.layout.backgroundResColor, 3, material3LibraryManager.canUseNightVariantColors()));
+            fill = DesignShapeAttrs.isColorDefined(resolved) ? resolved : Color.TRANSPARENT;
+        }
+        WidgetInjectApplier.ValueResolver resolver = new WidgetInjectApplier.ValueResolver() {
+            @Override
+            public int color(String value, int fallback) {
+                return PropertiesUtil.isHexColor(value) ? PropertiesUtil.parseColor(value) : fallback;
+            }
+
+            @Override
+            public int dimension(String value, int fallback) {
+                return PropertiesUtil.resolveSize(value, fallback);
+            }
+        };
+        WidgetInjectApplier.applyShapeBackground(view, handler, resolver, fill);
     }
 
     private void updateCardView(ItemCardView cardView, InjectAttributeHandler handler) {

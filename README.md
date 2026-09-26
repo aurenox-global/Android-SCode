@@ -42,7 +42,7 @@ your phone.
 - **Build & sign** — produce a signed APK or AAB, manage your keystores and install the result
   straight from the app.
 - **Project backup** — export and restore projects as portable `.swb` files.
-- **Extras** — Kotlin compiler, Flutter toolchain support and a Local AI Manager.
+- **Extras** — Kotlin compiler, Flutter toolchain support and a Local AI Manager with token-by-token streaming.
 
 ## Download
 

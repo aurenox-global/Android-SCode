@@ -68,7 +68,7 @@ android {
         namespace = "com.ascode.android"
       targetSdk = 35
         minSdk = 26
-        versionCode = 24
+        versionCode = 25
         versionName = "v1.0.19"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

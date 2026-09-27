@@ -1584,6 +1584,13 @@ public class LayoutPreviewActivity extends BaseAppCompatActivity {
                     handled.add("gradientEnd");
                     handled.add("gradientOrientation");
                     handled.add("glass");
+                    // Un MaterialButton trae app:backgroundTint (colorPrimary del tema) que se volcaria
+                    // sobre el shape drawable; con fondo propio se anula (el XML compilado ya emite
+                    // app:backgroundTint="@null" para estos botones).
+                    if (view instanceof com.google.android.material.button.MaterialButton materialButton) {
+                        materialButton.setBackgroundTintList(null);
+                        materialButton.setBackgroundTintMode(null);
+                    }
                     if (com.ascode.android.utility.DesignShapeAttrs.isGlass(shapeInject)) {
                         com.ascode.android.utility.DesignShapeAttrs.applyGlassBlur(view, shapeInject);
                     } else {

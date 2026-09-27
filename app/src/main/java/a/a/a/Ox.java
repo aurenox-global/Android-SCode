@@ -201,6 +201,15 @@ public class Ox {
                 && !hasAttr("background", viewBean)
                 && !toNotAdd.contains("android:background")
                 && !injectHandler.contains("background")) {
+            // Un MaterialButton gestiona su fondo con app:backgroundTint (colorPrimary del tema); al
+            // fijar un android:background propio hay que anular ese tinte o pintaria ENCIMA del shape
+            // drawable (patron soportado: android:background + app:backgroundTint="@null"). Si el
+            // usuario escribio su propio backgroundTint en inject no se toca (evita duplicados).
+            if (nx.c().equals("MaterialButton")
+                    && !toNotAdd.contains("app:backgroundTint")
+                    && !injectHandler.contains("backgroundTint")) {
+                nx.addAttribute("app", "backgroundTint", "@null");
+            }
             nx.addAttribute("android", "background",
                     "@drawable/" + com.ascode.android.utility.DesignShapeAttrs.drawableName(
                             projectFile.getXmlName() + "_" + viewBean.id));

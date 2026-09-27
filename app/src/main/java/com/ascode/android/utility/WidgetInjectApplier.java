@@ -256,6 +256,13 @@ public final class WidgetInjectApplier {
         int effectiveFill = glass && !gradient ? DesignShapeAttrs.glassFillColor(inject) : fillColor;
         view.setBackground(DesignShapeAttrs.buildDrawable(radius, strokeWidth, strokeColor, effectiveFill,
                 gradientStart, gradientEnd, DesignShapeAttrs.gradientOrientation(bean)));
+        // Un MaterialButton trae app:backgroundTint (colorPrimary del tema) y el framework lo volcaria
+        // ENCIMA del shape drawable, tapando el gradiente/glass. Al pasar a fondo propio se anula el
+        // tinte (mismo patron que el XML: android:background + app:backgroundTint="@null").
+        if (DesignShapeAttrs.isMaterialButtonWithCustomBackground(bean)) {
+            ((MaterialButton) view).setBackgroundTintList(null);
+            ((MaterialButton) view).setBackgroundTintMode(null);
+        }
         if (glass) {
             DesignShapeAttrs.applyGlassBlur(view, inject);
         } else {

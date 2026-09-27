@@ -7,6 +7,24 @@
 <meta name="description" content="Android SCode: crea apps Android reales desde el móvil con bloques o código. Características, instalación, compilación desde el código y los cambios de este fork.">
 <link rel="icon" href="assets/logo.png">
 <link rel="stylesheet" href="assets/style.css">
+<style>
+  /* últimas actualizaciones (bloque compacto) */
+  ul.updates { list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 8px; }
+  ul.updates li {
+    display: flex; gap: 12px; align-items: baseline;
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 10px 14px; font-size: 0.93rem; color: var(--text-dim);
+  }
+  ul.updates .ver {
+    flex: 0 0 auto; font-family: var(--mono); font-size: 0.78rem; font-weight: 700;
+    color: var(--sw-blue-light); background: rgba(0, 141, 205, 0.14);
+    border: 1px solid var(--border); border-radius: 999px; padding: 3px 9px;
+  }
+  p.updates-more { margin: 16px 0 0; }
+  @media (max-width: 520px) {
+    ul.updates li { font-size: 0.88rem; padding: 9px 12px; gap: 9px; }
+  }
+</style>
 </head>
 <body>
 
@@ -66,6 +84,22 @@
   }
 }</pre>
     </div>
+  </section>
+
+  <!-- ========================================== ultimas actualizaciones -->
+  <!-- Mantener SIEMPRE las 5 releases mas recientes: al anadir una nueva,
+       anade su <li> arriba y elimina el mas antiguo. -->
+  <section id="ultimas">
+    <h2><span class="hash">#</span>Últimas actualizaciones</h2>
+    <p class="sub">Las cinco releases más recientes, en una línea cada una.</p>
+    <ul class="updates">
+      <li><span class="ver">v1.0.30</span><span>R8 ya no se queda sin memoria en proyectos cargados; si no puede, avisa con un mensaje claro en vez de fallar sin explicación.</span></li>
+      <li><span class="ver">v1.0.29</span><span>Los modelos Gson sin anotar ya no fallan al activar R8.</span></li>
+      <li><span class="ver">v1.0.28</span><span>La exportación a Android Studio aplica R8 y shrinkResources: el APK baja ~50 % y el classes.dex ~63 %.</span></li>
+      <li><span class="ver">v1.0.27</span><span>Gradiente en botones renderizando bien en lienzo y vista previa (tinte del tema anulado).</span></li>
+      <li><span class="ver">v1.0.26</span><span>R8 activado por defecto en proyectos nuevos; propiedades Shape también en botones, con gradiente y glass opcionales.</span></li>
+    </ul>
+    <p class="updates-more"><a href="https://github.com/aurenox-global/Android-SCode/releases" target="_blank" rel="noopener">Ver todas las releases</a></p>
   </section>
 
   <!-- ========================================================== que es -->

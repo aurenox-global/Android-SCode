@@ -120,6 +120,19 @@
   .foot a{color:var(--muted);text-decoration:none;margin-right:14px}
   .foot a:hover{color:var(--green)}
   @media (max-width:640px){ .foot{justify-content:center;text-align:center} }
+
+  /* latest updates */
+  .updates{list-style:none;padding:0;margin:18px 0 0;display:grid;gap:8px}
+  .updates li{
+    display:flex;gap:12px;align-items:baseline;background:linear-gradient(180deg,var(--card),#111A2C);
+    border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:14.5px;color:var(--muted)
+  }
+  .updates .ver{
+    flex:0 0 auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;font-weight:700;
+    color:var(--green);background:rgba(61,220,132,.10);border:1px solid rgba(61,220,132,.28);border-radius:999px;padding:3px 9px
+  }
+  .updates-more{display:inline-block;margin-top:14px;font-size:13.5px}
+  @media (max-width:520px){ .updates li{font-size:13.5px;padding:9px 12px;gap:9px} }
 </style>
 </head>
 <body>
@@ -156,6 +169,22 @@
       <span class="chip">arm64-v8a</span><span class="chip">armeabi-v7a</span>
       <span class="chip">x86_64</span><span class="chip">x86</span>
     </div>
+  </section>
+
+  <!-- Últimas actualizaciones / Latest updates
+       Mantener SIEMPRE las 5 releases más recientes: al añadir una nueva,
+       añade su <li> arriba y elimina el más antiguo. -->
+  <section id="updates">
+    <h2 data-i18n="upd.title">Últimas actualizaciones</h2>
+    <p class="lead" data-i18n="upd.lead">Las cinco releases más recientes, en una línea cada una.</p>
+    <ul class="updates">
+      <li><span class="ver">v1.0.30</span><span data-i18n="upd.1">R8 ya no se queda sin memoria en proyectos cargados; si no puede, avisa con un mensaje claro en vez de fallar sin explicación.</span></li>
+      <li><span class="ver">v1.0.29</span><span data-i18n="upd.2">Los modelos Gson sin anotar ya no fallan al activar R8.</span></li>
+      <li><span class="ver">v1.0.28</span><span data-i18n="upd.3">La exportación a Android Studio aplica R8 y shrinkResources: el APK baja ~50 % y el classes.dex ~63 %.</span></li>
+      <li><span class="ver">v1.0.27</span><span data-i18n="upd.4">Gradiente en botones renderizando bien en lienzo y vista previa (tinte del tema anulado).</span></li>
+      <li><span class="ver">v1.0.26</span><span data-i18n="upd.5">R8 activado por defecto en proyectos nuevos; propiedades Shape también en botones, con gradiente y glass opcionales.</span></li>
+    </ul>
+    <a class="updates-more" href="https://github.com/aurenox-global/Android-SCode/releases" data-i18n="upd.more">Ver todas las releases</a>
   </section>
 
   <section id="features">
@@ -229,6 +258,14 @@ const I18N = {
     "hero.title1":"Crea apps Android","hero.title2":"desde tu móvil",
     "hero.sub":"Editor visual, bloques, recursos, librerías y compilación a APK o AAB firmado. Todo dentro del teléfono, sin depender de un ordenador.",
     "hero.cta1":"Descargar APK universal","hero.cta2":"Ver el código",
+    "upd.title":"Últimas actualizaciones",
+    "upd.lead":"Las cinco releases más recientes, en una línea cada una.",
+    "upd.1":"R8 ya no se queda sin memoria en proyectos cargados; si no puede, avisa con un mensaje claro en vez de fallar sin explicación.",
+    "upd.2":"Los modelos Gson sin anotar ya no fallan al activar R8.",
+    "upd.3":"La exportación a Android Studio aplica R8 y shrinkResources: el APK baja ~50 % y el classes.dex ~63 %.",
+    "upd.4":"Gradiente en botones renderizando bien en lienzo y vista previa (tinte del tema anulado).",
+    "upd.5":"R8 activado por defecto en proyectos nuevos; propiedades Shape también en botones, con gradiente y glass opcionales.",
+    "upd.more":"Ver todas las releases",
     "feat.title":"Todo lo que necesitas, en el móvil",
     "feat.lead":"Diseña, programa, compila y firma sin salir del teléfono, con un gestor de IA local que responde token a token.",
     "feat.1.t":"Editor de diseño","feat.1.d":"Arrastra widgets, edita XML y previsualiza tus pantallas; esquinas, borde, gradiente de 2 colores, layout_gravity en cualquier widget y modo glass editables, igual en la preview y en la app.",
@@ -254,6 +291,14 @@ const I18N = {
     "hero.title1":"Build Android apps","hero.title2":"right on your phone",
     "hero.sub":"Visual editor, blocks, resources, libraries and signed APK/AAB builds. Everything on the phone, no computer required.",
     "hero.cta1":"Download universal APK","hero.cta2":"View the source",
+    "upd.title":"Latest updates",
+    "upd.lead":"The five most recent releases, one line each.",
+    "upd.1":"R8 no longer runs out of memory on loaded projects; if it can't finish, it tells you clearly instead of failing silently.",
+    "upd.2":"Unannotated Gson models no longer break when R8 is enabled.",
+    "upd.3":"Exporting to Android Studio now applies R8 and shrinkResources: APK down ~50 %, classes.dex down ~63 %.",
+    "upd.4":"Button gradients render correctly in canvas and preview (theme tint cleared).",
+    "upd.5":"R8 on by default for new projects; Shape properties on buttons too, with optional gradient and glass.",
+    "upd.more":"View all releases",
     "feat.title":"Everything you need, on your phone",
     "feat.lead":"Design, code, build and sign without leaving your phone, with a local AI manager that streams its answer token by token.",
     "feat.1.t":"Design editor","feat.1.d":"Drag widgets, edit XML and preview your screens; editable corners, stroke, 2-colour gradient, layout_gravity on any widget and a glass mode, the same in the preview and the built app.",

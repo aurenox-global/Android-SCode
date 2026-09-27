@@ -269,7 +269,7 @@ public class ProjectBuilder {
      */
     public void createDexFilesFromClasses() throws Exception {
         FileUtil.makeDir(yq.binDirectoryPath + File.separator + "dex");
-        if (proguard.isShrinkingEnabled() && proguard.isR8Enabled()) return;
+        if (isR8ProcessingLibraries()) return;
 
         if (isD8Enabled()) {
             long savedTimeMillis = System.currentTimeMillis();
@@ -306,6 +306,108 @@ public class ProjectBuilder {
                 throw e;
             }
         }
+    }
+
+    /**
+     * @return true if R8 (instead of Dx/D8) will process this build, meaning built-in libraries'
+     * classes are handed to R8 as program input instead of being packaged as precompiled DEX files
+     */
+    public boolean isR8ProcessingLibraries() {
+        return proguard.isShrinkingEnabled() && proguard.isR8Enabled();
+    }
+
+    /**
+     * Names of every built-in library whose DEX file is normally packaged as-is alongside the app's
+     * DEX: AndroidX MultiDex, HTTP legacy and every used built-in library.
+     * <p>
+     * When {@link #isR8ProcessingLibraries()} is true these libraries are shrunk by R8 instead, so
+     * their precompiled DEX files must NOT be packaged separately anymore (otherwise every one of
+     * their classes would end up duplicated in the APK).
+     *
+     * @return Mutable list of built-in library names, in packaging order
+     */
+    private ArrayList<String> getBuiltInLibraryNames() {
+        ArrayList<String> libraryNames = new ArrayList<>();
+
+        /* Add AndroidX MultiDex library if needed */
+        if (settings.getMinSdkVersion() < 21) {
+            libraryNames.add(BuiltInLibraries.ANDROIDX_MULTIDEX);
+        }
+
+        /* Add HTTP legacy files if wanted */
+        if (!build_settings.getValue(BuildSettings.SETTING_NO_HTTP_LEGACY, ProjectSettings.SETTING_GENERIC_VALUE_FALSE)
+                .equals(ProjectSettings.SETTING_GENERIC_VALUE_TRUE)) {
+            libraryNames.add(BuiltInLibraries.HTTP_LEGACY_ANDROID);
+        }
+
+        /* Add used built-in libraries */
+        for (Jp builtInLibrary : builtInLibraryManager.getLibraries()) {
+            libraryNames.add(builtInLibrary.getName());
+        }
+
+        return libraryNames;
+    }
+
+    /**
+     * @return Precompiled DEX file of every built-in library packaged as-is (see
+     * {@link #getBuiltInLibraryNames()})
+     */
+    private ArrayList<File> getBuiltInLibraryDexFiles() {
+        ArrayList<File> dexes = new ArrayList<>();
+        for (String libraryName : getBuiltInLibraryNames()) {
+            dexes.add(BuiltInLibraries.getLibraryDexFile(libraryName));
+        }
+        return dexes;
+    }
+
+    /**
+     * Collects the DEX files of enabled Local libraries whose full mode is off, including their
+     * extra {@code classesN.dex} files. Local libraries are never handed to R8 (they are only
+     * available as DEX, which R8 cannot take as program input), so they keep being packaged as-is.
+     *
+     * @return List of Local libraries' DEX files
+     */
+    private ArrayList<File> getLocalLibraryDexFiles() {
+        ArrayList<File> dexes = new ArrayList<>();
+        ArrayList<HashMap<String, Object>> list = mll.list;
+
+        for (int i1 = 0, listSize = list.size(); i1 < listSize; i1++) {
+            HashMap<String, Object> localLibrary = list.get(i1);
+            Object localLibraryName = localLibrary.get("name");
+
+            if (localLibraryName instanceof String) {
+                Object localLibraryDexPath = localLibrary.get("dexPath");
+
+                if (localLibraryDexPath instanceof String) {
+                    if (!proguard.libIsProguardFMEnabled((String) localLibraryName)) {
+                        dexes.add(new File((String) localLibraryDexPath));
+                        /* Add library's extra DEX files */
+                        File localLibraryDirectory = new File((String) localLibraryDexPath).getParentFile();
+
+                        if (localLibraryDirectory != null) {
+                            File[] localLibraryFiles = localLibraryDirectory.listFiles();
+
+                            if (localLibraryFiles != null) {
+                                for (File localLibraryFile : localLibraryFiles) {
+                                    String filename = localLibraryFile.getName();
+
+                                    if (!filename.equals("classes.dex")
+                                            && filename.startsWith("classes") && filename.endsWith(".dex")) {
+                                        dexes.add(localLibraryFile);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    AscodeUtil.toastError("Invalid DEX file path of enabled Local library #" + i1, Toast.LENGTH_LONG);
+                }
+            } else {
+                AscodeUtil.toastError("Invalid name of enabled Local library #" + i1, Toast.LENGTH_LONG);
+            }
+        }
+
+        return dexes;
     }
 
     public String getClasspath() {
@@ -721,59 +823,16 @@ public class ProjectBuilder {
         long savedTimeMillis = System.currentTimeMillis();
         ArrayList<File> dexes = new ArrayList<>();
 
-        /* Add AndroidX MultiDex library if needed */
-        if (settings.getMinSdkVersion() < 21) {
-            dexes.add(BuiltInLibraries.getLibraryDexFile(BuiltInLibraries.ANDROIDX_MULTIDEX));
+        /*
+         * When R8 is active, built-in libraries are shrunk by R8 (see runR8()), so their
+         * precompiled DEX files must not be packaged as-is anymore.
+         */
+        if (!isR8ProcessingLibraries()) {
+            dexes.addAll(getBuiltInLibraryDexFiles());
         }
 
-        /* Add HTTP legacy files if wanted */
-        if (!build_settings.getValue(BuildSettings.SETTING_NO_HTTP_LEGACY, ProjectSettings.SETTING_GENERIC_VALUE_FALSE)
-                .equals(ProjectSettings.SETTING_GENERIC_VALUE_TRUE)) {
-            dexes.add(BuiltInLibraries.getLibraryDexFile(BuiltInLibraries.HTTP_LEGACY_ANDROID));
-        }
-
-        /* Add used built-in libraries' DEX files */
-        for (Jp builtInLibrary : builtInLibraryManager.getLibraries()) {
-            dexes.add(BuiltInLibraries.getLibraryDexFile(builtInLibrary.getName()));
-        }
-
-        /* Add local libraries' main DEX files */
-        ArrayList<HashMap<String, Object>> list = mll.list;
-        for (int i1 = 0, listSize = list.size(); i1 < listSize; i1++) {
-            HashMap<String, Object> localLibrary = list.get(i1);
-            Object localLibraryName = localLibrary.get("name");
-
-            if (localLibraryName instanceof String) {
-                Object localLibraryDexPath = localLibrary.get("dexPath");
-
-                if (localLibraryDexPath instanceof String) {
-                    if (!proguard.libIsProguardFMEnabled((String) localLibraryName)) {
-                        dexes.add(new File((String) localLibraryDexPath));
-                        /* Add library's extra DEX files */
-                        File localLibraryDirectory = new File((String) localLibraryDexPath).getParentFile();
-
-                        if (localLibraryDirectory != null) {
-                            File[] localLibraryFiles = localLibraryDirectory.listFiles();
-
-                            if (localLibraryFiles != null) {
-                                for (File localLibraryFile : localLibraryFiles) {
-                                    String filename = localLibraryFile.getName();
-
-                                    if (!filename.equals("classes.dex")
-                                            && filename.startsWith("classes") && filename.endsWith(".dex")) {
-                                        dexes.add(localLibraryFile);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    AscodeUtil.toastError("Invalid DEX file path of enabled Local library #" + i1, Toast.LENGTH_LONG);
-                }
-            } else {
-                AscodeUtil.toastError("Invalid name of enabled Local library #" + i1, Toast.LENGTH_LONG);
-            }
-        }
+        /* Local libraries are never shrunk by R8, so they always keep being packaged as-is */
+        dexes.addAll(getLocalLibraryDexFiles());
 
         for (String file : FileUtil.listFiles(yq.binDirectoryPath + File.separator + "dex", "dex")) {
             dexes.add(new File(file));
@@ -951,6 +1010,8 @@ public class ProjectBuilder {
 
         ArrayList<String> config = new ArrayList<>();
         config.add(ProguardHandler.ANDROID_PROGUARD_RULES_PATH);
+        /* Conservative rules for shrinking libraries too; never forces -dontoptimize */
+        config.add(ProguardHandler.SAFE_PROGUARD_RULES_PATH);
         config.add(yq.proguardAaptRules);
         config.add(proguard.getCustomProguardRules());
         var rules = new ArrayList<>(Arrays.asList(getRJavaRules().split("\n")));
@@ -963,6 +1024,22 @@ public class ProjectBuilder {
         config.addAll(mll.getPgRules());
         ArrayList<String> jars = new ArrayList<>();
         jars.add(yq.compiledClassesPath + ".jar");
+
+        /*
+         * Let R8 shrink built-in libraries too. R8 cannot take precompiled DEX as program input
+         * ("R8 does not support compiling DEX inputs"), so the library class files are used
+         * instead; getDexFilesReady() skips packaging their DEX files for exactly this reason.
+         */
+        if (isR8ProcessingLibraries()) {
+            for (String libraryName : getBuiltInLibraryNames()) {
+                File libraryClassesJar = BuiltInLibraries.getLibraryClassesJarPath(libraryName);
+                if (libraryClassesJar != null && libraryClassesJar.exists()) {
+                    jars.add(libraryClassesJar.getAbsolutePath());
+                } else {
+                    LogUtil.d(TAG, "Skipping missing library classes JAR: " + libraryName);
+                }
+            }
+        }
 
         for (HashMap<String, Object> hashMap : mll.list) {
             String obj = hashMap.get("name").toString();

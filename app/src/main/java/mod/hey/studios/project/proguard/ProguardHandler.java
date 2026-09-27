@@ -13,6 +13,7 @@ import com.ascode.android.utility.FileUtil;
 
 public class ProguardHandler {
     public static String ANDROID_PROGUARD_RULES_PATH = createAndroidRules();
+    public static String SAFE_PROGUARD_RULES_PATH = createSafeRules();
     public static String DEFAULT_PROGUARD_RULES_PATH = "";
     private final String config_path;
     private final String fm_config_path;
@@ -100,6 +101,81 @@ public class ProguardHandler {
                     -dontwarn androidx.lifecycle.**
                     -keep class androidx.arch.** { *; }
                     -keep class androidx.lifecycle.** { *; }
+                    """);
+        }
+
+        return rulePath;
+    }
+
+    /**
+     * Conservative keep rules used only when R8 is active, so that libraries' classes which are
+     * reached through reflection, the manifest or JSON deserialization survive shrinking.
+     * <p>
+     * The file is created once and can be freely overwritten by the user afterwards; unlike
+     * {@link #createAndroidRules()} it never forces {@code -dontoptimize}.
+     *
+     * @return Absolute path of the file containing the rules
+     */
+    private static String createSafeRules() {
+        String rulePath = FileUtil.getExternalStorageDir() + "/.AndroidSCode/libs/ascode-safe-rules.pro";
+
+        if (!FileUtil.isExistFile(rulePath)) {
+            FileUtil.writeFile(rulePath, """
+                    # Conservative keep rules for shrinking built-in libraries with R8.
+                    # This file is created once and can be overwritten; it never forces -dontoptimize.
+
+                    # --- Android components instantiated from the generated manifest ---
+                    -keep class * extends android.app.Activity { *; }
+                    -keep class * extends android.app.Service { *; }
+                    -keep class * extends android.content.BroadcastReceiver { *; }
+                    -keep class * extends android.content.ContentProvider { *; }
+                    -keep class * extends android.app.Application { *; }
+                    -keep class * extends android.app.backup.BackupAgentHelper { *; }
+
+                    # --- Attributes needed by reflection / JSON / Kotlin / annotations ---
+                    -keepattributes *Annotation*, Signature, InnerClasses, EnclosingMethod, Exceptions
+                    -keepattributes RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations
+                    -keepattributes RuntimeInvisibleAnnotations, RuntimeInvisibleParameterAnnotations
+                    -keepattributes AnnotationDefault, MethodParameters, KotlinMetadata
+
+                    # --- Parcelable, native methods, enums, JS interfaces, resources, views ---
+                    -keep class * implements android.os.Parcelable {
+                        public static final android.os.Parcelable$Creator *;
+                    }
+                    -keepclasseswithmembernames class * {
+                        native <methods>;
+                    }
+                    -keepclassmembers enum * {
+                        public static **[] values();
+                        public static ** valueOf(java.lang.String);
+                    }
+                    -keepclassmembers class * {
+                        @android.webkit.JavascriptInterface <methods>;
+                    }
+                    -keepclassmembers class **.R$* {
+                        public static <fields>;
+                    }
+                    -keepclassmembers class * extends android.view.View {
+                        void set*(***);
+                        *** get*();
+                    }
+
+                    # --- Reflection-heavy libraries ({@code proguard.txt} of each library is also applied) ---
+                    -keep class com.google.gson.** { *; }
+                    -keepclassmembers,allowobfuscation class * {
+                        @com.google.gson.annotations.SerializedName <fields>;
+                    }
+                    -keep class com.airbnb.lottie.** { *; }
+                    -keep class com.bumptech.glide.** { *; }
+
+                    # --- Kotlin / KMP ---
+                    -keep class kotlin.Metadata { *; }
+                    -keepclassmembers class **$Companion { *; }
+                    -dontwarn kotlin.**
+
+                    # --- Firebase / Play Services (complements each library's proguard.txt) ---
+                    -keep class com.google.firebase.** { *; }
+                    -dontwarn com.google.android.gms.**
                     """);
         }
 

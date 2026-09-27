@@ -45,6 +45,7 @@ import a.a.a.wB;
 import a.a.a.wq;
 import a.a.a.yB;
 import mod.hey.studios.project.ProjectSettings;
+import mod.hey.studios.project.proguard.ProguardHandler;
 import mod.hey.studios.util.Helper;
 import mod.hey.studios.util.ProjectFile;
 import mod.hilal.saif.activities.tools.ConfigActivity;
@@ -632,6 +633,10 @@ public class MyProjectSettingActivity extends BaseAppCompatActivity implements V
                 ProjectSettings projectSettings = new ProjectSettings(sc_id);
                 projectSettings.setValue(ProjectSettings.SETTING_NEW_XML_COMMAND, ProjectSettings.SETTING_GENERIC_VALUE_TRUE);
                 projectSettings.setValue(ProjectSettings.SETTING_ENABLE_VIEWBINDING, ProjectSettings.SETTING_GENERIC_VALUE_TRUE);
+
+                /* Brand-new projects are born with R8 enabled by default (release-only until the
+                 * user changes it). Existing projects keep their own config untouched. */
+                ProguardHandler.writeNewProjectDefaultConfig(sc_id);
 
                 maybeInitializeKmpScaffold();
                 maybeInitializeFlutterScaffold();

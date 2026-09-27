@@ -202,7 +202,7 @@ public class FlutterCompilerBridge {
         }
 
         /* 5) R8: las clases del embedding entran por reflexion/JNI, hay que conservarlas. */
-        if (builder.proguard != null && builder.proguard.isShrinkingEnabled()) {
+        if (builder.proguard != null && builder.isShrinkBuildEnabled()) {
             FlutterPackagingSupport.appendFlutterKeepRules(
                     new File(builder.proguard.getCustomProguardRules()));
         }

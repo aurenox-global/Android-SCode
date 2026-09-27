@@ -287,7 +287,7 @@ public class ProjectBuilder {
                     "--verbose",
                     "--multi-dex",
                     "--output=" + yq.binDirectoryPath + File.separator + "dex",
-                    proguard.isShrinkingEnabled() ? yq.proguardClassesPath : yq.compiledClassesPath
+                    isShrinkBuildEnabled() ? yq.proguardClassesPath : yq.compiledClassesPath
             );
 
             try {
@@ -309,11 +309,35 @@ public class ProjectBuilder {
     }
 
     /**
+     * @return true if code shrinking must run for this build. New projects come with shrinking
+     * enabled by default, but that default is <b>release only</b>: debug/debuggable builds (the
+     * editor's Run button, {@link yq.ExportType#DEBUG_APP}) never shrink, so that the development
+     * loop stays fast and debuggable. A shrink setting the user changed explicitly is always
+     * honoured, on every build type.
+     */
+    public boolean isShrinkBuildEnabled() {
+        if (!proguard.isShrinkingEnabled()) {
+            return false;
+        }
+
+        return !(yq.N.isDebugBuild && proguard.isShrinkFromDefault());
+    }
+
+    /**
+     * @return true if the given Local library must go through the shrinker ("Full Mode") for
+     * <i>this</i> build. Uses the same gate as {@link #isShrinkBuildEnabled()}, so a build that
+     * does not shrink never drops a Local library from the APK by mistake.
+     */
+    public boolean isLibFullModeEnabled(String library) {
+        return isShrinkBuildEnabled() && proguard.libIsProguardFMEnabled(library);
+    }
+
+    /**
      * @return true if R8 (instead of Dx/D8) will process this build, meaning built-in libraries'
      * classes are handed to R8 as program input instead of being packaged as precompiled DEX files
      */
     public boolean isR8ProcessingLibraries() {
-        return proguard.isShrinkingEnabled() && proguard.isR8Enabled();
+        return isShrinkBuildEnabled() && proguard.isR8Enabled();
     }
 
     /**
@@ -379,7 +403,7 @@ public class ProjectBuilder {
                 Object localLibraryDexPath = localLibrary.get("dexPath");
 
                 if (localLibraryDexPath instanceof String) {
-                    if (!proguard.libIsProguardFMEnabled((String) localLibraryName)) {
+                    if (!isLibFullModeEnabled((String) localLibraryName)) {
                         dexes.add(new File((String) localLibraryDexPath));
                         /* Add library's extra DEX files */
                         File localLibraryDirectory = new File((String) localLibraryDexPath).getParentFile();
@@ -479,7 +503,7 @@ public class ProjectBuilder {
 
             if (nameObject instanceof String name && jarPathObject instanceof String jarPath) {
 
-                if (localLibrary.containsKey("jarPath") && proguard.libIsProguardFMEnabled(name)) {
+                if (localLibrary.containsKey("jarPath") && isLibFullModeEnabled(name)) {
                     localLibraryJarsWithFullModeOn.add(jarPath);
                 }
             }
@@ -993,7 +1017,7 @@ public class ProjectBuilder {
         }
         for (HashMap<String, Object> hashMap : mll.list) {
             String obj = hashMap.get("name").toString();
-            if (hashMap.containsKey("packageName") && !proguard.libIsProguardFMEnabled(obj)) {
+            if (hashMap.containsKey("packageName") && !isLibFullModeEnabled(obj)) {
                 sb.append("\n");
                 sb.append("-keep class ");
                 sb.append(hashMap.get("packageName").toString());
@@ -1009,7 +1033,8 @@ public class ProjectBuilder {
         long savedTimeMillis = System.currentTimeMillis();
 
         ArrayList<String> config = new ArrayList<>();
-        config.add(ProguardHandler.ANDROID_PROGUARD_RULES_PATH);
+        /* R8 base rules: the classic keeps WITHOUT -dontoptimize, so R8 may optimize */
+        config.add(ProguardHandler.R8_BASE_PROGUARD_RULES_PATH);
         /* Conservative rules for shrinking libraries too; never forces -dontoptimize */
         config.add(ProguardHandler.SAFE_PROGUARD_RULES_PATH);
         config.add(yq.proguardAaptRules);
@@ -1043,7 +1068,7 @@ public class ProjectBuilder {
 
         for (HashMap<String, Object> hashMap : mll.list) {
             String obj = hashMap.get("name").toString();
-            if (hashMap.containsKey("jarPath") && proguard.libIsProguardFMEnabled(obj)) {
+            if (hashMap.containsKey("jarPath") && isLibFullModeEnabled(obj)) {
                 jars.add(hashMap.get("jarPath").toString());
             }
         }
@@ -1088,7 +1113,7 @@ public class ProjectBuilder {
 
         for (HashMap<String, Object> hashMap : mll.list) {
             String obj = hashMap.get("name").toString();
-            if (hashMap.containsKey("jarPath") && proguard.libIsProguardFMEnabled(obj)) {
+            if (hashMap.containsKey("jarPath") && isLibFullModeEnabled(obj)) {
                 args.add("-injars");
                 args.add(hashMap.get("jarPath").toString());
             }

@@ -32,6 +32,16 @@
                 android:text="Activated"
                 android:textSize="16sp" />
 
+            <TextView
+                android:id="@+id/tv_r8_default_notice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                android:text="@string/code_shrinker_default_on_notice"
+                android:textSize="12sp" />
+
             <!-- R8 code shrinker my beloved, I'll come to your house if your remove it -->
             <com.google.android.material.materialswitch.MaterialSwitch
                 android:id="@+id/r8_enabled"

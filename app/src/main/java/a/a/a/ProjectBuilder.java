@@ -1040,6 +1040,21 @@ public class ProjectBuilder {
         config.add(yq.proguardAaptRules);
         config.add(proguard.getCustomProguardRules());
         var rules = new ArrayList<>(Arrays.asList(getRJavaRules().split("\n")));
+        /*
+         * Gson deserializes plain (un-annotated) model classes reflectively and uses the Java field
+         * names as JSON keys, an access R8 cannot see. It is therefore free to rename those fields
+         * (breaking every JSON key) or, worse, to horizontally merge the class into an unrelated one,
+         * leaving Gson a class it cannot instantiate at all
+         * ("JsonIOException: Abstract classes can't be instantiated! ... Adjust the R8 configuration").
+         *
+         * The smallest rule that covers both the app: keep the fields of the project's own package
+         * and the classes they live in, so R8 may neither rename the fields nor merge the classes
+         * away. Deliberately `-keep` (not `-keepclassmembers`): the latter only protects the members
+         * of a class R8 still keeps, and we measured that R8 merges the un-annotated POJO anyway,
+         * after which the JSON parse still fails. Only the app's own package is affected; the built-in
+         * libraries are still shrunk by R8.
+         */
+        rules.add("-keep class " + yq.packageName + ".** { <fields>; }");
         for (Jp library : builtInLibraryManager.getLibraries()) {
             File f = BuiltInLibraries.getLibraryProguardConfiguration(library.getName());
             if (f.exists()) {

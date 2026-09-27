@@ -36,6 +36,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import a.a.a.KB;
+import a.a.a.Lx;
+import a.a.a.Jp;
 import a.a.a.MA;
 import a.a.a.ProjectBuilder;
 import a.a.a.eC;
@@ -348,10 +350,20 @@ public class ExportProjectActivity extends BaseAppCompatActivity {
             if (pathResources.exists()) {
                 FileUtil.copyDirectory(pathResources, new File(project_metadata.resDirectoryPath));
             }
+            /*
+             * The exported release build type shrinks (see Lx#getBuildGradleString), so the exported
+             * proguard-rules.pro must carry the keeps the project needs: the on-device R8 base rules,
+             * the conservative safe rules, the project's own rules and every used built-in library's
+             * own proguard.txt (AdMob, Gson, Glide, Lottie, ...).
+             */
             String pathProguard = util.getPathProguard(sc_id);
-            if (FileUtil.isExistFile(pathProguard)) {
-                FileUtil.copyFile(pathProguard, project_metadata.proguardFilePath);
+            String customProguardRules = FileUtil.isExistFile(pathProguard) ? FileUtil.readFile(pathProguard) : null;
+            ArrayList<String> builtInLibraryNames = new ArrayList<>();
+            for (Jp library : builder.getBuiltInLibraryManager().getLibraries()) {
+                builtInLibraryNames.add(library.getName());
             }
+            FileUtil.writeFile(project_metadata.proguardFilePath,
+                    Lx.getExportProguardRules(customProguardRules, builtInLibraryNames, project_metadata.packageName));
             if (pathAssets.exists()) {
                 FileUtil.copyDirectory(pathAssets, new File(project_metadata.assetsPath));
             }

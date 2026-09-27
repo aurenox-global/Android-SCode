@@ -578,6 +578,39 @@ public class ProguardHandler {
         FileUtil.writeFile(config_path, new Gson().toJson(config));
     }
 
+    /**
+     * Config key that opts a project into having R8 also shrink the <b>built-in libraries</b>
+     * (AndroidX/AppCompat, Material, AdMob, Firebase, …), not just the app's own classes.
+     * Defaults to {@code false} when absent.
+     */
+    private static final String KEY_R8_SHRINK_LIBRARIES = "r8_libs";
+
+    /**
+     * Whether R8 may also shrink the built-in libraries by taking their class files as program
+     * input (see {@link a.a.a.ProjectBuilder#isR8ProcessingLibraries()}).
+     * <p>
+     * This is <b>opt-in and off by default</b> on purpose. Feeding every used built-in library to
+     * R8 as program input makes R8 build its whole internal representation for tens of thousands of
+     * classes at once; on a device whose app process heap is capped by the ROM (512–768 MB, see
+     * {@code android:largeHeap="true"} / {@code dalvik.vm.heapsize}) that reliably ends in
+     * {@code OutOfMemoryError} for any realistically sized project (measured: a Material + AdMob
+     * project exhausts the full 768 MB heap). With this off, the built-in libraries keep being
+     * packaged as their precompiled DEX files (the classic behaviour) and R8 only shrinks the app's
+     * own classes, which needs a small fraction of the heap.
+     */
+    public boolean isR8ShrinkingLibraries() {
+        if (!FileUtil.isExistFile(config_path)) {
+            return false;
+        }
+
+        try {
+            HashMap<String, String> config = new Gson().fromJson(FileUtil.readFile(config_path), Helper.TYPE_STRING_MAP);
+            return "true".equals(config.get(KEY_R8_SHRINK_LIBRARIES));
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public boolean libIsProguardFMEnabled(String library) {
         boolean enabled;
         if (isShrinkingEnabled() && FileUtil.isExistFile(fm_config_path)) {

@@ -1451,6 +1451,42 @@ public class Fx {
                 handlesEmptySelectorParams = true;
                 break;
             }
+            case "setColorFilterView": {
+                /*
+                 * Un color filter NO tiene valor neutro: usar Color.TRANSPARENT como filtro
+                 * es PEOR que no aplicar nada, porque vacia el alpha del fondo (lo borra).
+                 * Por eso, si falta el color (selector principal del bloque) NO se emite nada
+                 * en vez de forzar un valor que cambiaria el aspecto. El modo SI es secundario:
+                 * si falta, el bloque debe seguir funcionando, asi que se usa SRC_ATOP (el modo
+                 * de tinte clasico) en lugar de borrar el bloque en silencio.
+                 */
+                String target = paramOrEmpty(params, 0);
+                String color = paramOrEmpty(params, 1);
+                opcode = (target.isEmpty() || color.isEmpty())
+                        ? ""
+                        : String.format("%s.getBackground().setColorFilter(%s, android.graphics.PorterDuff.Mode.%s);",
+                        target, color, porterDuffModeOr(paramOrEmpty(params, 2)));
+                handlesEmptySelectorParams = true;
+                break;
+            }
+            case "setGradientBackground": {
+                /*
+                 * Un gradiente necesita 2 colores. Si el usuario solo eligio uno, el extremo
+                 * vacio usa Color.TRANSPARENT (el mismo valor que muestra el selector de color
+                 * sin seleccion), de modo que el bloque produce un degradado real en vez de
+                 * borrarse en silencio. Si no hay ningun color no hay nada que pintar y no se
+                 * emite (un gradiente 100% transparente borraria el fondo).
+                 */
+                String target = paramOrEmpty(params, 0);
+                String first = paramOrEmpty(params, 1);
+                String second = paramOrEmpty(params, 2);
+                opcode = (target.isEmpty() || (first.isEmpty() && second.isEmpty()))
+                        ? ""
+                        : String.format("%s.setBackground(new android.graphics.drawable.GradientDrawable(android.graphics.drawable.GradientDrawable.Orientation.BR_TL, new int[] {%s,%s}));",
+                        target, colorOrTransparent(first), colorOrTransparent(second));
+                handlesEmptySelectorParams = true;
+                break;
+            }
             default:
                 opcode = getCodeExtraBlock(bean, "\"\"");
         }
@@ -1483,6 +1519,14 @@ public class Fx {
      */
     private String colorOrTransparent(String color) {
         return color.isEmpty() ? "android.graphics.Color.TRANSPARENT" : color;
+    }
+
+    /**
+     * @return El modo PorterDuff indicado, o {@code SRC_ATOP} (tinte clasico) si el usuario no
+     * ha seleccionado ninguno. El modo es un parametro secundario: no debe borrar el bloque.
+     */
+    private String porterDuffModeOr(String mode) {
+        return mode.isEmpty() ? "SRC_ATOP" : mode;
     }
 
     /**

@@ -1564,7 +1564,7 @@ public class LayoutPreviewActivity extends BaseAppCompatActivity {
         // para el modo glass (que si necesita los valores en runtime) se resuelve el bean ORIGINAL
         // del proyecto por id.
         String shapeInject = shapeInjectFor(bean);
-        if (com.ascode.android.utility.DesignShapeAttrs.supportsShapeBackground(view)
+        if (com.ascode.android.utility.DesignShapeAttrs.usesShapeDrawable(bean)
                 && com.ascode.android.utility.DesignShapeAttrs.hasAnyShape(shapeInject)) {
             String backgroundResource = bean.layout == null ? null : bean.layout.backgroundResource;
             boolean generatedShapeBackground = backgroundResource != null

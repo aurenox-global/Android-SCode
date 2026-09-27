@@ -1365,7 +1365,7 @@ public class ViewPane extends RelativeLayout {
      * Es el equivalente en memoria del shape drawable que se genera en el XML compilado.
      */
     private void applyDesignShapeBackground(View view, ViewBean viewBean, InjectAttributeHandler handler) {
-        if (!DesignShapeAttrs.supportsShapeBackground(view)) {
+        if (!DesignShapeAttrs.usesShapeDrawable(viewBean)) {
             return;
         }
         if (!DesignShapeAttrs.hasAnyShape(viewBean.inject)) {
@@ -1477,26 +1477,31 @@ public class ViewPane extends RelativeLayout {
     }
 
     private void updateMaterialButton(ItemMaterialButton materialButton, InjectAttributeHandler handler) {
-        String radius = handler.getAttributeValueOf("cornerRadius");
-        String stroke = handler.getAttributeValueOf("strokeWidth");
-        String strokeColor = handler.getAttributeValueOf("strokeColor");
-        materialButton.setStrokeWidth(PropertiesUtil.resolveSize(stroke, 0));
-        materialButton.setCornerRadius(PropertiesUtil.resolveSize(radius, 8));
-        // El lienzo leia esquinas y grosor del borde pero nunca el color: la vista previa y la app
-        // compilada si lo pintaban, asi que el editor mostraba un borde sin color. Se aplica aqui
-        // para que los tres motores coincidan.
-        if (strokeColor != null && !strokeColor.isEmpty()) {
-            int color;
-            if (PropertiesUtil.isHexColor(strokeColor)) {
-                color = PropertiesUtil.parseColor(strokeColor);
-            } else if (strokeColor.startsWith("@") || strokeColor.startsWith("?")) {
-                color = PropertiesUtil.parseColor(colorsEditorManager.getColorValue(context,
-                        strokeColor, 3, material3LibraryManager.canUseNightVariantColors()));
-            } else {
-                color = 0;
-            }
-            if (color != 0) {
-                materialButton.setStrokeColor(android.content.res.ColorStateList.valueOf(color));
+        // Con gradiente/glass el boton usa un shape drawable como fondo: esquina, borde y relleno los
+        // pinta el drawable (aplicado en applyDesignShapeBackground), no los atributos nativos, para
+        // que lienzo, vista previa y XML no mezclen dos formas distintas.
+        if (!DesignShapeAttrs.isMaterialButtonWithCustomBackground(handler.getBean())) {
+            String radius = handler.getAttributeValueOf("cornerRadius");
+            String stroke = handler.getAttributeValueOf("strokeWidth");
+            String strokeColor = handler.getAttributeValueOf("strokeColor");
+            materialButton.setStrokeWidth(PropertiesUtil.resolveSize(stroke, 0));
+            materialButton.setCornerRadius(PropertiesUtil.resolveSize(radius, 8));
+            // El lienzo leia esquinas y grosor del borde pero nunca el color: la vista previa y la app
+            // compilada si lo pintaban, asi que el editor mostraba un borde sin color. Se aplica aqui
+            // para que los tres motores coincidan.
+            if (strokeColor != null && !strokeColor.isEmpty()) {
+                int color;
+                if (PropertiesUtil.isHexColor(strokeColor)) {
+                    color = PropertiesUtil.parseColor(strokeColor);
+                } else if (strokeColor.startsWith("@") || strokeColor.startsWith("?")) {
+                    color = PropertiesUtil.parseColor(colorsEditorManager.getColorValue(context,
+                            strokeColor, 3, material3LibraryManager.canUseNightVariantColors()));
+                } else {
+                    color = 0;
+                }
+                if (color != 0) {
+                    materialButton.setStrokeColor(android.content.res.ColorStateList.valueOf(color));
+                }
             }
         }
     }

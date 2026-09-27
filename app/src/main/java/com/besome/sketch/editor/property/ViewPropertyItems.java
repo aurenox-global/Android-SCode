@@ -740,17 +740,19 @@ public class ViewPropertyItems extends LinearLayout implements Kw, View.OnClickL
             a(bean, "property_stroke_width");
             a(bean, "property_stroke_color");
             if (DesignShapeAttrs.supportsShapeGradient(bean)) {
-                // Fase 2: gradiente de 2 colores + modo glass (mismo sitio que el resto de la forma).
+                // Fase 3: gradiente de 2 colores + modo glass tambien en MaterialButton. A cambio, si
+                // se aplican, el boton pasa a un shape drawable propio y pierde el ripple/Material.
                 a(bean, "property_gradient_start");
                 a(bean, "property_gradient_end");
                 a(bean, "property_gradient_orientation");
                 a(bean, "property_glass");
                 a(bean, "property_glass_alpha");
                 a(bean, "property_glass_blur");
-            } else {
-                // MaterialButton: el gradiente/glass exigirian un shape drawable como fondo, que
-                // borraria el ripple y el estilo Material. Se informa en vez de degradarlo en silencio.
-                note(getContext().getString(R.string.property_shape_material_note));
+                if (DesignShapeAttrs.isMaterialButton(bean)) {
+                    // El aviso solo corresponde al MaterialButton, que es el unico que tiene un ripple
+                    // que perder.
+                    note(getContext().getString(R.string.property_shape_material_note));
+                }
             }
         }
     }

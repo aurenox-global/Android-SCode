@@ -6,21 +6,15 @@ import android.graphics.Shader;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.view.View;
-import android.widget.ImageView;
-
-import androidx.cardview.widget.CardView;
 
 import com.besome.sketch.beans.LayoutBean;
 import com.besome.sketch.beans.ViewBean;
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.tabs.TabLayout;
 
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import a.a.a.Gx;
-import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Atributos de forma (corner radius + stroke) para widgets que NO los soportan de forma nativa
@@ -312,19 +306,18 @@ public final class DesignShapeAttrs {
     // ---------------------------------------------------------------- que widgets lo usan
 
     /**
-     * ¿Este widget puede llevar forma propia? Se excluyen las familias que ya la aplican con sus
-     * propios appliers en los tres motores (CardView / MaterialButton / TabLayout / CircleImageView).
+     * ¿Este widget (bean) pinta su forma con un <b>shape drawable propio</b>?
+     *
+     * <p>Para los widgets sin forma nativa (LinearLayout / ImageView / TextView / EditText / Button)
+     * basta con tener cualquier atributo de forma. En un <b>MaterialButton</b> la forma normal es
+     * NATIVA ({@code app:cornerRadius/strokeWidth/strokeColor}); el shape drawable solo se usa cuando
+     * el usuario elige <b>gradiente o glass</b>, que no se pueden expresar con la forma Material y
+     * exigen sustituir su fondo (a cambio el boton pierde el ripple: decision explicita del usuario).
+     * Un MaterialButton sin gradiente/glass conserva el camino nativo intacto.
+     *
+     * <p>Se excluyen las familias con su propio applier (CardView / TabLayout / CircleImageView).
      */
-    public static boolean supportsShapeBackground(View view) {
-        return view != null
-                && !(view instanceof CardView)
-                && !(view instanceof MaterialButton)
-                && !(view instanceof TabLayout)
-                && !(view instanceof CircleImageView);
-    }
-
-    /** Version para el generador de XML, donde solo tenemos el bean (sin la vista instanciada). */
-    public static boolean supportsShapeBackgroundType(ViewBean bean) {
+    public static boolean usesShapeDrawable(ViewBean bean) {
         if (bean == null) {
             return false;
         }
@@ -332,10 +325,33 @@ public final class DesignShapeAttrs {
         if (info == null) {
             return false;
         }
+        if (info.b("MaterialButton")) {
+            return hasCustomBackground(bean);
+        }
         return !info.a("CardView")
-                && !info.a("MaterialButton")
                 && !info.a("TabLayout")
                 && !info.a("CircleImageView");
+    }
+
+    /** ¿El bean define gradiente (dos colores) o modo glass? (exige fondo propio en cualquier widget). */
+    public static boolean hasCustomBackground(ViewBean bean) {
+        return bean != null && (hasGradient(bean) || isGlass(bean.inject));
+    }
+
+    /**
+     * ¿Es un MaterialButton que ha pasado a fondo propio (gradiente/glass) y por tanto pierde el
+     * ripple/Material? En ese caso la esquina, el borde y el relleno los da el shape drawable.
+     */
+    public static boolean isMaterialButtonWithCustomBackground(ViewBean bean) {
+        return isMaterialButton(bean) && hasCustomBackground(bean);
+    }
+
+    /**
+     * Version para el generador de XML, donde solo tenemos el bean (sin la vista instanciada).
+     * Mismo criterio que {@link #usesShapeDrawable(ViewBean)}.
+     */
+    public static boolean supportsShapeBackgroundType(ViewBean bean) {
+        return usesShapeDrawable(bean);
     }
 
     /**
@@ -343,8 +359,9 @@ public final class DesignShapeAttrs {
      *
      * <ul>
      *   <li><b>MaterialButton</b>: forma NATIVA ({@code app:cornerRadius} / {@code app:strokeWidth} /
-     *       {@code app:strokeColor}); el widget ya la soporta en lienzo, vista previa y XML, asi que
-     *       el panel reutiliza esos mismos atributos en vez de crear un shape drawable.</li>
+     *       {@code app:strokeColor}); el widget ya la soporta en lienzo, vista previa y XML. Ademas,
+     *       si el usuario elige gradiente o glass, el boton pasa a un shape drawable propio (y pierde
+     *       el ripple; el panel lo avisa).</li>
      *   <li><b>LinearLayout / ImageView</b> (y las familias que comparten su jerarquia): shape
      *       drawable generico, como en la fase 1. CircleImageView queda fuera porque tiene su propio
      *       borde ({@code civ_*}) y el shape generico no se le aplica.</li>
@@ -383,12 +400,12 @@ public final class DesignShapeAttrs {
 
     /**
      * ¿Se le pueden ofrecer gradiente / glass a este widget? Los dos necesitan un shape drawable
-     * como fondo; en un MaterialButton eso sustituiria su fondo Material y perderia el ripple y el
-     * estilo de la familia. Por eso se ocultan en MaterialButton (que conserva su forma nativa:
-     * esquinas + borde) en vez de degradarlo en silencio.
+     * como fondo. Ahora tambien se ofrecen en MaterialButton: al aplicarlos el boton pasa a ese
+     * fondo propio y <b>pierde el ripple y el estilo Material</b> (compromiso anunciado en el panel).
+     * Sin gradiente/glass el boton conserva su forma nativa y su ripple.
      */
     public static boolean supportsShapeGradient(ViewBean bean) {
-        return bean != null && !isMaterialButton(bean);
+        return bean != null;
     }
 
     // ---------------------------------------------------------------- dibujo en memoria

@@ -1686,7 +1686,7 @@ ACTION_VIEW
     <string name="property_glass">Glass effect</string>
     <string name="property_glass_alpha">Glass alpha (0-255)</string>
     <string name="property_glass_blur">Glass blur (dp)</string>
-    <string name="property_shape_material_note">On a Material button the shape uses its native attributes (corner radius + stroke). The gradient and glass effects need a custom background drawable, which would remove the button\u2019s ripple, so they are not offered here.</string>
+    <string name="property_shape_material_note">Gradient and glass need a custom background drawable on a Material button. Applying them replaces the button background, so the button loses its ripple and Material style (corner radius and stroke then also come from that drawable). Without gradient/glass, the button keeps its native Material shape and ripple.</string>
     <string name="property_group_basic">Basic</string>
     <string name="property_group_event">Event</string>
     <string name="property_group_recent">Recent</string>

@@ -124,14 +124,20 @@ public final class WidgetInjectApplier {
                 "insetBottom", "iconSize")) {
             return;
         }
-        materialButton.setStrokeWidth(resolver.dimension(handler.getAttributeValueOf("strokeWidth"), 0));
-        materialButton.setCornerRadius(resolver.dimension(
-                handler.getAttributeValueOf("cornerRadius"), DEFAULT_MATERIAL_BUTTON_RADIUS));
-        String strokeColor = handler.getAttributeValueOf("strokeColor");
-        if (!TextUtils.isEmpty(strokeColor)) {
-            int color = resolver.color(strokeColor, 0);
-            if (color != 0) {
-                materialButton.setStrokeColor(android.content.res.ColorStateList.valueOf(color));
+        // Con gradiente/glass el MaterialButton usa un shape drawable como fondo: esquina, borde y
+        // relleno los da el drawable, asi que aqui NO se tocan los atributos NATIVOS de forma
+        // (mezclar nativo + drawable daria un render distinto en cada motor). El resto de atributos
+        // (iconTint/iconSize/insets) si se aplica.
+        if (!DesignShapeAttrs.isMaterialButtonWithCustomBackground(handler.getBean())) {
+            materialButton.setStrokeWidth(resolver.dimension(handler.getAttributeValueOf("strokeWidth"), 0));
+            materialButton.setCornerRadius(resolver.dimension(
+                    handler.getAttributeValueOf("cornerRadius"), DEFAULT_MATERIAL_BUTTON_RADIUS));
+            String strokeColor = handler.getAttributeValueOf("strokeColor");
+            if (!TextUtils.isEmpty(strokeColor)) {
+                int color = resolver.color(strokeColor, 0);
+                if (color != 0) {
+                    materialButton.setStrokeColor(android.content.res.ColorStateList.valueOf(color));
+                }
             }
         }
         String iconTint = handler.getAttributeValueOf("iconTint");
@@ -225,11 +231,10 @@ public final class WidgetInjectApplier {
      */
     public static boolean applyShapeBackground(View view, InjectAttributeHandler handler,
                                                ValueResolver resolver, int fillColor) {
-        if (view == null || handler == null || !DesignShapeAttrs.supportsShapeBackground(view)) {
-            return false;
-        }
-        ViewBean bean = handler.getBean();
-        if (bean == null || !DesignShapeAttrs.hasAnyShape(bean.inject)) {
+        ViewBean bean = handler == null ? null : handler.getBean();
+        if (view == null || bean == null
+                || !DesignShapeAttrs.usesShapeDrawable(bean)
+                || !DesignShapeAttrs.hasAnyShape(bean.inject)) {
             return false;
         }
         String inject = bean.inject == null ? "" : bean.inject;

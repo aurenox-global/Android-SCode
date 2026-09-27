@@ -269,7 +269,7 @@ public class ProjectBuilder {
      */
     public void createDexFilesFromClasses() throws Exception {
         FileUtil.makeDir(yq.binDirectoryPath + File.separator + "dex");
-        if (isR8ProcessingLibraries()) return;
+        if (isR8BuildEnabled()) return;
 
         if (isD8Enabled()) {
             long savedTimeMillis = System.currentTimeMillis();
@@ -333,11 +333,26 @@ public class ProjectBuilder {
     }
 
     /**
+     * @return true if R8 (instead of Dx/D8) is the shrinker for this build. R8 always produces the
+     * app's DEX itself, so D8/Dx must be skipped whenever this is true, independently of whether R8
+     * also shrinks the built-in libraries (see {@link #isR8ProcessingLibraries()}).
+     */
+    public boolean isR8BuildEnabled() {
+        return isShrinkBuildEnabled() && proguard.isR8Enabled();
+    }
+
+    /**
      * @return true if R8 (instead of Dx/D8) will process this build, meaning built-in libraries'
-     * classes are handed to R8 as program input instead of being packaged as precompiled DEX files
+     * classes are handed to R8 as program input instead of being packaged as precompiled DEX files.
+     * <p>
+     * Taking the built-in libraries as R8 program input is opt-in (see
+     * {@link ProguardHandler#isR8ShrinkingLibraries()}): it makes R8 build IR for tens of thousands
+     * of extra classes, which on-device does not fit in the ROM-capped app heap and ends in
+     * {@code OutOfMemoryError} for realistically sized projects. With it off, R8 still shrinks the
+     * app's own classes and the libraries are packaged as their precompiled DEX files as before.
      */
     public boolean isR8ProcessingLibraries() {
-        return isShrinkBuildEnabled() && proguard.isR8Enabled();
+        return isShrinkBuildEnabled() && proguard.isR8Enabled() && proguard.isR8ShrinkingLibraries();
     }
 
     /**
@@ -1089,11 +1104,96 @@ public class ProjectBuilder {
         }
         try {
             JarBuilder.INSTANCE.generateJar(new File(yq.compiledClassesPath));
-            new R8Compiler(rules, config.toArray(new String[0]), getProguardClasspath().split(":"), jars.toArray(new String[0]), settings.getMinSdkVersion(), yq).compile();
+
+            long programInputBytes = 0;
+            for (String jar : jars) {
+                File jarFile = new File(jar);
+                if (jarFile.exists()) {
+                    programInputBytes += jarFile.length();
+                }
+            }
+            LogUtil.d(TAG, "R8 program input: " + jars.size() + " JAR(s), " + programInputBytes
+                    + " bytes; shrinking built-in libraries=" + isR8ProcessingLibraries());
+
+            PeakHeapSampler heapSampler = new PeakHeapSampler();
+            heapSampler.start();
+            try {
+                new R8Compiler(rules, config.toArray(new String[0]), getProguardClasspath().split(":"), jars.toArray(new String[0]), settings.getMinSdkVersion(), yq).compile();
+            } finally {
+                heapSampler.requestStop();
+            }
+            LogUtil.d(TAG, "R8 peak heap usage: " + heapSampler.peakBytes + " bytes of "
+                    + Runtime.getRuntime().maxMemory() + " bytes max");
+        } catch (OutOfMemoryError e) {
+            throw new IOException(r8OutOfMemoryMessage(), e);
         } catch (Exception e) {
+            /* R8 wraps the allocation failure into CompilationFailedException, so the OOM can be
+             * several frames down the cause chain. */
+            if (isCausedByOutOfMemory(e)) {
+                throw new IOException(r8OutOfMemoryMessage(), e);
+            }
             throw new IOException(e);
         }
         LogUtil.d(TAG, "R8 took " + (System.currentTimeMillis() - savedTimeMillis) + " ms");
+    }
+
+    /**
+     * @return A clear, actionable message shown to the user when R8 could not shrink a project
+     * because the app's heap ran out, instead of a raw {@code OutOfMemoryError} stack trace.
+     */
+    private static String r8OutOfMemoryMessage() {
+        long maxHeapMb = Runtime.getRuntime().maxMemory() / (1024 * 1024);
+        return "R8 ran out of memory while shrinking this project.\n"
+                + "The app's heap is capped at " + maxHeapMb + " MB by the device, and this project "
+                + "(its classes plus the libraries it uses) is too large for R8 to shrink inside it.\n"
+                + "What you can do:\n"
+                + "  \u2022 Disable Code Shrinking (or R8) for this project, or\n"
+                + "  \u2022 Remove libraries the project does not use, or split the project.\n"
+                + "Proyecto demasiado grande para R8: desactiva el shrink (o R8) o divide el proyecto.";
+    }
+
+    private static boolean isCausedByOutOfMemory(Throwable throwable) {
+        for (Throwable t = throwable; t != null; t = t.getCause()) {
+            if (t instanceof OutOfMemoryError) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Samples the used Java heap (~every 50 ms) while a heavy step runs, to report its peak.
+     * Best-effort: it only reads {@link Runtime} counters, so it cannot itself cause an OOM.
+     */
+    private static final class PeakHeapSampler extends Thread {
+        volatile long peakBytes;
+        private volatile boolean running = true;
+
+        PeakHeapSampler() {
+            super("r8-heap-sampler");
+            setDaemon(true);
+        }
+
+        @Override
+        public void run() {
+            Runtime runtime = Runtime.getRuntime();
+            while (running) {
+                long used = runtime.totalMemory() - runtime.freeMemory();
+                if (used > peakBytes) {
+                    peakBytes = used;
+                }
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    return;
+                }
+            }
+        }
+
+        void requestStop() {
+            running = false;
+            interrupt();
+        }
     }
 
     public void runProguard() throws IOException {

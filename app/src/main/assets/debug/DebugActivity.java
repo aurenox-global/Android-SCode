@@ -31,7 +31,10 @@ public class DebugActivity extends Activity {
         String errorMessage = "";
 
         if (intent != null) {
-            errorMessage = intent.getStringExtra("error");
+            String errorExtra = intent.getStringExtra("error");
+            if (errorExtra != null) {
+                errorMessage = errorExtra;
+            }
         }
 
         if (!errorMessage.isEmpty()) {

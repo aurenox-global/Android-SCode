@@ -68,8 +68,8 @@ android {
         namespace = "com.ascode.android"
       targetSdk = 35
         minSdk = 26
-        versionCode = 33
-        versionName = "v1.0.27"
+        versionCode = 34
+        versionName = "v1.0.28"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "GIT_HASH", "\"${gitCommitHash}\"")

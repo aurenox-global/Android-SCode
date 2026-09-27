@@ -1560,8 +1560,12 @@ public class LayoutPreviewActivity extends BaseAppCompatActivity {
         }
         // Forma generica (corner radius + stroke) para widgets sin soporte nativo (LinearLayout,
         // ImageView...). Es equivalente en memoria al shape drawable que se genera en el XML.
+        // El XML generado NO lleva los atributos de forma (se representan con el drawable), asi que
+        // para el modo glass (que si necesita los valores en runtime) se resuelve el bean ORIGINAL
+        // del proyecto por id.
+        String shapeInject = shapeInjectFor(bean);
         if (com.ascode.android.utility.DesignShapeAttrs.supportsShapeBackground(view)
-                && com.ascode.android.utility.DesignShapeAttrs.hasAnyShape(bean.inject)) {
+                && com.ascode.android.utility.DesignShapeAttrs.hasAnyShape(shapeInject)) {
             String backgroundResource = bean.layout == null ? null : bean.layout.backgroundResource;
             boolean generatedShapeBackground = backgroundResource != null
                     && backgroundResource.startsWith("designshape_");
@@ -1571,18 +1575,62 @@ public class LayoutPreviewActivity extends BaseAppCompatActivity {
                 if (generatedShapeBackground) {
                     // El fondo ya es el shape drawable que genera el IDE: lo aplica applyBeanBackground
                     // resolviendo el fichero del proyecto (el mismo que compila el proyecto). Aqui solo
-                    // se marcan los atributos como atendidos para no avisar de setters inexistentes.
+                    // se marcan los atributos como atendidos para no avisar de setters inexistentes y
+                    // se aplica el blur del glass (que el drawable XML no puede expresar).
                     handled.add("cornerRadius");
                     handled.add("strokeWidth");
                     handled.add("strokeColor");
+                    handled.add("gradientStart");
+                    handled.add("gradientEnd");
+                    handled.add("gradientOrientation");
+                    handled.add("glass");
+                    if (com.ascode.android.utility.DesignShapeAttrs.isGlass(shapeInject)) {
+                        com.ascode.android.utility.DesignShapeAttrs.applyGlassBlur(view, shapeInject);
+                    } else {
+                        com.ascode.android.utility.DesignShapeAttrs.clearGlassBlur(view);
+                    }
                 } else if (com.ascode.android.utility.WidgetInjectApplier.applyShapeBackground(
                         view, handler, resolver, shapeFillColor(view, bean))) {
                     handled.add("cornerRadius");
                     handled.add("strokeWidth");
                     handled.add("strokeColor");
+                    handled.add("gradientStart");
+                    handled.add("gradientEnd");
+                    handled.add("gradientOrientation");
+                    handled.add("glass");
                 }
             }
         }
+    }
+
+    /**
+     * Inject del bean ORIGINAL del proyecto para un widget de la vista previa. El XML generado
+     * quita los atributos de forma (corner/stroke/gradiente/glass) porque se representan con el
+     * shape drawable, asi que aqui se busca el bean fuente por id para poder aplicar el glass.
+     */
+    private String shapeInjectFor(ViewBean bean) {
+        if (bean == null) {
+            return null;
+        }
+        if (com.ascode.android.utility.DesignShapeAttrs.hasAnyShape(bean.inject)) {
+            return bean.inject;
+        }
+        try {
+            String layoutName = currentLayout != null
+                    ? currentLayout
+                    : (layoutHistory.isEmpty() ? null : layoutHistory.peek());
+            if (layoutName != null && scId != null) {
+                for (ViewBean source : jC.a(scId).d(layoutName)) {
+                    if (source != null && bean.id != null && bean.id.equals(source.id)
+                            && com.ascode.android.utility.DesignShapeAttrs.hasAnyShape(source.inject)) {
+                        return source.inject;
+                    }
+                }
+            }
+        } catch (Throwable ignored) {
+            // Sin datos del proyecto: se usa el inject del bean parseado.
+        }
+        return bean.inject;
     }
 
     /**

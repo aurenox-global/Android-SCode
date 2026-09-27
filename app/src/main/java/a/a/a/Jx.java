@@ -29,6 +29,7 @@ import mod.hilal.saif.blocks.CommandBlock;
 import mod.hilal.saif.events.LogicHandler;
 import mod.pranav.viewbinding.ViewBindingBuilder;
 import com.ascode.android.control.logic.PermissionManager;
+import com.ascode.android.utility.DesignShapeAttrs;
 
 public class Jx {
 
@@ -184,6 +185,7 @@ public class Jx {
         handleAppCompat();
         addFieldsDeclaration();
         addDrawerComponentInitializer();
+        addDesignGlassInitializers();
         if (hasGeneratedWebView) {
             addWebViewSupportInitializers();
             fields.add("private ValueCallback<Uri[]> _filePathCallback;");
@@ -1207,6 +1209,40 @@ public class Jx {
             }
         }
         return false;
+    }
+
+    /**
+     * Aplica el blur del modo glass en la APP COMPILADA, a traves de los inicializadores del
+     * Activity/Fragment (se ejecutan tras crear las vistas). El desenfoque de lo que hay DETRAS de
+     * la vista no es posible de forma nativa: aqui se difumina el PROPIO widget. En API < 31 no se
+     * emite blur (el glass queda como translucido + borde + esquinas, sin excepciones).
+     */
+    private void addDesignGlassInitializers() {
+        for (ViewBean viewBean : projectDataManager.d(projectFileBean.getXmlName())) {
+            if (viewBean == null || viewBean.id == null || viewBean.id.startsWith("_") || viewBean.inject == null) {
+                continue;
+            }
+            if ("include".equals(viewBean.convert)) {
+                continue;
+            }
+            if (!DesignShapeAttrs.isGlass(viewBean.inject)) {
+                continue;
+            }
+            int blurDp = DesignShapeAttrs.glassBlurDp(viewBean.inject);
+            if (blurDp <= 0) {
+                continue;
+            }
+            String viewRef = Lx.getBindingOrViewName(viewBean.id, isViewBindingEnabled);
+            initializeMethodCode.add(
+                    "if (android.os.Build.VERSION.SDK_INT >= 31) {" + EOL +
+                            "try {" + EOL +
+                            viewRef + ".setRenderEffect(android.graphics.RenderEffect.createBlurEffect(" + blurDp
+                            + "f * getResources().getDisplayMetrics().density, " + blurDp
+                            + "f * getResources().getDisplayMetrics().density, android.graphics.Shader.TileMode.CLAMP));" + EOL +
+                            "} catch (Throwable _glassError) {}" + EOL +
+                            "}"
+            );
+        }
     }
 
     private void addWebViewSupportInitializers() {

@@ -1,7 +1,10 @@
 package com.ascode.android.utility;
 
 import android.graphics.Color;
+import android.graphics.RenderEffect;
+import android.graphics.Shader;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -41,6 +44,36 @@ public final class DesignShapeAttrs {
     public static final String ATTR_STROKE_WIDTH = "strokeWidth";
     public static final String ATTR_STROKE_COLOR = "strokeColor";
 
+    // Fase 2: gradiente de 2 colores (mismo sitio que el resto de la forma).
+    public static final String ATTR_GRADIENT_START = "gradientStart";
+    public static final String ATTR_GRADIENT_END = "gradientEnd";
+    public static final String ATTR_GRADIENT_ORIENTATION = "gradientOrientation";
+
+    /** Valores canonicos de orientacion del gradiente (los mismos que ofrece el panel). */
+    public static final String GRADIENT_VERTICAL = "vertical";
+    public static final String GRADIENT_HORIZONTAL = "horizontal";
+    /** Diagonal de arriba-izquierda a abajo-derecha (\u2198). */
+    public static final String GRADIENT_DIAGONAL_DOWN = "diagonal_down";
+    /** Diagonal de arriba-derecha a abajo-izquierda (\u2199). */
+    public static final String GRADIENT_DIAGONAL_UP = "diagonal_up";
+    public static final String[] GRADIENT_ORIENTATIONS = {
+            GRADIENT_VERTICAL, GRADIENT_HORIZONTAL, GRADIENT_DIAGONAL_DOWN, GRADIENT_DIAGONAL_UP};
+
+    // Modo glass: preset translucido + borde fino claro + esquinas redondeadas (+ blur del propio
+    // widget en API >= 31). El desenfoque de lo que hay DETRAS de la vista no es posible de forma
+    // nativa: aqui solo se difumina el propio widget.
+    public static final String ATTR_GLASS = "glass";
+    public static final String ATTR_GLASS_ALPHA = "glassAlpha";
+    public static final String ATTR_GLASS_BLUR = "glassBlur";
+
+    /** Alfa por defecto del fondo glass (0..255): ~20% (blanco translucido). */
+    public static final int DEFAULT_GLASS_ALPHA = 0x33;
+    public static final int DEFAULT_GLASS_CORNER_DP = 16;
+    public static final int DEFAULT_GLASS_STROKE_DP = 1;
+    /** Borde por defecto del glass: blanco al 40%. */
+    public static final int DEFAULT_GLASS_STROKE_COLOR = 0x66FFFFFF;
+    public static final int DEFAULT_GLASS_BLUR_DP = 16;
+
     /** Centinela de "color de fondo sin definir" del bean (mismo que usa Ox/ViewPane). */
     public static final int COLOR_NOT_SET = 0xffffff;
 
@@ -71,7 +104,149 @@ public final class DesignShapeAttrs {
         }
         return contains(inject, ATTR_CORNER_RADIUS)
                 || contains(inject, ATTR_STROKE_WIDTH)
-                || contains(inject, ATTR_STROKE_COLOR);
+                || contains(inject, ATTR_STROKE_COLOR)
+                || contains(inject, ATTR_GRADIENT_START)
+                || contains(inject, ATTR_GRADIENT_END)
+                || contains(inject, ATTR_GRADIENT_ORIENTATION)
+                || contains(inject, ATTR_GLASS)
+                || contains(inject, ATTR_GLASS_ALPHA)
+                || contains(inject, ATTR_GLASS_BLUR);
+    }
+
+    /** Todos los atributos de forma que NO deben acabar como atributos XML del widget. */
+    private static final String[] SHAPE_ATTRIBUTES = {
+            ATTR_CORNER_RADIUS, ATTR_STROKE_WIDTH, ATTR_STROKE_COLOR,
+            ATTR_GRADIENT_START, ATTR_GRADIENT_END, ATTR_GRADIENT_ORIENTATION,
+            ATTR_GLASS, ATTR_GLASS_ALPHA, ATTR_GLASS_BLUR};
+
+    /** Entero del inject (0 si no esta definido o no es un numero). */
+    public static int getInt(String inject, String name, int fallback) {
+        String raw = inject == null ? "" : raw(inject, name);
+        if (raw.isEmpty()) {
+            return fallback;
+        }
+        try {
+            return Integer.parseInt(raw.trim());
+        } catch (NumberFormatException e) {
+            return fallback;
+        }
+    }
+
+    private static String raw(String inject, String name) {
+        Matcher matcher = pattern(name).matcher(inject);
+        return matcher.find() ? matcher.group(1) : "";
+    }
+
+    // ---------------------------------------------------------------- gradiente
+
+    /** ¿El bean define un gradiente completo (los dos colores)? */
+    public static boolean hasGradient(ViewBean bean) {
+        return bean != null
+                && !get(bean, ATTR_GRADIENT_START).trim().isEmpty()
+                && !get(bean, ATTR_GRADIENT_END).trim().isEmpty();
+    }
+
+    public static String gradientOrientation(ViewBean bean) {
+        String value = get(bean, ATTR_GRADIENT_ORIENTATION).trim();
+        return value.isEmpty() ? GRADIENT_VERTICAL : value;
+    }
+
+    /**
+     * Angulo {@code android:angle} equivalente a la orientacion elegida. Android exige multiplos de
+     * 45: 0 = izquierda->derecha, 45 = abajo-izq->arriba-der, 135 = abajo-der->arriba-izq,
+     * 270 = arriba->abajo.
+     */
+    public static int gradientAngle(String orientation) {
+        String value = orientation == null ? "" : orientation.trim().toLowerCase(Locale.US);
+        return switch (value) {
+            case GRADIENT_HORIZONTAL -> 0;
+            case GRADIENT_DIAGONAL_DOWN -> 45;
+            case GRADIENT_DIAGONAL_UP -> 135;
+            default -> 270;
+        };
+    }
+
+    /** Orientacion equivalente del {@link GradientDrawable} del lienzo/vista previa. */
+    public static GradientDrawable.Orientation gradientDrawableOrientation(String orientation) {
+        return switch (gradientAngle(orientation)) {
+            case 0 -> GradientDrawable.Orientation.LEFT_RIGHT;
+            case 45 -> GradientDrawable.Orientation.BL_TR;
+            case 135 -> GradientDrawable.Orientation.BR_TL;
+            default -> GradientDrawable.Orientation.TOP_BOTTOM;
+        };
+    }
+
+    // ---------------------------------------------------------------- glass
+
+    /** ¿El widget lleva activado el modo glass? */
+    public static boolean isGlass(String inject) {
+        if (inject == null || inject.isEmpty() || !contains(inject, ATTR_GLASS)) {
+            return false;
+        }
+        String value = raw(inject, ATTR_GLASS).trim();
+        return !"false".equalsIgnoreCase(value) && !"0".equals(value) && !"none".equalsIgnoreCase(value);
+    }
+
+    /** Alfa (0..255) del fondo glass; por defecto ~20%. */
+    public static int glassAlpha(String inject) {
+        return clamp(getInt(inject, ATTR_GLASS_ALPHA, DEFAULT_GLASS_ALPHA), 0, 255);
+    }
+
+    /** Radio de blur (dp) del glass; 0 desactiva el blur aunque el modo siga activo. */
+    public static int glassBlurDp(String inject) {
+        return Math.max(0, getInt(inject, ATTR_GLASS_BLUR, DEFAULT_GLASS_BLUR_DP));
+    }
+
+    /** Color de fondo translucido del glass (#AARRGGBB con el alfa configurado). */
+    public static int glassFillColor(String inject) {
+        return (glassAlpha(inject) << 24) | 0x00FFFFFF;
+    }
+
+    private static int clamp(int value, int min, int max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
+    /**
+     * Aplica el blur del PROPIO widget en API >= 31 (RenderEffect). En API < 31 no hace nada y
+     * limpia cualquier efecto previo: el glass queda como translucido + borde + esquinas, sin
+     * excepciones. Devuelve {@code true} si el blur quedo aplicado.
+     */
+    public static boolean applyGlassBlur(View view, String inject) {
+        if (view == null) {
+            return false;
+        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            return false;
+        }
+        try {
+            int blurDp = glassBlurDp(inject);
+            if (blurDp <= 0) {
+                view.setRenderEffect(null);
+                return false;
+            }
+            float radius = blurDp * view.getResources().getDisplayMetrics().density;
+            view.setRenderEffect(RenderEffect.createBlurEffect(radius, radius, Shader.TileMode.CLAMP));
+            return true;
+        } catch (Throwable throwable) {
+            try {
+                view.setRenderEffect(null);
+            } catch (Throwable ignored) {
+                // sin efecto previo que limpiar
+            }
+            return false;
+        }
+    }
+
+    /** Limpia el blur del widget si el modo glass ya no esta activo (API < 31: no hace nada). */
+    public static void clearGlassBlur(View view) {
+        if (view == null || Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            return;
+        }
+        try {
+            view.setRenderEffect(null);
+        } catch (Throwable ignored) {
+            // nada que limpiar
+        }
     }
 
     private static boolean contains(String inject, String name) {
@@ -123,7 +298,7 @@ public final class DesignShapeAttrs {
             return inject;
         }
         String result = inject;
-        for (String name : new String[]{ATTR_CORNER_RADIUS, ATTR_STROKE_WIDTH, ATTR_STROKE_COLOR}) {
+        for (String name : SHAPE_ATTRIBUTES) {
             result = pattern(name).matcher(result).replaceAll("");
         }
         return result.replaceAll("\n{2,}", "\n").trim();
@@ -191,6 +366,20 @@ public final class DesignShapeAttrs {
      * @param fillColor     relleno; {@link Color#TRANSPARENT} para solo-borde
      */
     public static GradientDrawable buildDrawable(int radiusPx, int strokeWidthPx, int strokeColor, int fillColor) {
+        return buildDrawable(radiusPx, strokeWidthPx, strokeColor, fillColor, COLOR_NOT_SET, COLOR_NOT_SET, null);
+    }
+
+    /**
+     * Igual que {@link #buildDrawable(int, int, int, int)} pero con gradiente de dos colores
+     * opcional. Si los dos colores estan definidos se pinta el gradiente; si solo hay uno, se usa
+     * como color solido; si no hay ninguno, se usa {@code fillColor} (comportamiento actual).
+     *
+     * @param gradientStart color inicial ya resuelto por el motor que llama ({@code COLOR_NOT_SET}
+     *                      = sin definir)
+     * @param gradientEnd   color final ya resuelto ({@code COLOR_NOT_SET} = sin definir)
+     */
+    public static GradientDrawable buildDrawable(int radiusPx, int strokeWidthPx, int strokeColor, int fillColor,
+                                                 int gradientStart, int gradientEnd, String gradientOrientation) {
         GradientDrawable drawable = new GradientDrawable();
         drawable.setShape(GradientDrawable.RECTANGLE);
         if (radiusPx > 0) {
@@ -199,7 +388,18 @@ public final class DesignShapeAttrs {
         if (strokeWidthPx > 0 && Color.alpha(strokeColor) != 0) {
             drawable.setStroke(strokeWidthPx, strokeColor);
         }
-        drawable.setColor(fillColor);
+        boolean startDefined = isColorDefined(gradientStart);
+        boolean endDefined = isColorDefined(gradientEnd);
+        if (startDefined && endDefined) {
+            drawable.setOrientation(gradientDrawableOrientation(gradientOrientation));
+            drawable.setColors(new int[]{gradientStart, gradientEnd});
+        } else if (startDefined) {
+            drawable.setColor(gradientStart);
+        } else if (endDefined) {
+            drawable.setColor(gradientEnd);
+        } else {
+            drawable.setColor(fillColor);
+        }
         return drawable;
     }
 
@@ -228,32 +428,62 @@ public final class DesignShapeAttrs {
             return null;
         }
         LayoutBean layout = bean.layout;
-        String radius = get(bean, ATTR_CORNER_RADIUS);
-        String strokeWidth = get(bean, ATTR_STROKE_WIDTH);
-        String strokeColor = get(bean, ATTR_STROKE_COLOR);
+        boolean glass = isGlass(bean.inject);
+        String gradientStart = get(bean, ATTR_GRADIENT_START).trim();
+        String gradientEnd = get(bean, ATTR_GRADIENT_END).trim();
+        String radius = get(bean, ATTR_CORNER_RADIUS).trim();
+        String strokeWidth = get(bean, ATTR_STROKE_WIDTH).trim();
+        String strokeColor = get(bean, ATTR_STROKE_COLOR).trim();
+
+        // El glass rellena con corner/borde por defecto si el usuario no los eligio.
+        if (glass) {
+            if (radius.isEmpty()) {
+                radius = DEFAULT_GLASS_CORNER_DP + "dp";
+            }
+            if (strokeWidth.isEmpty()) {
+                strokeWidth = DEFAULT_GLASS_STROKE_DP + "dp";
+            }
+            if (strokeColor.isEmpty()) {
+                strokeColor = formatHex(DEFAULT_GLASS_STROKE_COLOR);
+            }
+        }
 
         StringBuilder sb = new StringBuilder();
         sb.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
         sb.append("<shape xmlns:android=\"http://schemas.android.com/apk/res/android\"\n");
         sb.append("    android:shape=\"rectangle\">\n");
 
-        // solid (relleno) a partir del fondo del bean.
-        if (layout != null) {
-            if (layout.backgroundResColor != null && !layout.backgroundResColor.isEmpty()) {
-                sb.append("    <solid android:color=\"").append(formatColorReference(layout.backgroundResColor)).append("\" />\n");
-            } else if (isColorDefined(layout.backgroundColor)) {
-                sb.append("    <solid android:color=\"").append(formatHex(layout.backgroundColor)).append("\" />\n");
-            } else {
-                sb.append("    <solid android:color=\"@android:color/transparent\" />\n");
-            }
+        // Relleno: gradiente si hay dos colores; si no, un color solido (glass -> blanco translucido;
+        // un unico color de gradiente -> ese color; si no, el fondo que ya tenia el bean).
+        if (!gradientStart.isEmpty() && !gradientEnd.isEmpty()) {
+            sb.append("    <gradient\n");
+            sb.append("        android:startColor=\"").append(formatColorReference(gradientStart)).append("\"\n");
+            sb.append("        android:endColor=\"").append(formatColorReference(gradientEnd)).append("\"\n");
+            sb.append("        android:angle=\"").append(gradientAngle(gradientOrientation(bean))).append("\" />\n");
         } else {
-            sb.append("    <solid android:color=\"@android:color/transparent\" />\n");
+            String solidColor = null;
+            if (!gradientStart.isEmpty()) {
+                solidColor = formatColorReference(gradientStart);
+            } else if (!gradientEnd.isEmpty()) {
+                solidColor = formatColorReference(gradientEnd);
+            } else if (glass) {
+                solidColor = formatHex(glassFillColor(bean.inject));
+            } else if (layout != null) {
+                if (layout.backgroundResColor != null && !layout.backgroundResColor.isEmpty()) {
+                    solidColor = formatColorReference(layout.backgroundResColor);
+                } else if (isColorDefined(layout.backgroundColor)) {
+                    solidColor = formatHex(layout.backgroundColor);
+                }
+            }
+            sb.append("    <solid android:color=\"")
+                    .append(solidColor == null ? "@android:color/transparent" : solidColor)
+                    .append("\" />\n");
         }
 
-        if (!radius.trim().isEmpty()) {
+        if (!radius.isEmpty()) {
             sb.append("    <corners android:radius=\"").append(normalizeDimen(radius)).append("\" />\n");
         }
-        if (!strokeWidth.trim().isEmpty() && !strokeColor.trim().isEmpty()) {
+        if (!strokeWidth.isEmpty() && !strokeColor.isEmpty()) {
             sb.append("    <stroke\n");
             sb.append("        android:width=\"").append(normalizeDimen(strokeWidth)).append("\"\n");
             sb.append("        android:color=\"").append(formatColorReference(strokeColor)).append("\" />\n");

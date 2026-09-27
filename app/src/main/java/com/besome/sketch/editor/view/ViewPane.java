@@ -1372,8 +1372,13 @@ public class ViewPane extends RelativeLayout {
             return;
         }
         String backgroundResource = viewBean.layout.backgroundResource;
-        if (backgroundResource != null && !backgroundResource.isEmpty() && !"NONE".equalsIgnoreCase(backgroundResource)) {
-            // El usuario eligio un fondo grafico: no lo pisamos con el shape.
+        boolean generatedShapeBackground = backgroundResource != null
+                && backgroundResource.startsWith("designshape_");
+        if (backgroundResource != null && !backgroundResource.isEmpty()
+                && !"NONE".equalsIgnoreCase(backgroundResource) && !generatedShapeBackground) {
+            // El usuario eligio un fondo grafico: no lo pisamos con el shape. Si el fondo ya es el
+            // shape generado por el IDE, seguimos (el shape se reconstruye igual en memoria).
+            DesignShapeAttrs.clearGlassBlur(view);
             return;
         }
         int fill = Color.TRANSPARENT;

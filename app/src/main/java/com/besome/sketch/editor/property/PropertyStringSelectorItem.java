@@ -141,6 +141,8 @@ public class PropertyStringSelectorItem extends RelativeLayout implements View.O
             // Un CircleImageView solo admite CENTER_CROP: no se ofrecen valores que
             // reventarian la app compilada (los fija ViewPropertyItems segun el widget).
             case "property_scale_type" -> allowedItems != null ? allowedItems : sq.j;
+            case "property_gradient_orientation" -> allowedItems != null
+                    ? allowedItems : new String[]{"vertical", "horizontal", "diagonal_down", "diagonal_up"};
             default -> null;
         };
 

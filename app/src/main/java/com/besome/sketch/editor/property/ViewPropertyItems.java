@@ -106,6 +106,12 @@ public class ViewPropertyItems extends LinearLayout implements Kw, View.OnClickL
             case "property_corner_radius" -> d(property, shapeSize(bean, DesignShapeAttrs.ATTR_CORNER_RADIUS));
             case "property_stroke_width" -> d(property, shapeSize(bean, DesignShapeAttrs.ATTR_STROKE_WIDTH));
             case "property_stroke_color" -> r(property, shapeResColor(bean), shapeColor(bean));
+            case "property_gradient_start" -> r(property, shapeResColor(bean, DesignShapeAttrs.ATTR_GRADIENT_START), shapeColor(bean, DesignShapeAttrs.ATTR_GRADIENT_START));
+            case "property_gradient_end" -> r(property, shapeResColor(bean, DesignShapeAttrs.ATTR_GRADIENT_END), shapeColor(bean, DesignShapeAttrs.ATTR_GRADIENT_END));
+            case "property_gradient_orientation" -> d(property, gradientOrientationValue(bean));
+            case "property_glass" -> e(property, DesignShapeAttrs.isGlass(bean.inject) ? 1 : 0);
+            case "property_glass_alpha" -> d(property, glassAlphaValue(bean));
+            case "property_glass_blur" -> d(property, glassBlurValue(bean));
             case "property_weight" -> b(property, String.valueOf(bean.layout.weight));
             case "property_text" -> b(property, bean.text.text);
             case "property_text_size" -> c(property, bean.text.textSize);
@@ -435,6 +441,10 @@ public class ViewPropertyItems extends LinearLayout implements Kw, View.OnClickL
         }
         a(bean, "property_padding");
         a(bean, "property_margin");
+        // layout_gravity = alineacion del PROPIO widget dentro de su padre. Se ofrece para CUALQUIER
+        // widget (incluido ImageView), y no se duplica cuando el padre ya lo ofrecia: el panel usa
+        // una unica clave "property_layout_gravity".
+        a(bean, "property_layout_gravity");
         if (classInfo.a("LinearLayout")) {
             a(bean, "property_orientation");
             a(bean, "property_weight_sum");
@@ -447,12 +457,7 @@ public class ViewPropertyItems extends LinearLayout implements Kw, View.OnClickL
 
         if (parentClassInfo != null) {
             if (parentClassInfo.a("LinearLayout")) {
-                a(bean, "property_layout_gravity");
                 a(bean, "property_weight");
-            }
-
-            if (parentClassInfo.a("ScrollView") || parentClassInfo.a("HorizontalScrollView")) {
-                a(bean, "property_layout_gravity");
             }
         }
     }
@@ -721,6 +726,13 @@ public class ViewPropertyItems extends LinearLayout implements Kw, View.OnClickL
             a(bean, "property_corner_radius");
             a(bean, "property_stroke_width");
             a(bean, "property_stroke_color");
+            // Fase 2: gradiente de 2 colores + modo glass (mismo sitio que el resto de la forma).
+            a(bean, "property_gradient_start");
+            a(bean, "property_gradient_end");
+            a(bean, "property_gradient_orientation");
+            a(bean, "property_glass");
+            a(bean, "property_glass_alpha");
+            a(bean, "property_glass_blur");
         }
     }
 
@@ -786,6 +798,9 @@ public class ViewPropertyItems extends LinearLayout implements Kw, View.OnClickL
                     case "property_ad_size" -> bean.adSize = stringSelectorItem.getValue();
                     case "property_indeterminate" ->
                             bean.indeterminate = stringSelectorItem.getValue();
+                    case "property_gradient_orientation" ->
+                            DesignShapeAttrs.set(bean, DesignShapeAttrs.ATTR_GRADIENT_ORIENTATION,
+                                    stringSelectorItem.getValue());
                 }
             } else if (view instanceof PropertyStringPairSelectorItem stringPairSelectorItem) {
                 if (stringPairSelectorItem.getKey().equals("property_progressbar_style")) {
@@ -805,6 +820,7 @@ public class ViewPropertyItems extends LinearLayout implements Kw, View.OnClickL
                             bean.clickable = switchSingleLineItem.getValue() ? 1 : 0;
                     case "property_checked" ->
                             bean.checked = switchSingleLineItem.getValue() ? 1 : 0;
+                    case "property_glass" -> setGlassEnabled(bean, switchSingleLineItem.getValue());
                 }
             } else if (view instanceof PropertyColorItem colorItem) {
                 switch (colorItem.getKey()) {
@@ -831,6 +847,10 @@ public class ViewPropertyItems extends LinearLayout implements Kw, View.OnClickL
                                             ? "" : DesignShapeAttrs.formatHex(value));
                         }
                     }
+                    case "property_gradient_start" ->
+                            saveShapeColor(bean, DesignShapeAttrs.ATTR_GRADIENT_START, colorItem);
+                    case "property_gradient_end" ->
+                            saveShapeColor(bean, DesignShapeAttrs.ATTR_GRADIENT_END, colorItem);
                 }
             } else if (view instanceof PropertyIndentItem indentItem) {
                 if (indentItem.getKey().equals("property_margin")) {
@@ -867,6 +887,12 @@ public class ViewPropertyItems extends LinearLayout implements Kw, View.OnClickL
                 } else if (sizeItem.getKey().equals("property_stroke_width")) {
                     DesignShapeAttrs.set(bean, DesignShapeAttrs.ATTR_STROKE_WIDTH,
                             sizeItem.getValue() > 0 ? sizeItem.getValue() + "dp" : "");
+                } else if (sizeItem.getKey().equals("property_glass_alpha")) {
+                    DesignShapeAttrs.set(bean, DesignShapeAttrs.ATTR_GLASS_ALPHA,
+                            String.valueOf(Math.max(0, Math.min(255, sizeItem.getValue()))));
+                } else if (sizeItem.getKey().equals("property_glass_blur")) {
+                    DesignShapeAttrs.set(bean, DesignShapeAttrs.ATTR_GLASS_BLUR,
+                            String.valueOf(Math.max(0, sizeItem.getValue())));
                 }
             } else if (view instanceof PropertyAttributesItem item) {
                 if (item.getKey().equals("property_parent_attr")) {
@@ -1070,7 +1096,16 @@ public class ViewPropertyItems extends LinearLayout implements Kw, View.OnClickL
     }
 
     private int shapeColor(ViewBean bean) {
-        String raw = DesignShapeAttrs.get(bean, DesignShapeAttrs.ATTR_STROKE_COLOR).trim();
+        return shapeColor(bean, DesignShapeAttrs.ATTR_STROKE_COLOR);
+    }
+
+    private String shapeResColor(ViewBean bean, String attribute) {
+        String raw = DesignShapeAttrs.get(bean, attribute).trim();
+        return (raw.startsWith("@") || raw.startsWith("?")) ? raw : null;
+    }
+
+    private int shapeColor(ViewBean bean, String attribute) {
+        String raw = DesignShapeAttrs.get(bean, attribute).trim();
         if (raw.isEmpty() || raw.startsWith("@") || raw.startsWith("?")) {
             // Sin definir: se usa el centinela para que el control muestre "NONE" (y no un
             // transparente que se guardaria como color real).
@@ -1080,6 +1115,72 @@ public class ViewPropertyItems extends LinearLayout implements Kw, View.OnClickL
             return android.graphics.Color.parseColor(raw);
         } catch (IllegalArgumentException e) {
             return DesignShapeAttrs.COLOR_NOT_SET;
+        }
+    }
+
+    /** Guarda un color de la forma (gradiente) tal cual lo devuelve el selector: recurso o hex. */
+    private void saveShapeColor(ViewBean bean, String attribute, PropertyColorItem colorItem) {
+        String res = colorItem.getResValue();
+        if (res != null && !res.isEmpty()) {
+            DesignShapeAttrs.set(bean, attribute, res);
+            return;
+        }
+        int value = colorItem.getValue();
+        DesignShapeAttrs.set(bean, attribute,
+                (value == 0 || value == DesignShapeAttrs.COLOR_NOT_SET)
+                        ? "" : DesignShapeAttrs.formatHex(value));
+    }
+
+    private String gradientOrientationValue(ViewBean bean) {
+        String value = DesignShapeAttrs.get(bean, DesignShapeAttrs.ATTR_GRADIENT_ORIENTATION).trim();
+        for (String candidate : DesignShapeAttrs.GRADIENT_ORIENTATIONS) {
+            if (candidate.equals(value)) {
+                return value;
+            }
+        }
+        return DesignShapeAttrs.GRADIENT_VERTICAL;
+    }
+
+    private int glassAlphaValue(ViewBean bean) {
+        return DesignShapeAttrs.getInt(bean == null ? null : bean.inject,
+                DesignShapeAttrs.ATTR_GLASS_ALPHA, DesignShapeAttrs.DEFAULT_GLASS_ALPHA);
+    }
+
+    private int glassBlurValue(ViewBean bean) {
+        return DesignShapeAttrs.getInt(bean == null ? null : bean.inject,
+                DesignShapeAttrs.ATTR_GLASS_BLUR, DesignShapeAttrs.DEFAULT_GLASS_BLUR_DP);
+    }
+
+    /**
+     * Activa/desactiva el modo glass. Al activarlo rellena los valores por defecto (alfa, blur,
+     * esquinas y borde fino claro) solo si el usuario no los habia elegido, para que el preset se
+     * vea completo de inmediato. El blur del propio widget se aplica en runtime (API >= 31).
+     */
+    private void setGlassEnabled(ViewBean bean, boolean enabled) {
+        if (enabled) {
+            DesignShapeAttrs.set(bean, DesignShapeAttrs.ATTR_GLASS, "true");
+            if (DesignShapeAttrs.get(bean, DesignShapeAttrs.ATTR_GLASS_ALPHA).trim().isEmpty()) {
+                DesignShapeAttrs.set(bean, DesignShapeAttrs.ATTR_GLASS_ALPHA,
+                        String.valueOf(DesignShapeAttrs.DEFAULT_GLASS_ALPHA));
+            }
+            if (DesignShapeAttrs.get(bean, DesignShapeAttrs.ATTR_GLASS_BLUR).trim().isEmpty()) {
+                DesignShapeAttrs.set(bean, DesignShapeAttrs.ATTR_GLASS_BLUR,
+                        String.valueOf(DesignShapeAttrs.DEFAULT_GLASS_BLUR_DP));
+            }
+            if (DesignShapeAttrs.get(bean, DesignShapeAttrs.ATTR_CORNER_RADIUS).trim().isEmpty()) {
+                DesignShapeAttrs.set(bean, DesignShapeAttrs.ATTR_CORNER_RADIUS,
+                        DesignShapeAttrs.DEFAULT_GLASS_CORNER_DP + "dp");
+            }
+            if (DesignShapeAttrs.get(bean, DesignShapeAttrs.ATTR_STROKE_WIDTH).trim().isEmpty()) {
+                DesignShapeAttrs.set(bean, DesignShapeAttrs.ATTR_STROKE_WIDTH,
+                        DesignShapeAttrs.DEFAULT_GLASS_STROKE_DP + "dp");
+            }
+            if (DesignShapeAttrs.get(bean, DesignShapeAttrs.ATTR_STROKE_COLOR).trim().isEmpty()) {
+                DesignShapeAttrs.set(bean, DesignShapeAttrs.ATTR_STROKE_COLOR,
+                        DesignShapeAttrs.formatHex(DesignShapeAttrs.DEFAULT_GLASS_STROKE_COLOR));
+            }
+        } else {
+            DesignShapeAttrs.remove(bean, DesignShapeAttrs.ATTR_GLASS);
         }
     }
 

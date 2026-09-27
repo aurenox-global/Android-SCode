@@ -7,6 +7,7 @@ import android.widget.ImageView;
 
 import androidx.cardview.widget.CardView;
 
+import com.besome.sketch.beans.ViewBean;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.tabs.TabLayout;
@@ -227,13 +228,34 @@ public final class WidgetInjectApplier {
         if (view == null || handler == null || !DesignShapeAttrs.supportsShapeBackground(view)) {
             return false;
         }
-        if (!DesignShapeAttrs.hasAnyShape(handler.getBean() == null ? null : handler.getBean().inject)) {
+        ViewBean bean = handler.getBean();
+        if (bean == null || !DesignShapeAttrs.hasAnyShape(bean.inject)) {
             return false;
         }
-        int radius = resolver.dimension(handler.getAttributeValueOf(DesignShapeAttrs.ATTR_CORNER_RADIUS), 0);
-        int strokeWidth = resolver.dimension(handler.getAttributeValueOf(DesignShapeAttrs.ATTR_STROKE_WIDTH), 0);
-        int strokeColor = resolver.color(handler.getAttributeValueOf(DesignShapeAttrs.ATTR_STROKE_COLOR), 0);
-        view.setBackground(DesignShapeAttrs.buildDrawable(radius, strokeWidth, strokeColor, fillColor));
+        String inject = bean.inject == null ? "" : bean.inject;
+        boolean glass = DesignShapeAttrs.isGlass(inject);
+        float density = view.getResources().getDisplayMetrics().density;
+        int radius = resolver.dimension(DesignShapeAttrs.get(bean, DesignShapeAttrs.ATTR_CORNER_RADIUS),
+                glass ? Math.round(DesignShapeAttrs.DEFAULT_GLASS_CORNER_DP * density) : 0);
+        int strokeWidth = resolver.dimension(DesignShapeAttrs.get(bean, DesignShapeAttrs.ATTR_STROKE_WIDTH),
+                glass ? Math.round(DesignShapeAttrs.DEFAULT_GLASS_STROKE_DP * density) : 0);
+        int strokeColor = resolver.color(DesignShapeAttrs.get(bean, DesignShapeAttrs.ATTR_STROKE_COLOR),
+                glass ? DesignShapeAttrs.DEFAULT_GLASS_STROKE_COLOR : 0);
+        int gradientStart = resolver.color(DesignShapeAttrs.get(bean, DesignShapeAttrs.ATTR_GRADIENT_START),
+                DesignShapeAttrs.COLOR_NOT_SET);
+        int gradientEnd = resolver.color(DesignShapeAttrs.get(bean, DesignShapeAttrs.ATTR_GRADIENT_END),
+                DesignShapeAttrs.COLOR_NOT_SET);
+        boolean gradient = DesignShapeAttrs.isColorDefined(gradientStart)
+                && DesignShapeAttrs.isColorDefined(gradientEnd);
+        // El glass sustituye el relleno por blanco translucido (salvo que haya gradiente).
+        int effectiveFill = glass && !gradient ? DesignShapeAttrs.glassFillColor(inject) : fillColor;
+        view.setBackground(DesignShapeAttrs.buildDrawable(radius, strokeWidth, strokeColor, effectiveFill,
+                gradientStart, gradientEnd, DesignShapeAttrs.gradientOrientation(bean)));
+        if (glass) {
+            DesignShapeAttrs.applyGlassBlur(view, inject);
+        } else {
+            DesignShapeAttrs.clearGlassBlur(view);
+        }
         return true;
     }
 

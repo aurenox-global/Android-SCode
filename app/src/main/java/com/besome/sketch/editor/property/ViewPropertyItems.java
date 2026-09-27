@@ -166,6 +166,17 @@ public class ViewPropertyItems extends LinearLayout implements Kw, View.OnClickL
         addView(sub);
     }
 
+    /** Nota informativa no editable dentro del panel de propiedades (p.ej. limites de un widget). */
+    private void note(String text) {
+        TextView note = new TextView(getContext());
+        note.setPadding(8, 4, 8, 12);
+        note.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        note.setTextColor(com.google.android.material.color.MaterialColors.getColor(
+                getContext(), com.google.android.material.R.attr.colorOnSurfaceVariant, 0xFF757575));
+        note.setText(text);
+        addView(note);
+    }
+
     private void a(String name, int value) {
         PropertyColorItem colorItem = (PropertyColorItem) f.get(name);
         if (colorItem == null) {
@@ -716,23 +727,31 @@ public class ViewPropertyItems extends LinearLayout implements Kw, View.OnClickL
         a(bean, "property_scale_x");
         a(bean, "property_scale_y");
 
-        // Forma (corner radius + stroke) para widgets sin soporte nativo. En la fase 1 se expone
-        // para LinearLayout e ImageView; el resto de familias (CardView/MaterialButton/...) ya
-        // tienen sus propios controles y appliers.
-        if (DesignShapeAttrs.isPhase1TargetType(bean)) {
+        // Forma (corner radius + stroke + gradiente + glass). Se expone para:
+        //  - MaterialButton: en sus atributos NATIVOS (app:cornerRadius/strokeWidth/strokeColor),
+        //    que el lienzo, la vista previa y el XML ya soportan.
+        //  - LinearLayout / ImageView / TextView / EditText / Button: widgets sin soporte nativo,
+        //    con un shape drawable generico equivalente en los tres motores.
+        if (DesignShapeAttrs.supportsShapePanel(bean)) {
             if (getOrientation() == LinearLayout.VERTICAL) {
                 a(getContext().getString(R.string.property_header_shape));
             }
             a(bean, "property_corner_radius");
             a(bean, "property_stroke_width");
             a(bean, "property_stroke_color");
-            // Fase 2: gradiente de 2 colores + modo glass (mismo sitio que el resto de la forma).
-            a(bean, "property_gradient_start");
-            a(bean, "property_gradient_end");
-            a(bean, "property_gradient_orientation");
-            a(bean, "property_glass");
-            a(bean, "property_glass_alpha");
-            a(bean, "property_glass_blur");
+            if (DesignShapeAttrs.supportsShapeGradient(bean)) {
+                // Fase 2: gradiente de 2 colores + modo glass (mismo sitio que el resto de la forma).
+                a(bean, "property_gradient_start");
+                a(bean, "property_gradient_end");
+                a(bean, "property_gradient_orientation");
+                a(bean, "property_glass");
+                a(bean, "property_glass_alpha");
+                a(bean, "property_glass_blur");
+            } else {
+                // MaterialButton: el gradiente/glass exigirian un shape drawable como fondo, que
+                // borraria el ripple y el estilo Material. Se informa en vez de degradarlo en silencio.
+                note(getContext().getString(R.string.property_shape_material_note));
+            }
         }
     }
 

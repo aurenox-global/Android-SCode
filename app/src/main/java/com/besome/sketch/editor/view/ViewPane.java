@@ -1479,8 +1479,26 @@ public class ViewPane extends RelativeLayout {
     private void updateMaterialButton(ItemMaterialButton materialButton, InjectAttributeHandler handler) {
         String radius = handler.getAttributeValueOf("cornerRadius");
         String stroke = handler.getAttributeValueOf("strokeWidth");
+        String strokeColor = handler.getAttributeValueOf("strokeColor");
         materialButton.setStrokeWidth(PropertiesUtil.resolveSize(stroke, 0));
         materialButton.setCornerRadius(PropertiesUtil.resolveSize(radius, 8));
+        // El lienzo leia esquinas y grosor del borde pero nunca el color: la vista previa y la app
+        // compilada si lo pintaban, asi que el editor mostraba un borde sin color. Se aplica aqui
+        // para que los tres motores coincidan.
+        if (strokeColor != null && !strokeColor.isEmpty()) {
+            int color;
+            if (PropertiesUtil.isHexColor(strokeColor)) {
+                color = PropertiesUtil.parseColor(strokeColor);
+            } else if (strokeColor.startsWith("@") || strokeColor.startsWith("?")) {
+                color = PropertiesUtil.parseColor(colorsEditorManager.getColorValue(context,
+                        strokeColor, 3, material3LibraryManager.canUseNightVariantColors()));
+            } else {
+                color = 0;
+            }
+            if (color != 0) {
+                materialButton.setStrokeColor(android.content.res.ColorStateList.valueOf(color));
+            }
+        }
     }
 
     private String extractAttrValue(String line, String attribute) {

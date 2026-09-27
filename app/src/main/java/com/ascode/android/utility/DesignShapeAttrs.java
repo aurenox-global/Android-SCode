@@ -338,8 +338,21 @@ public final class DesignShapeAttrs {
                 && !info.a("CircleImageView");
     }
 
-    /** Widgets que en la fase 1 exponen la UI dedicada de forma (LinearLayout / ImageView). */
-    public static boolean isPhase1TargetType(ViewBean bean) {
+    /**
+     * ¿Este widget expone el panel de propiedades Shape (radios, borde, gradiente, glass)?
+     *
+     * <ul>
+     *   <li><b>MaterialButton</b>: forma NATIVA ({@code app:cornerRadius} / {@code app:strokeWidth} /
+     *       {@code app:strokeColor}); el widget ya la soporta en lienzo, vista previa y XML, asi que
+     *       el panel reutiliza esos mismos atributos en vez de crear un shape drawable.</li>
+     *   <li><b>LinearLayout / ImageView</b> (y las familias que comparten su jerarquia): shape
+     *       drawable generico, como en la fase 1. CircleImageView queda fuera porque tiene su propio
+     *       borde ({@code civ_*}) y el shape generico no se le aplica.</li>
+     *   <li><b>TextView / EditText / Button</b> (vistas planas): mismo mecanismo de shape drawable que
+     *       LinearLayout/ImageView, asi que tambien exponen el panel.</li>
+     * </ul>
+     */
+    public static boolean supportsShapePanel(ViewBean bean) {
         if (bean == null) {
             return false;
         }
@@ -347,7 +360,35 @@ public final class DesignShapeAttrs {
         if (info == null) {
             return false;
         }
-        return info.a("LinearLayout") || info.a("ImageView");
+        if (info.b("MaterialButton")) {
+            return true; // forma nativa (los tres motores ya la aplican)
+        }
+        if (info.a("LinearLayout")) {
+            return true;
+        }
+        if (info.a("ImageView") && !info.a("CircleImageView")) {
+            return true;
+        }
+        return info.b("TextView") || info.b("EditText") || info.b("Button");
+    }
+
+    /** ¿Es este bean un boton Material (forma nativa, sin shape drawable)? */
+    public static boolean isMaterialButton(ViewBean bean) {
+        if (bean == null) {
+            return false;
+        }
+        Gx info = bean.getClassInfo();
+        return info != null && info.b("MaterialButton");
+    }
+
+    /**
+     * ¿Se le pueden ofrecer gradiente / glass a este widget? Los dos necesitan un shape drawable
+     * como fondo; en un MaterialButton eso sustituiria su fondo Material y perderia el ripple y el
+     * estilo de la familia. Por eso se ocultan en MaterialButton (que conserva su forma nativa:
+     * esquinas + borde) en vez de degradarlo en silencio.
+     */
+    public static boolean supportsShapeGradient(ViewBean bean) {
+        return bean != null && !isMaterialButton(bean);
     }
 
     // ---------------------------------------------------------------- dibujo en memoria

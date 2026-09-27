@@ -1564,11 +1564,16 @@ public class LayoutPreviewActivity extends BaseAppCompatActivity {
         // para el modo glass (que si necesita los valores en runtime) se resuelve el bean ORIGINAL
         // del proyecto por id.
         String shapeInject = shapeInjectFor(bean);
-        if (com.ascode.android.utility.DesignShapeAttrs.usesShapeDrawable(bean)
+        String shapeBackgroundResource = bean.layout == null ? null : bean.layout.backgroundResource;
+        // La preview parsea el XML GENERADO: los widgets con forma llevan
+        // android:background="@drawable/designshape_..." y ya NO los atributos de forma en inject.
+        // Por eso el bloque debe correr tambien cuando el bean trae ese fondo generado (aunque su
+        // inject este limpio), no solo cuando el bean en memoria conserva los atributos de forma.
+        boolean generatedShapeBackground = shapeBackgroundResource != null
+                && shapeBackgroundResource.startsWith("designshape_");
+        if ((com.ascode.android.utility.DesignShapeAttrs.usesShapeDrawable(bean) || generatedShapeBackground)
                 && com.ascode.android.utility.DesignShapeAttrs.hasAnyShape(shapeInject)) {
-            String backgroundResource = bean.layout == null ? null : bean.layout.backgroundResource;
-            boolean generatedShapeBackground = backgroundResource != null
-                    && backgroundResource.startsWith("designshape_");
+            String backgroundResource = shapeBackgroundResource;
             boolean userBackground = backgroundResource != null && !backgroundResource.isEmpty()
                     && !"NONE".equalsIgnoreCase(backgroundResource) && !generatedShapeBackground;
             if (!userBackground) {
@@ -2133,6 +2138,11 @@ public class LayoutPreviewActivity extends BaseAppCompatActivity {
                     return null;
                 }
                 case "backgroundTint": {
+                    // "@null"/"null" es un valor legitimo (anula el tinte): no es un color no resoluble.
+                    if ("@null".equals(value) || "null".equals(value)) {
+                        view.setBackgroundTintList(null);
+                        return null;
+                    }
                     int color = resourceResolver.resolveColor(view, value, 0);
                     if (isColorNotSet(color)) {
                         return "color no resoluble (" + value + ")";

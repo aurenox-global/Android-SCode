@@ -121,28 +121,38 @@ public class LocalAiPromptFactory {
             "IMPORTANTE: NO razones ni muestres pensamiento paso a paso. No incluyas bloques <think> ni explicaciones de tu proceso. Responde directo y conciso.";
 
     private static final String AGENT_JSON_SCHEMA =
-            "IMPORTANTE: \"type\" de cada action es SOLO add_view, add_event o inject_code; el tipo de vista va en \"view_type\".\n"
+            "IMPORTANTE: \"type\" de cada action es SOLO add_view, update_view, delete_view, move_view, add_event o inject_code; el tipo de vista va en \"view_type\".\n"
                     + "Acciones:\n"
                     + "  add_view: crear vista. Campos: screen,parent,view_type,id,text,text_size,hint,width,height,orientation,margenes,background_color. view_type: linear|vertical|horizontal|scroll|card|button|text|input|image|webview|progress|list|spinner|checkbox|switch|seekbar\n"
+                    + "  update_view: modificar una vista EXISTENTE por su id. Campos: screen,id, y solo los que cambian: text,text_size,hint,width,height,orientation,background_color,text_color,margin,margin_left,margin_top,margin_right,margin_bottom,padding,padding_left,padding_top,padding_right,padding_bottom,gravity,weight. Lo que no envies no se toca.\n"
+                    + "  delete_view: BORRAR una vista EXISTENTE y sus hijas/eventos. Campos: screen,id\n"
+                    + "  move_view: cambiar de padre o de orden una vista EXISTENTE. Campos: screen,id,parent,index (index=0 es el primero)\n"
                     + "  inject_code: inyectar codigo Java. Campos: target,event,code. event=\"initializeLogic\" o el id de la vista para su onClick\n"
                     + "  add_event: crear el onClick de una vista. Campos: target,view_id,event,code\n"
                     + "Reglas:\n"
                     + "  - Crea primero las vistas (add_view) y despues sus eventos (inject_code/add_event), SIEMPRE juntos en el mismo JSON.\n"
+                    + "  - update_view/delete_view/move_view solo funcionan con ids que YA existan; si no existe, se omite sin romper nada.\n"
                     + "  - ids unicos: button1, text1, input1...\n"
                     + "  - screen=main, parent=root.\n"
                     + "  - codigo Java dentro del evento indicado, sin declarar metodos.\n"
                     + "  - Para preguntas o consejos usa solo \"reply\" con \"actions\": [].\n"
-                    + "Ejemplo exacto:\n"
+                    + "  - Devuelve SOLO tu propio objeto JSON: empieza por { y termina en }, sin texto antes ni despues, sin bloques de codigo, sin explicaciones y sin repetir estas instrucciones ni los ejemplos.\n"
+                    + "Ejemplo 1 (crear):\n"
                     + "{\"reply\":\"Listo, boton creado con su evento.\",\"actions\":["
                     + "{\"type\":\"add_view\",\"screen\":\"main\",\"parent\":\"root\",\"view_type\":\"button\",\"id\":\"button1\",\"text\":\"Presioname\",\"width\":\"match_parent\",\"height\":\"wrap_content\",\"margin_top\":8},"
-                    + "{\"type\":\"inject_code\",\"target\":\"main\",\"event\":\"button1\",\"code\":\"Toast.makeText(getApplicationContext(), \\\"Hola\\\", Toast.LENGTH_SHORT).show();\"}]}\n";
+                    + "{\"type\":\"inject_code\",\"target\":\"main\",\"event\":\"button1\",\"code\":\"Toast.makeText(getApplicationContext(), \\\"Hola\\\", Toast.LENGTH_SHORT).show();\"}]}\n"
+                    + "Ejemplo 2 (modificar y borrar):\n"
+                    + "{\"reply\":\"Texto y color actualizados; boton borrado.\",\"actions\":["
+                    + "{\"type\":\"update_view\",\"screen\":\"main\",\"id\":\"button1\",\"text\":\"Hola\",\"background_color\":\"#00AA00\"},"
+                    + "{\"type\":\"delete_view\",\"screen\":\"main\",\"id\":\"button2\"}]}\n";
 
     public static String buildAgentPrompt(String projectScope,
                                           String userPrompt,
                                           String projectContext) {
         StringBuilder prompt = new StringBuilder();
-        prompt.append("Eres un Agente de Android SCode. Si el usuario pide crear o modificar algo, ")
-                .append("responde SOLO con un JSON valido con \"reply\" (1-2 frases en espanol) y \"actions\".\n\n")
+        prompt.append("Eres un Agente de Android SCode. Responde UNICAMENTE con un objeto JSON valido ")
+                .append("que contenga \"reply\" (1-2 frases en espanol) y \"actions\" (array; vacio si no hay cambios). ")
+                .append("No escribas nada antes ni despues del JSON y no repitas estas instrucciones.\n\n")
                 .append(AGENT_JSON_SCHEMA)
                 .append("\nContexto del proyecto:\n")
                 .append(projectContext == null || projectContext.trim().isEmpty()

@@ -1,12 +1,15 @@
 package io.ascode.android;
 
 import com.besome.sketch.beans.EventBean;
+import com.besome.sketch.beans.ProjectFileBean;
 import com.besome.sketch.beans.ViewBean;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import a.a.a.eC;
+import a.a.a.hC;
 import a.a.a.jC;
 
 public final class AgentProjectContext {
@@ -22,9 +25,10 @@ public final class AgentProjectContext {
             eC data = jC.a(scId);
             StringBuilder sb = new StringBuilder();
             sb.append("- Scope: ").append(scId).append('\n');
-            appendScreens(sb, data);
+            appendScreens(sb, scId, data);
             appendEvents(sb, data);
-            appendVariables(sb, data);
+            appendVariables(sb, scId, data);
+            appendPermissions(sb, scId);
             String files = ProjectCodeInjector.buildProjectContext(scId);
             if (!files.isEmpty()) {
                 sb.append("- Archivos:\n").append(files);
@@ -35,19 +39,42 @@ public final class AgentProjectContext {
         }
     }
 
-    private static void appendScreens(StringBuilder sb, eC data) {
-        sb.append("- Pantallas (xml):\n");
+    private static void appendScreens(StringBuilder sb, String scId, eC data) {
+        sb.append("- Pantallas (screen = nombre de la pantalla; main es la principal):\n");
+        List<String> xmlNames = new ArrayList<>();
+        List<String> emptyScreens = new ArrayList<>();
+        try {
+            hC projectFiles = jC.b(scId);
+            if (projectFiles != null) {
+                for (ProjectFileBean projectFile : projectFiles.b()) {
+                    if (projectFile != null && projectFile.fileName != null) {
+                        xmlNames.add(projectFile.getXmlName());
+                        if (data.c.get(projectFile.getXmlName()) == null || data.c.get(projectFile.getXmlName()).isEmpty()) {
+                            emptyScreens.add(projectFile.fileName);
+                        }
+                    }
+                }
+            }
+        } catch (Throwable ignored) {
+            // fall through to the raw data map
+        }
         Map<String, ArrayList<ViewBean>> screens = data.c;
-        if (screens == null || screens.isEmpty()) {
+        if (screens != null) {
+            for (String xmlName : screens.keySet()) {
+                if (!xmlNames.contains(xmlName)) {
+                    xmlNames.add(xmlName);
+                }
+            }
+        }
+        if (xmlNames.isEmpty()) {
             sb.append("  (sin layouts registrados)\n");
             return;
         }
         int totalViews = 0;
-        for (Map.Entry<String, ArrayList<ViewBean>> entry : screens.entrySet()) {
-            String xmlName = entry.getKey();
-            ArrayList<ViewBean> views = entry.getValue();
+        for (String xmlName : xmlNames) {
+            ArrayList<ViewBean> views = screens == null ? null : screens.get(xmlName);
             if (views == null || views.isEmpty()) {
-                sb.append("  ").append(xmlName).append(" (vacía)\n");
+                sb.append("  ").append(xmlName).append(" (vacia)\n");
                 continue;
             }
             sb.append("  ").append(xmlName).append(":\n");
@@ -66,6 +93,9 @@ public final class AgentProjectContext {
             if (listed == 0 && totalViews >= 40) {
                 sb.append("    (más views omitidas por límite)\n");
             }
+        }
+        if (!emptyScreens.isEmpty()) {
+            sb.append("  Pantallas vacias (sin views todavia): ").append(String.join(", ", emptyScreens)).append('\n');
         }
         if (totalViews >= 40) {
             sb.append("  (limited to 40 views to keep the prompt light)\n");
@@ -97,18 +127,88 @@ public final class AgentProjectContext {
         }
     }
 
-    private static void appendVariables(StringBuilder sb, eC data) {
+    private static void appendVariables(StringBuilder sb, String scId, eC data) {
+        sb.append("- Variables del proyecto (por archivo java):\n");
+        int listed = 0;
+        try {
+            hC projectFiles = jC.b(scId);
+            if (projectFiles != null) {
+                for (ProjectFileBean projectFile : projectFiles.b()) {
+                    if (projectFile == null) {
+                        continue;
+                    }
+                    String javaName = projectFile.getJavaName();
+                    listed += appendVariableGroup(sb, javaName, data.k(javaName), false);
+                    listed += appendVariableGroup(sb, javaName, data.j(javaName), true);
+                }
+            }
+        } catch (Throwable ignored) {
+            // fall back to the whole maps below
+        }
+        if (listed == 0) {
+            sb.append("  (sin variables todavia)\n");
+        }
+    }
+
+    private static int appendVariableGroup(StringBuilder sb,
+                                           String javaName,
+                                           ArrayList<android.util.Pair<Integer, String>> pairs,
+                                           boolean list) {
+        if (pairs == null || pairs.isEmpty()) {
+            return 0;
+        }
         int count = 0;
-        if (data.e != null) {
-            count += data.e.size();
+        for (android.util.Pair<Integer, String> pair : pairs) {
+            if (pair == null || pair.second == null) {
+                continue;
+            }
+            sb.append("  ").append(javaName).append(" -> ")
+                    .append(list ? "lista " : "variable ")
+                    .append(pair.second)
+                    .append(" (").append(variableTypeName(pair.first, list)).append(")\n");
+            count++;
         }
-        if (data.f != null) {
-            count += data.f.size();
+        return count;
+    }
+
+    private static String variableTypeName(Integer type, boolean list) {
+        int value = type == null ? -1 : type;
+        if (list) {
+            switch (value) {
+                case 1:
+                    return "ListInt";
+                case 3:
+                    return "ListMap";
+                default:
+                    return "ListString";
+            }
         }
-        if (data.g != null) {
-            count += data.g.size();
+        switch (value) {
+            case 0:
+                return "boolean";
+            case 1:
+                return "number(double)";
+            case 3:
+                return "map";
+            default:
+                return "String";
         }
-        sb.append("- Variables/listas registradas: ").append(count).append('\n');
+    }
+
+    private static void appendPermissions(StringBuilder sb, String scId) {
+        sb.append("- Permisos en el AndroidManifest:\n");
+        try {
+            List<String> permissions = AgentProjectPermissions.list(scId);
+            if (permissions.isEmpty()) {
+                sb.append("  (sin permisos personalizados)\n");
+                return;
+            }
+            for (String permission : permissions) {
+                sb.append("  - ").append(permission).append('\n');
+            }
+        } catch (Throwable throwable) {
+            sb.append("  (no se pudieron leer)\n");
+        }
     }
 
     private static String typeName(int type) {

@@ -121,7 +121,7 @@ public class LocalAiPromptFactory {
             "IMPORTANTE: NO razones ni muestres pensamiento paso a paso. No incluyas bloques <think> ni explicaciones de tu proceso. Responde directo y conciso.";
 
     private static final String AGENT_JSON_SCHEMA =
-            "IMPORTANTE: \"type\" de cada action es SOLO add_view, update_view, delete_view, move_view, add_event o inject_code; el tipo de vista va en \"view_type\".\n"
+            "IMPORTANTE: \"type\" de cada action es SOLO add_view, update_view, delete_view, move_view, add_event, inject_code, add_variable, update_variable, delete_variable, add_permission, remove_permission o add_screen; el tipo de vista va en \"view_type\" y el de la variable en \"var_type\".\n"
                     + "Acciones:\n"
                     + "  add_view: crear vista. Campos: screen,parent,view_type,id,text,text_size,hint,width,height,orientation,margenes,background_color. view_type: linear|vertical|horizontal|scroll|card|button|text|input|image|webview|progress|list|spinner|checkbox|switch|seekbar\n"
                     + "  update_view: modificar una vista EXISTENTE por su id. Campos: screen,id, y solo los que cambian: text,text_size,hint,width,height,orientation,background_color,text_color,margin,margin_left,margin_top,margin_right,margin_bottom,padding,padding_left,padding_top,padding_right,padding_bottom,gravity,weight. Lo que no envies no se toca.\n"
@@ -129,11 +129,18 @@ public class LocalAiPromptFactory {
                     + "  move_view: cambiar de padre o de orden una vista EXISTENTE. Campos: screen,id,parent,index (index=0 es el primero)\n"
                     + "  inject_code: inyectar codigo Java. Campos: target,event,code. event=\"initializeLogic\" o el id de la vista para su onClick\n"
                     + "  add_event: crear el onClick de una vista. Campos: target,view_id,event,code\n"
+                    + "  add_variable: crear una variable o una lista. Campos: screen,name,var_type,value(opcional). var_type: boolean|number|string|map (variable) o list_string|list_number|list_map (lista). No repitas una variable que ya exista.\n"
+                    + "  update_variable: renombrar o cambiar el tipo de una variable EXISTENTE. Campos: screen,name,new_name(opcional),var_type(opcional),value(opcional)\n"
+                    + "  delete_variable: BORRAR una variable EXISTENTE. Campos: screen,name\n"
+                    + "  add_permission: agregar un permiso al AndroidManifest. Campos: permission (p.ej. CAMERA o android.permission.CAMERA)\n"
+                    + "  remove_permission: quitar un permiso del AndroidManifest. Campos: permission\n"
+                    + "  add_screen: crear una pantalla/actividad nueva (xml+java vacios). Campos: name (minusculas, p.ej. login, screen2), orientation(opcional: portrait|landscape|both). Luego puedes usarla en screen/target de otras acciones.\n"
                     + "Reglas:\n"
+                    + "  - Crea primero las pantallas (add_screen) del mismo JSON antes de crear vistas dentro de ellas.\n"
                     + "  - Crea primero las vistas (add_view) y despues sus eventos (inject_code/add_event), SIEMPRE juntos en el mismo JSON.\n"
-                    + "  - update_view/delete_view/move_view solo funcionan con ids que YA existan; si no existe, se omite sin romper nada.\n"
+                    + "  - update_view/delete_view/move_view/update_variable/delete_variable/remove_permission solo funcionan con cosas que YA existan; si no existe, se omite sin romper nada.\n"
                     + "  - ids unicos: button1, text1, input1...\n"
-                    + "  - screen=main. parent=root por defecto (nivel superior).\n"
+                    + "  - screen=main es la pantalla principal. parent=root por defecto (nivel superior).\n"
                     + "  - PARENT (anidar): si el usuario indica DONDE insertar la vista (frases como 'dentro de linear1', 'en el linearX', 'metido en X', 'dentro del layout X', 'dentro del contenedor X'), usa parent=<id EXACTO de esa vista existente> en vez de root. Si esa vista NO existe, creala tambien y usa su id. Nunca inventes un parent inexistente.\n"
                     + "  - ORDEN: si creas un contenedor y algo dentro de el en la misma peticion, el add_view del contenedor va PRIMERO y el add_view del hijo despues, con parent=<id del contenedor>.\n"
                     + "  - codigo Java dentro del evento indicado, sin declarar metodos.\n"
@@ -149,7 +156,17 @@ public class LocalAiPromptFactory {
                     + "{\"type\":\"delete_view\",\"screen\":\"main\",\"id\":\"button2\"}]}\n"
                     + "Ejemplo 3 (crear DENTRO de un contenedor existente linear1):\n"
                     + "{\"reply\":\"Boton agregado dentro de linear1.\",\"actions\":["
-                    + "{\"type\":\"add_view\",\"screen\":\"main\",\"parent\":\"linear1\",\"view_type\":\"button\",\"id\":\"button1\",\"text\":\"Boton\",\"width\":\"match_parent\",\"height\":\"wrap_content\"}]}\n";
+                    + "{\"type\":\"add_view\",\"screen\":\"main\",\"parent\":\"linear1\",\"view_type\":\"button\",\"id\":\"button1\",\"text\":\"Boton\",\"width\":\"match_parent\",\"height\":\"wrap_content\"}]}\n"
+                    + "Ejemplo 4 (variable nueva con valor inicial):\n"
+                    + "{\"reply\":\"Variable creada en main.\",\"actions\":["
+                    + "{\"type\":\"add_variable\",\"screen\":\"main\",\"name\":\"contador\",\"var_type\":\"number\",\"value\":\"0\"}]}\n"
+                    + "Ejemplo 5 (permiso) :\n"
+                    + "{\"reply\":\"Permiso de camara agregado al manifest.\",\"actions\":["
+                    + "{\"type\":\"add_permission\",\"permission\":\"CAMERA\"}]}\n"
+                    + "Ejemplo 6 (pantalla nueva y vista dentro de ella):\n"
+                    + "{\"reply\":\"Pantalla login creada con un texto.\",\"actions\":["
+                    + "{\"type\":\"add_screen\",\"name\":\"login\"},"
+                    + "{\"type\":\"add_view\",\"screen\":\"login\",\"parent\":\"root\",\"view_type\":\"text\",\"id\":\"text1\",\"text\":\"Iniciar sesion\"}]}\n";
 
     public static String buildAgentPrompt(String projectScope,
                                           String userPrompt,

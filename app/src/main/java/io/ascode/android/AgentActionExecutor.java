@@ -1,6 +1,7 @@
 package io.ascode.android;
 
 import android.graphics.Color;
+import android.util.Pair;
 
 import com.besome.sketch.beans.BlockBean;
 import com.besome.sketch.beans.ComponentBean;
@@ -87,15 +88,33 @@ public final class AgentActionExecutor {
         final HashMap<String, HashMap<String, ArrayList<BlockBean>>> logic;
         final HashMap<String, ArrayList<EventBean>> events;
         final HashMap<String, ArrayList<ComponentBean>> components;
+        /** Project variables (eC.e) and lists (eC.f), for add/update/delete_variable rollback. */
+        final HashMap<String, ArrayList<Pair<Integer, String>>> variables;
+        final HashMap<String, ArrayList<Pair<Integer, String>>> lists;
+        /** Project file list (screens) in memory, for add_screen rollback. */
+        final ArrayList<ProjectFileBean> activities;
+        final ArrayList<ProjectFileBean> customViews;
+        /** Raw content of the manifest permission injections file (null if it did not exist). */
+        final String permissionsRaw;
 
         DataSnapshot(HashMap<String, ArrayList<ViewBean>> views,
                      HashMap<String, HashMap<String, ArrayList<BlockBean>>> logic,
                      HashMap<String, ArrayList<EventBean>> events,
-                     HashMap<String, ArrayList<ComponentBean>> components) {
+                     HashMap<String, ArrayList<ComponentBean>> components,
+                     HashMap<String, ArrayList<Pair<Integer, String>>> variables,
+                     HashMap<String, ArrayList<Pair<Integer, String>>> lists,
+                     ArrayList<ProjectFileBean> activities,
+                     ArrayList<ProjectFileBean> customViews,
+                     String permissionsRaw) {
             this.views = views;
             this.logic = logic;
             this.events = events;
             this.components = components;
+            this.variables = variables;
+            this.lists = lists;
+            this.activities = activities;
+            this.customViews = customViews;
+            this.permissionsRaw = permissionsRaw;
         }
     }
 
@@ -150,6 +169,13 @@ public final class AgentActionExecutor {
                 List<Integer> createOrder = orderedCreateIndices(actions);
                 for (int pass = 0; pass < 2; pass++) {
                     if (pass == 0) {
+                        // Screens first: a view can target a screen created in the same request.
+                        for (int i = 0; i < actions.length(); i++) {
+                            JSONObject action = actions.optJSONObject(i);
+                            if (action != null && "add_screen".equals(normalizeActionType(action.optString("type", "")))) {
+                                executeAction(action);
+                            }
+                        }
                         for (int idx : createOrder) {
                             JSONObject action = actions.optJSONObject(idx);
                             if (action != null) {
@@ -160,7 +186,7 @@ public final class AgentActionExecutor {
                     }
                     for (int i = 0; i < actions.length(); i++) {
                         JSONObject action = actions.optJSONObject(i);
-                        if (action == null || isCreateViewAction(action)) {
+                        if (action == null || isCreateViewAction(action) || isCreateScreenAction(action)) {
                             continue;
                         }
                         executeAction(action);
@@ -179,6 +205,11 @@ public final class AgentActionExecutor {
     private boolean isCreateViewAction(JSONObject action) {
         String type = normalizeActionType(action.optString("type", ""));
         return "add_view".equals(type);
+    }
+
+    private boolean isCreateScreenAction(JSONObject action) {
+        String type = normalizeActionType(action.optString("type", ""));
+        return "add_screen".equals(type);
     }
 
     private void executeAction(JSONObject action) {
@@ -204,6 +235,24 @@ public final class AgentActionExecutor {
                 return;
             case "move_view":
                 moveView(action);
+                return;
+            case "add_variable":
+                addVariable(action);
+                return;
+            case "update_variable":
+                updateVariable(action);
+                return;
+            case "delete_variable":
+                deleteVariable(action);
+                return;
+            case "add_permission":
+                addPermission(action);
+                return;
+            case "remove_permission":
+                removePermission(action);
+                return;
+            case "add_screen":
+                addScreen(action);
                 return;
             default:
                 skippedLines.add("Accion desconocida ignorada: " + type);
@@ -257,6 +306,44 @@ public final class AgentActionExecutor {
             case "set_parent":
             case "set_index":
                 return "move_view";
+            case "add_variable":
+            case "create_variable":
+            case "new_variable":
+            case "add_var":
+            case "create_var":
+            case "add_list":
+            case "create_list":
+                return "add_variable";
+            case "update_variable":
+            case "modify_variable":
+            case "edit_variable":
+            case "rename_variable":
+            case "set_variable":
+            case "update_var":
+            case "edit_var":
+                return "update_variable";
+            case "delete_variable":
+            case "remove_variable":
+            case "delete_var":
+            case "remove_var":
+                return "delete_variable";
+            case "add_permission":
+            case "add_perm":
+            case "create_permission":
+            case "request_permission":
+            case "permission":
+                return "add_permission";
+            case "remove_permission":
+            case "delete_permission":
+            case "remove_perm":
+                return "remove_permission";
+            case "add_screen":
+            case "create_screen":
+            case "new_screen":
+            case "add_activity":
+            case "create_activity":
+            case "new_activity":
+                return "add_screen";
             case "linear":
             case "linear_layout":
             case "vertical":
@@ -577,6 +664,452 @@ public final class AgentActionExecutor {
         }
         appliedLines.add("Vista '" + viewId + "' movida a '" + targetParent + "' (indice "
                 + view.index + ") en " + xmlName + ".");
+    }
+
+    // ------------------------------------------------------------------
+    // Variables (add_variable / update_variable / delete_variable)
+    // ------------------------------------------------------------------
+
+    private static final int VAR_TYPE_BOOLEAN = 0;
+    private static final int VAR_TYPE_NUMBER = 1;
+    private static final int VAR_TYPE_STRING = 2;
+    private static final int VAR_TYPE_MAP = 3;
+
+    private void addVariable(JSONObject action) {
+        String screen = normalizeFileName(firstNonEmpty(action, "screen", "target", "file"));
+        String javaName = ProjectFileBean.getJavaName(screen);
+        String name = normalizeVariableName(firstNonEmpty(action, "name", "variable", "var", "id"));
+        if (name.isEmpty()) {
+            skippedLines.add("add_variable ignorado (falta el nombre de la variable).");
+            return;
+        }
+        boolean list = wantsList(action);
+        int type = resolveVariableType(action, list);
+        if (type < 0) {
+            skippedLines.add("add_variable ignorado: tipo '" + variableKindRaw(action) + "' no soportado.");
+            return;
+        }
+        if (list && type == VAR_TYPE_BOOLEAN) {
+            skippedLines.add("add_variable ignorado: las listas no admiten boolean (usa texto, numero o mapa).");
+            return;
+        }
+        boolean exists = list ? containsVariable(listVariableNames(javaName), name)
+                : containsVariable(variableNames(javaName), name);
+        if (exists) {
+            skippedLines.add("add_variable omitido: '" + name + "' ya existe en " + javaName
+                    + " (usa update_variable para cambiarla).");
+            return;
+        }
+        if (list) {
+            data.b(javaName, type, name);
+        } else {
+            data.c(javaName, type, name);
+        }
+        appliedLines.add((list ? "Lista" : "Variable") + " '" + name + "' (" + variableTypeName(type, list)
+                + ") creada en " + javaName + ".");
+        android.util.Log.d("AscodeAgent", "add_variable " + name + " list=" + list + " type=" + type + " java=" + javaName);
+        applyVariableInitialValue(javaName, type, list, name, initialValue(action));
+    }
+
+    private void updateVariable(JSONObject action) {
+        String screen = normalizeFileName(firstNonEmpty(action, "screen", "target", "file"));
+        String javaName = ProjectFileBean.getJavaName(screen);
+        String name = normalizeVariableName(firstNonEmpty(action, "name", "variable", "var", "id"));
+        if (name.isEmpty()) {
+            skippedLines.add("update_variable ignorado (falta el nombre de la variable).");
+            return;
+        }
+
+        ArrayList<Pair<Integer, String>> variables = data.k(javaName);
+        ArrayList<Pair<Integer, String>> lists = data.j(javaName);
+        int variableType = findVariableType(variables, name);
+        int listType = findVariableType(lists, name);
+        if (variableType < 0 && listType < 0) {
+            skippedLines.add("update_variable omitido: '" + name + "' no existe en " + javaName + ".");
+            return;
+        }
+        boolean list = listType >= 0 && variableType < 0;
+        int currentType = list ? listType : variableType;
+
+        String newName = normalizeVariableName(firstNonEmpty(action, "new_name", "new_variable", "rename", "to"));
+        int requestedType = resolveVariableType(action, list);
+        if (requestedType < 0) {
+            requestedType = currentType;
+        }
+        if (list && requestedType == VAR_TYPE_BOOLEAN) {
+            requestedType = currentType;
+        }
+        boolean rename = !newName.isEmpty() && !newName.equals(name);
+        boolean retype = requestedType != currentType;
+        boolean hasValue = !initialValue(action).isEmpty();
+        if (!rename && !retype && !hasValue) {
+            skippedLines.add("update_variable omitido: no se indico ningun cambio en '" + name + "'.");
+            return;
+        }
+        if (rename && isVariableUsed(javaName, name, list)) {
+            skippedLines.add("update_variable omitido: '" + name
+                    + "' se usa en bloques; no se renombra para no romper la logica.");
+            return;
+        }
+        String finalName = rename ? newName : name;
+        if (rename && containsVariable(list ? listVariableNames(javaName) : variableNames(javaName), finalName)) {
+            skippedLines.add("update_variable omitido: '" + finalName + "' ya existe en " + javaName + ".");
+            return;
+        }
+
+        List<String> changes = new ArrayList<>();
+        if (rename || retype) {
+            if (list) {
+                data.o(javaName, name);
+                data.b(javaName, requestedType, finalName);
+            } else {
+                data.p(javaName, name);
+                data.c(javaName, requestedType, finalName);
+            }
+        }
+        if (rename) {
+            changes.add("renombrada a '" + finalName + "'");
+        }
+        if (retype) {
+            changes.add("tipo " + variableTypeName(currentType, list) + " -> " + variableTypeName(requestedType, list));
+        }
+        if (hasValue) {
+            changes.add("valor inicial");
+        }
+        appliedLines.add("Variable '" + name + "' actualizada en " + javaName + " (" + join(changes) + ").");
+        applyVariableInitialValue(javaName, requestedType, list, finalName, initialValue(action));
+    }
+
+    private void deleteVariable(JSONObject action) {
+        String screen = normalizeFileName(firstNonEmpty(action, "screen", "target", "file"));
+        String javaName = ProjectFileBean.getJavaName(screen);
+        String name = normalizeVariableName(firstNonEmpty(action, "name", "variable", "var", "id"));
+        if (name.isEmpty()) {
+            skippedLines.add("delete_variable ignorado (falta el nombre de la variable).");
+            return;
+        }
+        int variableType = findVariableType(data.k(javaName), name);
+        int listType = findVariableType(data.j(javaName), name);
+        if (variableType < 0 && listType < 0) {
+            skippedLines.add("delete_variable omitido: '" + name + "' no existe en " + javaName + ".");
+            return;
+        }
+        boolean list = listType >= 0 && variableType < 0;
+        if (isVariableUsed(javaName, name, list)) {
+            skippedLines.add("delete_variable omitido: '" + name + "' se usa en bloques; quitalo primero de la logica.");
+            return;
+        }
+        if (list) {
+            data.o(javaName, name);
+        } else {
+            data.p(javaName, name);
+        }
+        appliedLines.add((list ? "Lista" : "Variable") + " '" + name + "' eliminada de " + javaName + ".");
+    }
+
+    private ArrayList<String> variableNames(String javaName) {
+        ArrayList<String> names = new ArrayList<>();
+        ArrayList<Pair<Integer, String>> pairs = data.k(javaName);
+        if (pairs != null) {
+            for (Pair<Integer, String> pair : pairs) {
+                if (pair != null && pair.second != null) {
+                    names.add(pair.second);
+                }
+            }
+        }
+        return names;
+    }
+
+    private ArrayList<String> listVariableNames(String javaName) {
+        ArrayList<String> names = new ArrayList<>();
+        ArrayList<Pair<Integer, String>> pairs = data.j(javaName);
+        if (pairs != null) {
+            for (Pair<Integer, String> pair : pairs) {
+                if (pair != null && pair.second != null) {
+                    names.add(pair.second);
+                }
+            }
+        }
+        return names;
+    }
+
+    private static boolean containsVariable(List<String> names, String name) {
+        for (String candidate : names) {
+            if (candidate != null && candidate.equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static int findVariableType(ArrayList<Pair<Integer, String>> pairs, String name) {
+        if (pairs == null) {
+            return -1;
+        }
+        for (Pair<Integer, String> pair : pairs) {
+            if (pair != null && name.equals(pair.second)) {
+                return pair.first == null ? -1 : pair.first;
+            }
+        }
+        return -1;
+    }
+
+    private boolean isVariableUsed(String javaName, String name, boolean list) {
+        try {
+            // Event key "" does not match any real event: scans every block of the file.
+            return list ? data.b(javaName, name, "") : data.c(javaName, name, "");
+        } catch (Throwable throwable) {
+            return false;
+        }
+    }
+
+    private static boolean wantsList(JSONObject action) {
+        if (action.optBoolean("is_list", false) || action.optBoolean("list", false)) {
+            return true;
+        }
+        return variableKindRaw(action).toLowerCase(Locale.US).contains("list");
+    }
+
+    private static String variableKindRaw(JSONObject action) {
+        return firstNonEmpty(action, "var_type", "variable_type", "value_type", "data_type", "kind");
+    }
+
+    /** @return 0 boolean, 1 numero, 2 texto, 3 mapa or -1 if the requested type is unknown. */
+    private static int resolveVariableType(JSONObject action, boolean list) {
+        String kind = variableKindRaw(action).toLowerCase(Locale.US).replace('-', '_').replace(' ', '_');
+        kind = kind.replace("list_", "").replace("_list", "").replace("list", "");
+        if (kind.isEmpty()) {
+            return VAR_TYPE_STRING;
+        }
+        if (kind.contains("bool") || kind.contains("true_false") || kind.contains("switch")) {
+            return VAR_TYPE_BOOLEAN;
+        }
+        if (kind.contains("map") || kind.contains("dict")) {
+            return VAR_TYPE_MAP;
+        }
+        if (kind.contains("str") || kind.contains("text") || kind.contains("char")) {
+            return VAR_TYPE_STRING;
+        }
+        if (kind.contains("num") || kind.contains("int") || kind.contains("double")
+                || kind.contains("float") || kind.contains("decimal")) {
+            return VAR_TYPE_NUMBER;
+        }
+        return -1;
+    }
+
+    private static String variableTypeName(int type, boolean list) {
+        if (list) {
+            switch (type) {
+                case VAR_TYPE_NUMBER:
+                    return "lista de numeros";
+                case VAR_TYPE_MAP:
+                    return "lista de mapas";
+                default:
+                    return "lista de textos";
+            }
+        }
+        switch (type) {
+            case VAR_TYPE_BOOLEAN:
+                return "boolean";
+            case VAR_TYPE_NUMBER:
+                return "numero (double)";
+            case VAR_TYPE_MAP:
+                return "mapa";
+            default:
+                return "texto (String)";
+        }
+    }
+
+    private static String normalizeVariableName(String value) {
+        if (value == null) {
+            return "";
+        }
+        String name = value.trim().replaceAll("[^A-Za-z0-9_]", "");
+        if (name.isEmpty()) {
+            return "";
+        }
+        if (!Character.isLetter(name.charAt(0))) {
+            name = "v" + name;
+        }
+        return name;
+    }
+
+    private static String initialValue(JSONObject action) {
+        return firstNonEmpty(action, "value", "initial_value", "default_value", "default", "initial");
+    }
+
+    /**
+     * Sketchware variables have no stored initial value (they are only declared); an
+     * optional initial value is applied as an assignment inside initializeLogic.
+     * Maps and lists are skipped: they are filled with blocks, not with one literal.
+     */
+    private void applyVariableInitialValue(String javaName, int type, boolean list, String name, String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return;
+        }
+        String literal = variableLiteral(type, list, value);
+        if (literal == null) {
+            skippedLines.add("Valor inicial de '" + name + "' ignorado: " + (list ? "las listas" : "los mapas")
+                    + " se rellenan con bloques, no con un valor simple.");
+            return;
+        }
+        String code = name + " = " + literal + ";";
+        if (ProjectCodeInjector.injectIntoEvent(scId, javaName, ProjectCodeInjector.INITIALIZE_LOGIC_EVENT, code)) {
+            appliedLines.add("Valor inicial de '" + name + "' aplicado en initializeLogic (" + code + ").");
+        } else {
+            skippedLines.add("No se pudo aplicar el valor inicial de '" + name + "'.");
+        }
+    }
+
+    private static String variableLiteral(int type, boolean list, String value) {
+        if (list || type == VAR_TYPE_MAP) {
+            return null;
+        }
+        String trimmed = value.trim();
+        switch (type) {
+            case VAR_TYPE_BOOLEAN:
+                if ("true".equalsIgnoreCase(trimmed)) {
+                    return "true";
+                }
+                if ("false".equalsIgnoreCase(trimmed)) {
+                    return "false";
+                }
+                return null;
+            case VAR_TYPE_NUMBER:
+                String numeric = trimmed.replaceAll("[^0-9.eE+-]", "");
+                if (numeric.isEmpty()) {
+                    return null;
+                }
+                try {
+                    Double.parseDouble(numeric);
+                    return numeric;
+                } catch (NumberFormatException ignored) {
+                    return null;
+                }
+            default:
+                return "\"" + trimmed.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n") + "\"";
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // Permissions (add_permission / remove_permission)
+    // ------------------------------------------------------------------
+
+    private void addPermission(JSONObject action) {
+        String permission = AgentProjectPermissions.normalize(
+                firstNonEmpty(action, "permission", "perm", "name", "value", "id"));
+        if (permission.isEmpty()) {
+            skippedLines.add("add_permission ignorado (falta el permiso).");
+            return;
+        }
+        if (AgentProjectPermissions.add(scId, permission)) {
+            appliedLines.add("Permiso '" + permission + "' agregado al AndroidManifest del proyecto.");
+        } else if (AgentProjectPermissions.contains(scId, permission)) {
+            skippedLines.add("add_permission omitido: el permiso '" + permission + "' ya estaba en el manifest.");
+        } else {
+            skippedLines.add("No se pudo agregar el permiso '" + permission + "' al manifest.");
+        }
+    }
+
+    private void removePermission(JSONObject action) {
+        String permission = AgentProjectPermissions.normalize(
+                firstNonEmpty(action, "permission", "perm", "name", "value", "id"));
+        if (permission.isEmpty()) {
+            skippedLines.add("remove_permission ignorado (falta el permiso).");
+            return;
+        }
+        if (AgentProjectPermissions.remove(scId, permission)) {
+            appliedLines.add("Permiso '" + permission + "' quitado del AndroidManifest del proyecto.");
+        } else {
+            skippedLines.add("remove_permission omitido: el permiso '" + permission + "' no estaba en el manifest.");
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // Screens (add_screen)
+    // ------------------------------------------------------------------
+
+    private void addScreen(JSONObject action) {
+        String name = normalizeScreenName(firstNonEmpty(action, "name", "screen", "activity", "id", "file"));
+        if (name.isEmpty()) {
+            skippedLines.add("add_screen ignorado (falta el nombre de la pantalla).");
+            return;
+        }
+        hC projectFiles;
+        try {
+            projectFiles = jC.b(scId);
+        } catch (Throwable throwable) {
+            projectFiles = null;
+        }
+        if (projectFiles == null) {
+            skippedLines.add("add_screen omitido: no se pudo leer la lista de pantallas.");
+            return;
+        }
+        if (projectFiles.b(ProjectFileBean.getXmlName(name)) != null
+                || projectFiles.a(ProjectFileBean.getJavaName(name)) != null) {
+            skippedLines.add("add_screen omitido: la pantalla '" + name + "' ya existe.");
+            return;
+        }
+
+        boolean toolbar = !action.has("toolbar") || action.optBoolean("toolbar", true);
+        boolean fullscreen = action.optBoolean("fullscreen", false);
+        boolean fab = action.optBoolean("fab", false);
+        boolean drawer = action.optBoolean("drawer", false);
+        int orientation = resolveOrientation(action.optString("orientation", ""), ProjectFileBean.ORIENTATION_PORTRAIT);
+
+        ProjectFileBean projectFile = new ProjectFileBean(
+                ProjectFileBean.PROJECT_FILE_TYPE_ACTIVITY,
+                name,
+                orientation,
+                ProjectFileBean.KEYBOARD_STATE_UNSPECIFIED,
+                toolbar,
+                fullscreen,
+                fab,
+                drawer);
+        projectFiles.a(projectFile);
+        projectFiles.l();
+        projectFiles.j();
+        appliedLines.add("Pantalla '" + name + "' creada (" + ProjectFileBean.getXmlName(name)
+                + " + " + ProjectFileBean.getJavaName(name) + ").");
+        android.util.Log.d("AscodeAgent", "add_screen " + name + " xml=" + ProjectFileBean.getXmlName(name)
+                + " java=" + ProjectFileBean.getJavaName(name) + " orientation=" + orientation);
+    }
+
+    private static String normalizeScreenName(String value) {
+        if (value == null) {
+            return "";
+        }
+        String name = value.trim().replace('\\', '/');
+        int slash = name.lastIndexOf('/');
+        if (slash >= 0) {
+            name = name.substring(slash + 1);
+        }
+        if (name.toLowerCase(Locale.US).endsWith(".java")) {
+            name = name.substring(0, name.length() - 5);
+        }
+        if (name.toLowerCase(Locale.US).endsWith(".xml")) {
+            name = name.substring(0, name.length() - 4);
+        }
+        name = name.toLowerCase(Locale.US).replaceAll("[^a-z0-9_]", "_")
+                .replaceAll("_+", "_").replaceAll("^_+|_+$", "");
+        return name;
+    }
+
+    private static int resolveOrientation(String value, int fallback) {
+        if (value == null || value.trim().isEmpty()) {
+            return fallback;
+        }
+        String normalized = value.toLowerCase(Locale.US);
+        if (normalized.contains("land")) {
+            return ProjectFileBean.ORIENTATION_LANDSCAPE;
+        }
+        if (normalized.contains("both") || normalized.contains("sensor") || normalized.contains("auto")) {
+            return ProjectFileBean.ORIENTATION_BOTH;
+        }
+        if (normalized.contains("port")) {
+            return ProjectFileBean.ORIENTATION_PORTRAIT;
+        }
+        return fallback;
     }
 
     /**
@@ -1110,7 +1643,47 @@ public final class AgentActionExecutor {
                         : new ArrayList<>(entry.getValue()));
             }
         }
-        return new DataSnapshot(views, logic, events, components);
+        return new DataSnapshot(views, logic, events, components,
+                copyPairs(data.e), copyPairs(data.f),
+                snapshotActivities(), snapshotCustomViews(), AgentProjectPermissions.readRaw(scId));
+    }
+
+    /** Shallow-per-key copy of a variable/list map (the Pair values are immutable). */
+    private static HashMap<String, ArrayList<Pair<Integer, String>>> copyPairs(
+            HashMap<String, ArrayList<Pair<Integer, String>>> source) {
+        HashMap<String, ArrayList<Pair<Integer, String>>> copy = new HashMap<>();
+        if (source != null) {
+            for (Map.Entry<String, ArrayList<Pair<Integer, String>>> entry : source.entrySet()) {
+                copy.put(entry.getKey(), entry.getValue() == null
+                        ? new ArrayList<>()
+                        : new ArrayList<>(entry.getValue()));
+            }
+        }
+        return copy;
+    }
+
+    private ArrayList<ProjectFileBean> snapshotActivities() {
+        try {
+            hC projectFiles = jC.b(scId);
+            if (projectFiles != null) {
+                return new ArrayList<>(projectFiles.b());
+            }
+        } catch (Throwable ignored) {
+            android.util.Log.d("Ascode", "AgentActionExecutor: no screen snapshot", ignored);
+        }
+        return null;
+    }
+
+    private ArrayList<ProjectFileBean> snapshotCustomViews() {
+        try {
+            hC projectFiles = jC.b(scId);
+            if (projectFiles != null) {
+                return new ArrayList<>(projectFiles.c());
+            }
+        } catch (Throwable ignored) {
+            android.util.Log.d("Ascode", "AgentActionExecutor: no custom view snapshot", ignored);
+        }
+        return null;
     }
 
     private void restoreSnapshot(DataSnapshot snapshot) {
@@ -1133,7 +1706,37 @@ public final class AgentActionExecutor {
             data.h.clear();
             data.h.putAll(snapshot.components);
         }
+        if (data.e != null && snapshot.variables != null) {
+            data.e.clear();
+            data.e.putAll(snapshot.variables);
+        }
+        if (data.f != null && snapshot.lists != null) {
+            data.f.clear();
+            data.f.putAll(snapshot.lists);
+        }
+        restoreScreens(snapshot);
+        AgentProjectPermissions.restoreRaw(scId, snapshot.permissionsRaw);
         data.k();
+    }
+
+    /** Restores the project file list (screens) captured before the actions ran. */
+    private void restoreScreens(DataSnapshot snapshot) {
+        try {
+            hC projectFiles = jC.b(scId);
+            if (projectFiles == null) {
+                return;
+            }
+            if (snapshot.activities != null) {
+                projectFiles.a(new ArrayList<>(snapshot.activities));
+            }
+            if (snapshot.customViews != null) {
+                projectFiles.b(new ArrayList<>(snapshot.customViews));
+            }
+            projectFiles.j();
+            projectFiles.l();
+        } catch (Throwable ignored) {
+            android.util.Log.w("Ascode", "AgentActionExecutor: no se pudo restaurar la lista de pantallas", ignored);
+        }
     }
 
     /**

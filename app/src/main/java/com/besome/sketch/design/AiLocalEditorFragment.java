@@ -467,6 +467,11 @@ public class AiLocalEditorFragment extends Fragment {
 
     private void processAgentResponse(int messageIndex, String response) {
         updateChatMessage(messageIndex, "Procesando acciones del agente…", false);
+        // Resolve UI strings on the caller (main) thread: the worker below must not
+        // touch Fragment.getString after a possible detach.
+        final String changesAppliedHeader = getString(R.string.ai_changes_applied);
+        final String actionsSkippedHeader = getString(R.string.ai_actions_skipped);
+        final String noActionsWarning = getString(R.string.ai_no_actions_applied);
         Thread worker = new Thread(() -> {
             String raw = response == null ? "" : response.trim();
 
@@ -485,7 +490,15 @@ public class AiLocalEditorFragment extends Fragment {
                     if (thinkResult.hasThinking && messageIndex >= 0 && messageIndex < chatMessages.size()) {
                         chatMessages.get(messageIndex).thinkingText = thinkResult.thinkingText;
                     }
-                    updateChatMessage(messageIndex, fallbackText.isEmpty() ? "El agente no devolvió respuesta." : fallbackText, true);
+                    String shown;
+                    if (fallbackText.isEmpty()) {
+                        shown = "El agente no devolvió respuesta.\n\n" + noActionsWarning;
+                    } else {
+                        // The reply is prose (no agent JSON): nothing was applied, so the
+                        // chat must never present it as a successful change.
+                        shown = fallbackText + "\n\n" + noActionsWarning;
+                    }
+                    updateChatMessage(messageIndex, shown, true);
                     finishAgentRequest();
                 });
                 return;
@@ -511,18 +524,28 @@ public class AiLocalEditorFragment extends Fragment {
                 if (!result.getReply().trim().isEmpty()) {
                     resultText.append(result.getReply().trim()).append("\n\n");
                 }
-                java.util.List<String> summary = result.getSummaryLines();
-                if (summary.isEmpty()) {
-                    if (resultText.length() == 0) {
-                        resultText.append("No se detectaron acciones para aplicar.");
-                    }
-                } else {
-                    resultText.append("**Cambios aplicados:**\n");
-                    for (String line : summary) {
+                java.util.List<String> applied = result.getAppliedLines();
+                java.util.List<String> skipped = result.getSkippedLines();
+                if (!applied.isEmpty()) {
+                    resultText.append(changesAppliedHeader).append('\n');
+                    for (String line : applied) {
                         resultText.append("- ").append(line).append('\n');
                     }
                     changesApplied[0] = true;
                     AscodeUtil.toast("Agente: cambios aplicados al proyecto");
+                }
+                if (!skipped.isEmpty()) {
+                    resultText.append(actionsSkippedHeader).append('\n');
+                    for (String line : skipped) {
+                        resultText.append("- ").append(line).append('\n');
+                    }
+                }
+                if (!changesApplied[0]) {
+                    // No action touched the project: never claim success.
+                    if (resultText.length() > 0) {
+                        resultText.append('\n');
+                    }
+                    resultText.append(noActionsWarning);
                 }
             } catch (Throwable throwable) {
                 resultText.setLength(0);
@@ -558,13 +581,30 @@ public class AiLocalEditorFragment extends Fragment {
                 json = json.substring(0, fence);
             }
         }
+        // Small local models often wrap the JSON in prose or repeat the prompt's
+        // example. Try every '{' as a candidate start and keep the first parseable
+        // object, preferring one that actually carries agent fields.
+        JSONObject firstObject = null;
         int start = json.indexOf('{');
-        int end = json.lastIndexOf('}');
-        if (start < 0 || end <= start) {
-            return null;
+        while (start >= 0) {
+            JSONObject candidate = parseJsonObjectAt(json, start);
+            if (candidate != null) {
+                if (candidate.has("actions") || candidate.has("reply")) {
+                    return candidate;
+                }
+                if (firstObject == null) {
+                    firstObject = candidate;
+                }
+            }
+            start = json.indexOf('{', start + 1);
         }
+        return firstObject;
+    }
+
+    private static JSONObject parseJsonObjectAt(String text, int start) {
         try {
-            return new JSONObject(json.substring(start, end + 1));
+            Object value = new org.json.JSONTokener(text.substring(start)).nextValue();
+            return value instanceof JSONObject ? (JSONObject) value : null;
         } catch (JSONException ignored) {
             return null;
         }

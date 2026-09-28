@@ -125,6 +125,18 @@ public final class AgentActionExecutor {
     private final List<String> skippedLines = new ArrayList<>();
     /** Raw user message (agent chat); used by the deterministic nesting safety net. */
     private String userMessage = "";
+    /**
+     * Canonical color named in the user message (e.g. "rojo"), or {@code null} when the
+     * message names no color or names more than one distinct color. Drives the
+     * deterministic "the user said <color>" safety net (conservative by design).
+     */
+    private final String messageColorKey;
+    /**
+     * Number of add_view/update_view actions in the current response. The color safety net
+     * only fires on a single-view request, or when the color is directly attached to the
+     * view type word ("boton rojo"), so multi-view requests are never mass-colored.
+     */
+    private int viewActionCount = 0;
     /** Ids of container views created by the current request (parents created in-request). */
     private final Set<String> pendingContainerIds = new HashSet<>();
     /** Planned view type for each pending container id (used for parentType before it exists). */
@@ -138,6 +150,7 @@ public final class AgentActionExecutor {
         this.scId = scId;
         this.data = jC.a(scId);
         this.userMessage = userMessage == null ? "" : userMessage.trim();
+        this.messageColorKey = resolveUniqueMessageColor(this.userMessage);
         collectUsedIds();
     }
 
@@ -146,6 +159,7 @@ public final class AgentActionExecutor {
         skippedLines.clear();
         String reply = agentResponse == null ? "" : agentResponse.optString("reply", "");
         JSONArray actions = agentResponse == null ? null : agentResponse.optJSONArray("actions");
+        viewActionCount = countViewActions(actions);
         if (actions != null && actions.length() > 0) {
             DataSnapshot snapshot = null;
             File fileBackup = null;
@@ -210,6 +224,25 @@ public final class AgentActionExecutor {
     private boolean isCreateScreenAction(JSONObject action) {
         String type = normalizeActionType(action.optString("type", ""));
         return "add_screen".equals(type);
+    }
+
+    /** Counts add_view/update_view actions (the ones that can carry a background color). */
+    private static int countViewActions(JSONArray actions) {
+        if (actions == null) {
+            return 0;
+        }
+        int count = 0;
+        for (int i = 0; i < actions.length(); i++) {
+            JSONObject action = actions.optJSONObject(i);
+            if (action == null) {
+                continue;
+            }
+            String type = normalizeActionType(action.optString("type", ""));
+            if ("add_view".equals(type) || "update_view".equals(type)) {
+                count++;
+            }
+        }
+        return count;
     }
 
     private void executeAction(JSONObject action) {
@@ -503,22 +536,20 @@ public final class AgentActionExecutor {
         view.layout.marginRight = action.optInt("margin_right", action.optInt("marginRight", 0));
         view.layout.marginBottom = action.optInt("margin_bottom", action.optInt("marginBottom", 0));
 
-        String backgroundColor = action.optString("background_color", action.optString("backgroundColor", ""));
-        if (!backgroundColor.isEmpty()) {
-            try {
-                view.layout.backgroundColor = Color.parseColor(backgroundColor);
-            } catch (IllegalArgumentException ignored) {
-                android.util.Log.d("Ascode", "AgentActionExecutor: IllegalArgumentException ignored", ignored);
-            }
-        }
-        // Optional extras (text_color, padding, gravity, weight...) supported on create too.
+        // Colors (background_color / text_color) are applied centrally by
+        // applyOptionalViewFields(), which also accepts named colors (ES/EN) on top of #hex.
         applyOptionalViewFields(view, action);
 
         data.a(xmlName, view);
         usedIds.add(view.id);
         String parentNote = (view.parent == null || view.parent.isEmpty() || "root".equals(view.parent))
                 ? "" : " dentro de '" + view.parent + "'";
-        appliedLines.add(viewName(view) + " '" + view.id + "' agregado en " + xmlName + parentNote + ".");
+        // Honest note: the background color was deduced from the user message, not emitted by
+        // the model, so the user can see where the color came from.
+        String colorNote = (firstColor(action, "background_color", "backgroundColor") == null
+                && deterministicColorFor(type) != null)
+                ? " (fondo '" + messageColorKey + "')" : "";
+        appliedLines.add(viewName(view) + " '" + view.id + "' agregado en " + xmlName + parentNote + colorNote + ".");
         android.util.Log.d("AscodeAgent", "add_view " + view.id + " parent=" + view.parent
                 + " index=" + view.index + " screen=" + xmlName);
 
@@ -1128,10 +1159,31 @@ public final class AgentActionExecutor {
             view.text = new TextBean();
         }
 
+        String requestedLabel = requestedTextLabel();
         if (action.has("text")) {
             String value = action.optString("text", "");
+            // Safety net: a small model often puts the COLOR in "text" (e.g. text="Rojo"
+            // for "crea un boton rojo"). If the text is exactly a color name and the user
+            // did not ask for that literal label, replace it with the requested label (if
+            // any) or clear it, so the color name never ends up as the button text.
+            String corrected = correctedColorText(value);
+            if (corrected != null) {
+                value = corrected;
+                android.util.Log.d("AscodeAgent", "text color-name corregido a '" + value + "'");
+            } else if (requestedLabel != null && !value.equals(requestedLabel)
+                    && messageColorMentionIsTextOnly()) {
+                // The user asked for a label that is a color word ("que diga rojo") and the
+                // model emitted something else: honor the requested label. Restricted to the
+                // text-only color case so normal multi-view label requests are never rewritten.
+                value = requestedLabel;
+                android.util.Log.d("AscodeAgent", "text ajustado al label pedido '" + value + "'");
+            }
             view.text.text = value;
             changes.add("text=\"" + value + "\"");
+        } else if (requestedLabel != null && messageColorMentionIsTextOnly()
+                && (view.text.text == null || view.text.text.isEmpty())) {
+            view.text.text = requestedLabel;
+            changes.add("text=\"" + requestedLabel + "\"");
         }
         if (action.has("text_size") || action.has("textSize")) {
             int value = action.optInt("text_size", action.optInt("textSize", view.text.textSize));
@@ -1146,6 +1198,12 @@ public final class AgentActionExecutor {
             changes.add("hint=\"" + value + "\"");
         }
         Integer textColor = firstColor(action, "text_color", "textColor");
+        if (textColor != null && messageColorMentionIsTextOnly()) {
+            // The only color words in the message describe the requested TEXT ("que diga
+            // rojo"); a text_color the model copied from the color example must not apply.
+            android.util.Log.d("AscodeAgent", "text_color ignorado: el color mencionado es texto, no color");
+            textColor = null;
+        }
         if (textColor != null) {
             view.text.textColor = textColor;
             changes.add("text_color");
@@ -1203,9 +1261,31 @@ public final class AgentActionExecutor {
             changes.add("padding_bottom");
         }
         Integer background = firstColor(action, "background_color", "backgroundColor");
+        if (background != null && messageColorMentionIsTextOnly()) {
+            // The only color words in the message describe the requested TEXT ("que diga
+            // rojo"): the background_color the model copied from the color example must not
+            // apply, otherwise a legit "boton que diga rojo" would come out painted red.
+            android.util.Log.d("AscodeAgent", "background_color ignorado: el color mencionado es texto, no color");
+            background = null;
+        }
+        boolean deducedBackground = false;
+        if (background == null) {
+            // Deterministic color safety net: the user named a color but the action did not
+            // carry background_color (or carried an unparseable value). Apply the named color.
+            background = deterministicColorFor(viewName(view));
+            if (background != null) {
+                deducedBackground = true;
+                android.util.Log.d("AscodeAgent", "background_color deducido='" + messageColorKey
+                        + "' en vista tipo " + viewName(view));
+            }
+        }
         if (background != null) {
             view.layout.backgroundColor = background;
-            changes.add("background_color");
+            changes.add(deducedBackground
+                    ? "background_color (deducido de '" + messageColorKey + "')"
+                    : "background_color");
+        } else if (action.has("background_color") || action.has("backgroundColor")) {
+            changes.add("background_color (valor no reconocido)");
         }
         if (action.has("gravity")) {
             view.layout.gravity = parseGravity(action.optString("gravity", ""), view.layout.gravity);
@@ -2032,12 +2112,296 @@ public final class AgentActionExecutor {
         return matched ? gravity : fallback;
     }
 
+    // ---------------------------------------------------------------------------------
+    // Color names (ES/EN) -> ARGB. Used both to accept named colors on top of #hex and by
+    // the deterministic safety net that recovers the color the user asked for when a small
+    // model forgets background_color. Values follow the usual web/Material palette.
+    // ---------------------------------------------------------------------------------
+    private static final String[][] COLOR_TABLE = {
+            {"rojo", "red", "#FF0000"},
+            {"verde", "green", "#00AA00"},
+            {"azul", "blue", "#0000FF"},
+            {"amarillo", "yellow", "#FFFF00"},
+            {"naranja", "orange", "#FFA500"},
+            {"morado", "violeta", "purple", "violet", "#800080"},
+            {"negro", "black", "#000000"},
+            {"blanco", "white", "#FFFFFF"},
+            {"gris", "grey", "gray", "#808080"},
+            {"rosa", "pink", "#FFC0CB"},
+            {"cian", "cyan", "#00FFFF"},
+            {"magenta", "#FF00FF"},
+            {"marron", "marrón", "brown", "#A52A2A"},
+            {"dorado", "gold", "#FFD700"},
+            {"plata", "silver", "#C0C0C0"},
+    };
+
+    private static final Map<String, Integer> COLOR_NAMES = buildColorNames();
+    private static final Map<String, List<String>> COLOR_ALIASES = buildColorAliases();
+
+    private static Map<String, Integer> buildColorNames() {
+        Map<String, Integer> map = new HashMap<>();
+        for (String[] row : COLOR_TABLE) {
+            int argb = Color.parseColor(row[row.length - 1]);
+            for (int i = 0; i < row.length - 1; i++) {
+                map.put(normalizeColorKey(row[i]), argb);
+            }
+        }
+        return map;
+    }
+
+    private static Map<String, List<String>> buildColorAliases() {
+        Map<String, List<String>> map = new HashMap<>();
+        for (String[] row : COLOR_TABLE) {
+            List<String> aliases = new ArrayList<>();
+            for (int i = 0; i < row.length - 1; i++) {
+                aliases.add(normalizeColorKey(row[i]));
+            }
+            map.put(normalizeColorKey(row[0]), aliases);
+        }
+        return map;
+    }
+
+    /** Lowercases and strips the Spanish accents that can appear in color names. */
+    private static String normalizeColorKey(String value) {
+        if (value == null) {
+            return "";
+        }
+        String s = value.trim().toLowerCase(Locale.US);
+        s = s.replace('á', 'a').replace('é', 'e').replace('í', 'i')
+                .replace('ó', 'o').replace('ú', 'u').replace('ü', 'u').replace('ñ', 'n');
+        return s.replace("\"", "").replace("'", "").trim();
+    }
+
+    /** Canonical color key (first alias) named in the message, or null if 0 or >1 distinct. */
+    private static String resolveUniqueMessageColor(String message) {
+        if (message == null || message.trim().isEmpty()) {
+            return null;
+        }
+        String lower = message.toLowerCase(Locale.US);
+        Set<String> found = new java.util.LinkedHashSet<>();
+        for (Map.Entry<String, List<String>> entry : COLOR_ALIASES.entrySet()) {
+            for (String alias : entry.getValue()) {
+                java.util.regex.Matcher matcher = java.util.regex.Pattern
+                        .compile("(?<![A-Za-zÁÉÍÓÚÜÑáéíóúüñ])" + java.util.regex.Pattern.quote(alias)
+                                + "(?![A-Za-zÁÉÍÓÚÜÑáéíóúüñ])")
+                        .matcher(lower);
+                while (matcher.find()) {
+                    if (!isLabelRequestContext(lower, matcher.start())
+                            && !isTextColorRequestContext(lower, matcher.start())) {
+                        found.add(entry.getKey());
+                    }
+                }
+            }
+        }
+        return found.size() == 1 ? found.iterator().next() : null;
+    }
+
+    /**
+     * True when every color word in the message is an explicit label request ("que diga
+     * rojo", "con texto azul"…). In that case any background_color / text_color emitted by
+     * the model is a misread of the label and must be ignored.
+     */
+    private boolean messageColorMentionIsTextOnly() {
+        if (userMessage == null || userMessage.isEmpty()) {
+            return false;
+        }
+        String lower = userMessage.toLowerCase(Locale.US);
+        boolean any = false;
+        for (Map.Entry<String, List<String>> entry : COLOR_ALIASES.entrySet()) {
+            for (String alias : entry.getValue()) {
+                java.util.regex.Matcher matcher = java.util.regex.Pattern
+                        .compile("(?<![A-Za-zÁÉÍÓÚÜÑáéíóúüñ])" + java.util.regex.Pattern.quote(alias)
+                                + "(?![A-Za-zÁÉÍÓÚÜÑáéíóúüñ])")
+                        .matcher(lower);
+                while (matcher.find()) {
+                    any = true;
+                    if (!isLabelRequestContext(lower, matcher.start())) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return any;
+    }
+
+    /**
+     * True when the color word at {@code index} is part of an explicit label request
+     * ("que diga rojo", "con texto rojo", "texto: rojo"…), so it must not be used as a
+     * background color. This is what keeps "crea un boton que diga rojo" working.
+     */
+    private static boolean isLabelRequestContext(String message, int index) {
+        int from = Math.max(0, index - 28);
+        String before = message.substring(from, index);
+        return java.util.regex.Pattern.compile(
+                "(diga|dice|diga\\s+el\\s+texto|ponga|muestre|texto|palabra|llame|escriba|escribe|etiqueta|label)"
+                        + "\\s*[:\\\"']?\\s*(?:de\\s+|el\\s+|la\\s+)?$",
+                java.util.regex.Pattern.CASE_INSENSITIVE).matcher(before).find();
+    }
+
+    /**
+     * True when the color word at {@code index} is part of a TEXT COLOR request
+     * ("color del texto a rojo", "color de la letra azul"…). Such a mention is not a
+     * background color either, but it must still be allowed to set text_color.
+     */
+    private static boolean isTextColorRequestContext(String message, int index) {
+        int from = Math.max(0, index - 40);
+        String before = message.substring(from, index);
+        return java.util.regex.Pattern.compile(
+                "color\\s+(?:del?\\s+|de\\s+la\\s+)?(?:texto|letra|fuente)\\s*(?:a|en|de|al)?\\s*$",
+                java.util.regex.Pattern.CASE_INSENSITIVE).matcher(before).find();
+    }
+
+    /**
+     * Returns the corrected text when {@code text} is exactly a color name, or null when
+     * there is nothing to correct. Uses the label the user explicitly asked for when
+     * present ("que diga Hola"); otherwise clears the stray color name.
+     */
+    private String correctedColorText(String text) {
+        if (text == null) {
+            return null;
+        }
+        String trimmed = text.trim();
+        if (trimmed.isEmpty() || !COLOR_NAMES.containsKey(normalizeColorKey(trimmed))) {
+            return null;
+        }
+        String label = requestedTextLabel();
+        if (label != null) {
+            return label;
+        }
+        if (messageAsksForLiteralText(trimmed)) {
+            return null;
+        }
+        return "";
+    }
+
+    /** Text label explicitly requested by the user ("que diga Hola"), or null. */
+    private String requestedTextLabel() {
+        if (userMessage == null || userMessage.isEmpty()) {
+            return null;
+        }
+        java.util.regex.Matcher matcher = java.util.regex.Pattern.compile(
+                "(?:que\\s+diga|que\\s+dice|que\\s+ponga|que\\s+muestre|con\\s+(?:el\\s+)?texto(?:\\s+de)?|"
+                        + "texto\\s*[:=]|con\\s+la\\s+palabra|que\\s+se\\s+llame)\\s*[:\\\"“]?\\s*"
+                        + "([A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9][A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9 _-]{0,30})",
+                java.util.regex.Pattern.CASE_INSENSITIVE).matcher(userMessage);
+        if (!matcher.find()) {
+            return null;
+        }
+        String label = matcher.group(1) == null ? "" : matcher.group(1).trim();
+        // Cut at a connector that likely starts a new instruction.
+        label = label.split("\\s+(?:y|con|de|en|que|para|del|al)\\s+", 2)[0].trim();
+        label = label.replaceAll("[.,;:]+$", "").trim();
+        return label.isEmpty() ? null : label;
+    }
+
+    /** True when the message explicitly asks for that exact literal as visible text. */
+    private boolean messageAsksForLiteralText(String literal) {
+        if (userMessage == null || literal == null || literal.isEmpty()) {
+            return false;
+        }
+        return java.util.regex.Pattern.compile(
+                "(?:que\\s+diga|que\\s+dice|que\\s+ponga|que\\s+muestre|con\\s+(?:el\\s+)?texto|"
+                        + "texto\\s*[:=]|con\\s+la\\s+palabra|llame)\\s*[:\\\"“']?\\s*"
+                        + java.util.regex.Pattern.quote(literal),
+                java.util.regex.Pattern.CASE_INSENSITIVE).matcher(userMessage).find();
+    }
+
+    /**
+     * Deterministic color safety net. Returns the ARGB color the user named when the action
+     * for that view type did not carry a usable background_color. Conservative: only fires
+     * for a single-view request, or when the color is directly attached to the view type
+     * word ("boton rojo") in a multi-view request.
+     */
+    private Integer deterministicColorFor(String typeName) {
+        if (messageColorKey == null) {
+            return null;
+        }
+        if (viewActionCount > 1 && !messageAttachesColorToType(typeName)) {
+            return null;
+        }
+        return COLOR_NAMES.get(messageColorKey);
+    }
+
+    /** True when the message has "<viewWord> <color>" (e.g. "boton rojo") for this type. */
+    private boolean messageAttachesColorToType(String typeName) {
+        if (userMessage == null || userMessage.isEmpty() || messageColorKey == null) {
+            return false;
+        }
+        List<String> aliases = COLOR_ALIASES.get(messageColorKey);
+        if (aliases == null) {
+            return false;
+        }
+        StringBuilder colorAlt = new StringBuilder();
+        for (String alias : aliases) {
+            if (colorAlt.length() > 0) {
+                colorAlt.append('|');
+            }
+            colorAlt.append(java.util.regex.Pattern.quote(alias));
+        }
+        for (String word : typeWordsFor(typeName)) {
+            java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(
+                    "(?<![A-Za-zÁÉÍÓÚÜÑáéíóúüñ])" + java.util.regex.Pattern.quote(word)
+                            + "\\s+(?:de\\s+|color\\s+|en\\s+|es\\s+)?(?:\\\"|')?(" + colorAlt + ")"
+                            + "(?![A-Za-zÁÉÍÓÚÜÑáéíóúüñ])",
+                    java.util.regex.Pattern.CASE_INSENSITIVE);
+            if (pattern.matcher(userMessage).find()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Spanish/English words that identify a view type in the user message. */
+    private static String[] typeWordsFor(String typeName) {
+        if (typeName == null || typeName.isEmpty()) {
+            return new String[0];
+        }
+        String t = normalizeColorKey(typeName);
+        if (t.contains("button")) {
+            return new String[]{"boton", "button"};
+        }
+        if (t.contains("text") || t.contains("label")) {
+            return new String[]{"texto", "text", "etiqueta", "label", "textview"};
+        }
+        if (t.contains("input") || t.contains("edit")) {
+            return new String[]{"input", "campo", "edittext"};
+        }
+        if (t.contains("image")) {
+            return new String[]{"imagen", "image", "imageview"};
+        }
+        if (t.contains("card")) {
+            return new String[]{"tarjeta", "card"};
+        }
+        if (t.contains("linear") || t.contains("layout") || t.contains("vertical") || t.contains("horizontal")) {
+            return new String[]{"linear", "layout", "contenedor", "container"};
+        }
+        if (t.contains("scroll")) {
+            return new String[]{"scroll"};
+        }
+        if (t.contains("checkbox")) {
+            return new String[]{"checkbox", "casilla"};
+        }
+        if (t.contains("switch")) {
+            return new String[]{"switch", "interruptor"};
+        }
+        if (t.contains("progress")) {
+            return new String[]{"progress", "progreso", "barra"};
+        }
+        return new String[0];
+    }
+
     private static Integer parseColorOrNull(String value) {
         if (value == null || value.trim().isEmpty()) {
             return null;
         }
+        String trimmed = value.trim();
+        // Named colors first (ES/EN): rojo/red, azul/blue, verde/green, ...
+        Integer named = COLOR_NAMES.get(normalizeColorKey(trimmed));
+        if (named != null) {
+            return named;
+        }
         try {
-            return Color.parseColor(value.trim());
+            return Color.parseColor(trimmed);
         } catch (IllegalArgumentException ignored) {
             return null;
         }

@@ -123,7 +123,7 @@ public class LocalAiPromptFactory {
     private static final String AGENT_JSON_SCHEMA =
             "IMPORTANTE: \"type\" de cada action es SOLO add_view, update_view, delete_view, move_view, add_event, inject_code, add_variable, update_variable, delete_variable, add_permission, remove_permission o add_screen; el tipo de vista va en \"view_type\" y el de la variable en \"var_type\".\n"
                     + "Acciones:\n"
-                    + "  add_view: crear vista. Campos: screen,parent,view_type,id,text,text_size,hint,width,height,orientation,margenes,background_color. view_type: linear|vertical|horizontal|scroll|card|button|text|input|image|webview|progress|list|spinner|checkbox|switch|seekbar\n"
+                    + "  add_view: crear vista. Campos: screen,parent,view_type,id,text,text_size,text_color,hint,width,height,orientation,margenes,background_color. view_type: linear|vertical|horizontal|scroll|card|button|text|input|image|webview|progress|list|spinner|checkbox|switch|seekbar\n"
                     + "  update_view: modificar una vista EXISTENTE por su id. Campos: screen,id, y solo los que cambian: text,text_size,hint,width,height,orientation,background_color,text_color,margin,margin_left,margin_top,margin_right,margin_bottom,padding,padding_left,padding_top,padding_right,padding_bottom,gravity,weight. Lo que no envies no se toca.\n"
                     + "  delete_view: BORRAR una vista EXISTENTE y sus hijas/eventos. Campos: screen,id\n"
                     + "  move_view: cambiar de padre o de orden una vista EXISTENTE. Campos: screen,id,parent,index (index=0 es el primero)\n"
@@ -140,6 +140,7 @@ public class LocalAiPromptFactory {
                     + "  - Crea primero las vistas (add_view) y despues sus eventos (inject_code/add_event), SIEMPRE juntos en el mismo JSON.\n"
                     + "  - update_view/delete_view/move_view/update_variable/delete_variable/remove_permission solo funcionan con cosas que YA existan; si no existe, se omite sin romper nada.\n"
                     + "  - ids unicos: button1, text1, input1...\n"
+                    + "  - COLOR (obligatoria): el color NUNCA va en \"text\". \"text\" es SOLO la etiqueta visible del boton/texto. El color de FONDO va en \"background_color\" y el color del TEXTO va en \"text_color\"; ambos en formato \"#RRGGBB\" (o por nombre: rojo, verde, azul, amarillo, naranja, morado, negro, blanco, gris, rosa, cian, magenta, marron, dorado, plata). Si el usuario pide 'un boton rojo', pon text=<etiqueta del usuario o un texto util> y background_color=\"#FF0000\" (JAMAS text=\"rojo\").\n"
                     + "  - screen=main es la pantalla principal. parent=root por defecto (nivel superior).\n"
                     + "  - PARENT (anidar): si el usuario indica DONDE insertar la vista (frases como 'dentro de linear1', 'en el linearX', 'metido en X', 'dentro del layout X', 'dentro del contenedor X'), usa parent=<id EXACTO de esa vista existente> en vez de root. Si esa vista NO existe, creala tambien y usa su id. Nunca inventes un parent inexistente.\n"
                     + "  - ORDEN: si creas un contenedor y algo dentro de el en la misma peticion, el add_view del contenedor va PRIMERO y el add_view del hijo despues, con parent=<id del contenedor>.\n"
@@ -166,7 +167,12 @@ public class LocalAiPromptFactory {
                     + "Ejemplo 6 (pantalla nueva y vista dentro de ella):\n"
                     + "{\"reply\":\"Pantalla login creada con un texto.\",\"actions\":["
                     + "{\"type\":\"add_screen\",\"name\":\"login\"},"
-                    + "{\"type\":\"add_view\",\"screen\":\"login\",\"parent\":\"root\",\"view_type\":\"text\",\"id\":\"text1\",\"text\":\"Iniciar sesion\"}]}\n";
+                    + "{\"type\":\"add_view\",\"screen\":\"login\",\"parent\":\"root\",\"view_type\":\"text\",\"id\":\"text1\",\"text\":\"Iniciar sesion\"}]}\n"
+                    + "Ejemplo 7 (boton con COLOR de fondo, p.ej. 'crea un boton rojo'):\n"
+                    + "{\"reply\":\"Boton rojo creado en main.\",\"actions\":["
+                    + "{\"type\":\"add_view\",\"screen\":\"main\",\"parent\":\"root\",\"view_type\":\"button\",\"id\":\"button1\","
+                    + "\"text\":\"Presioname\",\"background_color\":\"#FF0000\",\"text_color\":\"#FFFFFF\","
+                    + "\"width\":\"match_parent\",\"height\":\"wrap_content\"}]}\n";
 
     public static String buildAgentPrompt(String projectScope,
                                           String userPrompt,

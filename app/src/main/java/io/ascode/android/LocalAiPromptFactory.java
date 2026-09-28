@@ -133,7 +133,9 @@ public class LocalAiPromptFactory {
                     + "  - Crea primero las vistas (add_view) y despues sus eventos (inject_code/add_event), SIEMPRE juntos en el mismo JSON.\n"
                     + "  - update_view/delete_view/move_view solo funcionan con ids que YA existan; si no existe, se omite sin romper nada.\n"
                     + "  - ids unicos: button1, text1, input1...\n"
-                    + "  - screen=main, parent=root.\n"
+                    + "  - screen=main. parent=root por defecto (nivel superior).\n"
+                    + "  - PARENT (anidar): si el usuario indica DONDE insertar la vista (frases como 'dentro de linear1', 'en el linearX', 'metido en X', 'dentro del layout X', 'dentro del contenedor X'), usa parent=<id EXACTO de esa vista existente> en vez de root. Si esa vista NO existe, creala tambien y usa su id. Nunca inventes un parent inexistente.\n"
+                    + "  - ORDEN: si creas un contenedor y algo dentro de el en la misma peticion, el add_view del contenedor va PRIMERO y el add_view del hijo despues, con parent=<id del contenedor>.\n"
                     + "  - codigo Java dentro del evento indicado, sin declarar metodos.\n"
                     + "  - Para preguntas o consejos usa solo \"reply\" con \"actions\": [].\n"
                     + "  - Devuelve SOLO tu propio objeto JSON: empieza por { y termina en }, sin texto antes ni despues, sin bloques de codigo, sin explicaciones y sin repetir estas instrucciones ni los ejemplos.\n"
@@ -144,7 +146,10 @@ public class LocalAiPromptFactory {
                     + "Ejemplo 2 (modificar y borrar):\n"
                     + "{\"reply\":\"Texto y color actualizados; boton borrado.\",\"actions\":["
                     + "{\"type\":\"update_view\",\"screen\":\"main\",\"id\":\"button1\",\"text\":\"Hola\",\"background_color\":\"#00AA00\"},"
-                    + "{\"type\":\"delete_view\",\"screen\":\"main\",\"id\":\"button2\"}]}\n";
+                    + "{\"type\":\"delete_view\",\"screen\":\"main\",\"id\":\"button2\"}]}\n"
+                    + "Ejemplo 3 (crear DENTRO de un contenedor existente linear1):\n"
+                    + "{\"reply\":\"Boton agregado dentro de linear1.\",\"actions\":["
+                    + "{\"type\":\"add_view\",\"screen\":\"main\",\"parent\":\"linear1\",\"view_type\":\"button\",\"id\":\"button1\",\"text\":\"Boton\",\"width\":\"match_parent\",\"height\":\"wrap_content\"}]}\n";
 
     public static String buildAgentPrompt(String projectScope,
                                           String userPrompt,
@@ -158,9 +163,74 @@ public class LocalAiPromptFactory {
                 .append(projectContext == null || projectContext.trim().isEmpty()
                         ? "- Scope: " + (projectScope == null ? "" : projectScope) + "\n"
                         : projectContext)
+                .append('\n')
+                .append(buildParentHint(userPrompt, projectContext))
                 .append("\nSolicitud del usuario:\n")
                 .append(userPrompt);
         return prompt.toString();
+    }
+
+    /**
+     * Deterministic prompt hint: if the user message names an existing container view
+     * (LinearLayout/RelativeLayout/ScrollView/CardView) that is listed in the project
+     * context, tell the model to use that exact id as {@code parent}. Small models often
+     * default to {@code parent=root} even when a container is explicitly requested.
+     * Kept conservative: it only emits the hint line; the client-side safety net in
+     * {@code AgentActionExecutor} still enforces nesting even if the model ignores it.
+     */
+    public static String buildParentHint(String userPrompt, String projectContext) {
+        if (userPrompt == null || userPrompt.trim().isEmpty()
+                || projectContext == null || projectContext.trim().isEmpty()) {
+            return "";
+        }
+        java.util.LinkedHashSet<String> mentioned = new java.util.LinkedHashSet<>();
+        java.util.regex.Matcher matcher = PROJECT_VIEW_PATTERN.matcher(projectContext);
+        while (matcher.find()) {
+            String id = matcher.group(1);
+            String type = matcher.group(2);
+            if (!isContainerTypeName(type)) {
+                continue;
+            }
+            if (isMentioned(userPrompt, id)) {
+                mentioned.add(id);
+            }
+        }
+        if (mentioned.isEmpty()) {
+            return "";
+        }
+        StringBuilder hint = new StringBuilder("PISTA DE ANIDADO (obligatoria): ");
+        if (mentioned.size() == 1) {
+            hint.append("el usuario menciona el contenedor existente '")
+                    .append(mentioned.iterator().next())
+                    .append("'. Cualquier vista que crees 'dentro de' el debe llevar parent=\"")
+                    .append(mentioned.iterator().next())
+                    .append("\" (NO parent=root).");
+        } else {
+            hint.append("el usuario menciona los contenedores ")
+                    .append(String.join(", ", mentioned))
+                    .append("; usa como parent el id exacto del contenedor que corresponda (NO parent=root).");
+        }
+        return hint.append('\n').toString();
+    }
+
+    private static final java.util.regex.Pattern PROJECT_VIEW_PATTERN =
+            java.util.regex.Pattern.compile("- id=([A-Za-z0-9_]+) tipo=([A-Za-z0-9_]+)");
+
+    private static boolean isContainerTypeName(String type) {
+        if (type == null) {
+            return false;
+        }
+        String lower = type.toLowerCase(java.util.Locale.US);
+        return lower.contains("layout") || lower.contains("scroll") || lower.contains("card")
+                || lower.contains("container") || lower.contains("root");
+    }
+
+    private static boolean isMentioned(String text, String id) {
+        if (id == null || id.isEmpty()) {
+            return false;
+        }
+        return java.util.regex.Pattern.compile("(?<![A-Za-z0-9_])" + java.util.regex.Pattern.quote(id)
+                + "(?![A-Za-z0-9_])", java.util.regex.Pattern.CASE_INSENSITIVE).matcher(text).find();
     }
 
     public static String buildAssistantPrompt(String userPrompt, boolean reasoningEnabled) {

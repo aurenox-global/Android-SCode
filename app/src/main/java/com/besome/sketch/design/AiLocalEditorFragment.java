@@ -300,7 +300,7 @@ public class AiLocalEditorFragment extends Fragment {
                         finishAgentRequest();
                         return;
                     }
-                    processAgentResponse(assistantMessageIndex, safeResponse);
+                    processAgentResponse(assistantMessageIndex, safeResponse, prompt);
                 }
 
                 @Override
@@ -465,7 +465,7 @@ public class AiLocalEditorFragment extends Fragment {
         }
     }
 
-    private void processAgentResponse(int messageIndex, String response) {
+    private void processAgentResponse(int messageIndex, String response, String userPrompt) {
         updateChatMessage(messageIndex, "Procesando acciones del agente…", false);
         // Resolve UI strings on the caller (main) thread: the worker below must not
         // touch Fragment.getString after a possible detach.
@@ -519,7 +519,7 @@ public class AiLocalEditorFragment extends Fragment {
             StringBuilder resultText = new StringBuilder();
             final boolean[] changesApplied = {false};
             try {
-                io.ascode.android.AgentActionExecutor executor = new io.ascode.android.AgentActionExecutor(projectId);
+                io.ascode.android.AgentActionExecutor executor = new io.ascode.android.AgentActionExecutor(projectId, userPrompt);
                 io.ascode.android.AgentActionExecutor.Result result = executor.execute(agentJson);
                 if (!result.getReply().trim().isEmpty()) {
                     resultText.append(result.getReply().trim()).append("\n\n");

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import a.a.a.eC;
 import a.a.a.hC;
@@ -103,10 +104,21 @@ public final class AgentActionExecutor {
     private final Set<String> usedIds = new HashSet<>();
     private final List<String> appliedLines = new ArrayList<>();
     private final List<String> skippedLines = new ArrayList<>();
+    /** Raw user message (agent chat); used by the deterministic nesting safety net. */
+    private String userMessage = "";
+    /** Ids of container views created by the current request (parents created in-request). */
+    private final Set<String> pendingContainerIds = new HashSet<>();
+    /** Planned view type for each pending container id (used for parentType before it exists). */
+    private final Map<String, Integer> pendingContainerTypes = new HashMap<>();
 
     public AgentActionExecutor(String scId) {
+        this(scId, "");
+    }
+
+    public AgentActionExecutor(String scId, String userMessage) {
         this.scId = scId;
         this.data = jC.a(scId);
+        this.userMessage = userMessage == null ? "" : userMessage.trim();
         collectUsedIds();
     }
 
@@ -126,20 +138,29 @@ public final class AgentActionExecutor {
                 snapshot = takeSnapshot();
                 fileBackup = snapshotDataFiles();
 
+                // Collect the container ids this request is about to create so the
+                // nesting safety net can target a parent created in the same request.
+                collectPendingContainerIds(actions);
+
                 // Two passes: create views first, then update/delete/move and events/code,
                 // so the rest of the actions always find the views they reference (small
                 // models often emit actions out of order).
+                // Pass 0 uses a stable order that creates a container before its children
+                // even when the model emits the child first.
+                List<Integer> createOrder = orderedCreateIndices(actions);
                 for (int pass = 0; pass < 2; pass++) {
+                    if (pass == 0) {
+                        for (int idx : createOrder) {
+                            JSONObject action = actions.optJSONObject(idx);
+                            if (action != null) {
+                                executeAction(action);
+                            }
+                        }
+                        continue;
+                    }
                     for (int i = 0; i < actions.length(); i++) {
                         JSONObject action = actions.optJSONObject(i);
-                        if (action == null) {
-                            continue;
-                        }
-                        boolean isCreateView = isCreateViewAction(action);
-                        if (pass == 0 && !isCreateView) {
-                            continue;
-                        }
-                        if (pass == 1 && isCreateView) {
+                        if (action == null || isCreateViewAction(action)) {
                             continue;
                         }
                         executeAction(action);
@@ -337,7 +358,6 @@ public final class AgentActionExecutor {
     private void addView(JSONObject action) {
         String screen = normalizeFileName(action.optString("screen", "main"));
         String xmlName = ProjectFileBean.getXmlName(screen);
-        String parentId = normalizeViewId(action.optString("parent", "root"));
         // Accept both "view_type" (preferred, unambiguous) and legacy "type".
         String type = action.optString("view_type", action.optString("type", "text"))
                 .toLowerCase(Locale.US).replace('-', '_').replace(' ', '_');
@@ -355,8 +375,15 @@ public final class AgentActionExecutor {
         view.convert = convert;
         view.id = nextId(action.optString("id", ""), viewType);
         view.name = view.id;
+
+        String parentId = normalizeViewId(action.optString("parent", "root"));
+        // Deterministic nesting safety net: small models often emit parent=root even when
+        // the user explicitly asked to nest inside a named container. If (and only if) the
+        // user message names exactly one container, nest there instead of root.
+        parentId = resolveParentHint(parentId, view.id, xmlName);
+        parentId = ensureParentExists(parentId, xmlName);
         view.parent = parentId;
-        view.parentType = parentId.equals("root") ? ViewBean.VIEW_TYPE_LAYOUT_LINEAR : parentTypeOf(parentId, xmlName);
+        view.parentType = parentTypeFor(parentId, xmlName);
         view.index = nextIndex(parentId, xmlName);
 
         String width = action.optString("width", "match_parent").trim().toLowerCase(Locale.US);
@@ -402,7 +429,11 @@ public final class AgentActionExecutor {
 
         data.a(xmlName, view);
         usedIds.add(view.id);
-        appliedLines.add(viewName(view) + " '" + view.id + "' agregado en " + xmlName + ".");
+        String parentNote = (view.parent == null || view.parent.isEmpty() || "root".equals(view.parent))
+                ? "" : " dentro de '" + view.parent + "'";
+        appliedLines.add(viewName(view) + " '" + view.id + "' agregado en " + xmlName + parentNote + ".");
+        android.util.Log.d("AscodeAgent", "add_view " + view.id + " parent=" + view.parent
+                + " index=" + view.index + " screen=" + xmlName);
 
         if (viewType == ViewBean.VIEW_TYPE_WIDGET_BUTTON) {
             String javaName = ProjectFileBean.getJavaName(screen);
@@ -818,6 +849,185 @@ public final class AgentActionExecutor {
             }
         }
         return max + 1;
+    }
+
+    // ------------------------------------------------------------------
+    // Deterministic nesting safety net (independent from the model)
+    // ------------------------------------------------------------------
+
+    /**
+     * Registers every container view this request is about to create (and its planned
+     * type) so the nesting safety net can target a parent created in the same request,
+     * even before it has been added to the project data.
+     */
+    private void collectPendingContainerIds(JSONArray actions) {
+        pendingContainerIds.clear();
+        pendingContainerTypes.clear();
+        if (actions == null) {
+            return;
+        }
+        for (int i = 0; i < actions.length(); i++) {
+            JSONObject action = actions.optJSONObject(i);
+            if (action == null || !isCreateViewAction(action)) {
+                continue;
+            }
+            String rawType = action.optString("view_type", action.optString("type", ""))
+                    .toLowerCase(Locale.US).replace('-', '_').replace(' ', '_');
+            int[] info = resolveViewType(rawType);
+            if (info == null || !isContainerViewType(info[0])) {
+                continue;
+            }
+            String id = normalizeViewId(action.optString("id", ""));
+            if (!id.isEmpty()) {
+                pendingContainerIds.add(id);
+                pendingContainerTypes.put(id, info[0]);
+            }
+        }
+    }
+
+    /**
+     * Stable creation order for the add_view actions: a container that is created in the
+     * same request always comes before the views nested inside it, even if the model
+     * emitted the child first. Falls back to the original order on cycles/self-references.
+     */
+    private List<Integer> orderedCreateIndices(JSONArray actions) {
+        List<Integer> result = new ArrayList<>();
+        if (actions == null) {
+            return result;
+        }
+        Map<String, Integer> createdBy = new HashMap<>();
+        List<Integer> remaining = new ArrayList<>();
+        for (int i = 0; i < actions.length(); i++) {
+            JSONObject action = actions.optJSONObject(i);
+            if (action == null || !isCreateViewAction(action)) {
+                continue;
+            }
+            remaining.add(i);
+            String id = normalizeViewId(action.optString("id", ""));
+            if (!id.isEmpty()) {
+                createdBy.put(id, i);
+            }
+        }
+        Set<String> done = new HashSet<>();
+        boolean progress = true;
+        while (!remaining.isEmpty() && progress) {
+            progress = false;
+            for (int k = 0; k < remaining.size(); ) {
+                int idx = remaining.get(k);
+                String parent = normalizeViewId(actions.optJSONObject(idx).optString("parent", "root"));
+                Integer creator = createdBy.get(parent);
+                boolean parentPending = creator != null && creator != idx && !done.contains(parent);
+                if (parentPending) {
+                    k++;
+                    continue;
+                }
+                result.add(idx);
+                remaining.remove(k);
+                String id = normalizeViewId(actions.optJSONObject(idx).optString("id", ""));
+                if (!id.isEmpty()) {
+                    done.add(id);
+                }
+                progress = true;
+            }
+        }
+        result.addAll(remaining);
+        return result;
+    }
+
+    /**
+     * If the user message names exactly one existing (or just-created) container and the
+     * model still requested {@code root}, nest the view inside that container instead.
+     * Conservative by design: with no match, or with several named containers, the
+     * model's parent is respected unchanged.
+     */
+    private String resolveParentHint(String requestedParent, String actionId, String xmlName) {
+        String parent = requestedParent == null ? "" : requestedParent;
+        boolean requestedRoot = parent.isEmpty() || "root".equals(parent);
+        if (!requestedRoot || userMessage.isEmpty()) {
+            return parent;
+        }
+        List<String> mentioned = mentionedContainerIds(xmlName, actionId);
+        if (mentioned.size() != 1) {
+            return parent;
+        }
+        return mentioned.get(0);
+    }
+
+    /**
+     * Container ids (existing views + containers created in this request) that appear as
+     * whole words in the user message, excluding the view currently being created.
+     */
+    private List<String> mentionedContainerIds(String xmlName, String excludeId) {
+        List<String> found = new ArrayList<>();
+        ArrayList<ViewBean> views = data.d(xmlName);
+        if (views != null) {
+            for (ViewBean view : views) {
+                if (view == null || view.id == null || view.id.equals(excludeId)) {
+                    continue;
+                }
+                if (isContainerViewType(view.type) && mentionsId(userMessage, view.id) && !found.contains(view.id)) {
+                    found.add(view.id);
+                }
+            }
+        }
+        for (String id : pendingContainerIds) {
+            if (id == null || id.equals(excludeId) || found.contains(id)) {
+                continue;
+            }
+            if (mentionsId(userMessage, id)) {
+                found.add(id);
+            }
+        }
+        return found;
+    }
+
+    private static boolean mentionsId(String message, String id) {
+        if (message == null || message.isEmpty() || id == null || id.isEmpty()) {
+            return false;
+        }
+        return Pattern.compile("(?<![A-Za-z0-9_])" + Pattern.quote(id) + "(?![A-Za-z0-9_])",
+                Pattern.CASE_INSENSITIVE).matcher(message).find();
+    }
+
+    private static boolean isContainerViewType(int type) {
+        return type == ViewBean.VIEW_TYPE_LAYOUT_LINEAR
+                || type == ViewBean.VIEW_TYPE_LAYOUT_RELATIVE
+                || type == ViewBean.VIEW_TYPE_LAYOUT_HSCROLLVIEW
+                || type == ViewBean.VIEW_TYPE_LAYOUT_VSCROLLVIEW
+                || type == ViewBeans.VIEW_TYPE_LAYOUT_CARDVIEW;
+    }
+
+    /** parentType for a parent id, honouring containers created in this same request. */
+    private int parentTypeFor(String parentId, String xmlName) {
+        if (parentId == null || parentId.isEmpty() || "root".equals(parentId)) {
+            return ViewBean.VIEW_TYPE_LAYOUT_LINEAR;
+        }
+        Integer pending = pendingContainerTypes.get(parentId);
+        if (pending != null) {
+            return pending;
+        }
+        ViewBean parent = data.c(xmlName, parentId);
+        return parent == null ? ViewBean.VIEW_TYPE_LAYOUT_LINEAR : parent.type;
+    }
+
+    /**
+     * A view whose parent id does not exist would silently disappear from the generated
+     * XML (Ox only renders root/empty parents and recurses into existing parents), so
+     * unknown parents fall back to {@code root} instead of losing the view.
+     */
+    private String ensureParentExists(String parentId, String xmlName) {
+        if (parentId == null) {
+            return "root";
+        }
+        if (parentId.isEmpty() || "root".equals(parentId)) {
+            return parentId;
+        }
+        if (pendingContainerIds.contains(parentId) || data.c(xmlName, parentId) != null) {
+            return parentId;
+        }
+        android.util.Log.d("Ascode", "AgentActionExecutor: parent '" + parentId
+                + "' no existe en " + xmlName + "; la vista se crea en root.");
+        return "root";
     }
 
     private String nextId(String hint, int viewType) {

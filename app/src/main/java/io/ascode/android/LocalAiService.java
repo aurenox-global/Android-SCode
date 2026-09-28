@@ -15,7 +15,10 @@ public class LocalAiService {
      * to a valid JSON object: {"reply": "...", "actions": [{...}, ...]}
      */
     public static final String AGENT_JSON_GRAMMAR =
-            "root   ::= object\n"
+            // Leading whitespace is allowed before the object: small local models often
+            // emit a newline after the chat template's assistant marker, and rejecting it
+            // outright makes the constrained pass far more fragile than it needs to be.
+            "root   ::= ws object\n"
                     + "value  ::= object | array | string | number | (\"true\" | \"false\" | \"null\") ws\n"
                     + "object ::= \"{\" ws (string \":\" ws value (\",\" ws string \":\" ws value)*)? \"}\" ws\n"
                     + "array  ::= \"[\" ws (value (\",\" ws value)*)? \"]\" ws\n"

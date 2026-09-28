@@ -73,7 +73,12 @@ public final class LocalAiPromptFormatter {
         } catch (LocalAiException ignored) {
             android.util.Log.d("Ascode", "LocalAiPromptFormatter: LocalAiException ignored", ignored);
         }
-        ARCHITECTURE_CACHE.put(modelPath, architecture);
+        if (!architecture.isEmpty()) {
+            // Never cache an empty result: an early read (storage not ready yet, model
+            // still being copied) would otherwise poison the cache forever and the model
+            // would never get its chat template.
+            ARCHITECTURE_CACHE.put(modelPath, architecture);
+        }
         return architecture;
     }
 

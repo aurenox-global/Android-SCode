@@ -251,6 +251,28 @@ bool json_object_complete(const std::string & text) {
 
 llama_sampler * create_sampler(float temperature, float top_p, const llama_vocab * vocab, const char * grammar, float presence_penalty, float repeat_penalty, int32_t top_k) {
     llama_sampler * sampler = llama_sampler_chain_init(llama_sampler_chain_default_params());
+    // The grammar MUST be the first stage of the chain, i.e. it has to mask the
+    // FULL logits distribution before top-k/top-p narrow the candidate set.
+    //
+    // If it is applied after them (the previous behaviour), the pre-filtered
+    // candidates can all be grammar-invalid: top-p with min_keep=1 can collapse
+    // the pool to a single token (e.g. ".xml" when a small Qwen model continues
+    // the prompt's file listing instead of opening JSON). The grammar then masks
+    // every remaining candidate, the whole distribution becomes -INFINITY and
+    // llama.cpp's dist sampler falls back to an arbitrary (invalid) token whose
+    // grammar accept() throws "Unexpected empty grammar stack". The JNI loop
+    // breaks on that exception and the grammar pass returns 0 characters, so the
+    // assistant silently falls back to unconstrained (prose) generation.
+    //
+    // Applying the grammar first mirrors llama.cpp's own `grammar_first` order
+    // in common/sampling.cpp and guarantees that top-k/top-p always choose among
+    // grammar-valid tokens, so constrained generation can never be empty.
+    if (grammar != nullptr && grammar[0] != '\0') {
+        llama_sampler * grammar_sampler = llama_sampler_init_grammar(vocab, grammar, "root");
+        if (grammar_sampler != nullptr) {
+            llama_sampler_chain_add(sampler, grammar_sampler);
+        }
+    }
     llama_sampler_chain_add(sampler, llama_sampler_init_top_k(std::max(1, top_k)));
     if (presence_penalty > 0.0f || repeat_penalty > 0.0f && repeat_penalty != 1.0f) {
         // Qwen3.5 thinking mode recommends presence_penalty = 1.5 to cut repetition;
@@ -264,12 +286,6 @@ llama_sampler * create_sampler(float temperature, float top_p, const llama_vocab
         }
     }
     llama_sampler_chain_add(sampler, llama_sampler_init_top_p(std::clamp(top_p, 0.01f, 1.0f), 1));
-    if (grammar != nullptr && grammar[0] != '\0') {
-        llama_sampler * grammar_sampler = llama_sampler_init_grammar(vocab, grammar, "root");
-        if (grammar_sampler != nullptr) {
-            llama_sampler_chain_add(sampler, grammar_sampler);
-        }
-    }
     if (temperature <= 0.0f) {
         llama_sampler_chain_add(sampler, llama_sampler_init_greedy());
     } else {

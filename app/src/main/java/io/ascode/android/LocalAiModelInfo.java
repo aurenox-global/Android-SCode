@@ -71,14 +71,14 @@ public class LocalAiModelInfo {
         try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file), 256 * 1024);
              DataInputStream data = new DataInputStream(inputStream)) {
             data.readFully(new byte[4]);
-            data.readInt();
-            data.readLong();
-            long kvCount = data.readLong();
+            readIntLittleEndian(data); // version (u32, little-endian)
+            readLongLittleEndian(data); // tensor count (u64)
+            long kvCount = readLongLittleEndian(data); // metadata kv count (u64)
             kvCount = Math.min(kvCount, 500L);
             for (long i = 0; i < kvCount; i++) {
                 String key = readString(data);
                 // GGUF stores the value type as a little-endian uint32, not a single byte.
-                int type = (int) Integer.toUnsignedLong(data.readInt());
+                int type = readIntLittleEndian(data);
                 if ("general.architecture".equals(key) && type == 8) {
                     archHolder[0] = readString(data);
                     continue;
@@ -94,8 +94,30 @@ public class LocalAiModelInfo {
         return result;
     }
 
+    // GGUF is a LITTLE-ENDIAN format, but DataInputStream.readInt()/readLong()/etc. read
+    // BIG-endian. Reading GGUF integers with the plain DataInputStream methods desyncs the
+    // stream on the very first field (e.g. the u32 version 3 is read as 0x03000000) and every
+    // later key/value is garbage, so readMetadata() used to throw "Unsupported GGUF value
+    // type" and return no metadata at all. That is why getArchitecture() was always empty and
+    // the chat template was never applied for local models.
+    private static int readIntLittleEndian(DataInputStream data) throws IOException {
+        int b0 = data.readUnsignedByte();
+        int b1 = data.readUnsignedByte();
+        int b2 = data.readUnsignedByte();
+        int b3 = data.readUnsignedByte();
+        return b0 | (b1 << 8) | (b2 << 16) | (b3 << 24);
+    }
+
+    private static long readLongLittleEndian(DataInputStream data) throws IOException {
+        long value = 0L;
+        for (int i = 0; i < 8; i++) {
+            value |= (long) data.readUnsignedByte() << (8 * i);
+        }
+        return value;
+    }
+
     private static String readString(DataInputStream data) throws IOException {
-        long length = data.readLong();
+        long length = readLongLittleEndian(data);
         if (length < 0 || length > 1_000_000L) {
             return "";
         }
@@ -111,31 +133,36 @@ public class LocalAiModelInfo {
             case 7: // BOOL
                 return Long.valueOf(data.readUnsignedByte());
             case 2: // UINT16
-                return Long.valueOf(data.readUnsignedShort());
+                return Long.valueOf(data.readUnsignedByte() | (data.readUnsignedByte() << 8));
             case 3: // INT16
-                return Long.valueOf(data.readShort());
+                return Long.valueOf((short) (data.readUnsignedByte() | (data.readUnsignedByte() << 8)));
             case 4: // UINT32
-                return Long.valueOf(Integer.toUnsignedLong(data.readInt()));
+                return Long.valueOf(Integer.toUnsignedLong(readIntLittleEndian(data)));
             case 5: // INT32
-                return Long.valueOf(data.readInt());
+                return Long.valueOf(readIntLittleEndian(data));
             case 10: // UINT64
-                return data.readLong();
             case 11: // INT64
-                return data.readLong();
+                return readLongLittleEndian(data);
             case 6: // FLOAT32
-                data.readFloat();
+                readIntLittleEndian(data);
                 return null;
             case 12: // FLOAT64
-                data.readDouble();
+                readLongLittleEndian(data);
                 return null;
             case 8: // STRING
                 readString(data);
                 return null;
             case 9: // ARRAY
                 // GGUF stores the array element type as a little-endian uint32 as well.
-                int elementType = (int) Integer.toUnsignedLong(data.readInt());
-                long elementCount = data.readLong();
-                elementCount = Math.min(elementCount, 100_000L);
+                // The element count must be consumed EXACTLY: an earlier Math.min(count, 100_000)
+                // cap truncated the huge tokenizer arrays (151936 entries) and desynced every
+                // following key, losing e.g. the chat template. If the count is absurd we stop
+                // parsing (IOException) instead of silently corrupting the stream.
+                int elementType = readIntLittleEndian(data);
+                long elementCount = readLongLittleEndian(data);
+                if (elementCount < 0 || elementCount > 5_000_000L) {
+                    throw new IOException("Unreasonable GGUF array length " + elementCount);
+                }
                 for (long j = 0; j < elementCount; j++) {
                     readSkippedValue(data, elementType);
                 }

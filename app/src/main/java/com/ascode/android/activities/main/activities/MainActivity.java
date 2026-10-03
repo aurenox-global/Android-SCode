@@ -43,9 +43,11 @@ import a.a.a.GB;
 import mod.hey.studios.project.backup.BackupFactory;
 import mod.hey.studios.project.backup.BackupRestoreManager;
 import mod.hey.studios.util.Helper;
+import mod.hilal.saif.activities.tools.AppSettings;
 import mod.hilal.saif.activities.tools.ConfigActivity;
 import mod.tyron.backup.SingleCopyTask;
 import com.ascode.android.R;
+import com.ascode.android.activities.ai.LocalAiManagerActivity;
 import com.ascode.android.activities.main.fragments.projects.ProjectsFragment;
 import com.ascode.android.accessibility.runtime.AccessibilityRuntimeReporter;
 import com.ascode.android.databinding.MainBinding;
@@ -181,7 +183,8 @@ public class MainActivity extends BasePermissionAppCompatActivity {
         }
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(null);
+        getSupportActionBar().setTitle(R.string.app_name);
+        getSupportActionBar().setSubtitle(null);
 
         drawerToggle = new ActionBarDrawerToggle(this, binding.drawerLayout, R.string.app_name, R.string.app_name);
         binding.drawerLayout.addDrawerListener(drawerToggle);
@@ -257,6 +260,18 @@ public class MainActivity extends BasePermissionAppCompatActivity {
             if (id == R.id.item_projects) {
                 navigateToProjectsFragment();
                 return true;
+            } else if (id == R.id.item_ai) {
+                // Same destination as the drawer's "Local AI Manager" item.
+                Intent intent = new Intent(this, LocalAiManagerActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(intent);
+                return false;
+            } else if (id == R.id.item_settings) {
+                // Same destination as the drawer's "Settings" item.
+                Intent intent = new Intent(this, AppSettings.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(intent);
+                return false;
             }
             return false;
         });
@@ -273,6 +288,16 @@ public class MainActivity extends BasePermissionAppCompatActivity {
         }
 
         navigateToProjectsFragment();
+    }
+
+    /**
+     * Updates the toolbar subtitle shown on the home screen, e.g. "12 proyectos · 2 publicados".
+     */
+    public void setProjectsSummary(int projectCount, int publishedCount) {
+        if (getSupportActionBar() == null) return;
+        String projects = projectCount == 1 ? "1 project" : projectCount + " projects";
+        String published = publishedCount == 1 ? "1 published" : publishedCount + " published";
+        getSupportActionBar().setSubtitle(projects + " · " + published);
     }
 
     private Fragment getFragmentForNavId(int navItemId) {
@@ -297,7 +322,6 @@ public class MainActivity extends BasePermissionAppCompatActivity {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
 
-        binding.createNewProject.show();
         if (activeFragment != null) transaction.hide(activeFragment);
         if (fm.findFragmentByTag(PROJECTS_FRAGMENT_TAG) == null) {
             shouldShow = false;

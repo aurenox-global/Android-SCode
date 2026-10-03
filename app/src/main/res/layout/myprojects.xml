@@ -4,11 +4,13 @@
     android:id="@+id/swipe_refresh"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/web_bg"
     android:transitionGroup="true">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/web_bg"
         android:gravity="center">
 
         <androidx.core.widget.NestedScrollView
@@ -24,78 +26,382 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <FrameLayout
-                    android:id="@+id/special_action_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <include
-                        android:id="@+id/special_action"
-                        layout="@layout/myprojects_item_special" />
-                </FrameLayout>
-
+                <!-- Hero: continue where you left off (most recent project) -->
                 <LinearLayout
+                    android:id="@+id/hero_container"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/bg_web_hero"
+                    android:orientation="vertical"
+                    android:padding="18dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:letterSpacing="0.06"
+                        android:text="Continue where you left off"
+                        android:textAllCaps="true"
+                        android:textColor="@color/web_hero_text"
+                        android:textSize="11.5sp"
+                        android:textStyle="bold" />
 
                     <LinearLayout
-                        android:id="@+id/title_container"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginVertical="6dp"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginTop="12dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
 
-                        <TextView
+                        <FrameLayout
+                            android:layout_width="58dp"
+                            android:layout_height="58dp"
+                            android:background="@drawable/bg_web_icon_hero">
+
+                            <TextView
+                                android:id="@+id/hero_initial"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:textColor="@color/web_hero_text"
+                                android:textSize="22sp"
+                                android:textStyle="bold"
+                                tools:text="C" />
+                        </FrameLayout>
+
+                        <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
                             android:layout_weight="1"
-                            android:text="Projects"
-                            android:textAppearance="?attr/textAppearanceTitleLargeEmphasized" />
+                            android:orientation="vertical">
 
-                        <ImageView
-                            android:id="@+id/icon_sort"
-                            android:layout_width="@dimen/mtrl_min_touch_target_size"
-                            android:layout_height="@dimen/mtrl_min_touch_target_size"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:scaleType="centerInside"
-                            app:srcCompat="@drawable/ic_mtrl_sort" />
+                            <TextView
+                                android:id="@+id/hero_name"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:ellipsize="end"
+                                android:maxLines="1"
+                                android:textColor="@color/web_hero_text"
+                                android:textSize="19sp"
+                                android:textStyle="bold"
+                                tools:text="Calculadora Pro" />
+
+                            <TextView
+                                android:id="@+id/hero_meta"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:ellipsize="end"
+                                android:maxLines="1"
+                                android:textColor="@color/web_hero_text_soft"
+                                android:textSize="12.5sp"
+                                tools:text="CalcPro (1.4) · editado hace 2 h" />
+                        </LinearLayout>
                     </LinearLayout>
 
-                    <FrameLayout
-                        android:id="@+id/loading_container"
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
-                        <com.google.android.material.progressindicator.CircularProgressIndicator
-                            style="@style/Widget.Material3Expressive.CircularProgressIndicator.Wavy"
+                        <LinearLayout
+                            android:id="@+id/hero_open"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginBottom="80dp"
-                            android:indeterminate="true"
-                            app:indicatorSize="64dp"
-                            app:waveAmplitude="2dp"
-                            app:wavelength="20dp" />
-                    </FrameLayout>
+                            android:background="@drawable/bg_web_cta"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="20dp"
+                            android:paddingTop="12dp"
+                            android:paddingEnd="20dp"
+                            android:paddingBottom="12dp">
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/myprojects"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:clipToPadding="false"
-                        android:nestedScrollingEnabled="true"
-                        android:paddingBottom="96dp"
-                        android:splitMotionEvents="false"
-                        android:transitionGroup="true"
-                        android:visibility="gone"
-                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        tools:listitem="@layout/myprojects_item"
-                        tools:visibility="visible" />
+                            <ImageView
+                                android:layout_width="19dp"
+                                android:layout_height="19dp"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_mtrl_circle_play"
+                                app:tint="@color/web_hero_btn_text" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="9dp"
+                                android:text="Open Project"
+                                android:textColor="@color/web_hero_btn_text"
+                                android:textSize="14.5sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/hero_compile"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_web_hero_ghost"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="16dp"
+                            android:paddingTop="11dp"
+                            android:paddingEnd="16dp"
+                            android:paddingBottom="11dp">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_mtrl_run"
+                                app:tint="@color/web_hero_text" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:text="Build"
+                                android:textColor="@color/web_hero_text"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </LinearLayout>
                 </LinearLayout>
+
+                <!-- Quick actions -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="18dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="10dp"
+                    android:text="Start something new"
+                    android:textColor="@color/web_text"
+                    android:textSize="16.5sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal"
+                    android:weightSum="3">
+
+                    <LinearLayout
+                        android:id="@+id/action_new"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="5dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_web_card"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <FrameLayout
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="@drawable/bg_web_tile">
+
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_mtrl_add"
+                                app:tint="@color/web_tile_ink" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="9dp"
+                            android:text="New"
+                            android:textColor="@color/web_text"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Blank project"
+                            android:textColor="@color/web_muted"
+                            android:textSize="10.5sp"
+                            android:minLines="2" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/action_import"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_web_card"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <FrameLayout
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="@drawable/bg_web_tile">
+
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_mtrl_download"
+                                app:tint="@color/web_tile_ink" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="9dp"
+                            android:text="Import"
+                            android:textColor="@color/web_text"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=".swb / ZIP"
+                            android:textColor="@color/web_muted"
+                            android:textSize="10.5sp"
+                            android:minLines="2" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/action_keystore"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_web_card"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <FrameLayout
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="@drawable/bg_web_tile">
+
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_mtrl_grid"
+                                app:tint="@color/web_tile_ink" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="9dp"
+                            android:text="Templates"
+                            android:textColor="@color/web_text"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Starter kits"
+                            android:textColor="@color/web_muted"
+                            android:textSize="10.5sp"
+                            android:minLines="2" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Recent projects section header -->
+                <LinearLayout
+                    android:id="@+id/title_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="18dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Recent"
+                        android:textColor="@color/web_text"
+                        android:textSize="16.5sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/icon_sort"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:paddingStart="12dp"
+                        android:paddingTop="8dp"
+                        android:paddingEnd="0dp"
+                        android:paddingBottom="8dp"
+                        android:text="View all"
+                        android:textColor="@color/web_green"
+                        android:textSize="13.5sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <FrameLayout
+                    android:id="@+id/loading_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <com.google.android.material.progressindicator.CircularProgressIndicator
+                        style="@style/Widget.Material3Expressive.CircularProgressIndicator.Wavy"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="80dp"
+                        android:indeterminate="true"
+                        app:indicatorColor="@color/web_green"
+                        app:indicatorSize="64dp"
+                        app:waveAmplitude="2dp"
+                        app:wavelength="20dp" />
+                </FrameLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/myprojects"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:nestedScrollingEnabled="true"
+                    android:paddingBottom="96dp"
+                    android:splitMotionEvents="false"
+                    android:transitionGroup="true"
+                    android:visibility="gone"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:listitem="@layout/myprojects_item"
+                    tools:visibility="visible" />
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 

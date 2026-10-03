@@ -83,6 +83,11 @@
         <item name="cornerSizeBottomLeft">4dp</item>
     </style>
 
+    <style name="ShapeAppearance.Ascode.UniformCard" parent="ShapeAppearance.Material3.Corner.Medium">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">18dp</item>
+    </style>
+
     <style name="ShapeAppearance.Ascode.AsymmetricDialog" parent="ShapeAppearance.Material3.Corner.Small">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSizeTopLeft">4dp</item>
@@ -182,5 +187,12 @@
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowSoftInputMode">stateVisible|adjustResize</item>
         <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+    </style>
+
+    <!-- Home ("Concepto C" with web palette) bottom navigation active pill. -->
+    <style name="Widget.Ascode.BottomNavIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/web_icon_bg</item>
+        <item name="android:width">64dp</item>
+        <item name="android:height">32dp</item>
     </style>
 </resources>

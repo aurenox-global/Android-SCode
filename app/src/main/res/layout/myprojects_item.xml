@@ -4,7 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
-    android:layout_marginBottom="4dp"
+    android:layout_marginBottom="10dp"
+    android:paddingStart="14dp"
+    android:paddingEnd="10dp"
     android:clickable="true"
     android:focusable="true"
     android:gravity="center_vertical"
@@ -22,12 +24,24 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:shapeAppearance="@style/ShapeAppearance.Ascode.AsymmetricCard"
-        app:strokeWidth="0.5dp">
+        app:cardBackgroundColor="@color/web_monogram"
+        app:shapeAppearance="@style/ShapeAppearance.Ascode.UniformCard"
+        app:strokeWidth="0dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/tv_monogram"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textColor="@color/web_monogram_ink"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                tools:text="A" />
 
             <ImageView
                 android:id="@+id/img_icon"
@@ -74,7 +88,7 @@
             android:id="@+id/project_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="end"
+            android:gravity="start"
             android:textAppearance="?attr/textAppearanceBodyLargeEmphasized"
             tools:text="Android SCode Demo" />
 
@@ -83,7 +97,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginVertical="4dp"
-            android:gravity="end"
+            android:gravity="start"
             android:textAppearance="?attr/textAppearanceBodySmall"
             android:textColor="?attr/colorOnSurfaceVariant"
             tools:text="InternalDemo (1.4)" />
@@ -92,7 +106,7 @@
             android:id="@+id/package_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="end"
+            android:gravity="start"
             android:textAppearance="?attr/textAppearanceBodySmall"
             android:textColor="?attr/colorOnSurfaceVariant"
             tools:text="com.jbk.internal.demo" />
@@ -105,7 +119,7 @@
         android:layout_marginStart="8dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:scaleType="centerInside"
-        android:src="@drawable/selector_ic_expand_more_24"
+        android:src="@drawable/ic_mtrl_more_vertical"
         app:tint="?attr/colorControlNormal" />
 
 </LinearLayout>

@@ -35,6 +35,7 @@ your phone.
 
 ## Features
 
+- **Redesigned home** — a "continue where you left off" card, quick actions (new, import, templates) and clean project cards, on a neutral + green palette.
 - **Visual design editor** — drag & drop widgets, edit the XML directly and preview screens, with editable corner radius, stroke, 2-colour gradient (vertical, horizontal and diagonal), layout_gravity on any widget and a glass mode, that render the same in the canvas, the preview and the built app.
 - **Logic editor** — blocks for fast prototyping, plus raw Java/Kotlin when you need full control.
 - **Resource manager** — images, sounds, fonts, icons, collections and custom blocks per project.

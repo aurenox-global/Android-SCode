@@ -20,21 +20,22 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.view.MenuProvider;
-import androidx.core.view.WindowInsetsCompat;
-import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.DiffUtil;
 
 import com.besome.sketch.adapters.ProjectsAdapter;
 import com.besome.sketch.design.DesignActivity;
 import com.besome.sketch.editor.manage.library.ProjectComparator;
 import com.besome.sketch.projects.MyProjectSettingActivity;
+import com.besome.sketch.tools.NewKeyStoreActivity;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.transition.MaterialFadeThrough;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
@@ -42,7 +43,8 @@ import java.util.stream.IntStream;
 import a.a.a.DA;
 import a.a.a.DB;
 import a.a.a.lC;
-import dev.chrisbanes.insetter.Insetter;
+import a.a.a.wq;
+import a.a.a.yB;
 import mod.hey.studios.project.ProjectTracker;
 import mod.hey.studios.project.backup.BackupRestoreManager;
 import com.ascode.android.R;
@@ -148,10 +150,6 @@ public class ProjectsFragment extends DA {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         preference = new DB(requireContext(), "project");
 
-        ExtendedFloatingActionButton fab = requireActivity().findViewById(R.id.create_new_project);
-        fab.setOnClickListener((v) -> toProjectSettingsActivity());
-        Insetter.builder().margin(WindowInsetsCompat.Type.navigationBars()).applyToView(fab);
-
         binding.swipeRefresh.setOnRefreshListener(this::refreshProjectsList);
 
         projectsAdapter = new ProjectsAdapter(this, projectsList);
@@ -159,21 +157,18 @@ public class ProjectsFragment extends DA {
         binding.myprojects.setHasFixedSize(true);
 
         binding.myprojects.post(this::refreshProjectsList); // wait for RecyclerView to be ready
-        UI.addSystemWindowInsetToPadding(binding.specialActionContainer, true, false, true, false);
         UI.addSystemWindowInsetToPadding(binding.loadingContainer, true, false, true, true);
         UI.addSystemWindowInsetToPadding(binding.titleContainer, true, false, true, false);
         UI.addSystemWindowInsetToPadding(binding.myprojects, true, false, true, true);
 
-        binding.nestedScroll.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
-            if (scrollY > oldScrollY) {
-                fab.shrink();
-            } else if (scrollY < oldScrollY) {
-                fab.extend();
-            }
-        });
-
         binding.iconSort.setOnClickListener(v -> showProjectSortingDialog());
-        binding.specialAction.getRoot().setOnClickListener(v -> restoreProject());
+
+        // "Empezar algo nuevo" quick actions
+        binding.actionNew.setOnClickListener(v -> toProjectSettingsActivity());
+        binding.actionImport.setOnClickListener(v -> restoreProject());
+        // "Templates": la app aun no tiene starter kits; placeholder por ahora.
+        binding.actionKeystore.setOnClickListener(v ->
+                android.widget.Toast.makeText(requireContext(), "Templates — coming soon", android.widget.Toast.LENGTH_SHORT).show());
 
         menuProvider = new MenuProvider() {
             @Override
@@ -244,8 +239,78 @@ public class ProjectsFragment extends DA {
                 diffResult.dispatchUpdatesTo(projectsAdapter);
                 if (projectsSearchView != null)
                     projectsAdapter.filterData(projectsSearchView.getQuery().toString());
+                updateHero();
+                updateProjectsSummary();
             });
         });
+    }
+
+    /**
+     * Fills the "Continuar donde lo dejaste" hero with the most recently modified project.
+     */
+    private void updateHero() {
+        if (binding == null) return;
+        if (projectsList.isEmpty()) {
+            binding.heroContainer.setVisibility(View.GONE);
+            return;
+        }
+        HashMap<String, Object> project = projectsList.get(0);
+        String scId = yB.c(project, "sc_id");
+        String appName = yB.c(project, "my_app_name");
+        String wsName = yB.c(project, "my_ws_name");
+        if (appName.isEmpty()) appName = wsName;
+
+        binding.heroContainer.setVisibility(View.VISIBLE);
+        binding.heroName.setText(appName);
+        binding.heroInitial.setText(appName.isEmpty() ? "?" : appName.substring(0, 1).toUpperCase(Locale.getDefault()));
+
+        String version = yB.c(project, "sc_ver_name");
+        String meta = (wsName.isEmpty() ? appName : wsName) + (version.isEmpty() ? "" : " (" + version + ")")
+                + " · edited " + getRelativeEditTime(scId, project);
+        binding.heroMeta.setText(meta);
+
+        binding.heroOpen.setOnClickListener(v -> toDesignActivity(scId));
+        // "Compilar" mirrors "Abrir proyecto": the compile flow lives inside the design editor.
+        binding.heroCompile.setOnClickListener(v -> toDesignActivity(scId));
+    }
+
+    /**
+     * Updates the toolbar subtitle ("N proyectos · M publicados").
+     */
+    private void updateProjectsSummary() {
+        if (!(getActivity() instanceof MainActivity)) return;
+        int published = 0;
+        for (HashMap<String, Object> project : projectsList) {
+            if (yB.a(project, "published") || !yB.c(project, "publish_date").isEmpty()) published++;
+        }
+        ((MainActivity) getActivity()).setProjectsSummary(projectsList.size(), published);
+    }
+
+    private String getRelativeEditTime(String scId, HashMap<String, Object> project) {
+        long when = 0L;
+        try {
+            File projectDir = new File(wq.c(scId));
+            if (projectDir.exists()) when = projectDir.lastModified();
+        } catch (Exception ignored) {
+        }
+        if (when <= 0) {
+            String registeredAt = yB.c(project, "my_sc_reg_dt");
+            if (registeredAt.length() >= 14) {
+                try {
+                    when = new SimpleDateFormat("yyyyMMddHHmmss", Locale.US).parse(registeredAt).getTime();
+                } catch (Exception ignored) {
+                }
+            }
+        }
+        if (when <= 0) return "today";
+        long diff = System.currentTimeMillis() - when;
+        long minutes = diff / 60000L;
+        if (minutes < 60) return Math.max(1, minutes) + " min ago";
+        long hours = diff / 3600000L;
+        if (hours < 24) return hours + " h ago";
+        long days = diff / 86400000L;
+        if (days <= 1) return "yesterday";
+        return days + " days ago";
     }
 
     private void addProject(String sc_id) {
@@ -256,6 +321,8 @@ public class ProjectsFragment extends DA {
                     projectsList.add(0, newProject);
                     projectsAdapter.notifyDataSetChanged();
                     binding.myprojects.scrollToPosition(0);
+                    updateHero();
+                    updateProjectsSummary();
                 });
             }
         });
@@ -268,7 +335,11 @@ public class ProjectsFragment extends DA {
                 int index = IntStream.range(0, projectsList.size()).filter(i -> projectsList.get(i).get("sc_id").equals(sc_id)).findFirst().orElse(-1);
                 if (index != -1) {
                     projectsList.set(index, updatedProject);
-                    requireActivity().runOnUiThread(() -> projectsAdapter.notifyDataSetChanged());
+                    requireActivity().runOnUiThread(() -> {
+                        projectsAdapter.notifyDataSetChanged();
+                        updateHero();
+                        updateProjectsSummary();
+                    });
                 }
             }
         });

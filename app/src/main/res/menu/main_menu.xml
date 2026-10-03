@@ -2,7 +2,17 @@
 
     <item
         android:id="@+id/item_projects"
-        android:icon="@drawable/ic_mtrl_list"
+        android:icon="@drawable/ic_mtrl_grid"
         android:title="Projects" />
+
+    <item
+        android:id="@+id/item_ai"
+        android:icon="@drawable/ic_mtrl_sparkle"
+        android:title="AI" />
+
+    <item
+        android:id="@+id/item_settings"
+        android:icon="@drawable/ic_mtrl_settings"
+        android:title="Settings" />
 
 </menu>

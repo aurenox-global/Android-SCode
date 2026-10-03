@@ -139,8 +139,6 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
         HashMap<String, Object> projectMap = shownProjects.get(position);
         String scId = yB.c(projectMap, "sc_id");
 
-        holder.binding.imgIcon.setImageResource(R.drawable.default_icon);
-
         if (yB.c(projectMap, "sc_ver_code").isEmpty()) {
             projectMap.put("sc_ver_code", "1");
             projectMap.put("sc_ver_name", "1.0");
@@ -152,6 +150,7 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
             lC.b(scId, projectMap);
         }
 
+        boolean customIconShown = false;
         if (yB.a(projectMap, "custom_icon")) {
             String iconFolder = wq.e() + File.separator + scId;
             File iconFile = new File(iconFolder, "icon.png");
@@ -160,9 +159,19 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
                 String providerPath = activity.getPackageName() + ".provider";
                 uri = FileProvider.getUriForFile(activity, providerPath, iconFile);
                 holder.binding.imgIcon.setImageURI(uri);
-            } else {
-                holder.binding.imgIcon.setImageResource(R.drawable.default_icon);
+                customIconShown = true;
             }
+        }
+        if (customIconShown) {
+            holder.binding.imgIcon.setVisibility(View.VISIBLE);
+            holder.binding.tvMonogram.setVisibility(View.GONE);
+        } else {
+            // No custom icon: show a green tile with the project's initial (matches the home design).
+            holder.binding.imgIcon.setVisibility(View.GONE);
+            holder.binding.tvMonogram.setVisibility(View.VISIBLE);
+            String monogramLetter = yB.c(projectMap, "my_app_name");
+            if (monogramLetter.isEmpty()) monogramLetter = yB.c(projectMap, "my_ws_name");
+            holder.binding.tvMonogram.setText(monogramLetter.isEmpty() ? "?" : monogramLetter.substring(0, 1).toUpperCase(java.util.Locale.getDefault()));
         }
 
         if (isPinned(projectMap)) {
@@ -176,7 +185,7 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
         holder.binding.appName.setText(yB.c(projectMap, "my_ws_name") + version);
         holder.binding.projectName.setText(yB.c(projectMap, "my_app_name"));
         holder.binding.packageName.setText(yB.c(projectMap, "my_sc_pkg_name"));
-        holder.binding.tvPublished.setVisibility(View.VISIBLE);
+        holder.binding.tvPublished.setVisibility(View.GONE);
         holder.binding.tvPublished.setText(scId);
         holder.itemView.setTag("custom");
 
@@ -195,7 +204,7 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsAdapter.Projec
         };
 
         holder.binding.expand.setOnClickListener(showProjectSettingsDialog);
-        holder.binding.imgIcon.setOnClickListener(v -> toProjectSettingOrRequestPermission(projectMap, position));
+        holder.binding.imgIconView.setOnClickListener(v -> toProjectSettingOrRequestPermission(projectMap, position));
         holder.binding.getRoot().setOnLongClickListener(v -> {
             showProjectOptionsBottomSheet(projectMap, holder.getAbsoluteAdapterPosition());
             return true;

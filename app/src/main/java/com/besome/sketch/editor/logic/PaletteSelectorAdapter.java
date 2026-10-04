@@ -2,14 +2,17 @@ package com.besome.sketch.editor.logic;
 
 import static com.besome.sketch.editor.logic.PaletteSelector.paletteSelectorRecord;
 import static com.google.android.material.color.MaterialColors.harmonizeWithPrimary;
-import static com.google.android.material.color.MaterialColors.isColorLight;
 import static com.ascode.android.utility.ThemeUtils.getColor;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.core.graphics.ColorUtils;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -62,12 +65,20 @@ public class PaletteSelectorAdapter extends RecyclerView.Adapter<PaletteSelector
         int color = harmonizeWithPrimary(context, item.color());
 
         holder.binding.tvCategory.setText(title);
-        holder.binding.bg.setBackgroundColor(color);
-        holder.binding.tvCategory.setTextColor(
-                position == selectedPosition ?
-                        isColorLight(color) ? getColor(context, R.attr.colorOnSurface) : getColor(context, R.attr.colorOnSurfaceInverse)
-                        : getColor(context, R.attr.colorOnSurface));
-        holder.binding.bg.getLayoutParams().width = position == selectedPosition ? ViewGroup.LayoutParams.MATCH_PARENT : (int) wB.a(context, 4f);
+        View bg = holder.binding.bg;
+        if (position == selectedPosition) {
+            bg.setBackgroundTintList(ColorStateList.valueOf(ColorUtils.setAlphaComponent(color, 0x3D)));
+            bg.getLayoutParams().width = ViewGroup.LayoutParams.MATCH_PARENT;
+            holder.binding.tvCategory.setTextColor(color);
+            holder.binding.tvCategory.setTypeface(null, Typeface.BOLD);
+        } else {
+            bg.setBackgroundTintList(ColorStateList.valueOf(color));
+            bg.getLayoutParams().width = (int) wB.a(context, 4f);
+            holder.binding.tvCategory.setTextColor(getColor(context, R.attr.colorOnSurface));
+            holder.binding.tvCategory.setTypeface(null, Typeface.NORMAL);
+        }
+        bg.requestLayout();
+        holder.binding.tvCategory.requestLayout();
 
         holder.itemView.setOnClickListener(v -> {
             selectedPosition = holder.getAbsoluteAdapterPosition();

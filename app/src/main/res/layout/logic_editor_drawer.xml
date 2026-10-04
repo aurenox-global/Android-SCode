@@ -4,8 +4,11 @@
     android:layout_width="150dp"
     android:layout_height="match_parent"
     android:layout_marginTop="56dp"
-    android:background="?attr/colorSurfaceContainer"
-    android:orientation="vertical">
+    android:background="@drawable/bg_drawer_sheet"
+    android:clipToOutline="true"
+    android:elevation="8dp"
+    android:orientation="vertical"
+    android:outlineProvider="background">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/new_button"

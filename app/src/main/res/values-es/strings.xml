@@ -3308,4 +3308,50 @@ ACTION_VIEW
     <string name="auto4_unknown_filename">Nombre de archivo desconocido</string>
     <string name="auto4_create_new">Crear nuevo</string>
     <string name="auto4_edit_title">Editar %1$s</string>
+    <string name="auto5_search_blocks">Buscar bloques…</string>
+    <string name="auto6_content_desc_delete">Eliminar bloque</string>
+    <string name="auto6_content_desc_duplicate">Duplicar bloque</string>
+    <string name="auto6_content_desc_collection">Añadir bloque a la colección</string>
+    <string name="auto6_content_desc_detail">Detalles del bloque</string>
+
+    <!-- Event section redesign (auto9) -->
+    <string name="auto9_events_section_title_activity">Eventos de Activity</string>
+    <string name="auto9_events_section_title_view">Eventos de View</string>
+    <string name="auto9_events_section_title_component">Eventos de Component</string>
+    <string name="auto9_events_section_title_drawer">Eventos de Drawer</string>
+    <string name="auto9_events_section_title_moreblock">More Blocks</string>
+    <string name="auto9_events_section_desc_activity">Añade eventos para controlar el ciclo de vida de tu Activity.</string>
+    <string name="auto9_events_section_desc_view">Añade eventos para reaccionar a la interacción del usuario con tus vistas.</string>
+    <string name="auto9_events_section_desc_component">Añade eventos para reaccionar a tus componentes.</string>
+    <string name="auto9_events_section_desc_drawer">Añade eventos para las vistas dentro del cajón de navegación.</string>
+    <string name="auto9_events_section_desc_moreblock">Crea bloques reutilizables e impórtalos desde tu colección.</string>
+    <string name="auto9_event_fab_add">Añadir evento</string>
+
+    <string name="auto9_event_desc_oncreate">Se llama cuando la Activity se crea por primera vez.</string>
+    <string name="auto9_event_desc_onstart">Se llama cuando la Activity se vuelve visible.</string>
+    <string name="auto9_event_desc_onresume">Se llama cuando la Activity empieza a interactuar con el usuario.</string>
+    <string name="auto9_event_desc_onpause">Se llama cuando la Activity pierde el foco.</string>
+    <string name="auto9_event_desc_onstop">Se llama cuando la Activity deja de ser visible.</string>
+    <string name="auto9_event_desc_ondestroy">Se llama antes de que la Activity se destruya.</string>
+    <string name="auto9_event_desc_onrestart">Se llama tras detenerse la Activity, antes de volver a iniciarse.</string>
+    <string name="auto9_event_desc_onbackpressed">Se llama cuando el usuario pulsa el botón atrás.</string>
+    <string name="auto9_event_desc_onoptionsitemselected">Se llama cuando se selecciona un elemento del menú.</string>
+    <string name="auto9_event_desc_onactivityresult">Se llama cuando una Activity iniciada devuelve un resultado.</string>
+    <string name="auto9_event_desc_onpostcreate">Se llama después de crear la Activity.</string>
+    <string name="auto9_event_desc_onsaveinstancestate">Se llama para guardar el estado de la Activity.</string>
+    <string name="auto9_event_desc_onrestoreinstancestate">Se llama para restaurar el estado guardado.</string>
+    <string name="auto9_event_desc_oncreateoptionsmenu">Se llama para crear el menú de opciones.</string>
+    <string name="auto9_event_desc_oncreatecontextmenu">Se llama para crear un menú contextual.</string>
+    <string name="auto9_event_desc_oncontextitemselected">Se llama al seleccionar un elemento del menú contextual.</string>
+    <string name="auto9_event_desc_onclick">Se llama cuando se toca la vista.</string>
+    <string name="auto9_event_desc_oncheckedchange">Se llama cuando cambia el estado marcado.</string>
+    <string name="auto9_event_desc_ontextchanged">Se llama cuando cambia el texto.</string>
+    <string name="auto9_event_desc_onitemselected">Se llama cuando se selecciona un elemento.</string>
+    <string name="auto9_event_desc_onitemclicked">Se llama cuando se toca un elemento.</string>
+    <string name="auto9_event_desc_onitemlongclicked">Se llama cuando se mantiene pulsado un elemento.</string>
+    <string name="auto9_event_desc_cat_activity">Evento disparado por la Activity.</string>
+    <string name="auto9_event_desc_cat_view">Evento disparado por esta vista.</string>
+    <string name="auto9_event_desc_cat_component">Evento disparado por este componente.</string>
+    <string name="auto9_event_desc_cat_drawer">Evento disparado por esta vista del cajón.</string>
+    <string name="auto9_event_desc_cat_moreblock">Bloque personalizado creado por ti.</string>
 </resources>

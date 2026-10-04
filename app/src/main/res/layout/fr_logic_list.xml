@@ -11,11 +11,11 @@
 
         <com.google.android.material.navigationrail.NavigationRailView
             android:id="@+id/palette"
+            style="@style/Widget.Ascode.NavigationRail"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:background="@android:color/transparent"
             android:fitsSystemWindows="false"
-            app:itemPaddingBottom="28dp"
             app:labelVisibilityMode="labeled"
             app:menu="@menu/logic_palette" />
 
@@ -25,13 +25,65 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
+            <!-- Section header: tonal icon + bold title + short description -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingTop="14dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="8dp">
+
+                <ImageView
+                    android:id="@+id/iv_section_icon"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_event_header_icon"
+                    android:contentDescription="@null"
+                    android:padding="12dp"
+                    app:tint="@color/event_on_accent_container"
+                    tools:src="@drawable/ic_mtrl_lifecycle" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_section_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:fontFamily="sans-serif-medium"
+                        android:maxLines="1"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="20sp"
+                        tools:text="Activity events" />
+
+                    <TextView
+                        android:id="@+id/tv_section_description"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:ellipsize="end"
+                        android:maxLines="2"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="12sp"
+                        tools:text="Add events to control your Activity's lifecycle." />
+                </LinearLayout>
+            </LinearLayout>
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/tv_import"
                 style="@style/Widget.Material3Expressive.Button.ElevatedButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="8dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginHorizontal="12dp"
+                android:layout_marginTop="4dp"
                 android:text="@string/logic_button_import_more_block"
                 android:textColor="?attr/colorOnSurface" />
 
@@ -39,9 +91,9 @@
                 android:id="@+id/search_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginStart="12dp"
                 android:layout_marginTop="6dp"
+                android:layout_marginEnd="12dp"
                 android:visibility="gone">
 
                 <EditText
@@ -80,6 +132,7 @@
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 android:visibility="gone"
                 tools:text="No events to display" />
 
@@ -88,8 +141,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
-                android:paddingTop="8dp"
-                android:paddingBottom="64dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="96dp"
                 android:scrollbars="vertical"
                 android:splitMotionEvents="false"
                 tools:itemCount="5"
@@ -104,9 +157,10 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_margin="16dp"
+        android:contentDescription="@string/auto9_event_fab_add"
+        app:backgroundTint="@color/event_accent_container"
         app:srcCompat="@drawable/ic_add_white_36dp"
+        app:tint="@color/event_on_accent_container"
         tools:ignore="ContentDescription" />
 
 </RelativeLayout>
-
-

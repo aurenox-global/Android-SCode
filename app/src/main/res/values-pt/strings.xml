@@ -3308,4 +3308,50 @@ ACTION_VIEW
     <string name="auto4_unknown_filename">Nome de arquivo desconhecido</string>
     <string name="auto4_create_new">Criar novo</string>
     <string name="auto4_edit_title">Editar %1$s</string>
+    <string name="auto5_search_blocks">Pesquisar blocos…</string>
+    <string name="auto6_content_desc_delete">Excluir bloco</string>
+    <string name="auto6_content_desc_duplicate">Duplicar bloco</string>
+    <string name="auto6_content_desc_collection">Adicionar bloco à coleção</string>
+    <string name="auto6_content_desc_detail">Detalhes do bloco</string>
+
+    <!-- Event section redesign (auto9) -->
+    <string name="auto9_events_section_title_activity">Eventos de Activity</string>
+    <string name="auto9_events_section_title_view">Eventos de View</string>
+    <string name="auto9_events_section_title_component">Eventos de Component</string>
+    <string name="auto9_events_section_title_drawer">Eventos de Drawer</string>
+    <string name="auto9_events_section_title_moreblock">More Blocks</string>
+    <string name="auto9_events_section_desc_activity">Adicione eventos para controlar o ciclo de vida da sua Activity.</string>
+    <string name="auto9_events_section_desc_view">Adicione eventos para reagir à interação do usuário com as views.</string>
+    <string name="auto9_events_section_desc_component">Adicione eventos para reagir aos seus componentes.</string>
+    <string name="auto9_events_section_desc_drawer">Adicione eventos para as views dentro do menu de navegação.</string>
+    <string name="auto9_events_section_desc_moreblock">Crie blocos reutilizáveis e importe-os da sua coleção.</string>
+    <string name="auto9_event_fab_add">Adicionar evento</string>
+
+    <string name="auto9_event_desc_oncreate">Chamado quando a Activity é criada pela primeira vez.</string>
+    <string name="auto9_event_desc_onstart">Chamado quando a Activity fica visível.</string>
+    <string name="auto9_event_desc_onresume">Chamado quando a Activity começa a interagir com o usuário.</string>
+    <string name="auto9_event_desc_onpause">Chamado quando a Activity perde o foco.</string>
+    <string name="auto9_event_desc_onstop">Chamado quando a Activity deixa de estar visível.</string>
+    <string name="auto9_event_desc_ondestroy">Chamado antes de a Activity ser destruída.</string>
+    <string name="auto9_event_desc_onrestart">Chamado após a Activity ser parada, antes de iniciar de novo.</string>
+    <string name="auto9_event_desc_onbackpressed">Chamado quando o usuário pressiona o botão voltar.</string>
+    <string name="auto9_event_desc_onoptionsitemselected">Chamado quando um item de menu é selecionado.</string>
+    <string name="auto9_event_desc_onactivityresult">Chamado quando uma Activity iniciada retorna um resultado.</string>
+    <string name="auto9_event_desc_onpostcreate">Chamado após a Activity ser criada.</string>
+    <string name="auto9_event_desc_onsaveinstancestate">Chamado para salvar o estado da Activity.</string>
+    <string name="auto9_event_desc_onrestoreinstancestate">Chamado para restaurar o estado salvo.</string>
+    <string name="auto9_event_desc_oncreateoptionsmenu">Chamado para criar o menu de opções.</string>
+    <string name="auto9_event_desc_oncreatecontextmenu">Chamado para criar um menu de contexto.</string>
+    <string name="auto9_event_desc_oncontextitemselected">Chamado ao selecionar um item do menu de contexto.</string>
+    <string name="auto9_event_desc_onclick">Chamado quando a view é tocada.</string>
+    <string name="auto9_event_desc_oncheckedchange">Chamado quando o estado marcado muda.</string>
+    <string name="auto9_event_desc_ontextchanged">Chamado quando o texto muda.</string>
+    <string name="auto9_event_desc_onitemselected">Chamado quando um item é selecionado.</string>
+    <string name="auto9_event_desc_onitemclicked">Chamado quando um item é tocado.</string>
+    <string name="auto9_event_desc_onitemlongclicked">Chamado quando um item é pressionado por mais tempo.</string>
+    <string name="auto9_event_desc_cat_activity">Evento disparado pela Activity.</string>
+    <string name="auto9_event_desc_cat_view">Evento disparado por esta view.</string>
+    <string name="auto9_event_desc_cat_component">Evento disparado por este componente.</string>
+    <string name="auto9_event_desc_cat_drawer">Evento disparado por esta view do menu.</string>
+    <string name="auto9_event_desc_cat_moreblock">Bloco personalizado criado por você.</string>
 </resources>

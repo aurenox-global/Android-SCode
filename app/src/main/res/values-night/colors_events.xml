@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="event_accent">#FF81C784</color>
+    <color name="event_accent_container">#FF2E7D32</color>
+    <color name="event_on_accent_container">#FFFFFFFF</color>
+    <color name="event_button">#FF2E7D32</color>
+    <color name="event_on_button">#FFFFFFFF</color>
+</resources>

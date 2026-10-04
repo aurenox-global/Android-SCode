@@ -2,6 +2,7 @@ package a.a.a;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -33,11 +34,13 @@ import com.besome.sketch.beans.ViewBean;
 import com.besome.sketch.editor.LogicEditorActivity;
 import com.besome.sketch.editor.event.AddEventActivity;
 import com.besome.sketch.editor.event.CollapsibleEventLayout;
+import com.besome.sketch.editor.event.EventDescriptions;
 import com.besome.sketch.lib.base.CollapsibleViewHolder;
 import com.besome.sketch.lib.ui.CollapsibleButton;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.color.MaterialColors;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigationrail.NavigationRailView;
 
@@ -71,6 +74,9 @@ public class rs extends qA implements View.OnClickListener, MoreblockImporterDia
     private EditText searchInput;
     private ImageView sortMenuIcon;
     private View searchContainer;
+    private ImageView sectionIcon;
+    private TextView sectionTitle;
+    private TextView sectionDescription;
     private final ActivityResultLauncher<Intent> addEventLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
             result -> refreshEvents());
     private final ActivityResultLauncher<Intent> openEvent = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -117,6 +123,42 @@ public class rs extends qA implements View.OnClickListener, MoreblockImporterDia
 
     private int getPaletteIndex() {
         return getPaletteIndex(paletteView.getSelectedItemId());
+    }
+
+    private void updateSectionHeader() {
+        int index = getPaletteIndex();
+        if (index < 0) {
+            index = 0;
+        }
+        if (sectionIcon != null) {
+            sectionIcon.setImageResource(a(index));
+        }
+        if (sectionTitle != null) {
+            sectionTitle.setText(sectionTitleRes(index));
+        }
+        if (sectionDescription != null) {
+            sectionDescription.setText(sectionDescriptionRes(index));
+        }
+    }
+
+    public static int sectionTitleRes(int index) {
+        return switch (index) {
+            case 1 -> R.string.auto9_events_section_title_view;
+            case 2 -> R.string.auto9_events_section_title_component;
+            case 3 -> R.string.auto9_events_section_title_drawer;
+            case 4 -> R.string.auto9_events_section_title_moreblock;
+            default -> R.string.auto9_events_section_title_activity;
+        };
+    }
+
+    public static int sectionDescriptionRes(int index) {
+        return switch (index) {
+            case 1 -> R.string.auto9_events_section_desc_view;
+            case 2 -> R.string.auto9_events_section_desc_component;
+            case 3 -> R.string.auto9_events_section_desc_drawer;
+            case 4 -> R.string.auto9_events_section_desc_moreblock;
+            default -> R.string.auto9_events_section_desc_activity;
+        };
     }
 
     @Override
@@ -198,6 +240,7 @@ public class rs extends qA implements View.OnClickListener, MoreblockImporterDia
                 eventAdapter.notifyDataSetChanged();
                 restoreSearchState();
             }
+            updateSectionHeader();
         }
     }
 
@@ -242,6 +285,9 @@ public class rs extends qA implements View.OnClickListener, MoreblockImporterDia
         searchInput = parent.findViewById(R.id.search_events);
         sortMenuIcon = parent.findViewById(R.id.sort_menu);
         searchContainer = parent.findViewById(R.id.search_container);
+        sectionIcon = parent.findViewById(R.id.iv_section_icon);
+        sectionTitle = parent.findViewById(R.id.tv_section_title);
+        sectionDescription = parent.findViewById(R.id.tv_section_description);
         paletteView = parent.findViewById(R.id.palette);
         paletteView.setOnItemSelectedListener(
                 item -> {
@@ -253,6 +299,7 @@ public class rs extends qA implements View.OnClickListener, MoreblockImporterDia
                     }
                     eventAdapter.a(events.get(getPaletteIndex(item.getItemId())));
                     eventAdapter.notifyDataSetChanged();
+                    updateSectionHeader();
                     return true;
                 });
         fab = parent.findViewById(R.id.fab);
@@ -276,6 +323,7 @@ public class rs extends qA implements View.OnClickListener, MoreblockImporterDia
         importMoreBlockFromCollection = parent.findViewById(R.id.tv_import);
         importMoreBlockFromCollection.setText(R.string.logic_button_import_more_block);
         importMoreBlockFromCollection.setOnClickListener(v -> showImportMoreBlockFromCollectionsDialog());
+        updateSectionHeader();
         setupSearchAndSort(parent);
     }
 
@@ -470,7 +518,9 @@ public class rs extends qA implements View.OnClickListener, MoreblockImporterDia
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             EventBean eventBean = getActiveList().get(position);
+            android.content.Context context = holder.itemView.getContext();
             holder.targetType.setVisibility(View.VISIBLE);
+            holder.targetId.setVisibility(View.VISIBLE);
             holder.previewContainer.setVisibility(View.VISIBLE);
             holder.preview.setVisibility(View.VISIBLE);
             holder.preview.setImageResource(oq.getEventIconResource(eventBean.eventName));
@@ -480,17 +530,23 @@ public class rs extends qA implements View.OnClickListener, MoreblockImporterDia
             } else {
                 holder.optionsLayout.hideAddToCollection();
             }
+
+            String eventLabel = oq.getEventName(eventBean.eventName);
+            if (eventLabel == null || eventLabel.isEmpty()) {
+                eventLabel = eventBean.eventName;
+            }
+            holder.name.setText(eventLabel);
+            holder.description.setText(EventDescriptions.get(context, eventBean));
+
             if (eventBean.eventType == EventBean.EVENT_TYPE_ACTIVITY) {
                 if (eventBean.eventName.equals("initializeLogic")) {
                     holder.optionsLayout.hideDelete();
                 }
-                holder.targetId.setText(eventBean.targetId);
                 holder.type.setBackgroundResource(oq.getEventIconResource(eventBean.eventName));
-                holder.name.setText(eventBean.eventName);
-                holder.description.setText(oq.getEventName(eventBean.eventName));
                 holder.icon.setImageResource(R.drawable.ic_mtrl_code);
                 holder.preview.setVisibility(View.GONE);
                 holder.targetType.setVisibility(View.GONE);
+                holder.targetId.setVisibility(View.GONE);
             } else {
                 holder.icon.setImageResource(EventBean.getEventIconResource(eventBean.eventType, eventBean.targetType));
                 if (eventBean.eventType == EventBean.EVENT_TYPE_VIEW) {
@@ -498,7 +554,7 @@ public class rs extends qA implements View.OnClickListener, MoreblockImporterDia
                 } else if (eventBean.eventType == EventBean.EVENT_TYPE_DRAWER_VIEW) {
                     holder.targetType.setText(ViewBean.getViewTypeName(eventBean.targetType));
                 } else if (eventBean.eventType == EventBean.EVENT_TYPE_COMPONENT) {
-                    holder.targetType.setText(ComponentBean.getComponentName(requireContext(), eventBean.targetType));
+                    holder.targetType.setText(ComponentBean.getComponentName(context, eventBean.targetType));
                 } else if (eventBean.eventType == EventBean.EVENT_TYPE_ETC) {
                     holder.icon.setImageResource(R.drawable.ic_mtrl_code);
                     holder.targetType.setVisibility(View.GONE);
@@ -511,11 +567,16 @@ public class rs extends qA implements View.OnClickListener, MoreblockImporterDia
                 }
                 holder.type.setText(EventBean.getEventTypeName(eventBean.eventType));
                 holder.type.setBackgroundResource(EventBean.getEventTypeBgRes(eventBean.eventType));
-                holder.name.setText(eventBean.eventName);
-                holder.description.setText(oq.getEventName(eventBean.eventName));
-                if (eventBean.eventType == EventBean.EVENT_TYPE_ETC) {
-                    holder.description.setText(ReturnMoreblockManager.getMbTypeList(eventBean.targetId));
-                }
+            }
+
+            if (position == 0) {
+                holder.root.setCardBackgroundColor(androidx.core.content.ContextCompat.getColor(context, R.color.event_accent_container));
+                holder.root.setStrokeColor(ColorStateList.valueOf(androidx.core.content.ContextCompat.getColor(context, R.color.event_accent_container)));
+                holder.root.setStrokeWidth(Math.round(wB.a(context, 1.0f)));
+            } else {
+                holder.root.setCardBackgroundColor(MaterialColors.getColor(holder.root,
+                        com.google.android.material.R.attr.colorSurfaceContainer));
+                holder.root.setStrokeWidth(0);
             }
             if (eventBean.isCollapsed) {
                 holder.optionContainer.setVisibility(View.GONE);
@@ -696,7 +757,7 @@ public class rs extends qA implements View.OnClickListener, MoreblockImporterDia
                 root.setOnClickListener(v -> {
                     if (!mB.a()) {
                         EventBean eventBean = getActiveList().get(getLayoutPosition());
-                        openEvent(eventBean.targetId, eventBean.eventName, Helper.getText(description));
+                        openEvent(eventBean.targetId, eventBean.eventName, oq.getEventName(eventBean.eventName));
                     }
                 });
             }

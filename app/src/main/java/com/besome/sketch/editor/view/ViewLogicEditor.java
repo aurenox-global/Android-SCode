@@ -29,6 +29,8 @@ public class ViewLogicEditor extends LogicEditorScrollView {
         blockPane = new BlockPane(context);
         blockPane.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT));
+        // Fondo del lienzo: color de superficie + rejilla de puntos sutil (tema claro/oscuro).
+        blockPane.setBackground(new LogicCanvasGridDrawable(context));
         addView(blockPane);
     }
 

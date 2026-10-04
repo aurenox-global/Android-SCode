@@ -8,7 +8,7 @@
     android:gravity="center"
     tools:layout_height="44dp"
     tools:layout_width="120dp"
-    tools:background="@drawable/border_top_corner_white_no_stroke">
+    tools:background="@drawable/bg_event_category_selected">
 
     <ImageView
         android:id="@+id/img_icon"
@@ -17,5 +17,6 @@
         tools:alpha="0.6"
         tools:scaleX="0.8"
         tools:scaleY="0.8"
-        tools:src="@drawable/ic_cycle_color_48dp" />
+        tools:src="@drawable/ic_cycle_color_48dp"
+        tools:tint="?attr/colorOnSurfaceVariant" />
 </LinearLayout>

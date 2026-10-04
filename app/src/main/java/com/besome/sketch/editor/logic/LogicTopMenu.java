@@ -1,23 +1,28 @@
 package com.besome.sketch.editor.logic;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 
 import com.google.android.material.card.MaterialCardView;
 
-import mod.hey.studios.util.Helper;
 import com.ascode.android.R;
 import com.ascode.android.databinding.LogicEditorTopMenuBinding;
 import com.ascode.android.utility.ThemeUtils;
 
 public class LogicTopMenu extends LinearLayout {
+
+    /**
+     * How much accent is blended into the neutral card surface for the active
+     * background. Keeps the tint subtle (tonal) in both light and dark themes.
+     */
+    private static final float ACTIVE_TONAL_RATIO = 0.18f;
 
     private final Context context;
     public boolean isDeleteActive;
@@ -25,8 +30,11 @@ public class LogicTopMenu extends LinearLayout {
     public boolean isFavoriteActive;
     public boolean isDetailActive;
     private int colorSurfaceContainerHigh;
-    private int colorDefault;
-    private int colorOnDrag;
+    private int colorOnSurfaceVariant;
+    private int accentDelete;
+    private int accentCopy;
+    private int accentFavorite;
+    private int accentDetail;
     private LogicEditorTopMenuBinding binding;
 
     public LogicTopMenu(Context context) {
@@ -43,34 +51,35 @@ public class LogicTopMenu extends LinearLayout {
 
     private void initialize() {
         binding = LogicEditorTopMenuBinding.inflate(LayoutInflater.from(context), this, true);
-        binding.tvDelete.setText(Helper.getResString(R.string.common_word_delete));
-        binding.tvCopy.setText(Helper.getResString(R.string.common_word_duplicate));
-        binding.tvFavorite.setText(Helper.getResString(R.string.common_word_collection));
-        binding.tvDetail.setText(Helper.getResString(R.string.common_word_detail));
 
         colorSurfaceContainerHigh = ThemeUtils.getColor(this, R.attr.colorSurfaceContainerHigh);
-        colorDefault = ContextCompat.getColor(context, R.color.view_property_tab_deactive_text);
-        colorOnDrag = ContextCompat.getColor(context, android.R.color.white);
+        colorOnSurfaceVariant = ThemeUtils.getColor(this, R.attr.colorOnSurfaceVariant);
+        accentDelete = ContextCompat.getColor(context, R.color.scolor_red_02);
+        accentCopy = ContextCompat.getColor(context, R.color.scolor_green_normal);
+        accentDetail = ContextCompat.getColor(context, R.color.scolor_green_violet);
+        // The collection/bookmark action is the only accented card by default,
+        // matching the red bookmark of the mockup.
+        accentFavorite = ThemeUtils.getColor(this, R.attr.colorError);
     }
 
     public void setCopyActive(boolean active) {
         isCopyActive = active;
-        updateLayoutAppearance(binding.layoutCopy, active, R.color.scolor_green_normal, binding.tvCopy, binding.ivCopy);
+        updateLayoutAppearance(binding.layoutCopy, active, accentCopy, binding.ivCopy, colorOnSurfaceVariant);
     }
 
     public void setDeleteActive(boolean active) {
         isDeleteActive = active;
-        updateLayoutAppearance(binding.layoutDelete, active, R.color.scolor_red_02, binding.tvDelete, binding.ivTrash);
+        updateLayoutAppearance(binding.layoutDelete, active, accentDelete, binding.ivTrash, colorOnSurfaceVariant);
     }
 
     public void setDetailActive(boolean active) {
         isDetailActive = active;
-        updateLayoutAppearance(binding.layoutDetail, active, R.color.scolor_green_violet, binding.tvDetail, binding.ivDetail);
+        updateLayoutAppearance(binding.layoutDetail, active, accentDetail, binding.ivDetail, colorOnSurfaceVariant);
     }
 
     public void setFavoriteActive(boolean active) {
         isFavoriteActive = active;
-        updateLayoutAppearance(binding.layoutFavorite, active, R.color.scolor_blue_01, binding.tvFavorite, binding.ivBookmark);
+        updateLayoutAppearance(binding.layoutFavorite, active, accentFavorite, binding.ivBookmark, accentFavorite);
     }
 
     public boolean isInsideCopyArea(float x, float y) {
@@ -95,17 +104,32 @@ public class LogicTopMenu extends LinearLayout {
         binding.layoutDetail.setVisibility(isBlockCollection ? GONE : VISIBLE);
     }
 
+    /**
+     * Active: tonal background derived from the accent + accent-tinted icon.
+     * Inactive: neutral surface container background + neutral icon (or the accent
+     * itself for the bookmark card, which stays colored by default).
+     */
     private void updateLayoutAppearance(
-            MaterialCardView layout, boolean active, int activeColorRes, TextView textView, ImageView icon) {
+            MaterialCardView layout, boolean active, int accentColor, ImageView icon, int defaultIconColor) {
         if (active) {
-            layout.setCardBackgroundColor(ContextCompat.getColor(context, activeColorRes));
-            textView.setTextColor(colorOnDrag);
-            icon.setColorFilter(colorOnDrag);
+            layout.setCardBackgroundColor(tonal(accentColor));
+            icon.setColorFilter(accentColor);
         } else {
             layout.setCardBackgroundColor(colorSurfaceContainerHigh);
-            textView.setTextColor(colorDefault);
-            icon.setColorFilter(colorDefault);
+            icon.setColorFilter(defaultIconColor);
         }
+    }
+
+    /** Blends the accent over the neutral surface to obtain a subtle tonal fill. */
+    private int tonal(int accentColor) {
+        return blend(accentColor, colorSurfaceContainerHigh, ACTIVE_TONAL_RATIO);
+    }
+
+    private static int blend(int foreground, int background, float ratio) {
+        int r = Math.round(Color.red(foreground) * ratio + Color.red(background) * (1f - ratio));
+        int g = Math.round(Color.green(foreground) * ratio + Color.green(background) * (1f - ratio));
+        int b = Math.round(Color.blue(foreground) * ratio + Color.blue(background) * (1f - ratio));
+        return Color.argb(255, r, g, b);
     }
 
     private boolean isInsideArea(View layout, float x, float y) {

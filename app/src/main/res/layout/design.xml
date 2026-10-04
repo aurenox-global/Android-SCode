@@ -35,7 +35,10 @@
                     android:id="@+id/tab_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@android:color/transparent" />
+                    android:background="@android:color/transparent"
+                    app:tabIndicatorColor="@color/event_accent"
+                    app:tabSelectedTextColor="@color/event_accent"
+                    app:tabTextColor="?attr/colorOnSurfaceVariant" />
 
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="match_parent"
@@ -155,10 +158,11 @@
                     android:minWidth="0dp"
                     android:paddingTop="0dp"
                     android:paddingBottom="0dp"
-                    app:backgroundTint="?attr/colorSecondaryContainer"
+                    android:backgroundTint="@color/event_button"
+                    app:backgroundTint="@color/event_button"
                     app:icon="@drawable/ic_mtrl_preview"
                     app:iconSize="22dp"
-                    app:iconTint="?attr/colorOnSecondaryContainer"
+                    app:iconTint="@color/event_on_button"
                     style="?attr/materialIconButtonFilledStyle" />
 
                 <com.google.android.material.button.MaterialSplitButton
@@ -174,15 +178,20 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/auto_run"
-                        app:icon="@drawable/ic_mtrl_run" />
+                        android:textColor="@color/event_on_button"
+                        app:backgroundTint="@color/event_button"
+                        app:icon="@drawable/ic_mtrl_run"
+                        app:iconTint="@color/event_on_button" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_options"
                         style="?attr/materialSplitButtonIconFilledStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        app:backgroundTint="@color/event_button"
                         app:icon="@drawable/m3_split_button_chevron_avd"
-                        app:iconSize="24dp" />
+                        app:iconSize="24dp"
+                        app:iconTint="@color/event_on_button" />
 
                 </com.google.android.material.button.MaterialSplitButton>
             </LinearLayout>

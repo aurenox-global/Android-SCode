@@ -2,6 +2,7 @@ package com.besome.sketch.editor.event;
 
 import android.animation.Animator;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -67,6 +68,14 @@ public class AddEventActivity extends BaseAppCompatActivity implements View.OnCl
     public void finish() {
         super.finish();
         overridePendingTransition(R.anim.ani_fade_in, R.anim.ani_fade_out);
+    }
+
+    private void updateCategoryHeader(int index) {
+        binding.tvCategory.setText(rs.sectionTitleRes(index));
+        binding.tvCategoryDescription.setText(rs.sectionDescriptionRes(index));
+        binding.ivCategoryIcon.setImageResource(rs.a(index));
+        binding.ivCategoryIcon.setImageTintList(ColorStateList.valueOf(
+                MaterialColors.getColor(binding.ivCategoryIcon, com.google.android.material.R.attr.colorOnPrimaryContainer)));
     }
 
     private void l() {
@@ -207,7 +216,7 @@ public class AddEventActivity extends BaseAppCompatActivity implements View.OnCl
         if (categoryAdapter.lastSelectedCategory == -1) {
             eventAdapter.setEvents(categories.get(categoryIndex));
             categoryAdapter.lastSelectedCategory = categoryIndex;
-            binding.tvCategory.setText(rs.a(getApplicationContext(), categoryIndex));
+            updateCategoryHeader(categoryIndex);
             if (categoryAdapter != null) {
                 categoryAdapter.notifyItemChanged(categoryIndex);
             }
@@ -236,7 +245,7 @@ public class AddEventActivity extends BaseAppCompatActivity implements View.OnCl
                         if (!moreBlockView.b()) {
                             eventAdapter.setEvents(categories.get(4));
                             categoryAdapter.lastSelectedCategory = 4;
-                            binding.tvCategory.setText(rs.a(getApplicationContext(), 4));
+                            updateCategoryHeader(4);
                             binding.emptyMessage.setVisibility(View.GONE);
                             binding.moreblockLayout.setVisibility(View.VISIBLE);
                             categoryAdapter.notifyDataSetChanged();
@@ -389,6 +398,7 @@ public class AddEventActivity extends BaseAppCompatActivity implements View.OnCl
                 holder.tv_target_id.setText(event.targetId);
             }
             holder.tv_event_name.setText(oq.getEventName(event.eventName));
+            holder.tv_event_description.setText(EventDescriptions.get(getApplicationContext(), event));
             holder.checkbox.setChecked(event.isSelected);
             e = false;
         }
@@ -421,6 +431,7 @@ public class AddEventActivity extends BaseAppCompatActivity implements View.OnCl
             public final TextView tv_target_type;
             public final TextView tv_target_id;
             public final TextView tv_event_name;
+            public final TextView tv_event_description;
             public final CheckBox checkbox;
 
             public ViewHolder(@NonNull View itemView) {
@@ -430,6 +441,7 @@ public class AddEventActivity extends BaseAppCompatActivity implements View.OnCl
                 tv_target_type = itemView.findViewById(R.id.tv_target_type);
                 tv_target_id = itemView.findViewById(R.id.tv_target_id);
                 tv_event_name = itemView.findViewById(R.id.tv_event_name);
+                tv_event_description = itemView.findViewById(R.id.tv_event_description);
                 checkbox = itemView.findViewById(R.id.checkbox);
                 itemView.setOnClickListener(v -> {
                     if (!mB.a()) {
@@ -483,11 +495,15 @@ public class AddEventActivity extends BaseAppCompatActivity implements View.OnCl
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             holder.img_icon.setImageResource(rs.a(position));
             if (lastSelectedCategory == position) {
-                holder.container.setBackgroundResource(R.drawable.border_top_corner_white_no_stroke);
+                holder.container.setBackgroundResource(R.drawable.bg_event_category_selected);
+                holder.img_icon.setImageTintList(ColorStateList.valueOf(
+                        androidx.core.content.ContextCompat.getColor(holder.img_icon.getContext(), R.color.event_accent)));
                 holder.img_icon.animate().scaleX(1.0f).scaleY(1.0f).alpha(1.0f).start();
                 holder.container.animate().translationY(0.0f).start();
             } else {
-                holder.container.setBackgroundResource(R.drawable.border_top_corner_grey_no_stroke);
+                holder.container.setBackgroundResource(R.drawable.bg_event_category_normal);
+                holder.img_icon.setImageTintList(ColorStateList.valueOf(
+                        MaterialColors.getColor(holder.img_icon, com.google.android.material.R.attr.colorOnSurfaceVariant)));
                 holder.img_icon.animate().scaleX(0.8f).scaleY(0.8f).alpha(0.6f).start();
                 holder.container.setTranslationY(wB.a(getApplicationContext(), 12.0f));
             }
@@ -502,6 +518,8 @@ public class AddEventActivity extends BaseAppCompatActivity implements View.OnCl
             inflate.findViewById(R.id.img_icon).setAlpha(0.6f);
             inflate.findViewById(R.id.img_icon).setScaleX(0.8f);
             inflate.findViewById(R.id.img_icon).setScaleY(0.8f);
+            ((ImageView) inflate.findViewById(R.id.img_icon)).setImageTintList(ColorStateList.valueOf(
+                    MaterialColors.getColor(inflate.findViewById(R.id.img_icon), com.google.android.material.R.attr.colorOnSurfaceVariant)));
             return new ViewHolder(inflate);
         }
 
@@ -528,7 +546,7 @@ public class AddEventActivity extends BaseAppCompatActivity implements View.OnCl
                     if (layoutPosition != lastSelectedCategory) {
                         lastSelectedCategory = getLayoutPosition();
                         notifyDataSetChanged();
-                        binding.tvCategory.setText(rs.a(getApplicationContext(), lastSelectedCategory));
+                        updateCategoryHeader(lastSelectedCategory);
                         if (lastSelectedCategory == 4) {
                             binding.moreblockLayout.setVisibility(View.VISIBLE);
                             binding.emptyMessage.setVisibility(View.GONE);

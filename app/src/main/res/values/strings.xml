@@ -3343,4 +3343,50 @@ Please try again later"</string>
     <string name="auto4_unknown_filename">Unknown filename</string>
     <string name="auto4_create_new">Create new</string>
     <string name="auto4_edit_title">Edit %1$s</string>
+    <string name="auto5_search_blocks">Search blocks…</string>
+    <string name="auto6_content_desc_delete">Delete block</string>
+    <string name="auto6_content_desc_duplicate">Duplicate block</string>
+    <string name="auto6_content_desc_collection">Add block to collection</string>
+    <string name="auto6_content_desc_detail">Block details</string>
+
+    <!-- Event section redesign (auto9) -->
+    <string name="auto9_events_section_title_activity">Activity events</string>
+    <string name="auto9_events_section_title_view">View events</string>
+    <string name="auto9_events_section_title_component">Component events</string>
+    <string name="auto9_events_section_title_drawer">Drawer events</string>
+    <string name="auto9_events_section_title_moreblock">More Blocks</string>
+    <string name="auto9_events_section_desc_activity">Add events to control your Activity\'s lifecycle.</string>
+    <string name="auto9_events_section_desc_view">Add events to react to user interaction with your views.</string>
+    <string name="auto9_events_section_desc_component">Add events to react to your components.</string>
+    <string name="auto9_events_section_desc_drawer">Add events for the views inside your navigation drawer.</string>
+    <string name="auto9_events_section_desc_moreblock">Create reusable blocks and import them from your collection.</string>
+    <string name="auto9_event_fab_add">Add event</string>
+
+    <string name="auto9_event_desc_oncreate">Called when the Activity is first created.</string>
+    <string name="auto9_event_desc_onstart">Called when the Activity becomes visible.</string>
+    <string name="auto9_event_desc_onresume">Called when the Activity starts interacting with the user.</string>
+    <string name="auto9_event_desc_onpause">Called when the Activity loses focus.</string>
+    <string name="auto9_event_desc_onstop">Called when the Activity is no longer visible.</string>
+    <string name="auto9_event_desc_ondestroy">Called before the Activity is destroyed.</string>
+    <string name="auto9_event_desc_onrestart">Called after the Activity has been stopped, before it is started again.</string>
+    <string name="auto9_event_desc_onbackpressed">Called when the user presses the back button.</string>
+    <string name="auto9_event_desc_onoptionsitemselected">Called when a menu item is selected.</string>
+    <string name="auto9_event_desc_onactivityresult">Called when a launched Activity returns a result.</string>
+    <string name="auto9_event_desc_onpostcreate">Called after the Activity has been created.</string>
+    <string name="auto9_event_desc_onsaveinstancestate">Called to save the Activity\'s state.</string>
+    <string name="auto9_event_desc_onrestoreinstancestate">Called to restore the saved state.</string>
+    <string name="auto9_event_desc_oncreateoptionsmenu">Called to create the options menu.</string>
+    <string name="auto9_event_desc_oncreatecontextmenu">Called to create a context menu.</string>
+    <string name="auto9_event_desc_oncontextitemselected">Called when a context menu item is selected.</string>
+    <string name="auto9_event_desc_onclick">Called when the view is clicked.</string>
+    <string name="auto9_event_desc_oncheckedchange">Called when the checked state changes.</string>
+    <string name="auto9_event_desc_ontextchanged">Called when the text changes.</string>
+    <string name="auto9_event_desc_onitemselected">Called when an item is selected.</string>
+    <string name="auto9_event_desc_onitemclicked">Called when an item is clicked.</string>
+    <string name="auto9_event_desc_onitemlongclicked">Called when an item is long-clicked.</string>
+    <string name="auto9_event_desc_cat_activity">Event triggered by the Activity.</string>
+    <string name="auto9_event_desc_cat_view">Event triggered by this view.</string>
+    <string name="auto9_event_desc_cat_component">Event triggered by this component.</string>
+    <string name="auto9_event_desc_cat_drawer">Event triggered by this drawer view.</string>
+    <string name="auto9_event_desc_cat_moreblock">Custom block created by you.</string>
 </resources>

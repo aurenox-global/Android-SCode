@@ -32,6 +32,43 @@
         <item name="titleTextAppearance">?attr/textAppearanceBodyLarge</item>
     </style>
 
+    <!-- Logic editor top bar: event name as a medium-weight 18sp title and a small
+         secondary description underneath, matching the block editor mockup. -->
+    <style name="TextAppearance.Ascode.LogicEditor.Title" parent="TextAppearance.Ascode.TitleMedium">
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="TextAppearance.Ascode.LogicEditor.Subtitle" parent="TextAppearance.Ascode.BodySmall">
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <!-- Event section rail: icon+label items where the selected item uses the app's
+         tonal accent (colorPrimaryContainer) as its rounded-square active indicator and
+         the accent (colorPrimary) for its icon and label. -->
+    <style name="Widget.Ascode.NavigationRail" parent="Widget.Material3Expressive.NavigationRailView">
+        <item name="itemIconTint">@color/selector_event_rail_item</item>
+        <item name="itemTextColor">@color/selector_event_rail_item</item>
+        <item name="itemActiveIndicatorStyle">@style/Widget.Ascode.NavigationRail.ActiveIndicator</item>
+        <item name="itemIconSize">22dp</item>
+        <item name="itemPaddingTop">14dp</item>
+        <item name="itemPaddingBottom">10dp</item>
+    </style>
+
+    <style name="Widget.Ascode.NavigationRail.ActiveIndicator"
+        parent="Widget.Material3.NavigationRailView.ActiveIndicator">
+        <item name="android:width">40dp</item>
+        <item name="android:height">40dp</item>
+        <item name="marginHorizontal">4dp</item>
+        <item name="android:color">@color/event_accent_container</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.Ascode.EventRailIndicator</item>
+    </style>
+
+    <style name="ShapeAppearance.Ascode.EventRailIndicator" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12dp</item>
+    </style>
+
     <style name="Widget.Ascode.NavigationView.Main" parent="Widget.Material3.NavigationView">
         <item name="dividerInsetEnd">@dimen/main_drawer_horizontal_padding</item>
         <item name="dividerInsetStart">@dimen/main_drawer_horizontal_padding</item>

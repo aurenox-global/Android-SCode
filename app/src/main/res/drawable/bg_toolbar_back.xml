@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Round navigation (back) button for the logic editor toolbar.
+    A circular surface container with the standard back arrow centered on top.
+    Both layers are theme-aware so light/dark are handled automatically.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:gravity="center">
+        <shape android:shape="oval">
+            <solid android:color="?attr/colorSurfaceContainerHigh" />
+            <size
+                android:width="40dp"
+                android:height="40dp" />
+        </shape>
+    </item>
+    <item
+        android:width="20dp"
+        android:height="20dp"
+        android:drawable="@drawable/abc_ic_ab_back_material"
+        android:gravity="center" />
+</layer-list>

@@ -146,6 +146,8 @@ preserved — see [LICENSE.md](LICENSE.md).
 
 Created and maintained by **Andrés Mag**.
 
+Home redesign (**v1.0.35**) — design collaboration: **[@azkafirley](https://github.com/azkafirley)**.
+
 ## License
 
 See **[LICENSE.md](LICENSE.md)**. This project derives from an open, source-available codebase; all

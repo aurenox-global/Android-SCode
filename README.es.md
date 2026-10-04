@@ -149,6 +149,8 @@ atribuciones que exige la licencia original — ver [LICENSE.md](LICENSE.md).
 
 Creado y mantenido por **Andrés Mag**.
 
+Rediseño del inicio (**v1.0.35**) — colaboración de diseño: **[@azkafirley](https://github.com/azkafirley)**.
+
 ## Licencia
 
 Ver **[LICENSE.md](LICENSE.md)**. Este proyecto deriva de una base de código abierto

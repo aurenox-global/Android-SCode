@@ -169,7 +169,7 @@ public class ShowBlockCollectionActivity extends BaseAppCompatActivity implement
             addBlocks(block.blocks);
             resizeBottomViews();
         } else {
-            AscodeUtil.toastError("Can't open corrupt Block");
+            AscodeUtil.toastError(getString(R.string.auto4_corrupt_block));
             finish();
         }
     }
@@ -180,7 +180,7 @@ public class ShowBlockCollectionActivity extends BaseAppCompatActivity implement
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuItem saveImageItem = menu.add(0, 12, 0, "Save image");
+        MenuItem saveImageItem = menu.add(0, 12, 0, getString(R.string.auto4_save_image));
         saveImageItem.setIcon(R.drawable.full_image_48);
         saveImageItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
@@ -191,9 +191,9 @@ public class ShowBlockCollectionActivity extends BaseAppCompatActivity implement
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == 12) {
             if (ImageFactory.saveBitmap(binding.editor.getChildAt(0), blockName).exists()) {
-                AscodeUtil.toast("Saved image to /Internal storage/ascode/saved_block/" + blockName + ".png!");
+                AscodeUtil.toast(getString(R.string.auto4_saved_image_to, blockName));
             } else {
-                AscodeUtil.toastError("Couldn't save image");
+                AscodeUtil.toastError(getString(R.string.auto4_couldnt_save_image));
             }
         }
 

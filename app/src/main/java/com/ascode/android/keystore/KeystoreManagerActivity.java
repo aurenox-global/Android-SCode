@@ -39,7 +39,7 @@ public class KeystoreManagerActivity extends BaseAppCompatActivity {
         binding = ActivityKeystoreManagerBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        binding.topAppBar.setTitle("Keystore manager");
+        binding.topAppBar.setTitle(R.string.app_settings_keystore_manager);
         binding.topAppBar.setNavigationOnClickListener(Helper.getBackPressedClickListener(this));
 
         binding.importKeystore.setOnClickListener(v -> pickKeystoreFile());
@@ -65,9 +65,9 @@ public class KeystoreManagerActivity extends BaseAppCompatActivity {
         for (KeystoreStore.Entry entry : entries) {
             ItemKeystoreBinding item = ItemKeystoreBinding.inflate(inflater, binding.keystoreContainer, false);
             item.keystoreName.setText(entry.getName());
-            item.keystoreAlias.setText("Alias: " + entry.getAlias());
+            item.keystoreAlias.setText(getString(R.string.auto_java_alias_label, entry.getAlias()));
             String fingerprint = KeystoreStore.certificateSha256(entry, this);
-            item.keystoreFingerprint.setText("SHA-256: " + fingerprint);
+            item.keystoreFingerprint.setText(getString(R.string.auto_java_sha256_label, fingerprint));
             item.getRoot().setOnClickListener(v -> showEntryOptions(entry));
             binding.keystoreContainer.addView(item.getRoot());
         }
@@ -76,7 +76,7 @@ public class KeystoreManagerActivity extends BaseAppCompatActivity {
     private void showEntryOptions(KeystoreStore.Entry entry) {
         new MaterialAlertDialogBuilder(this)
                 .setTitle(entry.getName())
-                .setItems(new String[]{"Show certificate", "Delete"}, (dialog, which) -> {
+                .setItems(new String[]{getString(R.string.auto_java_show_certificate), getString(R.string.common_word_delete)}, (dialog, which) -> {
                     if (which == 0) {
                         showCertificate(entry);
                     } else {
@@ -90,19 +90,16 @@ public class KeystoreManagerActivity extends BaseAppCompatActivity {
         String sha256 = KeystoreStore.certificateSha256(entry, this);
         String subject = KeystoreStore.certificateSubject(entry, this);
         new MaterialAlertDialogBuilder(this)
-                .setTitle("Certificate")
-                .setMessage("Alias: " + entry.getAlias()
-                        + "\nSubject: " + subject
-                        + "\nSHA-256: " + sha256
-                        + "\nFile: " + entry.file(this).getAbsolutePath())
-                .setPositiveButton("Close", null)
+                .setTitle(R.string.auto_java_certificate)
+                .setMessage(getString(R.string.auto_java_certificate_msg, entry.getAlias(), subject, sha256, entry.file(this).getAbsolutePath()))
+                .setPositiveButton(R.string.common_word_close, null)
                 .show();
     }
 
     private void confirmDelete(KeystoreStore.Entry entry) {
         new MaterialAlertDialogBuilder(this)
-                .setTitle("Delete " + entry.getName() + "?")
-                .setMessage("The keystore file and its stored passwords will be removed from this device. This cannot be undone.")
+                .setTitle(getString(R.string.auto_java_delete_named, entry.getName()))
+                .setMessage(R.string.auto_java_delete_keystore_msg)
                 .setPositiveButton(R.string.common_word_delete, (dialog, which) -> {
                     KeystoreStore.delete(this, entry.getId());
                     refreshList();
@@ -114,7 +111,7 @@ public class KeystoreManagerActivity extends BaseAppCompatActivity {
     private void pickKeystoreFile() {
         FilePickerOptions options = new FilePickerOptions();
         options.setExtensions(new String[]{"jks", "keystore", "bks", "p12", "pfx"});
-        options.setTitle("Select a keystore");
+        options.setTitle(getString(R.string.auto_java_select_keystore));
 
         FilePickerCallback callback = new FilePickerCallback() {
             @Override
@@ -132,10 +129,10 @@ public class KeystoreManagerActivity extends BaseAppCompatActivity {
         dialogBinding.etAlgorithm.setText("SHA256withRSA");
 
         MaterialAlertDialogBuilder dialog = new MaterialAlertDialogBuilder(this)
-                .setTitle("Import " + file.getName())
+                .setTitle(getString(R.string.auto_java_import_named, file.getName()))
                 .setView(dialogBinding.getRoot())
                 .setNegativeButton(R.string.common_word_cancel, null)
-                .setPositiveButton("Import", null);
+                .setPositiveButton(R.string.common_word_import, null);
 
         androidx.appcompat.app.AlertDialog alertDialog = dialog.create();
         alertDialog.show();
@@ -148,41 +145,41 @@ public class KeystoreManagerActivity extends BaseAppCompatActivity {
             String algorithm = Helper.getText(dialogBinding.etAlgorithm);
 
             if (TextUtils.isEmpty(name)) {
-                dialogBinding.tilName.setError("Name can't be empty");
+                dialogBinding.tilName.setError(getString(R.string.auto_java_name_empty));
                 return;
             }
             if (TextUtils.isEmpty(alias)) {
-                dialogBinding.tilAlias.setError("Alias can't be empty");
+                dialogBinding.tilAlias.setError(getString(R.string.auto_java_alias_empty));
                 return;
             }
             if (TextUtils.isEmpty(storePassword)) {
-                dialogBinding.tilStorePassword.setError("Password can't be empty");
+                dialogBinding.tilStorePassword.setError(getString(R.string.auto_java_password_empty));
                 return;
             }
             if (TextUtils.isEmpty(keyPassword)) {
-                dialogBinding.tilKeyPassword.setError("Password can't be empty");
+                dialogBinding.tilKeyPassword.setError(getString(R.string.auto_java_password_empty));
                 return;
             }
 
             KeystoreStore.Entry entry = KeystoreStore.importKeystore(this, name, alias, algorithm,
                     storePassword, keyPassword, file);
             if (entry == null) {
-                AscodeUtil.toastError("Could not copy the keystore file");
+                AscodeUtil.toastError(getString(R.string.auto_java_keystore_copy_failed));
                 return;
             }
 
             String result = KeystoreStore.certificateSha256(entry, this);
             if (result.contains(":")) {
                 alertDialog.dismiss();
-                AscodeUtil.toast("Keystore imported");
+                AscodeUtil.toast(getString(R.string.auto_java_keystore_imported));
                 refreshList();
             } else {
                 // Credentials are wrong: don't keep a broken entry around.
                 KeystoreStore.delete(this, entry.getId());
                 new MaterialAlertDialogBuilder(this)
-                        .setTitle("Could not read the keystore")
+                        .setTitle(R.string.auto_java_keystore_read_failed)
                         .setMessage(result)
-                        .setPositiveButton("Okay", null)
+                        .setPositiveButton(R.string.auto_java_okay, null)
                         .show();
             }
         });

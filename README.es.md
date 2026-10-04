@@ -36,6 +36,7 @@ firmado**, todo sin salir del teléfono.
 ## Características
 
 - **Inicio rediseñado** — tarjeta "Continuar donde lo dejaste", accesos rápidos (nuevo, importar, templates) y tarjetas de proyecto más limpias, con paleta neutra y verde.
+- **Multi-idioma** — inglés, español y portugués de Brasil, con selector en **Ajustes → Idioma**.
 - **Editor de diseño visual** — arrastra widgets, edita el XML y previsualiza las pantallas, con esquinas, borde, gradiente de 2 colores (vertical, horizontal y diagonal), layout_gravity en cualquier widget y modo glass editables, que se ven igual en el lienzo, la vista previa y la app compilada.
 - **Editor de lógica** — bloques para prototipar rápido y Java/Kotlin cuando necesitas control
   total.

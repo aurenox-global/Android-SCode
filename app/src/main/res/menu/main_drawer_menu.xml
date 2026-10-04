@@ -3,29 +3,34 @@
     <item
         android:id="@+id/program_info"
         android:icon="@drawable/ic_ascode_24"
-        android:title="App information" />
+        android:title="@string/drawer_app_info" />
 
     <item
         android:id="@+id/create_release_keystore"
         android:icon="@drawable/ic_mtrl_key"
-        android:title="Create keystore" />
+        android:title="@string/drawer_create_keystore" />
+
+    <item
+        android:id="@+id/language"
+        android:icon="@drawable/ic_mtrl_language"
+        android:title="@string/language" />
 
     <item
         android:id="@+id/app_settings"
         android:icon="@drawable/ic_mtrl_settings"
-        android:title="Settings" />
+        android:title="@string/drawer_settings" />
 
     <item
         android:id="@+id/local_ai_manager"
         android:icon="@drawable/ic_mtrl_bulb"
-        android:title="Local AI Manager" />
+        android:title="@string/drawer_local_ai" />
 
-    <item android:title="Links">
+    <item android:title="@string/drawer_links">
         <menu>
             <item
                 android:id="@+id/social_github"
                 android:icon="@drawable/ic_github"
-                android:title="GitHub" />
+                android:title="@string/drawer_github" />
         </menu>
     </item>
 

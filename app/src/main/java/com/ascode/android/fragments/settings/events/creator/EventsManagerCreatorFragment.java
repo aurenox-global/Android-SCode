@@ -154,11 +154,11 @@ public class EventsManagerCreatorFragment extends qA {
 
     private void save() {
         if (!filledIn()) {
-            AscodeUtil.toast("Some required fields are empty!");
+            AscodeUtil.toast(getString(R.string.auto_java_required_fields_empty));
             return;
         }
         if (!OldResourceIdMapper.isValidIconId(Helper.getText(binding.eventsCreatorIcon))) {
-            binding.eventsCreatorIconTil.setError("Invalid icon ID");
+            binding.eventsCreatorIconTil.setError(getString(R.string.auto_java_invalid_icon_id));
             binding.eventsCreatorIcon.requestFocus();
             return;
         }
@@ -189,7 +189,7 @@ public class EventsManagerCreatorFragment extends qA {
             arrayList.add(hashMap);
         }
         FileUtil.writeFile(concat, getGson().toJson(arrayList));
-        AscodeUtil.toast("Saved");
+        AscodeUtil.toast(getString(R.string.auto_java_saved));
         getParentFragmentManager().popBackStack();
     }
 
@@ -210,12 +210,12 @@ public class EventsManagerCreatorFragment extends qA {
         configureToolbar(binding.toolbar);
 
         if (isEdit) {
-            binding.toolbar.setTitle("Event Properties");
+            binding.toolbar.setTitle(R.string.auto_java_event_properties);
             binding.toolbar.setSubtitle(event_name);
         } else if (isActivityEvent) {
-            binding.toolbar.setTitle("New Activity Event");
+            binding.toolbar.setTitle(R.string.auto_java_new_activity_event);
         } else {
-            binding.toolbar.setTitle("New Event");
+            binding.toolbar.setTitle(R.string.auto_java_new_event);
             binding.toolbar.setSubtitle(lisName);
         }
     }

@@ -156,10 +156,10 @@ public class ColorsEditor extends Fragment {
             dialogBinding.colorPreview.setBackgroundColor(PropertiesUtil.parseColor(colorsEditorManager.getColorValue(activity.getApplicationContext(), colorModel.getColorValue(), 3, isNightVariant)));
             dialogBinding.importantNote.setVisibility(defaultColors.containsKey(colorModel.getColorName()) ? View.VISIBLE : View.GONE);
 
-            dialog.setTitle("Edit color");
+            dialog.setTitle(R.string.auto4_edit_color);
 
         } else {
-            dialog.setTitle("Create new color");
+            dialog.setTitle(R.string.auto4_create_new_color);
             dialogBinding.colorPreview.setBackgroundColor(0xFFFFFF);
         }
 
@@ -181,7 +181,7 @@ public class ColorsEditor extends Fragment {
             public void afterTextChanged(Editable s) {
                 String value = s.toString();
                 if (value.startsWith("#") && !PropertiesUtil.isHexColor(value)) {
-                    dialogBinding.colorValueInputLayout.setError("Invalid HEX color");
+                    dialogBinding.colorValueInputLayout.setError(getString(R.string.auto4_invalid_hex_color));
                     return;
                 }
                 dialogBinding.colorValueInput.setError(null);
@@ -205,18 +205,18 @@ public class ColorsEditor extends Fragment {
             }
         });
 
-        dialog.setPositiveButton("Save", (v1, which) -> {
+        dialog.setPositiveButton(R.string.auto4_save, (v1, which) -> {
             String key = Objects.requireNonNull(dialogBinding.colorKeyInput.getText()).toString();
             String value = Objects.requireNonNull(dialogBinding.colorValueInput.getText()).toString();
 
             if (key.isEmpty() || value.isEmpty()) {
-                AscodeUtil.toastError("Please fill in all fields", Toast.LENGTH_SHORT);
+                AscodeUtil.toastError(getString(R.string.auto4_please_fill_all_fields), Toast.LENGTH_SHORT);
                 return;
             }
 
             if (value.startsWith("#")) {
                 if (!PropertiesUtil.isHexColor(value)) {
-                    AscodeUtil.toastError("Please enter a valid HEX color");
+                    AscodeUtil.toastError(getString(R.string.auto4_enter_valid_hex));
                     return;
                 }
             }
@@ -259,7 +259,7 @@ public class ColorsEditor extends Fragment {
         });
 
         if (colorModel != null && !defaultColors.containsKey(colorModel.getColorName())) {
-            dialog.setNeutralButton("Delete", (v1, which) -> {
+            dialog.setNeutralButton(R.string.auto4_delete, (v1, which) -> {
                 colorList.remove(position);
                 adapter.notifyItemRemoved(position);
                 adapter.notifyItemRangeChanged(position, colorList.size());
@@ -278,7 +278,7 @@ public class ColorsEditor extends Fragment {
         ColorModel newItem = new ColorModel(name, value);
         for (int i = 0; i < colorList.size(); i++) {
             if (colorList.get(i).getColorName().equals(name)) {
-                AscodeUtil.toastError("\"" + name + "\" is already exist");
+                AscodeUtil.toastError(getString(R.string.auto4_already_exists, name));
                 return;
             }
         }

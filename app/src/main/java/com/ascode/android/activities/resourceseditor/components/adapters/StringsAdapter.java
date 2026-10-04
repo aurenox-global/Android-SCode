@@ -99,12 +99,12 @@ public class StringsAdapter extends RecyclerView.Adapter<StringsAdapter.ViewHold
                 dialogBinding.stringKeyInput.setEnabled(false);
             }
 
-            dialog.setTitle("Edit string");
-            dialog.setPositiveButton("Save", (d, which) -> {
+            dialog.setTitle(R.string.auto4_edit_string);
+            dialog.setPositiveButton(R.string.auto4_save, (d, which) -> {
                 String keyInput = Objects.requireNonNull(dialogBinding.stringKeyInput.getText()).toString();
                 String valueInput = Objects.requireNonNull(dialogBinding.stringValueInput.getText()).toString();
                 if (keyInput.isEmpty() || valueInput.isEmpty()) {
-                    AscodeUtil.toast("Please fill in all fields", Toast.LENGTH_SHORT);
+                    AscodeUtil.toast(activity.getString(R.string.auto4_please_fill_all_fields), Toast.LENGTH_SHORT);
                     return;
                 }
                 currentItem.put("key", keyInput);

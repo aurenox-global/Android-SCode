@@ -5,46 +5,46 @@
         android:id="@+id/menu_logic_showsource"
         android:icon="@drawable/ic_mtrl_code"
         android:orderInCategory="100"
-        android:title="Show Source Code"
+        android:title="@string/auto_show_source_code"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/menu_logic_undo"
         android:icon="@drawable/ic_mtrl_undo"
         android:orderInCategory="100"
-        android:title="Undo"
+        android:title="@string/auto_undo"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/menu_logic_redo"
         android:icon="@drawable/ic_mtrl_redo"
         android:orderInCategory="100"
-        android:title="Redo"
+        android:title="@string/auto_redo"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/menu_block_helper"
         android:icon="@drawable/ic_mtrl_bookmark"
         android:orderInCategory="100"
-        android:title="Blocks collection"
+        android:title="@string/auto_blocks_collection"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/menu_logic_kmp_target"
         android:orderInCategory="110"
-        android:title="KMP target"
+        android:title="@string/auto_kmp_target"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/menu_logic_kmp_preview"
         android:orderInCategory="111"
-        android:title="KMP preview"
+        android:title="@string/auto_kmp_preview"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/menu_logic_kmp_inspector"
         android:orderInCategory="112"
-        android:title="KMP compatibility inspector"
+        android:title="@string/auto_kmp_compatibility_inspector"
         app:showAsAction="never" />
 
     <item

@@ -19,6 +19,9 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.besome.sketch.help.ProgramInfoActivity;
 import com.besome.sketch.tools.NewKeyStoreActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.os.LocaleListCompat;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationView;
 
 import a.a.a.mB;
@@ -96,7 +99,32 @@ public class MainDrawer extends NavigationView {
             Intent intent = new Intent(activity, NewKeyStoreActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
             activity.startActivity(intent);
+        } else if (id == R.id.language) {
+            showLanguageDialog(activity);
         }
+    }
+
+    private void showLanguageDialog(Activity activity) {
+        LocaleListCompat current = AppCompatDelegate.getApplicationLocales();
+        String cur = current.isEmpty() ? "" : current.toLanguageTags();
+        String[] labels = {
+                getContext().getString(R.string.language_system),
+                "English", "Espa\u00f1ol", "Portugu\u00eas (Brasil)"
+        };
+        String[] tags = {"", "en", "es", "pt-BR"};
+        int checked = 0;
+        for (int i = 0; i < tags.length; i++) {
+            if (tags[i].equalsIgnoreCase(cur)) checked = i;
+        }
+        new MaterialAlertDialogBuilder(activity)
+                .setTitle(R.string.language)
+                .setSingleChoiceItems(labels, checked, (dialog, which) -> {
+                    AppCompatDelegate.setApplicationLocales(tags[which].isEmpty()
+                            ? LocaleListCompat.getEmptyLocaleList()
+                            : LocaleListCompat.forLanguageTags(tags[which]));
+                    dialog.dismiss();
+                })
+                .show();
     }
 
     private void openUrl(String url) {

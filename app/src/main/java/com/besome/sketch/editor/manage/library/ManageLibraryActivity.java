@@ -378,11 +378,11 @@ public class ManageLibraryActivity extends BaseAppCompatActivity implements View
         addLibraryItem(admobLibraryBean, basicCategory);
         addLibraryItem(googleMapLibraryBean, basicCategory, false);
 
-        LibraryCategoryView externalCategory = addCategoryItem("External libraries");
+        LibraryCategoryView externalCategory = addCategoryItem(getString(R.string.auto3_external_libraries));
         addLibraryItem(new ProjectLibraryBean(ProjectLibraryBean.PROJECT_LIB_TYPE_LOCAL_LIB), externalCategory);
         addLibraryItem(new ProjectLibraryBean(ProjectLibraryBean.PROJECT_LIB_TYPE_NATIVE_LIB), externalCategory, false);
 
-        LibraryCategoryView advancedCategory = addCategoryItem("Advanced");
+        LibraryCategoryView advancedCategory = addCategoryItem(getString(R.string.auto3_advanced));
         addCustomLibraryItem(ProjectLibraryBean.PROJECT_LIB_TYPE_EXCLUDE_BUILTIN_LIBRARIES, advancedCategory, false);
     }
 

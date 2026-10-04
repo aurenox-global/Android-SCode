@@ -64,7 +64,7 @@
                     android:id="@+id/think_header"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Thinking..."
+                    android:text="@string/auto_thinking"
                     android:textColor="?attr/colorOnTertiaryContainer"
                     android:textSize="11sp"
                     android:textStyle="bold" />
@@ -127,7 +127,7 @@
                         android:layout_height="wrap_content"
                         android:minWidth="0dp"
                         android:minHeight="32dp"
-                        android:text="Copy"
+                        android:text="@string/auto_copy"
                         android:textAllCaps="false"
                         android:textSize="11sp" />
 
@@ -139,7 +139,7 @@
                         android:layout_marginStart="4dp"
                         android:minWidth="0dp"
                         android:minHeight="32dp"
-                        android:text="Apply"
+                        android:text="@string/auto_apply"
                         android:textAllCaps="false"
                         android:textSize="11sp"
                         app:icon="@drawable/ic_mtrl_edit"

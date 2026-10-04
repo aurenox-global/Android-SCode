@@ -127,21 +127,21 @@ public class LogReaderActivity extends BaseAppCompatActivity {
         dialogBinding.imgDelete.setVisibility(View.GONE);
 
         var builder = new MaterialAlertDialogBuilder(this)
-                .setTitle("Filter by package name")
-                .setMessage("For multiple package names, separate them with a comma (,).")
+                .setTitle(R.string.auto_filter_by_package_name)
+                .setMessage(R.string.auto_java_filter_pkg_msg)
                 .setIcon(R.drawable.ic_mtrl_filter)
                 .setView(view)
-                .setPositiveButton("Apply", (dialog, which) -> {
+                .setPositiveButton(R.string.auto_apply, (dialog, which) -> {
                     pkgFilter = Helper.getText(dialogBinding.easyEdInput);
                     pkgFilterList = new ArrayList<>(Arrays.asList(pkgFilter.split(",")));
                     binding.searchInput.setText(Helper.getText(binding.searchInput));
                 })
-                .setNeutralButton("Reset", (dialog, which) -> {
+                .setNeutralButton(R.string.common_word_reset, (dialog, which) -> {
                     pkgFilter = "";
                     pkgFilterList.clear();
                     dialogBinding.easyEdInput.setText("");
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(R.string.common_word_cancel, null)
                 .create();
 
         builder.show();
@@ -154,7 +154,7 @@ public class LogReaderActivity extends BaseAppCompatActivity {
 
     private void exportLogcat(ArrayList<HashMap<String, Object>> logs) {
         if (logs.isEmpty()) {
-            AscodeUtil.toastError("Nothing to Export");
+            AscodeUtil.toastError(getString(R.string.auto_java_nothing_to_export));
             return;
         }
         try {
@@ -190,9 +190,9 @@ public class LogReaderActivity extends BaseAppCompatActivity {
 
             }
             FileUtil.writeFile(filePath, contentBuilder.toString());
-            AscodeUtil.toast("Logcat exported successfully: " + filePath);
+            AscodeUtil.toast(getString(R.string.auto_java_logcat_exported, filePath));
         } catch (Exception ex) {
-            AscodeUtil.toastError("Something went wrong!");
+            AscodeUtil.toastError(getString(R.string.auto_java_something_went_wrong));
         }
     }
 
@@ -349,7 +349,7 @@ public class LogReaderActivity extends BaseAppCompatActivity {
                 binding.dateHeader.setVisibility(View.GONE);
             }
             binding.getRoot().setOnLongClickListener(v -> {
-                AscodeUtil.toast("Copied to clipboard");
+                AscodeUtil.toast(getString(R.string.auto_java_copied_to_clipboard));
                 ((ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("clipboard", data.get(position).get("logRaw").toString()));
                 return true;
             });

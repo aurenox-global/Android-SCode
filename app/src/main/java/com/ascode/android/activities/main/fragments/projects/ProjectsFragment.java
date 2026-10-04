@@ -266,7 +266,7 @@ public class ProjectsFragment extends DA {
 
         String version = yB.c(project, "sc_ver_name");
         String meta = (wsName.isEmpty() ? appName : wsName) + (version.isEmpty() ? "" : " (" + version + ")")
-                + " · edited " + getRelativeEditTime(scId, project);
+                + " · " + getString(R.string.home_edited) + " " + getRelativeEditTime(scId, project);
         binding.heroMeta.setText(meta);
 
         binding.heroOpen.setOnClickListener(v -> toDesignActivity(scId));
@@ -302,15 +302,15 @@ public class ProjectsFragment extends DA {
                 }
             }
         }
-        if (when <= 0) return "today";
+        if (when <= 0) return getString(R.string.time_today);
         long diff = System.currentTimeMillis() - when;
         long minutes = diff / 60000L;
-        if (minutes < 60) return Math.max(1, minutes) + " min ago";
+        if (minutes < 60) return getString(R.string.time_minutes, Math.max(1, minutes));
         long hours = diff / 3600000L;
-        if (hours < 24) return hours + " h ago";
+        if (hours < 24) return getString(R.string.time_hours, hours);
         long days = diff / 86400000L;
-        if (days <= 1) return "yesterday";
-        return days + " days ago";
+        if (days <= 1) return getString(R.string.time_yesterday);
+        return getString(R.string.time_days, days);
     }
 
     private void addProject(String sc_id) {

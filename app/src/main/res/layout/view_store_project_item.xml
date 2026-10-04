@@ -55,7 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="2dp"
             android:gravity="center_vertical"
-            android:text="1.2K"
+            android:text="@string/auto_1_2k"
             android:textAppearance="?attr/textAppearanceBodySmallEmphasized" />
 
         <ImageView
@@ -71,7 +71,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="2dp"
             android:gravity="center_vertical"
-            android:text="1.2K"
+            android:text="@string/auto_1_2k"
             android:textAppearance="?attr/textAppearanceBodySmallEmphasized" />
     </LinearLayout>
 </LinearLayout>

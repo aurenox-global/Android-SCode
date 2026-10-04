@@ -118,7 +118,7 @@ public class ConfigActivity extends BaseAppCompatActivity {
                 // fall-through to shared error handler
             }
 
-            AscodeUtil.toastError("Couldn't parse App Settings! Restoring defaults.");
+            AscodeUtil.toastError(Helper.getResString(R.string.auto_java_parse_app_settings_failed));
             LogUtil.e("ConfigActivity", "Failed to parse App Settings.", toLog);
         }
         settings = new HashMap<>();
@@ -170,7 +170,7 @@ public class ConfigActivity extends BaseAppCompatActivity {
         var binding = PreferenceActivityBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        binding.topAppBar.setTitle("App Settings");
+        binding.topAppBar.setTitle(R.string.app_settings_app_settings);
         binding.topAppBar.setNavigationOnClickListener(Helper.getBackPressedClickListener(this));
         var fragment = new PreferenceFragment();
         fragment.setSnackbarView(binding.getRoot());
@@ -224,8 +224,8 @@ public class ConfigActivity extends BaseAppCompatActivity {
                 binding.chipGroupTypes.setVisibility(View.GONE);
                 AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
                         .setView(binding.getRoot())
-                        .setTitle("Backup directory")
-                        .setMessage("Directory inside /Internal storage/, e.g. .ascode/backups")
+                        .setTitle(R.string.auto_java_backup_directory)
+                        .setMessage(R.string.auto_java_backup_directory_msg)
                         .setNegativeButton(R.string.common_word_cancel, null)
                         .setPositiveButton(R.string.common_word_save, null)
                         .create();
@@ -252,7 +252,7 @@ public class ConfigActivity extends BaseAppCompatActivity {
                 if (installWithRoot.isChecked()) {
                     Shell.getShell(shell -> {
                         if (!shell.isRoot()) {
-                            Snackbar.make(snackbarView, "Couldn't acquire root access", BaseTransientBottomBar.LENGTH_SHORT).show();
+                            Snackbar.make(snackbarView, getString(R.string.auto_java_root_access_failed), BaseTransientBottomBar.LENGTH_SHORT).show();
                             installWithRoot.setChecked(false);
                         }
                     });
@@ -269,22 +269,13 @@ public class ConfigActivity extends BaseAppCompatActivity {
 
                 AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
                         .setView(binding.getRoot())
-                        .setTitle("Backup filename format")
-                        .setMessage("This defines how SWB backup files get named.\n" +
-                                "Available variables:\n" +
-                                " - $projectName - Project name\n" +
-                                " - $versionCode - App version code\n" +
-                                " - $versionName - App version name\n" +
-                                " - $pkgName - App package name\n" +
-                                " - $timeInMs - Time during backup in milliseconds\n" +
-                                "\n" +
-                                "Additionally, you can format your own time like this using Java's date formatter syntax:\n" +
-                                "$time(yyyy-MM-dd'T'HHmmss)\n")
+                        .setTitle(R.string.auto_java_backup_filename_format)
+                        .setMessage(R.string.auto_java_backup_filename_format_msg)
                         .setNegativeButton(R.string.common_word_cancel, null)
                         .setPositiveButton(R.string.common_word_save, null)
                         .setNeutralButton(R.string.common_word_reset, (dialogInterface, which) -> {
                             getDataStore().putString(SETTING_BACKUP_FILENAME, null);
-                            Snackbar.make(snackbarView, "Reset to default complete.", BaseTransientBottomBar.LENGTH_SHORT).show();
+                            Snackbar.make(snackbarView, getString(R.string.auto_java_reset_default_complete), BaseTransientBottomBar.LENGTH_SHORT).show();
                         })
                         .create();
 
@@ -307,12 +298,12 @@ public class ConfigActivity extends BaseAppCompatActivity {
             assert restoreMyBlockDefaults != null;
             restoreMyBlockDefaults.setOnPreferenceClickListener(preference -> {
                 new MaterialAlertDialogBuilder(requireContext())
-                        .setTitle("Restore My Block defaults")
-                        .setMessage("This will replace current block.json, palette.json and menu.json with bundled defaults from My Block and My Block 2.")
+                        .setTitle(R.string.auto_java_restore_my_block_defaults)
+                        .setMessage(R.string.auto_java_restore_my_block_files_msg2)
                         .setPositiveButton(Helper.getResString(R.string.common_word_yes), (dialog, which) -> {
                             MyBlockDefaultsInstaller.forceInstallDefaults(requireContext().getApplicationContext());
                             BlockLoader.refresh();
-                            Snackbar.make(snackbarView, "My Block defaults restored.", BaseTransientBottomBar.LENGTH_SHORT).show();
+                            Snackbar.make(snackbarView, getString(R.string.auto_java_my_block_defaults_restored), BaseTransientBottomBar.LENGTH_SHORT).show();
                         })
                         .setNegativeButton(Helper.getResString(R.string.common_word_cancel), null)
                         .show();

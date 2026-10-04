@@ -104,7 +104,7 @@ public class BlocksManagerDetailsActivity extends BaseAppCompatActivity {
                 intent.putExtra("pallet", String.valueOf(palette));
                 startActivity(intent);
             } else {
-                AscodeUtil.toastError("Invalid color of palette #" + (palette - 9));
+                AscodeUtil.toastError(getString(R.string.auto_java_invalid_palette_color, palette - 9));
             }
         });
     }
@@ -112,21 +112,21 @@ public class BlocksManagerDetailsActivity extends BaseAppCompatActivity {
     public void openFileExplorerImport() {
         FilePickerOptions options = new FilePickerOptions();
         options.setExtensions(new String[]{"json"});
-        options.setTitle("Select a JSON file");
+        options.setTitle(getString(R.string.auto_java_select_json_file));
 
         FilePickerCallback callback = new FilePickerCallback() {
             @Override
             public void onFileSelected(File file) {
                 if (FileUtil.readFile(file.getAbsolutePath()).isEmpty()) {
-                    AscodeUtil.toastError("The selected file is empty!");
+                    AscodeUtil.toastError(getString(R.string.auto_java_selected_file_empty));
                 } else if (FileUtil.readFile(file.getAbsolutePath()).equals("[]")) {
-                    AscodeUtil.toastError("The selected file is empty!");
+                    AscodeUtil.toastError(getString(R.string.auto_java_selected_file_empty));
                 } else {
                     try {
                         ArrayList<HashMap<String, Object>> readMap = getGson().fromJson(FileUtil.readFile(file.getAbsolutePath()), Helper.TYPE_MAP_LIST);
                         _importBlocks(readMap);
                     } catch (JsonParseException e) {
-                        AscodeUtil.toastError("Invalid JSON file");
+                        AscodeUtil.toastError(getString(R.string.auto_java_invalid_json_file));
                     }
                 }
             }
@@ -251,9 +251,9 @@ public class BlocksManagerDetailsActivity extends BaseAppCompatActivity {
                 if (paletteName instanceof String) {
                     String exportTo = new File(BLOCK_EXPORT_PATH, paletteName + ".json").getAbsolutePath();
                     FileUtil.writeFile(exportTo, getGson().toJson(filtered_list));
-                    AscodeUtil.toast("Successfully exported blocks to:\n" + exportTo, Toast.LENGTH_LONG);
+                    AscodeUtil.toast(getString(R.string.auto_java_exported_blocks, exportTo), Toast.LENGTH_LONG);
                 } else {
-                    AscodeUtil.toastError("Invalid name of palette #" + (palette - 9));
+                    AscodeUtil.toastError(getString(R.string.auto_java_invalid_palette_name, palette - 9));
                 }
                 break;
 
@@ -269,13 +269,13 @@ public class BlocksManagerDetailsActivity extends BaseAppCompatActivity {
         blocks_path = getIntent().getStringExtra("dirB");
         _refreshLists();
         if (palette == -1) {
-            getSupportActionBar().setTitle("Recycle Bin");
+            getSupportActionBar().setTitle(R.string.auto_recycle_bin);
             fab_button.setVisibility(View.GONE);
         } else {
             Object paletteName = pallet_list.get(palette - 9).get("name");
 
             if (paletteName instanceof String) {
-                getSupportActionBar().setTitle("Manage Block");
+                getSupportActionBar().setTitle(R.string.auto_java_manage_block);
                 getSupportActionBar().setSubtitle((String) paletteName);
             }
         }
@@ -342,7 +342,7 @@ public class BlocksManagerDetailsActivity extends BaseAppCompatActivity {
                         source_filtered_list.add(block);
                     }
                 } catch (NumberFormatException e) {
-                    AscodeUtil.toastError("Invalid palette entry in block #" + (i + 1));
+                    AscodeUtil.toastError(getString(R.string.auto_java_invalid_palette_entry, i + 1));
                 }
             }
         }
@@ -518,7 +518,7 @@ public class BlocksManagerDetailsActivity extends BaseAppCompatActivity {
                         intent.putExtra("pos", String.valueOf(position));
                         startActivity(intent);
                     } else {
-                        AscodeUtil.toastError("Invalid color of palette #" + (palette - 9));
+                        AscodeUtil.toastError(getString(R.string.auto_java_invalid_palette_color, palette - 9));
                     }
                     break;
 
@@ -528,11 +528,11 @@ public class BlocksManagerDetailsActivity extends BaseAppCompatActivity {
 
                 case "Delete":
                     new MaterialAlertDialogBuilder(this)
-                            .setTitle("Delete block?")
-                            .setMessage("Are you sure you want to delete this block?")
-                            .setPositiveButton("Recycle bin", (dialog, which) -> _moveToRecycleBin(position))
+                            .setTitle(R.string.auto_java_delete_block)
+                            .setMessage(R.string.auto_java_delete_block_msg)
+                            .setPositiveButton(R.string.auto_recycle_bin, (dialog, which) -> _moveToRecycleBin(position))
                             .setNegativeButton(R.string.common_word_cancel, null)
-                            .setNeutralButton("Delete permanently", (dialog, which) -> _deleteBlock(position))
+                            .setNeutralButton(R.string.auto_java_delete_permanently, (dialog, which) -> _deleteBlock(position))
                             .show();
                     break;
 
@@ -581,7 +581,7 @@ public class BlocksManagerDetailsActivity extends BaseAppCompatActivity {
             if (name instanceof String) {
                 paletteNames.add((String) name);
             } else {
-                AscodeUtil.toastError("Invalid name of Custom Block palette #" + (j + 1));
+                AscodeUtil.toastError(getString(R.string.auto_java_invalid_custom_palette_name, j + 1));
             }
         }
 
@@ -589,9 +589,9 @@ public class BlocksManagerDetailsActivity extends BaseAppCompatActivity {
                 .setNegativeButton(R.string.common_word_cancel, null);
         if (palette == -1) {
             AtomicInteger restoreToChoice = new AtomicInteger(-1);
-            builder.setTitle("Restore to")
+            builder.setTitle(R.string.auto_java_restore_to)
                     .setSingleChoiceItems(paletteNames.toArray(new String[0]), -1, (dialog, which) -> restoreToChoice.set(which))
-                    .setPositiveButton("Restore", (dialog, which) -> {
+                    .setPositiveButton(R.string.auto_java_restore, (dialog, which) -> {
                         if (restoreToChoice.get() != -1) {
                             all_blocks_list.get(position).put("palette", String.valueOf(restoreToChoice.get() + 9));
                             Collections.swap(all_blocks_list, position, all_blocks_list.size() - 1);
@@ -601,9 +601,9 @@ public class BlocksManagerDetailsActivity extends BaseAppCompatActivity {
                     });
         } else {
             AtomicInteger moveToChoice = new AtomicInteger(palette - 9);
-            builder.setTitle("Move to")
+            builder.setTitle(R.string.auto_java_move_to)
                     .setSingleChoiceItems(paletteNames.toArray(new String[0]), palette - 9, (dialog, which) -> moveToChoice.set(which))
-                    .setPositiveButton("Move", (dialog, which) -> {
+                    .setPositiveButton(R.string.auto_java_move, (dialog, which) -> {
                         all_blocks_list.get(position).put("palette", String.valueOf(moveToChoice.get() + 9));
                         Collections.swap(all_blocks_list, position, all_blocks_list.size() - 1);
                         FileUtil.writeFile(blocks_path, getGson().toJson(all_blocks_list));
@@ -623,11 +623,11 @@ public class BlocksManagerDetailsActivity extends BaseAppCompatActivity {
                 if (blockName instanceof String) {
                     names.add((String) blockName);
                 } else {
-                    AscodeUtil.toastError("Invalid name entry of Custom Block #" + (i + 1) + " in Blocks to import");
+                    AscodeUtil.toastError(getString(R.string.auto_java_invalid_import_block_name, i + 1));
                 }
             }
             MaterialAlertDialogBuilder import_dialog = new MaterialAlertDialogBuilder(this);
-            import_dialog.setTitle("Import blocks")
+            import_dialog.setTitle(R.string.auto_java_import_blocks)
                     .setMultiChoiceItems(names.toArray(new CharSequence[0]), null, (dialog, which, isChecked) -> {
                         if (isChecked) {
                             toAdd.add(which);
@@ -635,7 +635,7 @@ public class BlocksManagerDetailsActivity extends BaseAppCompatActivity {
                             toAdd.remove((Integer) which);
                         }
                     })
-                    .setPositiveButton("Import", (dialog, which) -> {
+                    .setPositiveButton(R.string.common_word_import, (dialog, which) -> {
                         for (int i = 0; i < blocks.size(); i++) {
                             if (toAdd.contains(i)) {
                                 HashMap<String, Object> map = blocks.get(i);
@@ -645,9 +645,9 @@ public class BlocksManagerDetailsActivity extends BaseAppCompatActivity {
                         }
                         FileUtil.writeFile(blocks_path, getGson().toJson(all_blocks_list));
                         _refreshLists();
-                        AscodeUtil.toast("Imported successfully");
+                        AscodeUtil.toast(getString(R.string.auto_java_imported_successfully));
                     })
-                    .setNegativeButton("Reverse", (dialog, which) -> {
+                    .setNegativeButton(R.string.auto_java_reverse, (dialog, which) -> {
                         for (int i = 0; i < blocks.size(); i++) {
                             if (!toAdd.contains(i)) {
                                 HashMap<String, Object> map = blocks.get(i);
@@ -657,9 +657,9 @@ public class BlocksManagerDetailsActivity extends BaseAppCompatActivity {
                         }
                         FileUtil.writeFile(blocks_path, getGson().toJson(all_blocks_list));
                         _refreshLists();
-                        AscodeUtil.toast("Imported successfully");
+                        AscodeUtil.toast(getString(R.string.auto_java_imported_successfully));
                     })
-                    .setNeutralButton("All", (dialog, which) -> {
+                    .setNeutralButton(R.string.auto_java_all, (dialog, which) -> {
                         for (int i = 0; i < blocks.size(); i++) {
                             HashMap<String, Object> map = blocks.get(i);
                             map.put("palette", String.valueOf(palette));
@@ -667,11 +667,11 @@ public class BlocksManagerDetailsActivity extends BaseAppCompatActivity {
                         }
                         FileUtil.writeFile(blocks_path, getGson().toJson(all_blocks_list));
                         _refreshLists();
-                        AscodeUtil.toast("Imported successfully");
+                        AscodeUtil.toast(getString(R.string.auto_java_imported_successfully));
                     })
                     .show();
         } catch (Exception e) {
-            AscodeUtil.toastError("An error occurred! [" + e.getMessage() + "]");
+            AscodeUtil.toastError(getString(R.string.auto_java_error_occurred, e.getMessage()));
         }
     }
 
@@ -736,7 +736,7 @@ public class BlocksManagerDetailsActivity extends BaseAppCompatActivity {
                 spec.setHint("");
             } else {
                 name.setText("");
-                name.setHint("(Invalid block name entry)");
+                name.setHint(R.string.auto_java_invalid_block_name_entry);
             }
 
             Object blockSpec = block.get("spec");
@@ -745,7 +745,7 @@ public class BlocksManagerDetailsActivity extends BaseAppCompatActivity {
                 spec.setHint("");
             } else {
                 spec.setText("");
-                spec.setHint("(Invalid block spec entry)");
+                spec.setHint(R.string.auto_java_invalid_block_spec_entry);
             }
 
             Object blockType = block.get("type");
@@ -792,14 +792,14 @@ public class BlocksManagerDetailsActivity extends BaseAppCompatActivity {
                         try {
                             color = Color.parseColor((String) blockColor);
                         } catch (IllegalArgumentException e) {
-                            AscodeUtil.toastError("Invalid color entry in block #" + (position + 1));
+                            AscodeUtil.toastError(getString(R.string.auto_java_invalid_color_entry, position + 1));
                         }
 
                         if (color != -1) {
                             spec.getBackground().setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.MULTIPLY));
                         }
                     } else {
-                        AscodeUtil.toastError("Invalid color entry in block #" + (position + 1));
+                        AscodeUtil.toastError(getString(R.string.auto_java_invalid_color_entry, position + 1));
                     }
                 } else {
                     HashMap<String, Object> paletteObject = pallet_list.get(palette - 9);
@@ -812,7 +812,7 @@ public class BlocksManagerDetailsActivity extends BaseAppCompatActivity {
                                     PorterDuff.Mode.MULTIPLY
                             ));
                         } catch (IllegalArgumentException e) {
-                            AscodeUtil.toastError("Invalid color in Custom Block palette #" + (palette - 8));
+                            AscodeUtil.toastError(getString(R.string.auto_java_invalid_custom_palette_color, palette - 8));
                         }
                     }
                 }

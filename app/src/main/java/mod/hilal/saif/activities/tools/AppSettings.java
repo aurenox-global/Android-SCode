@@ -99,27 +99,27 @@ public class AppSettings extends BaseAppCompatActivity {
         var preferences = new ArrayList<LibraryCategoryView>();
 
         LibraryCategoryView managersCategory = new LibraryCategoryView(this);
-        managersCategory.setTitle("Managers");
+        managersCategory.setTitle(getString(R.string.app_settings_managers));
         preferences.add(managersCategory);
 
-        managersCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_block, "Block manager", "Manage your own blocks to use in Logic Editor", new ActivityLauncher(new Intent(getApplicationContext(), BlocksManager.class))), true);
-        managersCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_pull_down, "Block selector menu manager", "Manage your own block selector menus", openSettingsActivity(SettingsActivity.BLOCK_SELECTOR_MANAGER_FRAGMENT)), true);
-        managersCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_component, "Component manager", "Manage your own components", new ActivityLauncher(new Intent(getApplicationContext(), ManageCustomComponentActivity.class))), true);
-        managersCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_list, "Event manager", "Manage your own events", openSettingsActivity(SettingsActivity.EVENTS_MANAGER_FRAGMENT)), true);
-        managersCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_box, "Local library manager", "Manage and download local libraries", new ActivityLauncher(new Intent(getApplicationContext(), ManageLocalLibraryActivity.class), new Pair<>("sc_id", "system"))), true);
+        managersCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_block, getString(R.string.app_settings_block_manager), getString(R.string.app_settings_block_manager_desc), new ActivityLauncher(new Intent(getApplicationContext(), BlocksManager.class))), true);
+        managersCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_pull_down, getString(R.string.app_settings_block_selector), getString(R.string.app_settings_block_selector_desc), openSettingsActivity(SettingsActivity.BLOCK_SELECTOR_MANAGER_FRAGMENT)), true);
+        managersCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_component, getString(R.string.app_settings_component_manager), getString(R.string.app_settings_component_manager_desc), new ActivityLauncher(new Intent(getApplicationContext(), ManageCustomComponentActivity.class))), true);
+        managersCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_list, getString(R.string.app_settings_event_manager), getString(R.string.app_settings_event_manager_desc), openSettingsActivity(SettingsActivity.EVENTS_MANAGER_FRAGMENT)), true);
+        managersCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_box, getString(R.string.app_settings_local_library), getString(R.string.app_settings_local_library_desc), new ActivityLauncher(new Intent(getApplicationContext(), ManageLocalLibraryActivity.class), new Pair<>("sc_id", "system"))), true);
         managersCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_article, Helper.getResString(R.string.design_drawer_menu_title_logcat_reader), Helper.getResString(R.string.design_drawer_menu_subtitle_logcat_reader), new ActivityLauncher(new Intent(getApplicationContext(), LogReaderActivity.class))), false);
 
         LibraryCategoryView generalCategory = new LibraryCategoryView(this);
-        generalCategory.setTitle("General");
+        generalCategory.setTitle(getString(R.string.app_settings_general));
         preferences.add(generalCategory);
 
-        generalCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_settings_applications, "App settings", "Change general app settings", new ActivityLauncher(new Intent(getApplicationContext(), ConfigActivity.class))), true);
-        generalCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_settings, "Feature flags", "Enable or disable experimental features", new ActivityLauncher(new Intent(getApplicationContext(), FeatureFlagsActivity.class))), true);
+        generalCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_settings_applications, getString(R.string.app_settings_app_settings), getString(R.string.app_settings_app_settings_desc), new ActivityLauncher(new Intent(getApplicationContext(), ConfigActivity.class))), true);
+        generalCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_settings, getString(R.string.app_settings_feature_flags), getString(R.string.app_settings_feature_flags_desc), new ActivityLauncher(new Intent(getApplicationContext(), FeatureFlagsActivity.class))), true);
         generalCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_palette, Helper.getResString(R.string.settings_appearance), Helper.getResString(R.string.settings_appearance_description), openSettingsActivity(SettingsActivity.SETTINGS_APPEARANCE_FRAGMENT)), true);
-        generalCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_folder, "Open working directory", "Open Android SCode's directory and edit files in it", v -> openWorkingDirectory()), true);
-        generalCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_key, "Keystore manager", "Import and manage the keystores used to sign your APKs and AABs", new ActivityLauncher(new Intent(getApplicationContext(), KeystoreManagerActivity.class))), true);
-        generalCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_apk_document, "Sign an APK file", "Sign an already existing APK file with the testkey or a saved keystore, signature schemes up to V4", v -> signApkFileDialog()), true);
-        generalCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_settings, Helper.getResString(R.string.main_drawer_title_system_settings), "Auto-save and vibrations", new ActivityLauncher(new Intent(getApplicationContext(), SystemSettingActivity.class))), false);
+        generalCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_folder, getString(R.string.app_settings_open_dir), getString(R.string.app_settings_open_dir_desc), v -> openWorkingDirectory()), true);
+        generalCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_key, getString(R.string.app_settings_keystore_manager), getString(R.string.app_settings_keystore_manager_desc), new ActivityLauncher(new Intent(getApplicationContext(), KeystoreManagerActivity.class))), true);
+        generalCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_apk_document, getString(R.string.app_settings_sign_apk), getString(R.string.app_settings_sign_apk_desc), v -> signApkFileDialog()), true);
+        generalCategory.addLibraryItem(createPreference(R.drawable.ic_mtrl_settings, Helper.getResString(R.string.main_drawer_title_system_settings), getString(R.string.app_settings_system_settings_desc), new ActivityLauncher(new Intent(getApplicationContext(), SystemSettingActivity.class))), false);
 
         preferences.forEach(content::addView);
     }
@@ -146,7 +146,7 @@ public class AppSettings extends BaseAppCompatActivity {
         FilePickerOptions options = new FilePickerOptions();
         options.setSelectionMode(SelectionMode.BOTH);
         options.setMultipleSelection(true);
-        options.setTitle("Select an entry to modify");
+        options.setTitle(getString(R.string.app_settings_select_entry));
         options.setInitialDirectory(getFilesDir().getParentFile().getAbsolutePath());
 
         FilePickerCallback callback = new FilePickerCallback() {
@@ -155,11 +155,11 @@ public class AppSettings extends BaseAppCompatActivity {
                 boolean isDirectory = files.get(0).isDirectory();
                 if (files.size() > 1 || isDirectory) {
                     new MaterialAlertDialogBuilder(AppSettings.this)
-                            .setTitle("Select an action")
-                            .setSingleChoiceItems(new String[]{"Delete"}, -1, (actionDialog, which) -> {
+                            .setTitle(R.string.app_settings_select_action)
+                            .setSingleChoiceItems(new String[]{getString(R.string.app_settings_delete)}, -1, (actionDialog, which) -> {
                                 new MaterialAlertDialogBuilder(AppSettings.this)
-                                        .setTitle("Delete " + (isDirectory ? "folder" : "file") + "?")
-                                        .setMessage("Are you sure you want to delete this " + (isDirectory ? "folder" : "file") + " permanently? This cannot be undone.")
+                                        .setTitle(getString(R.string.app_settings_delete_title, getString(isDirectory ? R.string.app_settings_word_folder : R.string.app_settings_word_file)))
+                                        .setMessage(getString(R.string.app_settings_delete_message, getString(isDirectory ? R.string.app_settings_word_folder : R.string.app_settings_word_file)))
                                         .setPositiveButton(R.string.common_word_delete, (deleteConfirmationDialog, pressedButton) -> {
                                             for (File file : files) {
                                                 FileUtil.deleteFile(file.getAbsolutePath());
@@ -173,8 +173,8 @@ public class AppSettings extends BaseAppCompatActivity {
                             .show();
                 } else {
                     new MaterialAlertDialogBuilder(AppSettings.this)
-                            .setTitle("Select an action")
-                            .setSingleChoiceItems(new String[]{"Edit", "Delete"}, -1, (actionDialog, which) -> {
+                            .setTitle(R.string.app_settings_select_action)
+                            .setSingleChoiceItems(new String[]{getString(R.string.app_settings_edit), getString(R.string.app_settings_delete)}, -1, (actionDialog, which) -> {
                                 switch (which) {
                                     case 0 -> {
                                         Intent intent = new Intent(getApplicationContext(), SrcCodeEditor.class);
@@ -184,8 +184,8 @@ public class AppSettings extends BaseAppCompatActivity {
                                         startActivity(intent);
                                     }
                                     case 1 -> new MaterialAlertDialogBuilder(AppSettings.this)
-                                            .setTitle("Delete file?")
-                                            .setMessage("Are you sure you want to delete this file permanently? This cannot be undone.")
+                                            .setTitle(R.string.app_settings_delete_file_title)
+                                            .setMessage(R.string.app_settings_delete_file_message)
                                             .setPositiveButton(R.string.common_word_delete, (deleteDialog, pressedButton) ->
                                                     FileUtil.deleteFile(files.get(0).getAbsolutePath()))
                                             .setNegativeButton(R.string.common_word_cancel, null)
@@ -204,7 +204,7 @@ public class AppSettings extends BaseAppCompatActivity {
     private void signApkFileDialog() {
         boolean[] isAPKSelected = {false};
         MaterialAlertDialogBuilder apkPathDialog = new MaterialAlertDialogBuilder(this);
-        apkPathDialog.setTitle("Sign an APK file");
+        apkPathDialog.setTitle(R.string.app_settings_sign_apk);
 
         DialogSelectApkToSignBinding binding = DialogSelectApkToSignBinding.inflate(getLayoutInflater());
         View testkey_root = binding.getRoot();
@@ -224,9 +224,9 @@ public class AppSettings extends BaseAppCompatActivity {
             dialog.show(getSupportFragmentManager(), "file_picker");
         });
 
-        apkPathDialog.setPositiveButton("Continue", (v, which) -> {
+        apkPathDialog.setPositiveButton(getString(R.string.app_settings_continue), (v, which) -> {
             if (!isAPKSelected[0]) {
-                AscodeUtil.toast("Please select an APK file to sign", Toast.LENGTH_SHORT);
+                AscodeUtil.toast(getString(R.string.app_settings_select_apk), Toast.LENGTH_SHORT);
                 shakeView(binding.selectFile);
                 return;
             }
@@ -238,11 +238,11 @@ public class AppSettings extends BaseAppCompatActivity {
             if (new File(output_apk_path).exists()) {
                 MaterialAlertDialogBuilder confirmOverwrite = new MaterialAlertDialogBuilder(this);
                 confirmOverwrite.setIcon(R.drawable.color_save_as_new_96);
-                confirmOverwrite.setTitle("File exists");
-                confirmOverwrite.setMessage("An APK named " + output_apk_file_name + " already exists at /.AndroidSCode/signed_apk/.  Overwrite it?");
+                confirmOverwrite.setTitle(R.string.app_settings_file_exists);
+                confirmOverwrite.setMessage(getString(R.string.app_settings_overwrite_message, output_apk_file_name));
 
                 confirmOverwrite.setNegativeButton(Helper.getResString(R.string.common_word_cancel), null);
-                confirmOverwrite.setPositiveButton("Overwrite", (view, which1) -> {
+                confirmOverwrite.setPositiveButton(getString(R.string.app_settings_overwrite), (view, which1) -> {
                     v.dismiss();
                     chooseSigningMethod(input_apk_path, output_apk_path);
                 });
@@ -266,13 +266,13 @@ public class AppSettings extends BaseAppCompatActivity {
     private void chooseSigningMethod(String inputApkPath, String outputApkPath) {
         List<KeystoreStore.Entry> savedKeystores = KeystoreStore.list(this);
         List<String> labels = new ArrayList<>();
-        labels.add("Sign with the testkey");
+        labels.add(getString(R.string.app_settings_sign_testkey));
         for (KeystoreStore.Entry entry : savedKeystores) {
-            labels.add("Sign with " + entry.getName() + " (" + entry.getAlias() + ")");
+            labels.add(getString(R.string.app_settings_sign_with, entry.getName(), entry.getAlias()));
         }
 
         new MaterialAlertDialogBuilder(this)
-                .setTitle("Sign with")
+                .setTitle(R.string.app_settings_sign_with_title)
                 .setItems(labels.toArray(new String[0]), (dialog, which) -> {
                     if (which == 0) {
                         signApkFileWithDialog(inputApkPath, outputApkPath, true, null, null, null, null);
@@ -281,7 +281,7 @@ public class AppSettings extends BaseAppCompatActivity {
                     KeystoreStore.Entry entry = savedKeystores.get(which - 1);
                     File source = entry.file(this);
                     if (!source.exists()) {
-                        AscodeUtil.toastError("The keystore file is missing. Import it again from Settings → Keystore manager.");
+                        AscodeUtil.toastError(getString(R.string.app_settings_keystore_missing));
                         return;
                     }
                     signApkFileWithDialog(inputApkPath, outputApkPath, false,
@@ -304,7 +304,7 @@ public class AppSettings extends BaseAppCompatActivity {
         scroll_view.addView(tv_log);
         layout_quiz.addView(scroll_view);
 
-        tv_progress.setText("Signing APK...");
+        tv_progress.setText(R.string.app_settings_signing);
 
         AlertDialog building_dialog = new MaterialAlertDialogBuilder(this)
                 .setView(building_root)
@@ -329,12 +329,12 @@ public class AppSettings extends BaseAppCompatActivity {
                 runOnUiThread(() -> {
                     if (ApkSigner.LogCallback.errorCount.get() == 0) {
                         building_dialog.dismiss();
-                        AscodeUtil.toast("Successfully saved signed APK to: /Internal storage/ascode/signed_apk/"
-                                        + Uri.fromFile(new File(outputApkPath)).getLastPathSegment(),
+                        AscodeUtil.toast(getString(R.string.app_settings_signed_ok,
+                                        "/Internal storage/ascode/signed_apk/" + Uri.fromFile(new File(outputApkPath)).getLastPathSegment()),
                                 Toast.LENGTH_LONG);
                         showSignedApkCertificate(outputApkPath);
                     } else {
-                        tv_progress.setText("An error occurred. Check the log for more details.");
+                        tv_progress.setText(R.string.app_settings_signed_error);
                     }
                 });
             }
@@ -366,15 +366,15 @@ public class AppSettings extends BaseAppCompatActivity {
                         builder.append("\nSHA-256: ").append(KeystoreStore.formatSha256(
                                 MessageDigest.getInstance("SHA-256").digest(certificate.getEncoded())));
                     }
-                    message = first ? "No certificates found in the signed APK." : builder.toString();
+                    message = first ? getString(R.string.app_settings_no_certs) : builder.toString();
                 } catch (Exception e) {
-                    message = "Could not read the resulting certificate: " + e.getMessage();
+                    message = getString(R.string.app_settings_cert_error, e.getMessage());
                 }
                 String finalMessage = message;
                 runOnUiThread(() -> new MaterialAlertDialogBuilder(AppSettings.this)
-                        .setTitle("Signed APK certificate")
+                        .setTitle(R.string.app_settings_cert_title)
                         .setMessage(finalMessage)
-                        .setPositiveButton("Close", null)
+                        .setPositiveButton(getString(R.string.app_settings_close), null)
                         .show());
             }
         }.start();

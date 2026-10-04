@@ -38,7 +38,7 @@ public class FeatureFlagsActivity extends BaseAppCompatActivity {
         binding = PreferenceActivityBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        binding.topAppBar.setTitle("Feature Flags");
+        binding.topAppBar.setTitle(R.string.app_settings_feature_flags);
         binding.topAppBar.setNavigationOnClickListener(Helper.getBackPressedClickListener(this));
 
         onAdaptiveLayoutChanged(getAdaptiveLayoutSnapshot());
@@ -61,7 +61,6 @@ public class FeatureFlagsActivity extends BaseAppCompatActivity {
                 horizontalPaddingPx,
                 binding.contentLayout.getPaddingBottom()
         );
-        binding.topAppBar.setSubtitle("Layout: " + snapshot.widthClass.label() + " (" + snapshot.widthDp + "dp)");
     }
 
     public static class FeatureFlagsFragment extends PreferenceFragmentCompat {
@@ -222,40 +221,24 @@ public class FeatureFlagsActivity extends BaseAppCompatActivity {
 
             if (snapshot.totalCount == 0) {
                 if (buildSummaryPreference != null) {
-                    buildSummaryPreference.setSummary("No data yet. Run a build to collect metrics.");
+                    buildSummaryPreference.setSummary(R.string.auto_java_ff_build_no_data);
                 }
                 if (buildLastPreference != null) {
-                    buildLastPreference.setSummary("No build has been recorded.");
+                    buildLastPreference.setSummary(R.string.auto_java_ff_no_build);
                 }
                 if (buildStagesPreference != null) {
-                    buildStagesPreference.setSummary("No stage data yet.");
+                    buildStagesPreference.setSummary(R.string.auto_java_ff_no_stage_data);
                 }
                 return;
             }
 
             if (buildSummaryPreference != null) {
-                buildSummaryPreference.setSummary(
-                        "Total: " + snapshot.totalCount
-                                + " | Success: " + snapshot.successCount
-                                + " | Failed: " + snapshot.failureCount
-                                + " | Canceled: " + snapshot.canceledCount
-                                + " | Cold: " + snapshot.coldCount
-                                + " | Incremental: " + snapshot.incrementalCount
-                        + " | Cache hit est: " + BuildMetricsStore.formatPercent(snapshot.cacheHitEstimateRate)
-                        + " (" + snapshot.cacheHitEstimateCount + "/"
-                        + (snapshot.cacheHitEstimateCount + snapshot.cacheMissEstimateCount) + ")"
-                                + " | Avg success: " + BuildMetricsStore.formatDuration(snapshot.averageSuccessDurationMs)
-                );
+                buildSummaryPreference.setSummary(getString(R.string.auto_java_ff_build_summary, snapshot.totalCount, snapshot.successCount, snapshot.failureCount, snapshot.canceledCount, snapshot.coldCount, snapshot.incrementalCount, BuildMetricsStore.formatPercent(snapshot.cacheHitEstimateRate), snapshot.cacheHitEstimateCount, snapshot.cacheHitEstimateCount + snapshot.cacheMissEstimateCount, BuildMetricsStore.formatDuration(snapshot.averageSuccessDurationMs)));
             }
 
             if (buildLastPreference != null) {
-                String status = snapshot.lastCanceled ? "Canceled" : (snapshot.lastSuccess ? "Success" : "Failed");
-                buildLastPreference.setSummary(
-                        "Type: " + snapshot.lastType
-                                + " | Profile: " + snapshot.lastProfile
-                                + " | Status: " + status
-                                + " | Duration: " + BuildMetricsStore.formatDuration(snapshot.lastDurationMs)
-                );
+                String status = snapshot.lastCanceled ? getString(R.string.auto_java_ff_status_canceled) : (snapshot.lastSuccess ? getString(R.string.auto_java_ff_status_success) : getString(R.string.auto_java_ff_status_failed));
+                buildLastPreference.setSummary(getString(R.string.auto_java_ff_build_last, snapshot.lastType, snapshot.lastProfile, status, BuildMetricsStore.formatDuration(snapshot.lastDurationMs)));
             }
 
             if (buildStagesPreference != null) {
@@ -271,13 +254,13 @@ public class FeatureFlagsActivity extends BaseAppCompatActivity {
 
             if (snapshot.totalSamples == 0) {
                 if (editorSummaryPreference != null) {
-                    editorSummaryPreference.setSummary("No data yet. Use the editor with LSP enabled to collect metrics.");
+                    editorSummaryPreference.setSummary(R.string.auto_java_ff_editor_no_data);
                 }
                 if (editorLspPreference != null) {
-                    editorLspPreference.setSummary("No LSP latency samples yet.");
+                    editorLspPreference.setSummary(R.string.auto_java_ff_no_lsp);
                 }
                 if (editorDiagnosticsPreference != null) {
-                    editorDiagnosticsPreference.setSummary("No diagnostics latency samples yet.");
+                    editorDiagnosticsPreference.setSummary(R.string.auto_java_ff_no_diagnostics);
                 }
                 return;
             }
@@ -287,11 +270,7 @@ public class FeatureFlagsActivity extends BaseAppCompatActivity {
                 int diagnosticsSamples = snapshot.diagnosticsAnalyze.count
                         + snapshot.diagnosticsRender.count
                         + snapshot.diagnosticsPublishToRender.count;
-                editorSummaryPreference.setSummary(
-                        "Total: " + snapshot.totalSamples
-                                + " | LSP ops: " + lspSamples
-                                + " | Diagnostics ops: " + diagnosticsSamples
-                );
+                editorSummaryPreference.setSummary(getString(R.string.auto_java_ff_editor_summary, snapshot.totalSamples, lspSamples, diagnosticsSamples));
             }
 
             if (editorLspPreference != null) {
@@ -320,25 +299,19 @@ public class FeatureFlagsActivity extends BaseAppCompatActivity {
 
             if (snapshot.totalRuns == 0) {
                 if (kmpBuildSummaryPreference != null) {
-                    kmpBuildSummaryPreference.setSummary("No data yet. Run KMP experimental builds to collect metrics.");
+                    kmpBuildSummaryPreference.setSummary(R.string.auto_java_ff_kmp_no_data);
                 }
                 if (kmpBuildTrendPreference != null) {
-                    kmpBuildTrendPreference.setSummary("No trend data yet.");
+                    kmpBuildTrendPreference.setSummary(R.string.auto_java_ff_no_trend);
                 }
                 if (kmpBuildStagesPreference != null) {
-                    kmpBuildStagesPreference.setSummary("No stage data yet.");
+                    kmpBuildStagesPreference.setSummary(R.string.auto_java_ff_no_stage_data);
                 }
                 return;
             }
 
             if (kmpBuildSummaryPreference != null) {
-                kmpBuildSummaryPreference.setSummary(
-                        "Runs: " + snapshot.totalRuns
-                                + " | Cold: " + snapshot.coldRuns
-                                + " | Incremental: " + snapshot.incrementalRuns
-                                + " | Last profile: " + snapshot.lastProfile
-                                + " | Last duration: " + KmpBuildPerformanceMetricsStore.formatDuration(snapshot.lastDurationMs)
-                );
+                kmpBuildSummaryPreference.setSummary(getString(R.string.auto_java_ff_kmp_summary, snapshot.totalRuns, snapshot.coldRuns, snapshot.incrementalRuns, snapshot.lastProfile, KmpBuildPerformanceMetricsStore.formatDuration(snapshot.lastDurationMs)));
             }
 
             if (kmpBuildTrendPreference != null) {
@@ -361,45 +334,28 @@ public class FeatureFlagsActivity extends BaseAppCompatActivity {
 
             if (snapshot.totalCount == 0) {
                 if (startupSummaryPreference != null) {
-                    startupSummaryPreference.setSummary("No data yet. Open the app with startup profiling enabled to collect samples.");
+                    startupSummaryPreference.setSummary(R.string.auto_java_ff_startup_no_data);
                 }
                 if (startupLastPreference != null) {
-                    startupLastPreference.setSummary("No startup has been recorded.");
+                    startupLastPreference.setSummary(R.string.auto_java_ff_no_startup);
                 }
                 if (startupThresholdPreference != null) {
-                    startupThresholdPreference.setSummary(
-                            "Threshold: " + StartupPerformanceMetricsStore.formatDuration(snapshot.activeThresholdMs)
-                    );
+                    startupThresholdPreference.setSummary(getString(R.string.auto_java_ff_threshold, StartupPerformanceMetricsStore.formatDuration(snapshot.activeThresholdMs)));
                 }
                 return;
             }
 
             if (startupSummaryPreference != null) {
-                startupSummaryPreference.setSummary(
-                        "Total: " + snapshot.totalCount
-                                + " | Regressions: " + snapshot.regressionCount
-                                + " (" + StartupPerformanceMetricsStore.formatPercent(snapshot.regressionRate) + ")"
-                                + "\n"
-                                + StartupPerformanceMetricsStore.formatOperation("startup.total", snapshot.total)
-                );
+                startupSummaryPreference.setSummary(getString(R.string.auto_java_ff_startup_summary, snapshot.totalCount, snapshot.regressionCount, StartupPerformanceMetricsStore.formatPercent(snapshot.regressionRate), StartupPerformanceMetricsStore.formatOperation("startup.total", snapshot.total)));
             }
 
             if (startupLastPreference != null) {
-                startupLastPreference.setSummary(
-                        "Total: " + StartupPerformanceMetricsStore.formatDuration(snapshot.lastTotalDurationMs)
-                                + " | app.init: " + StartupPerformanceMetricsStore.formatDuration(snapshot.lastApplicationInitDurationMs)
-                                + " | main.ready: " + StartupPerformanceMetricsStore.formatDuration(snapshot.lastMainActivityDurationMs)
-                );
+                startupLastPreference.setSummary(getString(R.string.auto_java_ff_startup_last, StartupPerformanceMetricsStore.formatDuration(snapshot.lastTotalDurationMs), StartupPerformanceMetricsStore.formatDuration(snapshot.lastApplicationInitDurationMs), StartupPerformanceMetricsStore.formatDuration(snapshot.lastMainActivityDurationMs)));
             }
 
             if (startupThresholdPreference != null) {
-                String status = snapshot.lastRegression ? "REGRESSION" : "ok";
-                startupThresholdPreference.setSummary(
-                        "Last status: " + status
-                                + " | Last threshold: " + StartupPerformanceMetricsStore.formatDuration(snapshot.lastThresholdMs)
-                                + " | Active threshold: " + StartupPerformanceMetricsStore.formatDuration(snapshot.activeThresholdMs)
-                                + " | Baseline p50: " + StartupPerformanceMetricsStore.formatDuration(snapshot.lastBaselineP50Ms)
-                );
+                String status = snapshot.lastRegression ? getString(R.string.auto_java_ff_regression) : getString(R.string.auto_java_ff_ok);
+                startupThresholdPreference.setSummary(getString(R.string.auto_java_ff_startup_status, status, StartupPerformanceMetricsStore.formatDuration(snapshot.lastThresholdMs), StartupPerformanceMetricsStore.formatDuration(snapshot.activeThresholdMs), StartupPerformanceMetricsStore.formatDuration(snapshot.lastBaselineP50Ms)));
             }
         }
 
@@ -409,41 +365,30 @@ public class FeatureFlagsActivity extends BaseAppCompatActivity {
 
             if (snapshot.totalScans == 0) {
                 if (accessibilitySummaryPreference != null) {
-                    accessibilitySummaryPreference.setSummary("No data yet. Open screens with accessibility reporting enabled to collect checks.");
+                    accessibilitySummaryPreference.setSummary(R.string.auto_java_ff_a11y_no_data);
                 }
                 if (accessibilityLastPreference != null) {
-                    accessibilityLastPreference.setSummary("No accessibility report has been recorded.");
+                    accessibilityLastPreference.setSummary(R.string.auto_java_ff_no_a11y);
                 }
                 return;
             }
 
             if (accessibilitySummaryPreference != null) {
-                accessibilitySummaryPreference.setSummary(
-                        "Scans: " + snapshot.totalScans
-                                + " | Issues: " + snapshot.totalIssues
-                                + " (" + AccessibilityIssueReportStore.formatPercent(snapshot.issueRate) + ")"
-                                + " | Warnings: " + snapshot.totalWarnings
-                                + " | Errors: " + snapshot.totalErrors
-                );
+                accessibilitySummaryPreference.setSummary(getString(R.string.auto_java_ff_a11y_summary, snapshot.totalScans, snapshot.totalIssues, AccessibilityIssueReportStore.formatPercent(snapshot.issueRate), snapshot.totalWarnings, snapshot.totalErrors));
             }
 
             if (accessibilityLastPreference != null) {
-                accessibilityLastPreference.setSummary(
-                        "Screen: " + snapshot.lastScreenId
-                                + " | Issues: " + snapshot.lastIssueCount
-                                + " (W: " + snapshot.lastWarningCount + ", E: " + snapshot.lastErrorCount + ")"
-                                + " | Duration: " + AccessibilityIssueReportStore.formatDuration(snapshot.lastDurationMs)
-                );
+                accessibilityLastPreference.setSummary(getString(R.string.auto_java_ff_a11y_last, snapshot.lastScreenId, snapshot.lastIssueCount, snapshot.lastWarningCount, snapshot.lastErrorCount, AccessibilityIssueReportStore.formatDuration(snapshot.lastDurationMs)));
             }
         }
 
         private void refreshKpiDashboardMetrics() {
             if (!FeatureFlags.isEnabled(requireContext().getApplicationContext(), FeatureFlags.Key.KPI_DASHBOARD_RELEASE_GATES)) {
                 if (kpiSummaryPreference != null) {
-                    kpiSummaryPreference.setSummary("Disabled. Enable KPI Dashboard and Release Gates to evaluate rollout readiness.");
+                    kpiSummaryPreference.setSummary(R.string.auto_java_ff_kpi_disabled);
                 }
                 if (kpiReleaseGatesPreference != null) {
-                    kpiReleaseGatesPreference.setSummary("Disabled.");
+                    kpiReleaseGatesPreference.setSummary(R.string.auto_java_ff_disabled);
                 }
                 return;
             }
@@ -452,43 +397,25 @@ public class FeatureFlagsActivity extends BaseAppCompatActivity {
             KpiDashboardReleaseGatesResult gates = KpiDashboardStore.evaluateReleaseGates(requireContext().getApplicationContext());
 
             if (kpiSummaryPreference != null) {
-                kpiSummaryPreference.setSummary(
-                        "Builds: " + snapshot.build.totalCount
-                                + " | KMP runs: " + snapshot.kmpBuild.totalRuns
-                                + " | Editor samples: " + snapshot.editor.totalSamples
-                                + " | Startup samples: " + snapshot.startup.totalCount
-                                + " | Accessibility scans: " + snapshot.accessibility.totalScans
-                );
+                kpiSummaryPreference.setSummary(getString(R.string.auto_java_ff_kpi_summary, snapshot.build.totalCount, snapshot.kmpBuild.totalRuns, snapshot.editor.totalSamples, snapshot.startup.totalCount, snapshot.accessibility.totalScans));
             }
 
             if (kpiReleaseGatesPreference != null) {
-                kpiReleaseGatesPreference.setSummary(
-                        "Overall: " + gates.overallStatus().name()
-                                + " | PASS " + gates.passCount
-                                + " | WARN " + gates.warnCount
-                                + " | FAIL " + gates.failCount
-                );
+                kpiReleaseGatesPreference.setSummary(getString(R.string.auto_java_ff_kpi_gates_summary, gates.overallStatus().name(), gates.passCount, gates.warnCount, gates.failCount));
             }
         }
 
         private void showKmpDeveloperDocsDialog() {
-            StringBuilder message = new StringBuilder();
-            message.append("Guide path: docs/kmp_developer_docs.md\n\n")
-                    .append("Sample path: docs/kmp_sample_app\n\n")
-                    .append("Build command from repository root:\n")
-                    .append("./gradlew -p docs/kmp_sample_app --no-daemon :androidApp:assembleDebug :desktopApp:desktopJar\n\n")
-                    .append("Expected artifacts:\n")
-                    .append("- Android APK in androidApp/build/outputs/apk/debug\n")
-                    .append("- Desktop JAR in desktopApp/build/libs");
+            String message = getString(R.string.auto_java_kmp_dev_docs_msg);
 
             new MaterialAlertDialogBuilder(requireContext())
-                    .setTitle("KMP Developer Docs")
-                    .setMessage(message.toString())
-                    .setPositiveButton("Open Docs Site", (dialog, which) -> {
+                    .setTitle(R.string.auto_java_kmp_dev_docs)
+                    .setMessage(message)
+                    .setPositiveButton(R.string.auto_java_open_docs_site, (dialog, which) -> {
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://docs.ascode.pro"));
                         startActivity(intent);
                     })
-                    .setNegativeButton("Close", null)
+                    .setNegativeButton(R.string.common_word_close, null)
                     .show();
         }
     }

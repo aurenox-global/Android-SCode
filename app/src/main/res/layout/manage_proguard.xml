@@ -29,7 +29,7 @@
                 android:gravity="center|left"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp"
-                android:text="Activated"
+                android:text="@string/auto_activated"
                 android:textSize="16sp" />
 
             <TextView
@@ -154,7 +154,7 @@
                     android:gravity="center_vertical"
                     android:paddingTop="8dp"
                     android:paddingBottom="8dp"
-                    android:text="Full Mode"
+                    android:text="@string/auto_full_mode"
                     android:textColor="?attr/colorPrimary"
                     android:textSize="16sp" />
 

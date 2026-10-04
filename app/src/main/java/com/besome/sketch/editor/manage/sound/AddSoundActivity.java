@@ -250,7 +250,7 @@ public class AddSoundActivity extends BaseDialogActivity implements View.OnClick
                             finish();
                         }
                     }, e -> {
-                        AscodeUtil.toastError("Error while loading sound: " + e.getMessage());
+                        AscodeUtil.toastError(getString(R.string.auto4_error_loading_sound, e.getMessage()));
                         LogUtil.e("AddSoundActivity", "Failed to load sound", e);
                     });
         }
@@ -376,7 +376,7 @@ public class AddSoundActivity extends BaseDialogActivity implements View.OnClick
         Optional<String> displayName = AscodeUtil.getSafDocumentDisplayName(input);
 
         //noinspection SimplifyOptionalCallChains
-        if (!displayName.isPresent()) return "Unknown filename";
+        if (!displayName.isPresent()) return getString(R.string.auto4_unknown_filename);
         String name = displayName.get();
 
         if (name.contains(".")) {

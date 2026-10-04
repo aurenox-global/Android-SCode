@@ -44,7 +44,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:letterSpacing="0.06"
-                        android:text="Continue where you left off"
+                        android:text="@string/home_hero_label"
                         android:textAllCaps="true"
                         android:textColor="@color/web_hero_text"
                         android:textSize="11.5sp"
@@ -136,7 +136,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="9dp"
-                                android:text="Open Project"
+                                android:text="@string/home_hero_open"
                                 android:textColor="@color/web_hero_btn_text"
                                 android:textSize="14.5sp"
                                 android:textStyle="bold" />
@@ -168,7 +168,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="8dp"
-                                android:text="Build"
+                                android:text="@string/home_hero_build"
                                 android:textColor="@color/web_hero_text"
                                 android:textSize="14sp"
                                 android:textStyle="bold" />
@@ -184,7 +184,7 @@
                     android:layout_marginTop="18dp"
                     android:layout_marginEnd="16dp"
                     android:layout_marginBottom="10dp"
-                    android:text="Start something new"
+                    android:text="@string/home_start_new"
                     android:textColor="@color/web_text"
                     android:textSize="16.5sp"
                     android:textStyle="bold" />
@@ -229,7 +229,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="9dp"
-                            android:text="New"
+                            android:text="@string/home_action_new"
                             android:textColor="@color/web_text"
                             android:textSize="13sp"
                             android:textStyle="bold" />
@@ -237,7 +237,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Blank project"
+                            android:text="@string/home_action_new_sub"
                             android:textColor="@color/web_muted"
                             android:textSize="10.5sp"
                             android:minLines="2" />
@@ -275,7 +275,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="9dp"
-                            android:text="Import"
+                            android:text="@string/home_action_import"
                             android:textColor="@color/web_text"
                             android:textSize="13sp"
                             android:textStyle="bold" />
@@ -283,7 +283,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text=".swb / ZIP"
+                            android:text="@string/auto_swb_zip"
                             android:textColor="@color/web_muted"
                             android:textSize="10.5sp"
                             android:minLines="2" />
@@ -320,7 +320,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="9dp"
-                            android:text="Templates"
+                            android:text="@string/home_action_templates"
                             android:textColor="@color/web_text"
                             android:textSize="13sp"
                             android:textStyle="bold" />
@@ -328,7 +328,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Starter kits"
+                            android:text="@string/home_action_templates_sub"
                             android:textColor="@color/web_muted"
                             android:textSize="10.5sp"
                             android:minLines="2" />
@@ -351,7 +351,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Recent"
+                        android:text="@string/home_recent"
                         android:textColor="@color/web_text"
                         android:textSize="16.5sp"
                         android:textStyle="bold" />
@@ -365,7 +365,7 @@
                         android:paddingTop="8dp"
                         android:paddingEnd="0dp"
                         android:paddingBottom="8dp"
-                        android:text="View all"
+                        android:text="@string/home_view_all"
                         android:textColor="@color/web_green"
                         android:textSize="13.5sp"
                         android:textStyle="bold" />

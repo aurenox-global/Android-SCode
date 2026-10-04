@@ -295,8 +295,8 @@ public class MainActivity extends BasePermissionAppCompatActivity {
      */
     public void setProjectsSummary(int projectCount, int publishedCount) {
         if (getSupportActionBar() == null) return;
-        String projects = projectCount == 1 ? "1 project" : projectCount + " projects";
-        String published = publishedCount == 1 ? "1 published" : publishedCount + " published";
+        String projects = projectCount == 1 ? getString(R.string.projects_summary_projects_one) : getString(R.string.projects_summary_projects, projectCount);
+        String published = publishedCount == 1 ? getString(R.string.projects_summary_published_one) : getString(R.string.projects_summary_published, publishedCount);
         getSupportActionBar().setSubtitle(projects + " · " + published);
     }
 

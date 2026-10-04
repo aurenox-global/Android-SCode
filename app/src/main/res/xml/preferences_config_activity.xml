@@ -3,60 +3,60 @@
     <SwitchPreferenceCompat
         app:iconSpaceReserved="false"
         app:key="built-in-blocks"
-        app:summary="May slow down loading blocks in Logic Editor."
-        app:title="Built-in blocks" />
+        app:summary="@string/auto2_may_slow_down_loading_blocks_in_logic_ed"
+        app:title="@string/auto2_built_in_blocks" />
 
     <SwitchPreferenceCompat
         app:iconSpaceReserved="false"
         app:key="always-show-blocks"
-        app:summary="All variable blocks will be visible, even if you don't have variables for them."
-        app:title="Show all variable blocks" />
+        app:summary="@string/auto2_all_variable_blocks_will_be_visible_even"
+        app:title="@string/auto2_show_all_variable_blocks" />
 
     <SwitchPreferenceCompat
         app:iconSpaceReserved="false"
         app:key="show-every-single-block"
-        app:summary="Every single available block will be shown. Will slow down opening palettes!"
-        app:title="Show all blocks of palettes" />
+        app:summary="@string/auto2_every_single_available_block_will_be_sho"
+        app:title="@string/auto2_show_all_blocks_of_palettes" />
 
     <Preference
         app:iconSpaceReserved="false"
         app:key="backup-dir"
-        app:summary="The default directory is /Internal storage/.AndroidSCode/backups/."
-        app:title="Backup directory" />
+        app:summary="@string/auto2_the_default_directory_is_internal_storag"
+        app:title="@string/auto2_backup_directory" />
 
     <Preference
         app:iconSpaceReserved="false"
         app:key="restore-my-block-defaults"
-        app:summary="Force restore default custom blocks from My Block and My Block 2"
-        app:title="Restore My Block defaults" />
+        app:summary="@string/auto2_force_restore_default_custom_blocks_from"
+        app:title="@string/auto2_restore_my_block_defaults" />
 
     <SwitchPreferenceCompat
         app:iconSpaceReserved="false"
         app:key="root-auto-install-projects"
-        app:summary="Automatically installs project APKs after building using root access."
-        app:title="Install projects with root access" />
+        app:summary="@string/auto2_automatically_installs_project_apks_afte"
+        app:title="@string/auto2_install_projects_with_root_access" />
 
     <SwitchPreferenceCompat
         app:iconSpaceReserved="false"
         app:key="root-auto-open-after-installing"
-        app:summary="Opens projects automatically after auto-installation using root."
-        app:title="Launch projects after installing" />
+        app:summary="@string/auto2_opens_projects_automatically_after_auto_"
+        app:title="@string/auto2_launch_projects_after_installing" />
 
     <SwitchPreferenceCompat
         app:iconSpaceReserved="false"
         app:key="use-new-version-control"
-        app:summary="Enables custom version code and name for projects."
-        app:title="Use new Version Control" />
+        app:summary="@string/auto2_enables_custom_version_code_and_name_for"
+        app:title="@string/auto2_use_new_version_control" />
 
     <SwitchPreferenceCompat
         app:iconSpaceReserved="false"
         app:key="use-asd-highlighter"
-        app:summary="Enables syntax highlighting while editing blocks' text parameters."
-        app:title="Enable block text input highlighting" />
+        app:summary="@string/auto2_enables_syntax_highlighting_while_editin"
+        app:title="@string/auto2_enable_block_text_input_highlighting" />
 
     <Preference
         app:iconSpaceReserved="false"
         app:key="backup-filename"
         app:summary="Default is &quot;$projectName v$versionName ($pkgName, $versionCode) $time(yyyy-MM-dd'T'HHmmss)&quot;"
-        app:title="Backup filename format" />
+        app:title="@string/auto2_backup_filename_format" />
 </PreferenceScreen>

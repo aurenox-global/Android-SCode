@@ -283,7 +283,7 @@ public class AddImageActivity extends BaseDialogActivity implements View.OnClick
         layout_img_inform.setVisibility(View.VISIBLE);
         layout_img_modify.setVisibility(View.GONE);
         tv_imgcnt.setVisibility(View.VISIBLE);
-        tv_imgcnt.setText("+ " + (count - 1) + " more");
+        tv_imgcnt.setText(getString(R.string.auto4_more_images, count - 1));
     }
 
     private void flipImageHorizontally() {
@@ -360,7 +360,7 @@ public class AddImageActivity extends BaseDialogActivity implements View.OnClick
         public void b() throws By {
             var activity = this.activity.get();
             try {
-                publishProgress("Now processing..");
+                publishProgress(activity.getString(R.string.auto4_now_processing));
                 if (!activity.multipleImagesPicked) {
                     if (!activity.editing) {
                         var image = new ProjectResourceBean(ProjectResourceBean.PROJECT_RES_TYPE_FILE,

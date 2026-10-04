@@ -28,6 +28,8 @@ import androidx.annotation.NonNull;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import mod.hey.studios.build.BuildSettings;
+import mod.hey.studios.util.Helper;
+import com.ascode.android.R;
 import com.ascode.android.databinding.ProjectConfigLayoutBinding;
 import com.ascode.android.utility.AscodeUtil;
 
@@ -63,7 +65,7 @@ public class BuildSettingsBottomSheet extends BottomSheetDialogFragment {
 
     public static void handleJavaVersionChange(String choice) {
         if (!choice.equals(SETTING_JAVA_VERSION_1_7)) {
-            AscodeUtil.toast("Don't forget to enable D8 to be able to compile Java 8+ code");
+            AscodeUtil.toast(Helper.getResString(R.string.auto4_d8_hint));
         }
     }
 
@@ -168,9 +170,9 @@ public class BuildSettingsBottomSheet extends BottomSheetDialogFragment {
         checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 if (key.equals(SETTING_NO_HTTP_LEGACY)) {
-                    AscodeUtil.toast("Note that this option may cause issues if RequestNetwork component is used");
+                    AscodeUtil.toast(Helper.getResString(R.string.auto4_requestnetwork_hint));
                 } else if (key.equals(SETTING_ENABLE_KMP_GRADLE_BRIDGE)) {
-                    AscodeUtil.toast("Experimental KMP Gradle bridge enabled");
+                    AscodeUtil.toast(Helper.getResString(R.string.auto4_kmp_bridge_enabled));
                 }
             }
         });

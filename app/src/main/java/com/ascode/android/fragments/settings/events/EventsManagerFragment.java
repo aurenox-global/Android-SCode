@@ -148,9 +148,9 @@ public class EventsManagerFragment extends qA {
         }
 
         var dialog = new MaterialAlertDialogBuilder(requireContext())
-                .setTitle(existingListener == null ? "New Listener" : "Edit Listener")
+                .setTitle(existingListener == null ? getString(R.string.auto_java_new_listener) : getString(R.string.auto_java_edit_listener))
                 .setView(listenerBinding.getRoot())
-                .setPositiveButton("Save", (di, i) -> {
+                .setPositiveButton(R.string.common_word_save, (di, i) -> {
                     String listenerName = Helper.getText(listenerBinding.listenerName);
                     if (!listenerName.isEmpty()) {
                         HashMap<String, Object> hashMap = existingListener != null ? existingListener : new HashMap<>();
@@ -168,10 +168,10 @@ public class EventsManagerFragment extends qA {
                         addListenerItem();
                         di.dismiss();
                     } else {
-                        AscodeUtil.toastError("Invalid name!");
+                        AscodeUtil.toastError(getString(R.string.auto_java_invalid_name));
                     }
                 })
-                .setNegativeButton("Cancel", (di, i) -> di.dismiss()).create();
+                .setNegativeButton(R.string.common_word_cancel, (di, i) -> di.dismiss()).create();
         dialog.show();
     }
 
@@ -187,23 +187,23 @@ public class EventsManagerFragment extends qA {
 
     private void showImportEventsDialog() {
         FilePickerOptions options = new FilePickerOptions();
-        options.setTitle("Select a .txt file");
+        options.setTitle(getString(R.string.auto_java_select_txt_file));
         options.setExtensions(new String[]{"txt"});
 
         FilePickerCallback callback = new FilePickerCallback() {
             @Override
             public void onFileSelected(File file) {
                 if (FileUtil.readFile(file.getAbsolutePath()).isEmpty()) {
-                    AscodeUtil.toastError("The selected file is empty!");
+                    AscodeUtil.toastError(getString(R.string.auto_java_selected_file_empty));
                 } else if (FileUtil.readFile(file.getAbsolutePath()).equals("[]")) {
-                    AscodeUtil.toastError("The selected file is empty!");
+                    AscodeUtil.toastError(getString(R.string.auto_java_selected_file_empty));
                 } else {
                     try {
                         String[] split = FileUtil.readFile(file.getAbsolutePath()).split("\n");
                         importEvents(new Gson().fromJson(split[0], Helper.TYPE_MAP_LIST),
                                 new Gson().fromJson(split[1], Helper.TYPE_MAP_LIST));
                     } catch (Exception e) {
-                        AscodeUtil.toastError("Invalid file");
+                        AscodeUtil.toastError(getString(R.string.auto_java_invalid_file));
                     }
                 }
             }
@@ -224,7 +224,7 @@ public class EventsManagerFragment extends qA {
         listMap.addAll(data);
         FileUtil.writeFile(EventsManagerConstants.LISTENERS_FILE.getAbsolutePath(), new Gson().toJson(listMap));
         refreshList();
-        AscodeUtil.toast("Successfully imported events");
+        AscodeUtil.toast(getString(R.string.auto_java_imported_events));
     }
 
     private void exportListener(int p) {
@@ -242,8 +242,7 @@ public class EventsManagerFragment extends qA {
             }
         }
         FileUtil.writeFile(concat + ex.get(0).get("name").toString() + ".txt", new Gson().toJson(ex) + "\n" + new Gson().toJson(ex2));
-        AscodeUtil.toast("Successfully exported event to:\n" +
-                "/Internal storage/.AndroidSCode/data/system/export/events", Toast.LENGTH_LONG);
+        AscodeUtil.toast(getString(R.string.auto_java_exported_event), Toast.LENGTH_LONG);
     }
 
     private void exportAllEvents() {
@@ -253,8 +252,7 @@ public class EventsManagerFragment extends qA {
         }
         FileUtil.writeFile(new File(EventsManagerConstants.EVENT_EXPORT_LOCATION, "All_Events.txt").getAbsolutePath(),
                 new Gson().toJson(listMap) + "\n" + new Gson().toJson(events));
-        AscodeUtil.toast("Successfully exported events to:\n" +
-                "/Internal storage/.AndroidSCode/data/system/export/events", Toast.LENGTH_LONG);
+        AscodeUtil.toast(getString(R.string.auto_java_exported_events), Toast.LENGTH_LONG);
     }
 
     private void addListenerItem() {
@@ -316,7 +314,7 @@ public class EventsManagerFragment extends qA {
             holder.itemView.setOnLongClickListener(v -> {
                 new MaterialAlertDialogBuilder(context)
                         .setTitle(name)
-                        .setItems(new String[]{"Edit", "Export", "Delete"}, (dialog, which) -> {
+                        .setItems(new String[]{context.getString(R.string.common_word_edit), context.getString(R.string.common_word_export), context.getString(R.string.common_word_delete)}, (dialog, which) -> {
                             switch (which) {
                                 case 0:
                                     showEditListenerDialog(position);
@@ -326,14 +324,14 @@ public class EventsManagerFragment extends qA {
                                     break;
                                 case 2:
                                     new MaterialAlertDialogBuilder(context)
-                                            .setTitle("Delete listener")
-                                            .setMessage("Are you sure you want to delete this item?")
-                                            .setPositiveButton("Yes", (di, i) -> {
+                                            .setTitle(context.getString(R.string.auto_java_delete_listener))
+                                            .setMessage(context.getString(R.string.auto_java_delete_item_msg))
+                                            .setPositiveButton(R.string.common_word_yes, (di, i) -> {
                                                 deleteRelatedEvents(name);
                                                 deleteItem(position);
                                                 di.dismiss();
                                             })
-                                            .setNegativeButton("No", (di, i) -> di.dismiss())
+                                            .setNegativeButton(R.string.common_word_no, (di, i) -> di.dismiss())
                                             .show();
                                     break;
                             }

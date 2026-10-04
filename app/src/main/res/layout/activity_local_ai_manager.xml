@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:navigationIcon="?attr/homeAsUpIndicator"
-            app:title="Local AI Manager" />
+            app:title="@string/auto2_local_ai_manager" />
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/manager_tabs"
@@ -568,7 +568,7 @@
                                     android:id="@+id/context_size_label"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:text="Context: 2048"
+                                    android:text="@string/auto_context_2048"
                                     android:textColor="?attr/colorOnSurfaceVariant"
                                     android:textSize="12sp" />
 
@@ -592,7 +592,7 @@
                                     android:id="@+id/threads_label"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:text="Threads: 4"
+                                    android:text="@string/auto_threads_4"
                                     android:textColor="?attr/colorOnSurfaceVariant"
                                     android:textSize="12sp" />
 
@@ -624,7 +624,7 @@
                                     android:id="@+id/max_tokens_label"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:text="Max tokens: 512"
+                                    android:text="@string/auto_max_tokens_512"
                                     android:textColor="?attr/colorOnSurfaceVariant"
                                     android:textSize="12sp" />
 
@@ -648,7 +648,7 @@
                                     android:id="@+id/temperature_label"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:text="Temperature: 0.2"
+                                    android:text="@string/auto_temperature_0_2"
                                     android:textColor="?attr/colorOnSurfaceVariant"
                                     android:textSize="12sp" />
 
@@ -680,7 +680,7 @@
                                     android:id="@+id/top_p_label"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:text="Top P: 0.85"
+                                    android:text="@string/auto_top_p_0_85"
                                     android:textColor="?attr/colorOnSurfaceVariant"
                                     android:textSize="12sp" />
 
@@ -704,7 +704,7 @@
                                     android:id="@+id/top_k_label"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:text="Top K: 20"
+                                    android:text="@string/auto_top_k_20"
                                     android:textColor="?attr/colorOnSurfaceVariant"
                                     android:textSize="12sp" />
 
@@ -728,7 +728,7 @@
                                 android:id="@+id/presence_penalty_label"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="Presence penalty: 1.5"
+                                android:text="@string/auto_presence_penalty_1_5"
                                 android:textColor="?attr/colorOnSurfaceVariant"
                                 android:textSize="12sp" />
 

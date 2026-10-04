@@ -347,7 +347,7 @@ public class IconCreatorActivity extends BaseAppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (data == null) {
-            AscodeUtil.toastError("Received invalid data");
+            AscodeUtil.toastError(getString(R.string.auto4_received_invalid_data));
             return;
         }
         Uri uri = data.getData();

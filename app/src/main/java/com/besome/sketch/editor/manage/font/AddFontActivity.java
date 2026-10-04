@@ -134,7 +134,7 @@ public class AddFontActivity extends BaseDialogActivity implements View.OnClickL
                 try {
                     Typeface typeface = Typeface.createFromFile(tempFontFile);
                     if (typeface.equals(Typeface.DEFAULT)) {
-                        AscodeUtil.toastError("Warning: Font doesn't seem to be valid");
+                        AscodeUtil.toastError(getString(R.string.auto4_invalid_font_warning));
                         return;
                     }
                     validFontPicked = true;
@@ -149,11 +149,11 @@ public class AddFontActivity extends BaseDialogActivity implements View.OnClickL
                     e.printStackTrace();
                     validFontPicked = false;
                     binding.fontPreviewView.setVisibility(View.GONE);
-                    AscodeUtil.toast("Couldn't load font: " + e.getMessage());
+                    AscodeUtil.toast(getString(R.string.auto4_couldnt_load_font, e.getMessage()));
                     LogUtil.e("AddFontActivity", "Failed to load font", e);
                 }
             }, e -> {
-                AscodeUtil.toastError("Error while loading font: " + e.getMessage());
+                AscodeUtil.toastError(getString(R.string.auto4_error_loading_font, e.getMessage()));
                 e.printStackTrace();
                 LogUtil.e("AddFontActivity", "Failed to load font", e);
             });

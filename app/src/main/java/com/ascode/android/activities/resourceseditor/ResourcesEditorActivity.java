@@ -203,7 +203,7 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
         builder = new MaterialAlertDialogBuilder(this);
         builder.setTitle(Helper.getResString(R.string.resources_manager_xml_load_failed_title))
                 .setMessage(String.format(Helper.getResString(R.string.resources_manager_xml_load_failed_message), title))
-                .setPositiveButton("Open code editor", (dialog, which) -> goToCodeEditor(title, contentPath))
+                .setPositiveButton(R.string.auto4_open_code_editor, (dialog, which) -> goToCodeEditor(title, contentPath))
                 .setNegativeButton(Helper.getResString(R.string.common_word_exit), (dialogInterface, i) -> finish())
                 .setCancelable(false)
                 .create()
@@ -244,10 +244,10 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
         if (unsavedFiles.size() == 1) {
             return unsavedFiles.get(0);
         } else if (unsavedFiles.size() == 2) {
-            return String.join(" and ", unsavedFiles);
+            return String.join(getString(R.string.auto4_join_and), unsavedFiles);
         } else {
             String lastFile = unsavedFiles.remove(unsavedFiles.size() - 1);
-            return String.join(", ", unsavedFiles) + ", and " + lastFile;
+            return String.join(", ", unsavedFiles) + getString(R.string.auto4_join_comma_and) + lastFile;
         }
     }
 
@@ -398,7 +398,7 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
         themesEditor.saveThemesFile();
         arraysEditor.saveArraysFile();
         updateProjectMetadata();
-        AscodeUtil.toast("Save completed");
+        AscodeUtil.toast(getString(R.string.auto4_save_completed));
     }
 
     private void updateProjectMetadata() {
@@ -547,7 +547,7 @@ public class ResourcesEditorActivity extends BaseAppCompatActivity {
             if (newVariant.startsWith(variantFullNameStarts)) {
                 initializeBackgroundTask(newVariant.replace("values", ""));
             } else {
-                AscodeUtil.toastError("Invalid variant input");
+                AscodeUtil.toastError(getString(R.string.auto4_invalid_variant_input));
             }
         } else {
             initializeBackgroundTask(variants.get(selectedChoice.get()).replace("values", ""));

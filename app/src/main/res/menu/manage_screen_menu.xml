@@ -5,7 +5,7 @@
         android:id="@+id/menu_screen_edit"
         android:icon="@drawable/ic_mtrl_edit"
         android:orderInCategory="1"
-        android:title="edit"
+        android:title="@string/auto_edit_3"
         android:visible="false"
         app:showAsAction="always" />
     <item

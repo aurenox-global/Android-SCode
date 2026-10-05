@@ -54,6 +54,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/action_button_margin"
             android:src="@drawable/block_flled_white"
+            app:backgroundTint="@color/web_green"
+            app:tint="@color/web_on_green"
             tools:ignore="ContentDescription" />
 
         <LinearLayout

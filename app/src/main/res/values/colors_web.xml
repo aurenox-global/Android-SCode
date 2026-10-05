@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Palette sampled from the user's reference mockup (light). -->
+    <!-- Paleta de la web (verdes #3DDC84 / #00BFA5) en variante clara -->
     <color name="web_bg">#FFF1F2F2</color>
     <color name="web_card">#FFFAFBFB</color>
     <color name="web_card2">#FFEFF1F1</color>
     <color name="web_line">#FFE3E6E6</color>
     <color name="web_text">#FF17181A</color>
     <color name="web_muted">#FF5F656D</color>
-    <color name="web_green">#FF2E7D32</color>
-    <color name="web_green2">#FF43A047</color>
-    <color name="web_on_green">#FFFFFFFF</color>
-    <color name="web_icon_bg">#FFAEEAB4</color>
-    <color name="web_icon_bg2">#FFAEEAB4</color>
-    <color name="web_tile">#FFAEEAB4</color>
-    <color name="web_tile_ink">#FF1E7A34</color>
-    <color name="web_monogram">#FFAEEAB4</color>
-    <color name="web_monogram_ink">#FF1E7A34</color>
-    <color name="web_grad1">#FF368A3C</color>
-    <color name="web_grad2">#FF429648</color>
-    <color name="web_nav_pill">#FFDDE1E3</color>
-    <color name="web_hero_border">#FF368A3C</color>
-    <!-- Hero (green gradient, same in light & dark) -->
+    <color name="web_green">#FF1E9E5A</color>
+    <color name="web_green2">#FF00BFA5</color>
+    <color name="web_on_green">#FF06281C</color>
+    <color name="web_icon_bg">#1F3DDC84</color>
+    <color name="web_icon_bg2">#1F3DDC84</color>
+    <color name="web_tile">#1F3DDC84</color>
+    <color name="web_tile_ink">#FF1E9E5A</color>
+    <color name="web_monogram">#1F3DDC84</color>
+    <color name="web_monogram_ink">#FF1E9E5A</color>
+    <color name="web_grad1">#FF3DDC84</color>
+    <color name="web_grad2">#FF00BFA5</color>
+    <color name="web_nav_pill">#1F3DDC84</color>
+    <color name="web_hero_border">#473DDC84</color>
+    <!-- Hero (compartido) -->
     <color name="web_hero_text">#FFFFFFFF</color>
     <color name="web_hero_text_soft">#D9FFFFFF</color>
     <color name="web_hero_btn">#FFFFFFFF</color>
-    <color name="web_hero_btn_text">#FF1B5E20</color>
+    <color name="web_hero_btn_text">#FF06281C</color>
     <color name="web_hero_outline">#B3FFFFFF</color>
     <color name="web_hero_icon_bg">#47FFFFFF</color>
     <color name="web_hero_icon_text">#FFFFFFFF</color>

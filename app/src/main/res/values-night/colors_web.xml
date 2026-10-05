@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Palette sampled from the user's reference mockup (dark). -->
-    <color name="web_bg">#FF101014</color>
-    <color name="web_card">#FF1C1C20</color>
-    <color name="web_card2">#FF18181C</color>
-    <color name="web_line">#FF2A2B2F</color>
-    <color name="web_text">#FFEDF1F4</color>
-    <color name="web_muted">#FF9AA0A8</color>
-    <color name="web_green">#FF7EC08A</color>
-    <color name="web_green2">#FF4CAF50</color>
+    <!-- Paleta EXACTA de la web (docs/index.html): verde #3DDC84 / teal #00BFA5 sobre azul marino -->
+    <color name="web_bg">#FF0B1220</color>
+    <color name="web_card">#FF141C2E</color>
+    <color name="web_card2">#FF0F1830</color>
+    <color name="web_line">#FF1F2A40</color>
+    <color name="web_text">#FFEAF1FA</color>
+    <color name="web_muted">#FF9AA9BF</color>
+    <color name="web_green">#FF3DDC84</color>
+    <color name="web_green2">#FF00BFA5</color>
     <color name="web_on_green">#FF06281C</color>
-    <color name="web_icon_bg">#FF36724E</color>
-    <color name="web_icon_bg2">#FF36724E</color>
-    <color name="web_tile">#FF36724E</color>
-    <color name="web_tile_ink">#FFAEEAB4</color>
-    <color name="web_monogram">#FF7EC08A</color>
-    <color name="web_monogram_ink">#FF08260F</color>
-    <color name="web_grad1">#FF24722A</color>
-    <color name="web_grad2">#FF307836</color>
-    <color name="web_nav_pill">#FF2A2B2F</color>
-    <color name="web_hero_border">#FF24722A</color>
-    <!-- Hero (shared) -->
+    <color name="web_icon_bg">#1F3DDC84</color>
+    <color name="web_icon_bg2">#1F3DDC84</color>
+    <color name="web_tile">#1F3DDC84</color>
+    <color name="web_tile_ink">#FF3DDC84</color>
+    <color name="web_monogram">#1F3DDC84</color>
+    <color name="web_monogram_ink">#FF3DDC84</color>
+    <color name="web_grad1">#FF3DDC84</color>
+    <color name="web_grad2">#FF00BFA5</color>
+    <color name="web_nav_pill">#1F3DDC84</color>
+    <color name="web_hero_border">#473DDC84</color>
+    <!-- Hero (compartido) -->
     <color name="web_hero_text">#FFFFFFFF</color>
     <color name="web_hero_text_soft">#D9FFFFFF</color>
     <color name="web_hero_btn">#FFFFFFFF</color>
-    <color name="web_hero_btn_text">#FF1B5E20</color>
+    <color name="web_hero_btn_text">#FF06281C</color>
     <color name="web_hero_outline">#B3FFFFFF</color>
     <color name="web_hero_icon_bg">#47FFFFFF</color>
     <color name="web_hero_icon_text">#FFFFFFFF</color>

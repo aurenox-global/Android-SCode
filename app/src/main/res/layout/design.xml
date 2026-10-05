@@ -36,8 +36,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
-                    app:tabIndicatorColor="@color/event_accent"
-                    app:tabSelectedTextColor="@color/event_accent"
+                    app:tabIndicatorColor="@color/web_green"
+                    app:tabRippleColor="@color/web_tile"
+                    app:tabSelectedTextColor="@color/web_green"
                     app:tabTextColor="?attr/colorOnSurfaceVariant" />
 
                 <com.google.android.material.divider.MaterialDivider

@@ -1,4 +1,8 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/web_hero_btn" />
+    <gradient
+        android:angle="315"
+        android:startColor="#FF3DDC84"
+        android:endColor="#FF00BFA5"
+        android:type="linear" />
     <corners android:radius="13dp" />
 </shape>

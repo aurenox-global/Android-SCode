@@ -1,5 +1,20 @@
 <resources>
-    <color name="color_accent">#ff008dcd</color>
+    <color name="color_accent">#ff3ddc84</color>
+
+    <!--  paleta web (green/teal) para el tema oscuro legacy  -->
+    <color name="color_primary">#ff3ddc84</color>
+    <color name="color_primary_dark">#ff2fb871</color>
+    <color name="color_secondary">#ff00bfa5</color>
+    <color name="color_control_normal">#ff9aa9bf</color>
+    <color name="color_control_highlight">#1F3DDC84</color>
+    <color name="design_tab_background">#ff1e9e5a</color>
+    <color name="list_selected_background">#1F3DDC84</color>
+    <color name="colorBottomBarSW">#ff1e9e5a</color>
+    <color name="view_property_grid_see_all_background">#ff1e9e5a</color>
+    <color name="main_tab_indicator_color">#ff3ddc84</color>
+    <color name="main_tab_selected_text_color">#ff3ddc84</color>
+    <color name="main_tab_text_color">#ff9aa9bf</color>
+    <color name="scolor_sl_04">#ff3ddc84</color>
 
     <color name="color_text_onSurface">#E2E2E5</color>
     <color name="color_text_onSurfaceVariant">#C1C7CE</color>
@@ -17,11 +32,11 @@
     <color name="cardStrokeColor">#2E2E2E</color>
 
     <color name="view_property_background_color">#292929</color>
-    <color name="view_property_tab_active">#525252</color>
-    <color name="view_property_tab_deactive">#60525252</color>
-    <color name="view_property_tab_active_text">#ff000000</color>
-    <color name="view_property_tab_deactive_text">#ffffffff</color>
-    <color name="view_property_grid_background">#60525252</color>
+    <color name="view_property_tab_active">#ff3ddc84</color>
+    <color name="view_property_tab_deactive">#303ddc84</color>
+    <color name="view_property_tab_active_text">#ff06281c</color>
+    <color name="view_property_tab_deactive_text">#ffeaf1fa</color>
+    <color name="view_property_grid_background">#303ddc84</color>
     <color name="view_property_spinner_filter">#ffffffff</color>
 
     <color name="splash_bg_color">@color/md_theme_dark_background</color>

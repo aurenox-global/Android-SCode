@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Acento del apartado de Eventos: verde de la pantalla de inicio -->
-    <color name="event_accent">#FF2E7D32</color>
-    <color name="event_accent_container">#FFC8E6C9</color>
-    <color name="event_on_accent_container">#FF1B5E20</color>
-    <!-- Botón Ejecutar: claro = verde; oscuro = mismo color que las tarjetas -->
-    <color name="event_button">#FF2E7D32</color>
-    <color name="event_on_button">#FFFFFFFF</color>
+    <!-- Acento verde EXACTO de la web (#3DDC84 / #00BFA5 / #06281C) -->
+    <color name="event_accent">#FF1E9E5A</color>
+    <color name="event_accent_container">#FF3DDC84</color>
+    <color name="event_on_accent_container">#FF06281C</color>
+    <color name="event_button">#FF3DDC84</color>
+    <color name="event_on_button">#FF06281C</color>
 </resources>

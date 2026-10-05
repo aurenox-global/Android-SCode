@@ -71,6 +71,8 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="20dp"
         android:text="@string/program_information_button_check_update"
+        android:textColor="@color/web_on_green"
+        app:backgroundTint="@color/web_green"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/btn_reset"
         app:layout_constraintTop_toBottomOf="@id/app_icon" />

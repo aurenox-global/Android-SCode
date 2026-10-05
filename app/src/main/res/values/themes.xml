@@ -1,5 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Base.Theme.Ascode" parent="Scheme.Ascode.DayNight" />
+    <style name="Base.Theme.Ascode" parent="Scheme.Ascode.DayNight">
+        <item name="materialSwitchStyle">@style/Widget.Ascode.MaterialSwitch</item>
+        <item name="switchStyle">@style/Widget.Ascode.MaterialSwitch</item>
+    </style>
     <style name="Theme.Ascode" parent="Platform.Theme.Ascode">
         <item name="android:windowOptOutEdgeToEdgeEnforcement" tools:targetApi="35">true</item>
         <item name="bottomNavigationStyle">@style/Widget.Ascode.BottomNavigationView</item>

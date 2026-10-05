@@ -232,4 +232,9 @@
         <item name="android:width">64dp</item>
         <item name="android:height">32dp</item>
     </style>
+    <style name="Widget.Ascode.MaterialSwitch" parent="Widget.Material3.CompoundButton.MaterialSwitch">
+        <item name="thumbTint">@color/ascode_switch_thumb</item>
+        <item name="trackTint">@color/ascode_switch_track</item>
+        <item name="trackDecorationTint">@color/ascode_switch_track_decoration</item>
+    </style>
 </resources>

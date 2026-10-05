@@ -34,14 +34,14 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                tools:background="#6200EE" />
+                tools:background="#1E9E5A" />
 
             <View
                 android:id="@+id/color_primary_dark"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                tools:background="#3700B3" />
+                tools:background="#157045" />
 
             <View
                 android:id="@+id/color_control_highlight"

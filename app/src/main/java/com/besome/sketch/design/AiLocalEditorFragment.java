@@ -860,8 +860,8 @@ public class AiLocalEditorFragment extends Fragment {
             int backgroundColor;
             int textColor;
             if (isUser) {
-                backgroundColor = MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorPrimaryContainer);
-                textColor = MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorOnPrimaryContainer);
+                backgroundColor = holder.itemView.getContext().getColor(R.color.web_green);
+                textColor = holder.itemView.getContext().getColor(R.color.web_on_green);
             } else {
                 backgroundColor = MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorSurfaceContainerHigh);
                 textColor = MaterialColors.getColor(holder.itemView, com.google.android.material.R.attr.colorOnSurface);

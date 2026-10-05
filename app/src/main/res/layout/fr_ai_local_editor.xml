@@ -41,6 +41,7 @@
                     android:minWidth="0dp"
                     android:minHeight="36dp"
                     android:textAllCaps="false"
+                    android:textColor="@color/web_green"
                     android:textSize="11sp"
                     android:text="@string/ai_open_manager" />
 
@@ -54,7 +55,9 @@
                     android:minHeight="36dp"
                     android:text="@string/ai_new_chat"
                     android:textAllCaps="false"
-                    android:textSize="11sp" />
+                    android:textColor="@color/web_green"
+                    android:textSize="11sp"
+                    app:strokeColor="@color/web_green" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/chat_export_button"
@@ -66,6 +69,7 @@
                     android:minHeight="36dp"
                     android:text="@string/ai_export"
                     android:textAllCaps="false"
+                    android:textColor="@color/web_green"
                     android:textSize="11sp" />
             </LinearLayout>
 
@@ -97,7 +101,9 @@
                     android:minHeight="34dp"
                     android:text="@string/ai_think"
                     android:textAllCaps="false"
-                    android:textSize="10sp" />
+                    android:textColor="@color/web_green"
+                    android:textSize="10sp"
+                    app:strokeColor="@color/web_green" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/agent_badge_button"
@@ -111,9 +117,12 @@
                     android:minHeight="34dp"
                     android:text="@string/ai_agent"
                     android:textAllCaps="false"
+                    android:textColor="@color/web_on_green"
                     android:textSize="10sp"
+                    app:backgroundTint="@color/web_green"
                     app:icon="@drawable/ic_mtrl_android"
-                    app:iconSize="14dp" />
+                    app:iconSize="14dp"
+                    app:iconTint="@color/web_on_green" />
             </LinearLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
@@ -187,11 +196,11 @@
                     android:contentDescription="Send"
                     android:minWidth="0dp"
                     android:minHeight="0dp"
-                    app:backgroundTint="?attr/colorPrimary"
+                    app:backgroundTint="@color/web_green"
                     app:cornerRadius="21dp"
                     app:icon="@drawable/ic_mtrl_arrow_up"
                     app:iconSize="20dp"
-                    app:iconTint="?attr/colorOnPrimary"
+                    app:iconTint="@color/web_on_green"
                     style="@style/Widget.App.Button.OutlinedButton.IconOnly" />
             </LinearLayout>
         </LinearLayout>

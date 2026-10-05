@@ -45,7 +45,7 @@ your phone.
 - **Build & sign** — produce a signed APK or AAB, manage your keystores and install the result
   straight from the app.
 - **Project backup** — export and restore projects as portable `.swb` files.
-- **Extras** — Kotlin compiler, Flutter toolchain support and a Local AI Manager with token-by-token streaming.
+- **Extras** — Kotlin compiler, Flutter toolchain support (bundled Dart runtime + AOT backend, kept in step with the latest Dart SDK) and a Local AI Manager with token-by-token streaming.
 
 ## Download
 

@@ -47,7 +47,7 @@ firmado**, todo sin salir del teléfono.
 - **Compilar y firmar** — genera un APK o AAB firmado, gestiona tus keystores e instala el
   resultado desde la propia app.
 - **Copias de seguridad** — exporta y restaura proyectos en ficheros portables `.swb`.
-- **Extras** — compilador de Kotlin, soporte de Flutter y gestor de IA local con streaming token a token.
+- **Extras** — compilador de Kotlin, soporte de Flutter (runtime y backend AOT de Dart empaquetados, al día con el SDK más reciente) y gestor de IA local con streaming token a token.
 
 ## Descargar
 

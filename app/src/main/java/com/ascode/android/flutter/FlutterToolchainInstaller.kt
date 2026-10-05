@@ -88,6 +88,10 @@ object FlutterToolchainInstaller {
     /** Igual que [install] pero forzando la ABI (útil para diagnóstico). */
     @JvmStatic
     fun installAbi(context: android.content.Context, abi: String, progress: (String) -> Unit): Boolean {
+        // Auto-deteccion del `.deb` vigente en el pool de Termux (hilo de fondo; nunca lanza).
+        // Si no hay red, `dartPackageSpec` cae al fallback conocido (DART_VERSION).
+        FlutterToolchainPaths.refreshDartCatalog(context)
+
         val spec = FlutterToolchainPaths.dartPackageSpec(abi)
         if (spec == null) {
             progress("No hay paquete Dart para la ABI $abi")
@@ -100,7 +104,14 @@ object FlutterToolchainInstaller {
             progress("Fallo la descarga o la verificacion de ${spec.url}")
             return false
         }
-        progress("sha256 verificado: ${spec.sha256}")
+        if (spec.sha256.isNotEmpty()) {
+            progress("sha256 verificado: ${spec.sha256}")
+        } else {
+            progress(
+                "sha256 no disponible para ${spec.fileName}: " +
+                    "solo se verifico el tamano (${spec.sizeBytes} B)"
+            )
+        }
 
         val dartDir = FlutterToolchainPaths.dartDir(context)
         deleteRecursively(dartDir)
@@ -154,13 +165,13 @@ object FlutterToolchainInstaller {
         val runtime = probeDartRuntime(context)
         if (runtime.runnable) {
             progress(
-                "SDK Dart ${FlutterToolchainPaths.DART_VERSION} instalado: ${extracted.files} ficheros " +
+                "SDK Dart ${spec.version} instalado: ${extracted.files} ficheros " +
                     "(${formatMb(extracted.bytes)}) en ${dartDir.absolutePath}; runtime ejecutable: " +
                     "${runtime.executable?.absolutePath} -> ${runtime.versionLine}"
             )
         } else {
             progress(
-                "SDK Dart ${FlutterToolchainPaths.DART_VERSION} extraido (${extracted.files} ficheros, " +
+                "SDK Dart ${spec.version} extraido (${extracted.files} ficheros, " +
                     "${formatMb(extracted.bytes)}): los datos estan completos, pero NINGUN runtime de Dart " +
                     "se puede ejecutar desde este APK. Detalle pieza a pieza:"
             )
@@ -602,7 +613,7 @@ object FlutterToolchainInstaller {
         summary: ExtractionSummary,
     ) {
         val marker = StringBuilder()
-            .append("version=").append(FlutterToolchainPaths.DART_VERSION).append('\n')
+            .append("version=").append(spec.version).append('\n')
             .append("abi=").append(spec.abi).append('\n')
             .append("deb=").append(spec.fileName).append('\n')
             .append("sha256=").append(spec.sha256).append('\n')

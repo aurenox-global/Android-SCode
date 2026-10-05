@@ -1621,11 +1621,15 @@ public class DesignActivity extends BaseAppCompatActivity implements View.OnClic
 
         private void updateRunButton(boolean isRunning) {
             var context = getActivity();
-            btnRun.setBackgroundTintList(ColorStateList.valueOf(ThemeUtils.getColor(context, isRunning ? R.attr.colorErrorContainer : R.attr.colorPrimary)));
+            int runBg = isRunning ? ThemeUtils.getColor(context, R.attr.colorErrorContainer)
+                    : ContextCompat.getColor(context, R.color.event_button);
+            int runFg = isRunning ? ThemeUtils.getColor(context, R.attr.colorOnErrorContainer)
+                    : ContextCompat.getColor(context, R.color.event_on_button);
+            btnRun.setBackgroundTintList(ColorStateList.valueOf(runBg));
             btnRun.setIcon(ContextCompat.getDrawable(context, isRunning ? R.drawable.ic_mtrl_stop : R.drawable.ic_mtrl_run));
-            btnRun.setIconTint(ColorStateList.valueOf(ThemeUtils.getColor(context, isRunning ? R.attr.colorOnErrorContainer : R.attr.colorSurfaceContainerLowest)));
-            btnRun.setTextColor(ColorStateList.valueOf(ThemeUtils.getColor(context, isRunning ? R.attr.colorOnErrorContainer : R.attr.colorSurfaceContainerLowest)));
-            btnRun.setText(isRunning ? "Stop" : "Run");
+            btnRun.setIconTint(ColorStateList.valueOf(runFg));
+            btnRun.setTextColor(ColorStateList.valueOf(runFg));
+            btnRun.setText(isRunning ? context.getString(R.string.auto_stop) : context.getString(R.string.auto_run));
             btnOptions.setEnabled(!isRunning);
             progressContainer.setVisibility(isRunning ? View.VISIBLE : View.GONE);
         }

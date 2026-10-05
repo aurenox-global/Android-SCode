@@ -3354,4 +3354,5 @@ ACTION_VIEW
     <string name="auto9_event_desc_cat_component">Evento disparado por este componente.</string>
     <string name="auto9_event_desc_cat_drawer">Evento disparado por esta vista del cajón.</string>
     <string name="auto9_event_desc_cat_moreblock">Bloque personalizado creado por ti.</string>
+    <string name="auto_stop">Detener</string>
 </resources>

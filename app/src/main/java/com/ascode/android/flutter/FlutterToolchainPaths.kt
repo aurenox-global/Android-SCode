@@ -2,7 +2,14 @@ package com.ascode.android.flutter
 
 import android.content.Context
 import android.os.Build
+import android.os.Looper
+import android.util.Log
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.net.HttpURLConnection
+import java.net.URL
 
 /**
  * Rutas y constantes del toolchain Flutter/Dart que se instala **en el propio dispositivo**
@@ -20,8 +27,8 @@ import java.io.File
  */
 object FlutterToolchainPaths {
 
-    /** Versión del paquete `dart` de Termux. */
-    const val DART_VERSION = "3.13.4"
+    /** Versión del paquete `dart` de Termux (fallback sin red; la deteccion puede subirla). */
+    const val DART_VERSION = "3.13.5"
 
     /** Versión de Flutter cuyo engine se empaqueta. */
     const val FLUTTER_VERSION = "3.47.5"
@@ -58,21 +65,25 @@ object FlutterToolchainPaths {
      */
     const val PACKAGED_GEN_SNAPSHOT = "libfluttergensnapshot.so"
 
-    /** `bin/dartaotruntime` del `dart_3.13.4_aarch64.deb`: 5.684.384 B (ELF aarch64, stripped). */
+    /** `lib/dart-sdk/bin/dartaotruntime` del `dart_3.13.5_aarch64.deb`: 5.684.384 B (ELF aarch64, stripped). */
     const val PACKAGED_DART_AOT_RUNTIME_SIZE = 5_684_384L
     const val PACKAGED_DART_AOT_RUNTIME_SHA256 =
-        "e2ea1775e28bc92ce738c5df3b4ac4f95103ee2b13aefee87d90972dad3d1eb1"
+        "b79836dfe537177c411eb41c8487a5ff0a1bf9aafb931bbed0edb42233e0a626"
 
-    /** `gen_snapshot_arm64c_android_product`: 4.991.592 B sha256 `9921983f…` (informe AOT §7.1). */
+    /**
+     * `gen_snapshot_arm64c_android_product` construido del Dart SDK **3.13.5**
+     * (tag `3.13.5` = commit `04bcd1036cdc799ac6564988f159ee454d42c822`):
+     * 4.991.592 B sha256 `7155cc51…`.
+     */
     const val PACKAGED_GEN_SNAPSHOT_SIZE = 4_991_592L
     const val PACKAGED_GEN_SNAPSHOT_SHA256 =
-        "9921983f8765fe10e45e2010b73c6599d6a3ed13ea564f96190ba00587354233"
+        "7155cc51940776d8596a802420a9475f63120ebe75928093e0242b5a7e852483"
 
     /* --- x86_64 (mismo trato que arm64-v8a: sus dos ejecutables van empaquetados) ----------- */
 
     /**
-     * `lib/dart-sdk/bin/dartaotruntime` del `dart_3.13.4_x86_64.deb`: 5.873.176 B
-     * (ELF x86-64, `/system/bin/linker64`, stripped, mismo build 3.13.4 que el de arm64).
+     * `lib/dart-sdk/bin/dartaotruntime` del `dart_3.13.5_x86_64.deb`: 5.873.176 B
+     * (ELF x86-64, `/system/bin/linker64`, stripped, mismo build 3.13.5 que el de arm64).
      *
      * OJO con la ruta: en las **dos** arquitecturas el `bin/dartaotruntime` que aparece en
      * `usr/bin/` es un script de shell de 115 B (`exec .../lib/dart-sdk/bin/dartaotruntime "$@"`),
@@ -80,7 +91,7 @@ object FlutterToolchainPaths {
      */
     const val PACKAGED_DART_AOT_RUNTIME_X86_64_SIZE = 5_873_176L
     const val PACKAGED_DART_AOT_RUNTIME_X86_64_SHA256 =
-        "f23e06adf40d2cd451c856cb270f7aff439ef5d3e0c007b216191b37a2eff97f"
+        "c18664daa9edc1a75564b3871930616fb7867ade12e5376b4d78f540e6bb821a"
 
     /**
      * `gen_snapshot_x64c_android_product`: nuestro `gen_snapshot` para Android x86_64, build
@@ -91,27 +102,58 @@ object FlutterToolchainPaths {
      * `product no-asan no-msan no-tsan no-shared_data no-code_comments no-dwarf_stack_traces x64 android compressed-pointers`
      * (el de `android-arm64` declara lo mismo con `arm64`), y el VM lo exige al cargar.
      */
-    const val PACKAGED_GEN_SNAPSHOT_X86_64_SIZE = 5_123_768L
+    const val PACKAGED_GEN_SNAPSHOT_X86_64_SIZE = 5_131_672L
     const val PACKAGED_GEN_SNAPSHOT_X86_64_SHA256 =
-        "2f37d68799dd91b8d6458bbada3dfc53e22d9f77b35500632431bb6d2b705678"
+        "423c0d55f48636b593f718e1ee8dab24c106accb7314e3a6b60c052d58b12bd1"
 
     private const val TERMUX_DART_POOL =
         "https://packages.termux.dev/apt/termux-main/pool/main/d/dart/"
+
+    private const val TAG = "FlutterToolchainPaths"
+
+    /** Timeout (conexión y lectura) del GET del listado del pool de Termux. */
+    private const val DART_POOL_REQUEST_TIMEOUT_MS = 12_000
+
+    /** Tope de lectura del listado (el HTML real ronda unos pocos KB). */
+    private const val DART_POOL_LISTING_MAX_BYTES = 2 * 1024 * 1024
+
+    private const val DART_CATALOG_CACHE_FILE = "dart-pool-catalog.properties"
+
+    /** Caducidad de la cache en disco: pasada, [refreshDartCatalog] vuelve a consultar el pool. */
+    private const val DART_CATALOG_TTL_MS = 24L * 60L * 60L * 1000L
+
+    /** `dart_3.13.5_aarch64.deb` -> grupo 1 = version, grupo 2 = arquitectura. */
+    private val DART_DEB_NAME_REGEX = Regex("""dart_([0-9]+(?:\.[0-9]+)*)_(aarch64|x86_64)\.deb""")
+
+    /** Columna de tamano del listado: ultimo bloque de 5+ cifras de la linea. */
+    private val SIZE_TOKEN_REGEX = Regex("""\d{5,}""")
+
+    private val dartCatalogLock = Any()
+
+    @Volatile
+    private var dartCatalog: DartCatalog? = null
 
     private const val DOWNLOAD_FLUTTER_IO = "https://storage.googleapis.com/download.flutter.io"
 
     private const val FLUTTER_INFRA_RELEASE =
         "https://storage.googleapis.com/flutter_infra_release/flutter"
 
-    /** `dart_3.13.4_aarch64.deb` (96.035.948 B). */
-    const val DART_DEB_ARM64_SIZE = 96_035_948L
+    /**
+     * **Fallback sin red** de [dartPackageSpec] si la auto-deteccion del pool no esta disponible
+     * (aun no se ha consultado, fallo de red…).
+     *
+     * `dart_3.13.5_aarch64.deb` (96.044.396 B; sha256 y tamano verificados descargando el `.deb`
+     * del pool de Termux el 2026-10-05). La version coincide con [DART_VERSION], que es la
+     * condicion para que [dartPackageSpec] conserve estos sha256 fijos.
+     */
+    const val DART_DEB_ARM64_SIZE = 96_044_396L
     const val DART_DEB_ARM64_SHA256 =
-        "29d4a6d716518cee9dc4cf5ef12d098ed397c6e3f2db87c3ac6b0c05d8799146"
+        "430f2daab52d5b6b8c08f80a2f12a370f959f671a0943399d15c9f8c01709163"
 
-    /** `dart_3.13.4_x86_64.deb` (137.243.692 B). */
-    const val DART_DEB_X86_64_SIZE = 137_243_692L
+    /** `dart_3.13.5_x86_64.deb` (137.226.804 B; verificado el 2026-10-05). */
+    const val DART_DEB_X86_64_SIZE = 137_226_804L
     const val DART_DEB_X86_64_SHA256 =
-        "8125cade40c62d60006fcb9f52d46c9b3ee50f97d2377cb9f813a4168a44e974"
+        "5efd7777afcc7697d093f0d4c9cc4a87c8722cebf6c30e6a44a2be5c64be1872"
 
     /** Tamaños verificados con `curl -sI` (HTTP 200, `content-length`), 2026-09-23. */
     const val EMBEDDING_JAR_SIZE = 1_584_072L
@@ -196,10 +238,28 @@ object FlutterToolchainPaths {
     /** Especificación de un `.deb` descargable. */
     class DartPackageSpec(
         @JvmField val abi: String,
+        @JvmField val version: String,
         @JvmField val fileName: String,
         @JvmField val url: String,
         @JvmField val sizeBytes: Long,
         @JvmField val sha256: String,
+    )
+
+    /**
+     * Entrada del pool de Termux detectada para una ABI: version (ordenable numericamente) y tamano
+     * real (bytes) que publica el listado.
+     */
+    class DetectedDartPackage(
+        @JvmField val abi: String,
+        @JvmField val version: String,
+        @JvmField val fileName: String,
+        @JvmField val sizeBytes: Long,
+    )
+
+    /** Catalogo del pool de Termux (mejor `.deb` por ABI) con su marca temporal. */
+    class DartCatalog(
+        @JvmField val packages: Map<String, DetectedDartPackage>,
+        @JvmField val fetchedAtMillis: Long,
     )
 
     /** Especificación de un artefacto remoto del engine. */
@@ -223,25 +283,206 @@ object FlutterToolchainPaths {
         return null
     }
 
-    /** `.deb` correspondiente a [abi] (`arm64-v8a` -> `aarch64`, `x86_64` -> `x86_64`). */
+    /**
+     * `.deb` correspondiente a [abi] (`arm64-v8a` -> `aarch64`, `x86_64` -> `x86_64`).
+     *
+     * Usa la version y el tamano detectados por [refreshDartCatalog] / [cachedDartCatalog] cuando
+     * estan disponibles; si no, cae al fallback de [DART_VERSION].
+     *
+     * **sha256**: solo se conserva el hash fijo cuando la version detectada coincide con la del
+     * fallback conocido ([DART_VERSION]); con cualquier otra version va vacio (el instalador salta
+     * la verificacion) para no rechazar un `.deb` legitimo. El **tamano** si se mantiene siempre.
+     */
     @JvmStatic
     fun dartPackageSpec(abi: String?): DartPackageSpec? {
-        return when (abi) {
-            ABI_ARM64_V8A -> DartPackageSpec(
-                ABI_ARM64_V8A,
-                "dart_${DART_VERSION}_aarch64.deb",
-                TERMUX_DART_POOL + "dart_${DART_VERSION}_aarch64.deb",
-                DART_DEB_ARM64_SIZE,
-                DART_DEB_ARM64_SHA256,
-            )
-            ABI_X86_64 -> DartPackageSpec(
-                ABI_X86_64,
-                "dart_${DART_VERSION}_x86_64.deb",
-                TERMUX_DART_POOL + "dart_${DART_VERSION}_x86_64.deb",
-                DART_DEB_X86_64_SIZE,
-                DART_DEB_X86_64_SHA256,
-            )
-            else -> null
+        val arch = when (abi) {
+            ABI_ARM64_V8A -> "aarch64"
+            ABI_X86_64 -> "x86_64"
+            else -> return null
+        }
+        val detected = dartCatalog?.packages?.get(abi)
+        val version = detected?.version ?: DART_VERSION
+        val fallbackSize = if (abi == ABI_ARM64_V8A) DART_DEB_ARM64_SIZE else DART_DEB_X86_64_SIZE
+        val fallbackSha = if (abi == ABI_ARM64_V8A) DART_DEB_ARM64_SHA256 else DART_DEB_X86_64_SHA256
+        val sizeBytes = detected?.sizeBytes?.takeIf { it > 0L } ?: fallbackSize
+        val sha256 = if (version == DART_VERSION) fallbackSha else ""
+        val fileName = "dart_${version}_${arch}.deb"
+        return DartPackageSpec(
+            abi,
+            version,
+            fileName,
+            TERMUX_DART_POOL + fileName,
+            sizeBytes,
+            sha256,
+        )
+    }
+
+    /* -------------------------------------------------------------------------------------- */
+    /* Auto-deteccion del pool de Termux (version/tamano vigentes del `.deb`)                    */
+    /* -------------------------------------------------------------------------------------- */
+
+    /** Catalogo en memoria, o `null` si aun no se ha detectado nada. */
+    @JvmStatic
+    fun detectedDartCatalog(): DartCatalog? = dartCatalog
+
+    /**
+     * Catalogo detectado, leyendo la copia en `<cacheDir>` si aun no esta en memoria.
+     * **No hace red**: seguro desde el hilo de UI.
+     */
+    @JvmStatic
+    fun cachedDartCatalog(context: Context?): DartCatalog? {
+        dartCatalog?.let { return it }
+        val fromDisk = context?.let { readDartCatalogFile(it) } ?: return null
+        synchronized(dartCatalogLock) {
+            if (dartCatalog == null) dartCatalog = fromDisk
+        }
+        return dartCatalog
+    }
+
+    /**
+     * Consulta el listado del pool de Termux, se queda con el `.deb` de version mas alta de cada ABI
+     * (comparando versiones **numericamente**, no como texto) y con el tamano que publica el listado,
+     * y lo cachea (memoria + `<cacheDir>/dart-pool-catalog.properties`).
+     *
+     * **Bloqueante y de red: hay que invocarla desde un hilo de fondo.** En el hilo principal se
+     * omite (se devuelve la cache) para no bloquear la UI. Nunca lanza: si la red falla devuelve el
+     * mejor dato disponible (cache/fallback).
+     */
+    @JvmStatic
+    fun refreshDartCatalog(context: Context?): DartCatalog? {
+        dartCatalog?.let { if (!isDartCatalogStale(it)) return it }
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            Log.w(TAG, "refreshDartCatalog llamado desde el hilo principal: se omite la red")
+            return cachedDartCatalog(context)
+        }
+        val body = httpGetText(
+            TERMUX_DART_POOL,
+            DART_POOL_REQUEST_TIMEOUT_MS,
+            DART_POOL_LISTING_MAX_BYTES,
+        ) ?: return cachedDartCatalog(context)
+        val parsed = parseDartPoolListing(body)
+        if (parsed.packages.isEmpty()) {
+            Log.w(TAG, "El listado del pool de Termux no traia ningun .deb util")
+            return cachedDartCatalog(context)
+        }
+        synchronized(dartCatalogLock) { dartCatalog = parsed }
+        context?.let { writeDartCatalogFile(it, parsed) }
+        return parsed
+    }
+
+    /**
+     * Parsea el HTML del listado del pool y devuelve, por ABI, el `.deb` de version mas alta.
+     *
+     * El tamano es el ultimo bloque de digitos (5+ cifras) de la linea del fichero, que en el
+     * listado de Termux es la columna de bytes. Es una funcion pura (sin red) para poder probarla.
+     */
+    @JvmStatic
+    fun parseDartPoolListing(body: String): DartCatalog {
+        val best = LinkedHashMap<String, DetectedDartPackage>()
+        for (line in body.lineSequence()) {
+            val match = DART_DEB_NAME_REGEX.find(line) ?: continue
+            val version = match.groupValues[1]
+            val arch = match.groupValues[2]
+            val abi = if (arch == "aarch64") ABI_ARM64_V8A else ABI_X86_64
+            val sizeBytes = SIZE_TOKEN_REGEX.findAll(line).lastOrNull()?.value?.toLongOrNull() ?: 0L
+            val current = best[abi]
+            if (current == null || compareDartVersions(version, current.version) > 0) {
+                best[abi] = DetectedDartPackage(abi, version, "dart_${version}_${arch}.deb", sizeBytes)
+            }
+        }
+        return DartCatalog(best, System.currentTimeMillis())
+    }
+
+    /** Compara dos versiones `a.b.c` **numericamente** (no lexicograficamente): `-1`, `0` o `1`. */
+    @JvmStatic
+    fun compareDartVersions(a: String, b: String): Int {
+        val pa = a.split('.')
+        val pb = b.split('.')
+        val count = maxOf(pa.size, pb.size)
+        for (i in 0 until count) {
+            val va = pa.getOrNull(i)?.toIntOrNull() ?: 0
+            val vb = pb.getOrNull(i)?.toIntOrNull() ?: 0
+            if (va != vb) return if (va < vb) -1 else 1
+        }
+        return 0
+    }
+
+    private fun isDartCatalogStale(catalog: DartCatalog): Boolean =
+        System.currentTimeMillis() - catalog.fetchedAtMillis > DART_CATALOG_TTL_MS
+
+    /** GET de texto con timeouts acotados y limite de bytes; `null` si falla o no es HTTP 200. */
+    private fun httpGetText(url: String, timeoutMs: Int, maxBytes: Int): String? {
+        var connection: HttpURLConnection? = null
+        return try {
+            connection = (URL(url).openConnection() as HttpURLConnection).apply {
+                connectTimeout = timeoutMs
+                readTimeout = timeoutMs
+                instanceFollowRedirects = true
+                requestMethod = "GET"
+            }
+            if (connection.responseCode != HttpURLConnection.HTTP_OK) {
+                Log.w(TAG, "HTTP ${connection.responseCode} al leer $url")
+                return null
+            }
+            val output = ByteArrayOutputStream()
+            connection.inputStream.use { input ->
+                val buffer = ByteArray(64 * 1024)
+                var total = 0
+                while (true) {
+                    val n = input.read(buffer)
+                    if (n <= 0) break
+                    if (total + n > maxBytes) break
+                    output.write(buffer, 0, n)
+                    total += n
+                }
+            }
+            String(output.toByteArray(), Charsets.UTF_8)
+        } catch (e: Exception) {
+            Log.w(TAG, "No se pudo leer $url: ${e.message}")
+            null
+        } finally {
+            connection?.disconnect()
+        }
+    }
+
+    private fun readDartCatalogFile(context: Context): DartCatalog? {
+        return try {
+            val file = File(context.cacheDir, DART_CATALOG_CACHE_FILE)
+            if (!file.isFile) return null
+            val properties = java.util.Properties()
+            FileInputStream(file).use { properties.load(it) }
+            val fetchedAt = properties.getProperty("fetchedAt")?.toLongOrNull() ?: 0L
+            val packages = LinkedHashMap<String, DetectedDartPackage>()
+            for (abi in listOf(ABI_ARM64_V8A, ABI_X86_64)) {
+                val arch = if (abi == ABI_ARM64_V8A) "aarch64" else "x86_64"
+                val version = properties.getProperty("$arch.version") ?: continue
+                val sizeBytes = properties.getProperty("$arch.size")?.toLongOrNull() ?: 0L
+                packages[abi] =
+                    DetectedDartPackage(abi, version, "dart_${version}_${arch}.deb", sizeBytes)
+            }
+            if (packages.isEmpty()) null else DartCatalog(packages, fetchedAt)
+        } catch (e: Exception) {
+            Log.w(TAG, "No se pudo leer la cache del pool de Termux: ${e.message}")
+            null
+        }
+    }
+
+    private fun writeDartCatalogFile(context: Context, catalog: DartCatalog) {
+        try {
+            val file = File(context.cacheDir, DART_CATALOG_CACHE_FILE)
+            file.parentFile?.mkdirs()
+            val properties = java.util.Properties()
+            properties.setProperty("fetchedAt", catalog.fetchedAtMillis.toString())
+            for ((abi, pkg) in catalog.packages) {
+                val arch = if (abi == ABI_ARM64_V8A) "aarch64" else "x86_64"
+                properties.setProperty("$arch.version", pkg.version)
+                properties.setProperty("$arch.size", pkg.sizeBytes.toString())
+            }
+            FileOutputStream(file).use {
+                properties.store(it, "Pool de Termux (dart) detectado por FlutterToolchainPaths")
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "No se pudo escribir la cache del pool de Termux: ${e.message}")
         }
     }
 

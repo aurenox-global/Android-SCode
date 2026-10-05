@@ -3389,4 +3389,5 @@ Please try again later"</string>
     <string name="auto9_event_desc_cat_component">Event triggered by this component.</string>
     <string name="auto9_event_desc_cat_drawer">Event triggered by this drawer view.</string>
     <string name="auto9_event_desc_cat_moreblock">Custom block created by you.</string>
+    <string name="auto_stop">Stop</string>
 </resources>

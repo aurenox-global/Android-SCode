@@ -375,6 +375,9 @@ object FlutterToolchainManager {
     @JvmStatic
     fun componentInventory(context: Context, mode: FlutterBuildMode): List<ToolchainComponent> {
         val abi = FlutterToolchainPaths.resolveSupportedAbi() ?: FlutterToolchainPaths.deviceAbiName()
+        // Mejor dato disponible sin red (memoria + cache en disco); la deteccion real la hace el
+        // instalador en hilo de fondo.
+        FlutterToolchainPaths.cachedDartCatalog(context)
         val dartSpec = FlutterToolchainPaths.dartPackageSpec(abi)
         val patchedSdkSpec = if (mode == FlutterBuildMode.RELEASE_AOT) {
             FlutterToolchainPaths.patchedSdkProductArtifact()
@@ -386,7 +389,8 @@ object FlutterToolchainManager {
         // 1) SDK Dart on-device (el .deb de Termux de la ABI del dispositivo).
         components.add(
             ToolchainComponent(
-                "SDK Dart ${FlutterToolchainPaths.DART_VERSION} (${dartSpec?.fileName ?: "sin paquete para $abi"})",
+                "SDK Dart ${dartSpec?.version ?: FlutterToolchainPaths.DART_VERSION} " +
+                    "(${dartSpec?.fileName ?: "sin paquete para $abi"})",
                 dartSpec?.sizeBytes ?: 0L,
                 isDartSdkInstalled(context),
             )

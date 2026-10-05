@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tarjeta de evento con el aspecto del hero del inicio (bg_web_hero):
+     tinte verde suave + borde verde de 1dp, radio 16dp. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="315"
+        android:startColor="#1F3DDC84"
+        android:endColor="#1000BFA5"
+        android:type="linear" />
+    <stroke
+        android:width="1dp"
+        android:color="#473DDC84" />
+    <corners android:radius="16dp" />
+</shape>

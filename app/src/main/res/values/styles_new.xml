@@ -47,7 +47,7 @@
          tonal accent (colorPrimaryContainer) as its rounded-square active indicator and
          the accent (colorPrimary) for its icon and label. -->
     <style name="Widget.Ascode.NavigationRail" parent="Widget.Material3Expressive.NavigationRailView">
-        <item name="itemIconTint">@color/selector_event_rail_item</item>
+        <item name="itemIconTint">@color/selector_event_rail_icon</item>
         <item name="itemTextColor">@color/selector_event_rail_item</item>
         <item name="itemActiveIndicatorStyle">@style/Widget.Ascode.NavigationRail.ActiveIndicator</item>
         <item name="itemIconSize">22dp</item>

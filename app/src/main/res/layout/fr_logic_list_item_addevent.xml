@@ -21,7 +21,7 @@
         android:background="@drawable/bg_event_icon_square"
         android:contentDescription="@null"
         android:padding="10dp"
-        android:tint="@color/event_on_accent_container"
+        android:tint="#FF000000"
         tools:src="@drawable/widget_button" />
 
     <LinearLayout

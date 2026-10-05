@@ -35,6 +35,7 @@ firmado**, todo sin salir del teléfono.
 
 ## Características
 
+- **Tema con la paleta de la web (v1.0.39)** — toda la app usa los colores exactos de la web: verde #3DDC84 y teal #00BFA5 sobre azul marino, en Material 3 claro y oscuro, sin morados heredados (FABs, botones y diálogos).
 - **Inicio rediseñado** — tarjeta "Continuar donde lo dejaste", accesos rápidos (nuevo, importar, templates) y tarjetas de proyecto más limpias, con paleta neutra y verde.
 - **Multi-idioma** — inglés, español y portugués de Brasil, con selector en **Ajustes → Idioma**.
 - **Editor rediseñado** — panel de bloques moderno con buscador y categorías con su color, barra superior más limpia y apartado de Eventos con tarjetas y descripciones, en el verde de la app.

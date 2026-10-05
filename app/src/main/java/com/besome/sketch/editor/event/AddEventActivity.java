@@ -496,8 +496,8 @@ public class AddEventActivity extends BaseAppCompatActivity implements View.OnCl
             holder.img_icon.setImageResource(rs.a(position));
             if (lastSelectedCategory == position) {
                 holder.container.setBackgroundResource(R.drawable.bg_event_category_selected);
-                holder.img_icon.setImageTintList(ColorStateList.valueOf(
-                        androidx.core.content.ContextCompat.getColor(holder.img_icon.getContext(), R.color.event_accent)));
+                // Icono del rail sobre el cuadrado verde: negro puro para maximo contraste.
+                holder.img_icon.setImageTintList(ColorStateList.valueOf(android.graphics.Color.BLACK));
                 holder.img_icon.animate().scaleX(1.0f).scaleY(1.0f).alpha(1.0f).start();
                 holder.container.animate().translationY(0.0f).start();
             } else {

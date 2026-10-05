@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Overrides de la paleta *baseline* de Material (m3_sys_color_light_* / m3_sys_color_dark_*).
+  Los estilos de las librerias Widget.Material3.* / Material3Expressive referencian estas
+  variables directamente en vez de los atributos del tema, por lo que hay que reescribirlas
+  aqui (en el merge el recurso de la app gana al de la libreria).
+  MISMOS valores que res/values/m3_colors.xml (md_theme_*).
+-->
+<resources>
+    <!-- ===== Baseline light (dia) ===== -->
+    <color name="m3_sys_color_dark_background">#FFF6F7F9</color>
+    <color name="m3_sys_color_dark_error">#FFBA1A1A</color>
+    <color name="m3_sys_color_dark_error_container">#FFFFDAD6</color>
+    <color name="m3_sys_color_dark_inverse_on_surface">#FFEAF1FA</color>
+    <color name="m3_sys_color_dark_inverse_primary">#FF3DDC84</color>
+    <color name="m3_sys_color_dark_inverse_surface">#FF0B1220</color>
+    <color name="m3_sys_color_dark_on_background">#FF17181A</color>
+    <color name="m3_sys_color_dark_on_error">#FFFFFFFF</color>
+    <color name="m3_sys_color_dark_on_error_container">#FF410002</color>
+    <color name="m3_sys_color_dark_on_primary">#FFFFFFFF</color>
+    <color name="m3_sys_color_dark_on_primary_container">#FF06281C</color>
+    <color name="m3_sys_color_dark_on_secondary">#FFFFFFFF</color>
+    <color name="m3_sys_color_dark_on_secondary_container">#FF06281C</color>
+    <color name="m3_sys_color_dark_on_surface">#FF17181A</color>
+    <color name="m3_sys_color_dark_on_surface_variant">#FF5F656D</color>
+    <color name="m3_sys_color_dark_on_tertiary">#FFFFFFFF</color>
+    <color name="m3_sys_color_dark_on_tertiary_container">#FF06281C</color>
+    <color name="m3_sys_color_dark_outline">#FFC6CBD4</color>
+    <color name="m3_sys_color_dark_outline_variant">#FFE3E6E6</color>
+    <color name="m3_sys_color_dark_primary">#FF1E9E5A</color>
+    <color name="m3_sys_color_dark_primary_container">#FFA8F0C6</color>
+    <color name="m3_sys_color_dark_secondary">#FF00897B</color>
+    <color name="m3_sys_color_dark_secondary_container">#FFA8F0E8</color>
+    <color name="m3_sys_color_dark_surface">#FFF6F7F9</color>
+    <color name="m3_sys_color_dark_surface_bright">#FFFFFFFF</color>
+    <color name="m3_sys_color_dark_surface_container">#FFEFF1F5</color>
+    <color name="m3_sys_color_dark_surface_container_high">#FFE9ECF2</color>
+    <color name="m3_sys_color_dark_surface_container_highest">#FFE2E6EE</color>
+    <color name="m3_sys_color_dark_surface_container_low">#FFFFFFFF</color>
+    <color name="m3_sys_color_dark_surface_container_lowest">#FFFFFFFF</color>
+    <color name="m3_sys_color_dark_surface_dim">#FFDDE1E8</color>
+    <color name="m3_sys_color_dark_surface_tint">#FF1E9E5A</color>
+    <color name="m3_sys_color_dark_surface_variant">#FFE2E6EE</color>
+    <color name="m3_sys_color_dark_tertiary">#FF00897B</color>
+    <color name="m3_sys_color_dark_tertiary_container">#FFA8F0E8</color>
+    <color name="m3_sys_color_light_background">#FFF6F7F9</color>
+    <color name="m3_sys_color_light_error">#FFBA1A1A</color>
+    <color name="m3_sys_color_light_error_container">#FFFFDAD6</color>
+    <color name="m3_sys_color_light_inverse_on_surface">#FFEAF1FA</color>
+    <color name="m3_sys_color_light_inverse_primary">#FF3DDC84</color>
+    <color name="m3_sys_color_light_inverse_surface">#FF0B1220</color>
+    <color name="m3_sys_color_light_on_background">#FF17181A</color>
+    <color name="m3_sys_color_light_on_error">#FFFFFFFF</color>
+    <color name="m3_sys_color_light_on_error_container">#FF410002</color>
+    <color name="m3_sys_color_light_on_primary">#FFFFFFFF</color>
+    <color name="m3_sys_color_light_on_primary_container">#FF06281C</color>
+    <color name="m3_sys_color_light_on_secondary">#FFFFFFFF</color>
+    <color name="m3_sys_color_light_on_secondary_container">#FF06281C</color>
+    <color name="m3_sys_color_light_on_surface">#FF17181A</color>
+    <color name="m3_sys_color_light_on_surface_variant">#FF5F656D</color>
+    <color name="m3_sys_color_light_on_tertiary">#FFFFFFFF</color>
+    <color name="m3_sys_color_light_on_tertiary_container">#FF06281C</color>
+    <color name="m3_sys_color_light_outline">#FFC6CBD4</color>
+    <color name="m3_sys_color_light_outline_variant">#FFE3E6E6</color>
+    <color name="m3_sys_color_light_primary">#FF1E9E5A</color>
+    <color name="m3_sys_color_light_primary_container">#FFA8F0C6</color>
+    <color name="m3_sys_color_light_secondary">#FF00897B</color>
+    <color name="m3_sys_color_light_secondary_container">#FFA8F0E8</color>
+    <color name="m3_sys_color_light_surface">#FFF6F7F9</color>
+    <color name="m3_sys_color_light_surface_bright">#FFFFFFFF</color>
+    <color name="m3_sys_color_light_surface_container">#FFEFF1F5</color>
+    <color name="m3_sys_color_light_surface_container_high">#FFE9ECF2</color>
+    <color name="m3_sys_color_light_surface_container_highest">#FFE2E6EE</color>
+    <color name="m3_sys_color_light_surface_container_low">#FFFFFFFF</color>
+    <color name="m3_sys_color_light_surface_container_lowest">#FFFFFFFF</color>
+    <color name="m3_sys_color_light_surface_dim">#FFDDE1E8</color>
+    <color name="m3_sys_color_light_surface_tint">#FF1E9E5A</color>
+    <color name="m3_sys_color_light_surface_variant">#FFE2E6EE</color>
+    <color name="m3_sys_color_light_tertiary">#FF00897B</color>
+    <color name="m3_sys_color_light_tertiary_container">#FFA8F0E8</color>
+    <color name="m3_sys_color_on_primary_fixed">#FF06281C</color>
+    <color name="m3_sys_color_on_primary_fixed_variant">#FF06281C</color>
+    <color name="m3_sys_color_on_secondary_fixed">#FF06281C</color>
+    <color name="m3_sys_color_on_secondary_fixed_variant">#FF06281C</color>
+    <color name="m3_sys_color_on_tertiary_fixed">#FF06281C</color>
+    <color name="m3_sys_color_on_tertiary_fixed_variant">#FF06281C</color>
+    <color name="m3_sys_color_primary_fixed">#FFA8F0C6</color>
+    <color name="m3_sys_color_primary_fixed_dim">#FF1E9E5A</color>
+    <color name="m3_sys_color_secondary_fixed">#FFA8F0E8</color>
+    <color name="m3_sys_color_secondary_fixed_dim">#FF00897B</color>
+    <color name="m3_sys_color_tertiary_fixed">#FFA8F0E8</color>
+    <color name="m3_sys_color_tertiary_fixed_dim">#FF00897B</color>
+</resources>

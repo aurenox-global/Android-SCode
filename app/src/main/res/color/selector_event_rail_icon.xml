@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Icono del rail sobre el indicador verde (#3DDC84): negro puro para maximo contraste.
+         (Antes heredaba @color/event_accent, que en oscuro es el mismo #3DDC84 del fondo
+         del indicador -> icono invisible.) -->
+    <item android:color="#FF000000" android:state_checked="true" />
+    <item android:color="?attr/colorOnSurfaceVariant" />
+</selector>

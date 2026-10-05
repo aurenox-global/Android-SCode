@@ -11,8 +11,10 @@
     app:strokeWidth="0dp">
 
     <LinearLayout
+        android:id="@+id/card_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/bg_event_card_web"
         android:orientation="vertical">
 
         <LinearLayout
@@ -29,7 +31,7 @@
                 android:background="@drawable/bg_event_icon_square"
                 android:contentDescription="@null"
                 android:padding="10dp"
-                android:tint="@color/event_on_accent_container"
+                android:tint="#FF000000"
                 tools:src="@drawable/widget_button" />
 
             <LinearLayout
@@ -46,7 +48,7 @@
                     android:ellipsize="end"
                     android:fontFamily="sans-serif-medium"
                     android:maxLines="1"
-                    android:textColor="?attr/colorOnSurface"
+                    android:textColor="@color/web_text"
                     android:textSize="15sp"
                     tools:text="On activity create" />
 
@@ -72,7 +74,7 @@
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
                         android:maxLines="2"
-                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textColor="@color/web_muted"
                         android:textSize="13sp"
                         tools:text="Called when the Activity is first created." />
                 </LinearLayout>
@@ -125,7 +127,7 @@
                 android:focusable="true"
                 android:padding="2dp"
                 android:src="@drawable/ic_mtrl_chevron_right_24"
-                app:tint="?attr/colorOnSurfaceVariant" />
+                app:tint="@color/web_green" />
         </LinearLayout>
 
         <LinearLayout

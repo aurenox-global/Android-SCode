@@ -43,7 +43,7 @@
                     android:background="@drawable/bg_event_header_icon"
                     android:contentDescription="@null"
                     android:padding="12dp"
-                    app:tint="@color/event_on_accent_container"
+                    app:tint="#FF000000"
                     tools:src="@drawable/ic_mtrl_lifecycle" />
 
                 <LinearLayout

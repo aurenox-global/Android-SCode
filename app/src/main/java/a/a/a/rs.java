@@ -570,13 +570,16 @@ public class rs extends qA implements View.OnClickListener, MoreblockImporterDia
             }
 
             if (position == 0) {
-                holder.root.setCardBackgroundColor(androidx.core.content.ContextCompat.getColor(context, R.color.event_accent_container));
-                holder.root.setStrokeColor(ColorStateList.valueOf(androidx.core.content.ContextCompat.getColor(context, R.color.event_accent_container)));
-                holder.root.setStrokeWidth(Math.round(wB.a(context, 1.0f)));
+                // Tarjeta destacada con el aspecto del hero del inicio (tinte + borde verde),
+                // en lugar del verde solido anterior.
+                holder.root.setCardBackgroundColor(android.graphics.Color.TRANSPARENT);
+                holder.root.setStrokeWidth(0);
+                holder.content.setBackgroundResource(R.drawable.bg_event_card_web);
             } else {
                 holder.root.setCardBackgroundColor(MaterialColors.getColor(holder.root,
                         com.google.android.material.R.attr.colorSurfaceContainer));
                 holder.root.setStrokeWidth(0);
+                holder.content.setBackground(null);
             }
             if (eventBean.isCollapsed) {
                 holder.optionContainer.setVisibility(View.GONE);
@@ -684,6 +687,7 @@ public class rs extends qA implements View.OnClickListener, MoreblockImporterDia
 
         private class ViewHolder extends CollapsibleViewHolder {
             public final MaterialCardView root;
+            public final LinearLayout content;
             public final ImageView menu;
             public final ImageView preview;
             public final LinearLayout previewContainer;
@@ -699,6 +703,7 @@ public class rs extends qA implements View.OnClickListener, MoreblockImporterDia
             public ViewHolder(View itemView) {
                 super(itemView, 200);
                 root = (MaterialCardView) itemView;
+                content = itemView.findViewById(R.id.card_content);
                 icon = itemView.findViewById(R.id.img_icon);
                 targetType = itemView.findViewById(R.id.tv_target_type);
                 targetId = itemView.findViewById(R.id.tv_target_id);

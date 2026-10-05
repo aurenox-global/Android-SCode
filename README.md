@@ -35,6 +35,7 @@ your phone.
 
 ## Features
 
+- **Web-palette theme (v1.0.39)** — the whole app now uses the website's exact colours: #3DDC84 green and #00BFA5 teal on deep navy, in Material 3 light and dark, with no leftover purple accents (FABs, buttons, dialogs).
 - **Redesigned home** — a "continue where you left off" card, quick actions (new, import, templates) and clean project cards, on a neutral + green palette.
 - **Multi-language** — English, Spanish and Brazilian Portuguese, switchable from **Settings → Language**.
 - **Redesigned editor** — a modern block palette with search and colour-coded categories, a cleaner top bar, and an Events section with cards and descriptions, in the app's green.

@@ -3,7 +3,9 @@ package a.a.a;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -11,8 +13,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 
 import com.besome.sketch.beans.HistoryViewBean;
 import com.besome.sketch.beans.ProjectFileBean;
@@ -20,6 +26,7 @@ import com.besome.sketch.beans.ViewBean;
 import com.besome.sketch.design.DesignActivity;
 import com.besome.sketch.editor.LogicEditorActivity;
 import com.besome.sketch.editor.PropertyActivity;
+import com.besome.sketch.editor.manage.view.AddViewActivity;
 import com.besome.sketch.editor.view.DraggingListener;
 import com.besome.sketch.editor.view.ViewEditor;
 import com.besome.sketch.editor.view.ViewProperty;
@@ -31,6 +38,14 @@ import mod.hey.studios.util.Helper;
 import com.ascode.android.R;
 import com.ascode.android.utility.AscodeUtil;
 import com.ascode.android.widgets.WidgetsCreatorManager;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import io.ascode.android.ScreenDesignCopier;
+
+/**
+ * Request code used to create a brand-new screen from the "copy design and
+ * logic" dialog. Kept distinct from 213 (property editor) and from the codes
+ * used by AddViewActivity (264/265/276).
+ */
 
 public class ViewEditorFragment extends qA {
 
@@ -43,6 +58,13 @@ public class ViewEditorFragment extends qA {
     private boolean isPropertyViewVisible;
     private boolean isDragging = false;
     private String sc_id;
+
+    /**
+     * Request code used to create a brand-new screen from the "copy design and
+     * logic" dialog. Kept distinct from 213 (property editor) and from the codes
+     * used by AddViewActivity (264/265/276).
+     */
+    private static final int REQUEST_CODE_CREATE_SCREEN = 279;
 
     private WidgetsCreatorManager widgetsCreatorManager;
 
@@ -458,6 +480,13 @@ public class ViewEditorFragment extends qA {
                 }
             }
             invalidateOptionsMenu();
+        } else if (requestCode == REQUEST_CODE_CREATE_SCREEN
+                && resultCode == android.app.Activity.RESULT_OK) {
+            ProjectFileBean newScreen = data != null
+                    ? data.getParcelableExtra("project_file") : null;
+            if (newScreen != null) {
+                registerNewScreenAndCopy(newScreen);
+            }
         }
     }
 
@@ -505,8 +534,190 @@ public class ViewEditorFragment extends qA {
             onRedo();
         } else if (itemId == R.id.menu_view_undo) {
             onUndo();
+        } else if (itemId == R.id.menu_view_copy_design) {
+            showCopyDesignDialog();
         }
         return true;
+    }
+
+    /**
+     * Shows the screen picker for "Copiar diseño y lógica…". Lists every other
+     * activity of the project; custom views are not offered because they have no
+     * logic (their Java name is empty).
+     */
+    private void showCopyDesignDialog() {
+        if (projectFileBean == null) {
+            return;
+        }
+        ArrayList<ProjectFileBean> targets = new ArrayList<>();
+        ArrayList<ProjectFileBean> projectFiles = jC.b(sc_id).b();
+        if (projectFiles != null) {
+            for (ProjectFileBean file : projectFiles) {
+                if (file != null
+                        && file.fileType == ProjectFileBean.PROJECT_FILE_TYPE_ACTIVITY
+                        && !file.getXmlName().equals(projectFileBean.getXmlName())) {
+                    targets.add(file);
+                }
+            }
+        }
+        // Build the list by hand instead of using AlertDialog#setItems: this app's
+        // dialog theme doesn't render the framework list rows.
+        float density = getResources().getDisplayMetrics().density;
+        int pad = (int) (16 * density);
+        LinearLayout list = new LinearLayout(requireContext());
+        list.setOrientation(LinearLayout.VERTICAL);
+        list.setPadding(pad / 2, pad / 2, pad / 2, pad / 2);
+        ScrollView scrollView = new ScrollView(requireContext());
+        scrollView.addView(list, new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(Helper.getResString(R.string.design_copy_screen_title))
+                .setMessage(Helper.getResString(R.string.design_copy_screen_select_target))
+                .setView(scrollView)
+                .setNegativeButton(Helper.getResString(R.string.common_word_cancel), null)
+                .create();
+
+        // "New screen" is always offered, even when this is the only screen of the
+        // project, so a design can always be duplicated into a fresh screen.
+        TextView newScreenRow = new TextView(requireContext());
+        newScreenRow.setText(Helper.getResString(R.string.design_copy_screen_new));
+        newScreenRow.setTextSize(16f);
+        newScreenRow.setTypeface(null, Typeface.BOLD);
+        newScreenRow.setGravity(Gravity.CENTER_VERTICAL);
+        newScreenRow.setPadding(pad, pad, pad, pad);
+        newScreenRow.setClickable(true);
+        newScreenRow.setFocusable(true);
+        newScreenRow.setOnClickListener(v -> {
+            dialog.dismiss();
+            createNewScreenForCopy();
+        });
+        list.addView(newScreenRow);
+
+        for (ProjectFileBean target : targets) {
+            TextView row = new TextView(requireContext());
+            row.setText(target.fileName);
+            row.setTextSize(16f);
+            row.setGravity(Gravity.CENTER_VERTICAL);
+            row.setPadding(pad, pad, pad, pad);
+            row.setClickable(true);
+            row.setFocusable(true);
+            row.setOnClickListener(v -> {
+                dialog.dismiss();
+                confirmCopyDesign(target);
+            });
+            list.addView(row);
+        }
+        dialog.show();
+    }
+
+    /**
+     * Launches the normal "add screen" screen ({@link AddViewActivity}) so the user
+     * can name and configure the destination, then copies the current design and
+     * logic onto it once it has been created.
+     */
+    private void createNewScreenForCopy() {
+        ArrayList<String> screenNames = new ArrayList<>();
+        ArrayList<ProjectFileBean> activities = jC.b(sc_id).b();
+        if (activities != null) {
+            for (ProjectFileBean file : activities) {
+                if (file != null) {
+                    screenNames.add(file.fileName);
+                }
+            }
+        }
+        ArrayList<ProjectFileBean> customViews = jC.b(sc_id).c();
+        if (customViews != null) {
+            for (ProjectFileBean file : customViews) {
+                if (file != null) {
+                    screenNames.add(file.fileName);
+                }
+            }
+        }
+        Intent intent = new Intent(requireContext(), AddViewActivity.class);
+        intent.putExtra("screen_names", screenNames);
+        intent.putExtra("request_code", AddViewActivity.REQUEST_CODE_ADD);
+        startActivityForResult(intent, REQUEST_CODE_CREATE_SCREEN);
+    }
+
+    /**
+     * Registers the freshly created screen in the project structures, then copies
+     * the current screen design + logic onto it and refreshes the editor.
+     */
+    private void registerNewScreenAndCopy(ProjectFileBean newScreen) {
+        hC projectFiles = jC.b(sc_id);
+        projectFiles.a(newScreen);
+        if (newScreen.hasActivityOption(ProjectFileBean.OPTION_ACTIVITY_DRAWER)) {
+            projectFiles.a(2, newScreen.getDrawerName());
+        }
+        // Rebuild the internal xml/java name lists and persist the project file.
+        projectFiles.j();
+        projectFiles.l();
+        // The new screen is empty (no confirmation needed), so copy right away.
+        copyDesignAndLogic(newScreen);
+    }
+
+    /**
+     * Asks for confirmation when the destination already has a design or logic,
+     * then performs the copy.
+     */
+    private void confirmCopyDesign(ProjectFileBean target) {
+        if (!targetHasContent(target)) {
+            copyDesignAndLogic(target);
+            return;
+        }
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(Helper.getResString(R.string.design_copy_screen_confirm_title))
+                .setMessage(getString(R.string.design_copy_screen_confirm_message, target.fileName))
+                .setPositiveButton(Helper.getResString(R.string.common_word_ok),
+                        (dialog, which) -> copyDesignAndLogic(target))
+                .setNegativeButton(Helper.getResString(R.string.common_word_cancel), null)
+                .show();
+    }
+
+    private boolean targetHasContent(ProjectFileBean target) {
+        eC data = jC.a(sc_id);
+        String xmlName = target.getXmlName();
+        String javaName = target.getJavaName();
+        ArrayList<ViewBean> views = data.d(xmlName);
+        if (views != null && !views.isEmpty()) {
+            return true;
+        }
+        if (javaName == null || javaName.isEmpty()) {
+            return false;
+        }
+        return !data.b(javaName).isEmpty()
+                || !data.g(javaName).isEmpty()
+                || !data.e(javaName).isEmpty()
+                || !data.k(javaName).isEmpty()
+                || !data.j(javaName).isEmpty();
+    }
+
+    private void copyDesignAndLogic(ProjectFileBean target) {
+        try {
+            ScreenDesignCopier.Result result = ScreenDesignCopier.copy(sc_id, projectFileBean, target);
+            // The destination may have an undo/redo history referencing the old design;
+            // drop it so a later Undo can't bring back the replaced content.
+            cC history = cC.c(sc_id);
+            if (history != null) {
+                if (history.c != null) history.c.remove(target.getXmlName());
+                if (history.b != null) history.b.remove(target.getXmlName());
+            }
+            // Reload the editor tabs that may be showing the destination screen.
+            if (requireActivity() instanceof DesignActivity designActivity) {
+                designActivity.refreshAfterAiActions();
+            }
+            AscodeUtil.toast(getString(R.string.design_copy_screen_success, target.fileName));
+            // Persist design + logic with the normal project save path (background).
+            new Thread(() -> {
+                try {
+                    jC.a(sc_id).j();
+                } catch (Exception ignored) {
+                }
+            }).start();
+        } catch (Exception e) {
+            AscodeUtil.toast(Helper.getResString(R.string.design_copy_screen_failed));
+        }
     }
 
     @Override

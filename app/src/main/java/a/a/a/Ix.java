@@ -502,7 +502,14 @@ public class Ix {
         }
         AndroidManifestInjector.getP(a, c.sc_id);
 
-        if (c.isAdMobEnabled || c.isTextToSpeechUsed || c.isSpeechToTextUsed) {
+        // Android 11+ (API 30+) package visibility: without declaring the TTS_SERVICE intent,
+        // TextToSpeech.getEngines() returns [] and onInit can fail with ERROR (-1). Any compiled
+        // app may use Text-to-Speech (the TTS component or the WebView AndroidBridge), so the
+        // declaration is emitted for every project targeting API 30+. Generation rebuilds the
+        // whole manifest, so exactly one <queries> node with exactly one TTS intent is written:
+        // repeated builds stay idempotent and never duplicate the block.
+        boolean needsTtsVisibility = targetSdkVersion >= 30;
+        if (c.isAdMobEnabled || c.isTextToSpeechUsed || c.isSpeechToTextUsed || needsTtsVisibility) {
             XmlBuilder queries = new XmlBuilder("queries");
             if (c.isAdMobEnabled) {
                 XmlBuilder forBrowserContent = new XmlBuilder("intent");
@@ -526,7 +533,7 @@ public class Ix {
                 }
                 queries.addChildNode(forCustomTabsService);
             }
-            if (c.isTextToSpeechUsed && targetSdkVersion >= 30) {
+            if (needsTtsVisibility) {
                 XmlBuilder intent = new XmlBuilder("intent");
                 XmlBuilder action = new XmlBuilder("action");
                 action.addAttribute("android", "name", "android.intent.action.TTS_SERVICE");

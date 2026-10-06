@@ -30,6 +30,7 @@ import mod.hilal.saif.events.LogicHandler;
 import mod.pranav.viewbinding.ViewBindingBuilder;
 import com.ascode.android.control.logic.PermissionManager;
 import com.ascode.android.utility.DesignShapeAttrs;
+import com.ascode.android.webview.ProjectWebViewSettings;
 
 public class Jx {
 
@@ -47,6 +48,7 @@ public class Jx {
     private final jq buildConfig;
     private final Ox ox;
     private final Boolean isViewBindingEnabled;
+    private final ProjectWebViewSettings webViewSettings;
     /**
      * Fields with static initializer that added Components need,
      * e.g. {"private Timer _timer = new Timer();"}
@@ -104,6 +106,7 @@ public class Jx {
         extraBlocks = getExtraBlockData();
         isViewBindingEnabled = settings.getValue(ProjectSettings.SETTING_ENABLE_VIEWBINDING, BuildSettings.SETTING_GENERIC_VALUE_FALSE)
                 .equals(BuildSettings.SETTING_GENERIC_VALUE_TRUE);
+        webViewSettings = new ProjectWebViewSettings(settings);
         materialLibraryManager = new Material3LibraryManager(projectDataManager.a);
     }
 
@@ -547,6 +550,9 @@ public class Jx {
             sb.append("}").append(EOL);
 
             appendWebViewDownloadHelpers(sb, EOL);
+            if (webViewSettings.isTtsBridgeEnabled()) {
+                appendWebViewTtsHelpers(sb, EOL, webViewSettings.getTtsRate(), webViewSettings.getTtsLang());
+            }
         }
 
         String agusComponentsOnActivityResultCode = getBillingResponseCode(buildConfig.x);
@@ -963,9 +969,9 @@ public class Jx {
             replaceAll = viewBean.getClassInfo().getClassName();
         }
         if (projectFileBean.fileName.contains("_fragment")) {
-            return Lx.getViewInitializer(replaceAll, viewBean.id, true, isViewBindingEnabled);
+            return Lx.getViewInitializer(replaceAll, viewBean.id, true, isViewBindingEnabled, webViewSettings);
         }
-        return Lx.getViewInitializer(replaceAll, viewBean.id, false, isViewBindingEnabled);
+        return Lx.getViewInitializer(replaceAll, viewBean.id, false, isViewBindingEnabled, webViewSettings);
     }
 
     private void addMoreBlockCodes() {
@@ -1246,6 +1252,10 @@ public class Jx {
     }
 
     private void addWebViewSupportInitializers() {
+        boolean ttsBridgeEnabled = webViewSettings.isTtsBridgeEnabled();
+        if (ttsBridgeEnabled) {
+            addImport("android.speech.tts.TextToSpeech");
+        }
         for (ViewBean viewBean : projectDataManager.d(projectFileBean.getXmlName())) {
             if (viewBean.type != ViewBean.VIEW_TYPE_WIDGET_WEBVIEW) {
                 continue;
@@ -1255,18 +1265,32 @@ public class Jx {
                     ? Lx.getBindingOrViewName(viewBean.id, true)
                     : viewBean.id;
 
-            initializeMethodCode.add(
-                    webViewName + ".setWebChromeClient(new WebChromeClient() {" + EOL +
-                            "@Override" + EOL +
-                            "public boolean onShowFileChooser(WebView _webView, ValueCallback<Uri[]> _filePathCallback, FileChooserParams _fileChooserParams) {" + EOL +
-                            "return _openWebFileChooser(_filePathCallback, _fileChooserParams);" + EOL +
-                            "}" + EOL +
-                            "});"
-            );
+            StringBuilder chromeClient = new StringBuilder(512);
+            chromeClient.append(webViewName).append(".setWebChromeClient(new WebChromeClient() {").append(EOL);
+            chromeClient.append("@Override").append(EOL);
+            chromeClient.append("public boolean onShowFileChooser(WebView _webView, ValueCallback<Uri[]> _filePathCallback, FileChooserParams _fileChooserParams) {").append(EOL);
+            chromeClient.append("return _openWebFileChooser(_filePathCallback, _fileChooserParams);").append(EOL);
+            chromeClient.append("}").append(EOL);
+            if (ttsBridgeEnabled) {
+                chromeClient.append("@Override").append(EOL);
+                chromeClient.append("public void onProgressChanged(WebView _webView, int _newProgress) {").append(EOL);
+                chromeClient.append("if (_newProgress >= 100) {").append(EOL);
+                chromeClient.append("_injectTtsShim(_webView);").append(EOL);
+                chromeClient.append("}").append(EOL);
+                chromeClient.append("}").append(EOL);
+            }
+            chromeClient.append("});");
+            initializeMethodCode.add(chromeClient.toString());
 
             initializeMethodCode.add(
                     webViewName + ".addJavascriptInterface(new _BlobDownloadBridge(), \"_BlobDownloader\");"
             );
+
+            if (ttsBridgeEnabled) {
+                initializeMethodCode.add(
+                        webViewName + ".addJavascriptInterface(new _TtsBridge(), \"AndroidBridge\");"
+                );
+            }
 
             initializeMethodCode.add(buildSafeWebViewDownloadListener(webViewName, EOL));
         }
@@ -1880,6 +1904,361 @@ public class Jx {
         sb.append("return;").append(EOL);
         sb.append("}").append(EOL);
         sb.append("_saveBlobBase64ToDownloads(_base64Data, _mimeType, _fileName);").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("});").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("}").append(EOL);
+    }
+
+    /**
+     * Appends the WebView Text-to-Speech helper methods (and the {@code _TtsBridge} inner class)
+     * to {@code sb}. Compiled Android apps expose a JavaScript bridge named {@code AndroidBridge}
+     * (methods {@code speak(String texto, String rate)} / {@code stop()}), and a minimal
+     * {@code window.speechSynthesis} shim so HTML written against the Web Speech API keeps working
+     * inside a WebView, where the platform does not implement {@code window.speechSynthesis}.
+     */
+    public static void appendWebViewTtsHelpers(StringBuilder sb, String EOL) {
+        appendWebViewTtsHelpers(sb, EOL, ProjectWebViewSettings.DEFAULT_TTS_RATE, ProjectWebViewSettings.DEFAULT_TTS_LANG);
+    }
+
+    /**
+     * Same as {@link #appendWebViewTtsHelpers(StringBuilder, String)} but using the project's
+     * configured default speech rate and language. With the default values (0.95 / es-ES) the
+     * generated code is identical to the pre-configuration output.
+     */
+    public static void appendWebViewTtsHelpers(StringBuilder sb, String EOL, String defaultRate, String defaultLang) {
+        String rate = (defaultRate == null || defaultRate.trim().isEmpty())
+                ? ProjectWebViewSettings.DEFAULT_TTS_RATE : defaultRate.trim();
+        String lang = (defaultLang == null || defaultLang.trim().isEmpty())
+                ? ProjectWebViewSettings.DEFAULT_TTS_LANG : defaultLang.trim();
+        float rateFloat;
+        try {
+            rateFloat = Float.parseFloat(rate);
+        } catch (NumberFormatException e) {
+            rate = ProjectWebViewSettings.DEFAULT_TTS_RATE;
+            rateFloat = Float.parseFloat(rate);
+        }
+        String rateLiteral = rateFloat + "f";
+        String[] langParts = lang.split("-", 2);
+        String localeCode = "new Locale(\"" + langParts[0] + "\""
+                + (langParts.length > 1 ? ", \"" + langParts[1] + "\"" : "") + ")";
+
+        sb.append(EOL);
+        sb.append("private TextToSpeech _tts;").append(EOL);
+        sb.append("private boolean _ttsReady = false;").append(EOL);
+        sb.append("private String _ttsPendingText = null;").append(EOL);
+        sb.append("private String _ttsPendingRate = \"").append(rate).append("\";").append(EOL);
+        sb.append("private int _ttsUtteranceSeq = 0;").append(EOL);
+        sb.append("private String _ttsEngine = null;").append(EOL);
+        sb.append("private final java.util.ArrayList<String> _ttsTriedEngines = new java.util.ArrayList<String>();").append(EOL);
+        sb.append("private boolean _ttsGivingUp = false;").append(EOL);
+        sb.append("private java.util.List<String> _ttsEnginePkgs = null;").append(EOL);
+
+        sb.append(EOL);
+        sb.append("private void _initTts() {").append(EOL);
+        sb.append("if (_ttsReady) {").append(EOL);
+        sb.append("return;").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("if (_ttsGivingUp) {").append(EOL);
+        sb.append("android.util.Log.w(\"AscodeTTS\", \"TTS: ningún motor disponible, init ignorado\");").append(EOL);
+        sb.append("return;").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("if (_tts == null) {").append(EOL);
+        sb.append("_startTtsEngine(_ttsEngine);").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("}").append(EOL);
+
+        sb.append(EOL);
+        sb.append("private void _startTtsEngine(final String _enginePkg) {").append(EOL);
+        sb.append("android.util.Log.i(\"AscodeTTS\", \"TTS intentando motor=\" + (_enginePkg == null ? \"(por defecto)\" : _enginePkg));").append(EOL);
+        sb.append("try {").append(EOL);
+        sb.append("TextToSpeech.OnInitListener _listener = new TextToSpeech.OnInitListener() {").append(EOL);
+        sb.append("@Override").append(EOL);
+        sb.append("public void onInit(int _status) {").append(EOL);
+        sb.append("android.util.Log.i(\"AscodeTTS\", \"TTS onInit status=\" + _status + \" motor=\" + (_enginePkg == null ? \"(por defecto)\" : _enginePkg));").append(EOL);
+        sb.append("if (_status == TextToSpeech.SUCCESS) {").append(EOL);
+        sb.append("_ttsEngine = _enginePkg;").append(EOL);
+        sb.append("_onTtsReady();").append(EOL);
+        sb.append("} else {").append(EOL);
+        sb.append("android.util.Log.e(\"AscodeTTS\", \"TTS onInit FAILED status=\" + _status + \" motor=\" + (_enginePkg == null ? \"(por defecto)\" : _enginePkg));").append(EOL);
+        sb.append("_ttsFallbackAfterFailure(_enginePkg);").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("};").append(EOL);
+        sb.append("if (_enginePkg == null) {").append(EOL);
+        sb.append("_tts = new TextToSpeech(getApplicationContext(), _listener);").append(EOL);
+        sb.append("} else {").append(EOL);
+        sb.append("_tts = new TextToSpeech(getApplicationContext(), _listener, _enginePkg);").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("} catch (Throwable _ttsCreateError) {").append(EOL);
+        sb.append("android.util.Log.e(\"AscodeTTS\", \"TTS constructor error motor=\" + _enginePkg + \": \" + _ttsCreateError);").append(EOL);
+        sb.append("_ttsFallbackAfterFailure(_enginePkg);").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("}").append(EOL);
+
+        sb.append(EOL);
+        sb.append("private void _ttsFallbackAfterFailure(String _failedPkg) {").append(EOL);
+        sb.append("String _failedName = _failedPkg;").append(EOL);
+        sb.append("if (_failedName == null && _tts != null) {").append(EOL);
+        sb.append("try {").append(EOL);
+        sb.append("_failedName = _tts.getDefaultEngine();").append(EOL);
+        sb.append("} catch (Throwable ignored) {").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("if (_failedName != null) {").append(EOL);
+        sb.append("if (!_ttsTriedEngines.contains(_failedName)) {").append(EOL);
+        sb.append("_ttsTriedEngines.add(_failedName);").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("} else if (!_ttsTriedEngines.contains(\"<default>\")) {").append(EOL);
+        sb.append("_ttsTriedEngines.add(\"<default>\");").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("_ttsRememberEngines();").append(EOL);
+        sb.append("try {").append(EOL);
+        sb.append("if (_tts != null) {").append(EOL);
+        sb.append("_tts.shutdown();").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("} catch (Throwable ignored) {").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("_tts = null;").append(EOL);
+        sb.append("_ttsReady = false;").append(EOL);
+        sb.append("String _next = _ttsNextEngine();").append(EOL);
+        sb.append("if (_next == null) {").append(EOL);
+        sb.append("_ttsGivingUp = true;").append(EOL);
+        sb.append("android.util.Log.e(\"AscodeTTS\", \"TTS: ningún motor disponible\");").append(EOL);
+        sb.append("_ttsPendingText = null;").append(EOL);
+        sb.append("return;").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("android.util.Log.w(\"AscodeTTS\", \"TTS fallback: reintentando con motor=\" + _next);").append(EOL);
+        sb.append("_startTtsEngine(_next);").append(EOL);
+        sb.append("}").append(EOL);
+
+        sb.append(EOL);
+        sb.append("private void _ttsRememberEngines() {").append(EOL);
+        sb.append("if (_ttsEnginePkgs != null) {").append(EOL);
+        sb.append("return;").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("java.util.ArrayList<String> _pkgs = new java.util.ArrayList<String>();").append(EOL);
+        sb.append("try {").append(EOL);
+        sb.append("if (_tts != null) {").append(EOL);
+        sb.append("java.util.List<TextToSpeech.EngineInfo> _engines = _tts.getEngines();").append(EOL);
+        sb.append("if (_engines != null) {").append(EOL);
+        sb.append("for (TextToSpeech.EngineInfo _info : _engines) {").append(EOL);
+        sb.append("if (_info != null && _info.name != null && !_pkgs.contains(_info.name)) {").append(EOL);
+        sb.append("_pkgs.add(_info.name);").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("} catch (Throwable _enginesError) {").append(EOL);
+        sb.append("android.util.Log.e(\"AscodeTTS\", \"TTS getEngines error: \" + _enginesError);").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("if (_pkgs.isEmpty()) {").append(EOL);
+        sb.append("try {").append(EOL);
+        sb.append("java.util.List<android.content.pm.ResolveInfo> _ris = getPackageManager().queryIntentServices(new android.content.Intent(\"android.intent.action.TTS_SERVICE\"), 0);").append(EOL);
+        sb.append("if (_ris != null) {").append(EOL);
+        sb.append("for (android.content.pm.ResolveInfo _ri : _ris) {").append(EOL);
+        sb.append("if (_ri != null && _ri.serviceInfo != null && _ri.serviceInfo.packageName != null && !_pkgs.contains(_ri.serviceInfo.packageName)) {").append(EOL);
+        sb.append("_pkgs.add(_ri.serviceInfo.packageName);").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("} catch (Throwable _pmError) {").append(EOL);
+        sb.append("android.util.Log.e(\"AscodeTTS\", \"TTS queryIntentServices error: \" + _pmError);").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("_ttsEnginePkgs = _pkgs;").append(EOL);
+        sb.append("android.util.Log.i(\"AscodeTTS\", \"TTS motores instalados=\" + _ttsEnginePkgs);").append(EOL);
+        sb.append("}").append(EOL);
+
+        sb.append(EOL);
+        sb.append("private String _ttsNextEngine() {").append(EOL);
+        sb.append("_ttsRememberEngines();").append(EOL);
+        sb.append("String _google = \"com.google.android.tts\";").append(EOL);
+        sb.append("if (_ttsEnginePkgs.contains(_google) && !_ttsTriedEngines.contains(_google)) {").append(EOL);
+        sb.append("return _google;").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("for (String _pkg : _ttsEnginePkgs) {").append(EOL);
+        sb.append("if (_pkg != null && !_ttsTriedEngines.contains(_pkg)) {").append(EOL);
+        sb.append("return _pkg;").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("return null;").append(EOL);
+        sb.append("}").append(EOL);
+
+        sb.append("private boolean _ttsEngineInstalled(String _pkg) {").append(EOL);
+        sb.append("_ttsRememberEngines();").append(EOL);
+        sb.append("return _ttsEnginePkgs.contains(_pkg);").append(EOL);
+        sb.append("}").append(EOL);
+
+        sb.append("private void _onTtsReady() {").append(EOL);
+        sb.append("if (_tts == null) {").append(EOL);
+        sb.append("return;").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("if (_ttsTriedEngines.isEmpty()) {").append(EOL);
+        sb.append("android.util.Log.i(\"AscodeTTS\", \"TTS activo engine=\" + (_ttsEngine == null ? \"(por defecto)\" : _ttsEngine));").append(EOL);
+        sb.append("} else {").append(EOL);
+        sb.append("android.util.Log.i(\"AscodeTTS\", \"TTS fallback engine=\" + (_ttsEngine == null ? \"(por defecto)\" : _ttsEngine) + \" OK\");").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("try {").append(EOL);
+        sb.append("_tts.setOnUtteranceProgressListener(new android.speech.tts.UtteranceProgressListener() {").append(EOL);
+        sb.append("@Override").append(EOL);
+        sb.append("public void onStart(String _utteranceId) {").append(EOL);
+        sb.append("android.util.Log.i(\"AscodeTTS\", \"TTS onStart id=\" + _utteranceId);").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("@Override").append(EOL);
+        sb.append("public void onDone(String _utteranceId) {").append(EOL);
+        sb.append("android.util.Log.i(\"AscodeTTS\", \"TTS onDone id=\" + _utteranceId);").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("@Override").append(EOL);
+        sb.append("public void onError(String _utteranceId) {").append(EOL);
+        sb.append("android.util.Log.e(\"AscodeTTS\", \"TTS onError id=\" + _utteranceId);").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("@Override").append(EOL);
+        sb.append("public void onStop(String _utteranceId, boolean _interrupted) {").append(EOL);
+        sb.append("android.util.Log.i(\"AscodeTTS\", \"TTS onStop id=\" + _utteranceId + \" interrupted=\" + _interrupted);").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("});").append(EOL);
+        sb.append("Locale _ttsLocale = ").append(localeCode).append(";").append(EOL);
+        sb.append("int _ttsAvail = _tts.isLanguageAvailable(_ttsLocale);").append(EOL);
+        sb.append("android.util.Log.i(\"AscodeTTS\", \"TTS isLanguageAvailable(").append(lang).append(")=\" + _ttsAvail);").append(EOL);
+        sb.append("int _langResult;").append(EOL);
+        sb.append("if (_ttsAvail == TextToSpeech.LANG_AVAILABLE || _ttsAvail == TextToSpeech.LANG_COUNTRY_AVAILABLE || _ttsAvail == TextToSpeech.LANG_COUNTRY_VAR_AVAILABLE) {").append(EOL);
+        sb.append("_langResult = _tts.setLanguage(_ttsLocale);").append(EOL);
+        sb.append("} else {").append(EOL);
+        sb.append("Locale _ttsFallback = Locale.getDefault();").append(EOL);
+        sb.append("android.util.Log.w(\"AscodeTTS\", \"TTS ").append(lang).append(" no disponible (\" + _ttsAvail + \"), fallback a \" + _ttsFallback);").append(EOL);
+        sb.append("_langResult = _tts.setLanguage(_ttsFallback);").append(EOL);
+        sb.append("if (_langResult == TextToSpeech.LANG_MISSING_DATA || _langResult == TextToSpeech.LANG_NOT_SUPPORTED) {").append(EOL);
+        sb.append("_langResult = _tts.setLanguage(Locale.US);").append(EOL);
+        sb.append("android.util.Log.w(\"AscodeTTS\", \"TTS fallback final Locale.US result=\" + _langResult);").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("android.util.Log.i(\"AscodeTTS\", \"TTS setLanguage result=\" + _langResult);").append(EOL);
+        sb.append("int _ttsRateResult = _tts.setSpeechRate(").append(rateLiteral).append(");").append(EOL);
+        sb.append("int _ttsPitchResult = _tts.setPitch(1.0f);").append(EOL);
+        sb.append("android.util.Log.i(\"AscodeTTS\", \"TTS setSpeechRate=").append(rate).append(" -> \" + _ttsRateResult + \", setPitch=1.0 -> \" + _ttsPitchResult);").append(EOL);
+        sb.append("} catch (Throwable _ttsInitError) {").append(EOL);
+        sb.append("android.util.Log.e(\"AscodeTTS\", \"TTS init error: \" + _ttsInitError);").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("_ttsReady = true;").append(EOL);
+        sb.append("if (_ttsPendingText != null) {").append(EOL);
+        sb.append("String _pendingText = _ttsPendingText;").append(EOL);
+        sb.append("String _pendingRate = _ttsPendingRate;").append(EOL);
+        sb.append("_ttsPendingText = null;").append(EOL);
+        sb.append("_speakTtsNow(_pendingText, _pendingRate);").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("}").append(EOL);
+
+        sb.append("private void _speakTtsNow(String _text, String _rate) {").append(EOL);
+        sb.append("if (_ttsGivingUp) {").append(EOL);
+        sb.append("android.util.Log.w(\"AscodeTTS\", \"TTS speak ignorado: ningún motor disponible\");").append(EOL);
+        sb.append("return;").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("if (_tts == null || !_ttsReady) {").append(EOL);
+        sb.append("android.util.Log.w(\"AscodeTTS\", \"TTS speak skipped ready=\" + _ttsReady + \" tts=\" + (_tts != null));").append(EOL);
+        sb.append("return;").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("float _speechRate = ").append(rateLiteral).append(";").append(EOL);
+        sb.append("try {").append(EOL);
+        sb.append("_speechRate = Float.parseFloat(_rate);").append(EOL);
+        sb.append("} catch (Throwable _rateError) {").append(EOL);
+        sb.append("android.util.Log.w(\"AscodeTTS\", \"TTS rate parse failed for '\" + _rate + \"', usando ").append(rate).append("\");").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("if (_speechRate <= 0f) {").append(EOL);
+        sb.append("_speechRate = ").append(rateLiteral).append(";").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("if (_speechRate > 2f) {").append(EOL);
+        sb.append("_speechRate = 2f;").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("String _speakText = (_text == null) ? \"\" : _text;").append(EOL);
+        sb.append("if (_speakText.trim().isEmpty()) {").append(EOL);
+        sb.append("android.util.Log.i(\"AscodeTTS\", \"TTS speak skipped: texto vacio\");").append(EOL);
+        sb.append("return;").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("String _utteranceId = \"ascode_tts_\" + (++_ttsUtteranceSeq);").append(EOL);
+        sb.append("try {").append(EOL);
+        sb.append("_tts.setSpeechRate(_speechRate);").append(EOL);
+        sb.append("int _ttsQueued = _tts.speak(_speakText, TextToSpeech.QUEUE_FLUSH, null, _utteranceId);").append(EOL);
+        sb.append("android.util.Log.i(\"AscodeTTS\", \"TTS speak id=\" + _utteranceId + \" rate=\" + _speechRate + \" queued=\" + _ttsQueued + \" len=\" + _speakText.length());").append(EOL);
+        sb.append("} catch (Throwable _ttsSpeakError) {").append(EOL);
+        sb.append("android.util.Log.e(\"AscodeTTS\", \"TTS speak error: \" + _ttsSpeakError);").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("}").append(EOL);
+
+        sb.append(EOL);
+        sb.append("private void _stopTts() {").append(EOL);
+        sb.append("android.util.Log.i(\"AscodeTTS\", \"TTS stop()\");").append(EOL);
+        sb.append("if (_tts != null) {").append(EOL);
+        sb.append("try {").append(EOL);
+        sb.append("_tts.stop();").append(EOL);
+        sb.append("} catch (Throwable _ttsStopError) {").append(EOL);
+        sb.append("android.util.Log.e(\"AscodeTTS\", \"TTS stop error: \" + _ttsStopError);").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("}").append(EOL);
+
+        sb.append(EOL);
+        sb.append("private void _injectTtsShim(WebView _webView) {").append(EOL);
+        sb.append("if (_webView == null) {").append(EOL);
+        sb.append("return;").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("android.util.Log.i(\"AscodeTTS\", \"SHIM inject on \" + _webView.getUrl());").append(EOL);
+        sb.append("String _shim = \"(function(){\"").append(EOL);
+        sb.append("+ \"if(window.__ascodeTtsShim){return;}\"").append(EOL);
+        sb.append("+ \"window.__ascodeTtsShim=true;\"").append(EOL);
+        sb.append("+ \"function _Utterance(t){this.text=(t===undefined||t===null)?'':String(t);this.lang='").append(lang).append("';this.rate=").append(rate).append(";this.pitch=1;this.volume=1;this.voice=null;this.onstart=null;this.onend=null;this.onerror=null;}\"").append(EOL);
+        sb.append("+ \"if(typeof window.SpeechSynthesisUtterance==='undefined'){window.SpeechSynthesisUtterance=_Utterance;}\"").append(EOL);
+        sb.append("+ \"if(typeof window.speechSynthesis==='undefined'){\"").append(EOL);
+        sb.append("+ \"var _s={speaking:false,paused:false,onvoiceschanged:null,voices:[],\"").append(EOL);
+        sb.append("+ \"getVoices:function(){return this.voices;},\"").append(EOL);
+        sb.append("+ \"speak:function(u){\"").append(EOL);
+        sb.append("+ \"var t=(u&&typeof u==='object')?u.text:u;t=(t===undefined||t===null)?'':String(t);\"").append(EOL);
+        sb.append("+ \"var r=(u&&typeof u==='object'&&u.rate)?String(u.rate):'").append(rate).append("';\"").append(EOL);
+        sb.append("+ \"this.speaking=true;\"").append(EOL);
+        sb.append("+ \"try{if(typeof u.onstart==='function')u.onstart();}catch(e){}\"").append(EOL);
+        sb.append("+ \"try{var _b=window.AndroidBridge;if(_b&&typeof _b.speak==='function'){_b.speak(t,r);}}catch(e){}\"").append(EOL);
+        sb.append("+ \"var _self=this;var _dur=Math.min(28000,Math.max(900,t.length*65));\"").append(EOL);
+        sb.append("+ \"setTimeout(function(){_self.speaking=false;try{if(typeof u.onend==='function')u.onend();}catch(e){}}, _dur);\"").append(EOL);
+        sb.append("+ \"},\"").append(EOL);
+        sb.append("+ \"cancel:function(){this.speaking=false;try{var _b2=window.AndroidBridge;if(_b2&&typeof _b2.stop==='function'){_b2.stop();}}catch(e){}},\"").append(EOL);
+        sb.append("+ \"pause:function(){this.paused=true;},resume:function(){this.paused=false;}};\"").append(EOL);
+        sb.append("+ \"window.speechSynthesis=_s;\"").append(EOL);
+        sb.append("+ \"}\"").append(EOL);
+        sb.append("+ \"})();\";").append(EOL);
+        sb.append("if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {").append(EOL);
+        sb.append("_webView.evaluateJavascript(_shim, null);").append(EOL);
+        sb.append("} else {").append(EOL);
+        sb.append("_webView.loadUrl(\"javascript:\" + _shim);").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("}").append(EOL);
+
+        sb.append(EOL);
+        sb.append("private class _TtsBridge {").append(EOL);
+        sb.append("@JavascriptInterface").append(EOL);
+        sb.append("public void speak(final String _text, final String _rate) {").append(EOL);
+        sb.append("android.util.Log.i(\"AscodeTTS\", \"BRIDGE speak len=\" + (_text == null ? 0 : _text.length()) + \" rate=\" + _rate);").append(EOL);
+        sb.append("new Handler(Looper.getMainLooper()).post(new Runnable() {").append(EOL);
+        sb.append("@Override").append(EOL);
+        sb.append("public void run() {").append(EOL);
+        sb.append("_initTts();").append(EOL);
+        sb.append("if (_ttsReady) {").append(EOL);
+        sb.append("_speakTtsNow(_text, _rate);").append(EOL);
+        sb.append("} else if (_ttsGivingUp) {").append(EOL);
+        sb.append("android.util.Log.w(\"AscodeTTS\", \"BRIDGE speak ignorado: ningún motor disponible\");").append(EOL);
+        sb.append("} else {").append(EOL);
+        sb.append("_ttsPendingText = _text;").append(EOL);
+        sb.append("_ttsPendingRate = _rate;").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("});").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("@JavascriptInterface").append(EOL);
+        sb.append("public void stop() {").append(EOL);
+        sb.append("android.util.Log.i(\"AscodeTTS\", \"BRIDGE stop()\");").append(EOL);
+        sb.append("new Handler(Looper.getMainLooper()).post(new Runnable() {").append(EOL);
+        sb.append("@Override").append(EOL);
+        sb.append("public void run() {").append(EOL);
+        sb.append("_stopTts();").append(EOL);
         sb.append("}").append(EOL);
         sb.append("});").append(EOL);
         sb.append("}").append(EOL);

@@ -123,7 +123,9 @@ public class CodeViewerActivity extends BaseAppCompatActivity {
         }
         editableMode = !editableMode;
         binding.editor.setEditable(editableMode);
-        AscodeUtil.toast(editableMode ? "Edit mode enabled" : "Edit mode disabled");
+        AscodeUtil.toast(getString(editableMode
+                ? R.string.code_viewer_edit_mode_enabled
+                : R.string.code_viewer_edit_mode_disabled));
     }
 
     private void saveCode() {
@@ -132,12 +134,12 @@ public class CodeViewerActivity extends BaseAppCompatActivity {
         }
         String currentCode = binding.editor.getText().toString();
         if (currentCode.equals(originalCode)) {
-            AscodeUtil.toast("No changes to save");
+            AscodeUtil.toast(getString(R.string.code_viewer_no_changes_to_save));
             return;
         }
         String targetPath = resolveTargetPath();
         if (targetPath == null || targetPath.isEmpty()) {
-            AscodeUtil.toastError("This source cannot be saved from Code Viewer.");
+            AscodeUtil.toastError(getString(R.string.code_viewer_source_cannot_be_saved));
             return;
         }
 
@@ -155,7 +157,7 @@ public class CodeViewerActivity extends BaseAppCompatActivity {
         result.putExtra("source_file", sourceFile);
         result.putExtra("code", currentCode);
         setResult(RESULT_OK, result);
-        AscodeUtil.toast("Saved");
+        AscodeUtil.toast(getString(R.string.code_viewer_saved));
     }
 
     private String resolveTargetPath() {
@@ -170,8 +172,12 @@ public class CodeViewerActivity extends BaseAppCompatActivity {
             if ("strings.xml".equals(sourceFile) || "colors.xml".equals(sourceFile) || "styles.xml".equals(sourceFile)) {
                 return basePath + "resource/values/" + sourceFile;
             }
+            // The AndroidManifest.xml generated for the project is not sourced from the
+            // resource folders: it is assembled on the fly by {@link a.a.a.Ix}. A user edit
+            // saved here becomes the project's custom manifest and is honored by
+            // {@link a.a.a.yq#getFileSrc} / the project generator while it exists.
             if ("AndroidManifest.xml".equals(sourceFile)) {
-                return null;
+                return basePath + sourceFile;
             }
             return basePath + "resource/layout/" + sourceFile;
         }

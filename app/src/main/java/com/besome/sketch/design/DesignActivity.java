@@ -128,6 +128,7 @@ import com.ascode.android.activities.editor.command.ManageXMLCommandActivity;
 import com.ascode.android.activities.editor.view.CodeViewerActivity;
 import com.ascode.android.activities.editor.view.ViewCodeEditorActivity;
 import com.ascode.android.activities.resourceseditor.ResourcesEditorActivity;
+import com.ascode.android.activities.webview.WebViewSettingsActivity;
 import com.ascode.android.dialogs.BuildSettingsBottomSheet;
 import com.ascode.android.metrics.BuildMetricsStore;
 import com.ascode.android.utility.FileUtil;
@@ -1082,6 +1083,16 @@ public class DesignActivity extends BaseAppCompatActivity implements View.OnClic
             Log.d("Ascode", "DesignActivity: no se pudo resolver el modo Flutter del proyecto", e);
         }
         return FlutterProjectDefaults.DEFAULT_MODE;
+    }
+
+    /**
+     * Opens {@link WebViewSettingsActivity}, the per-project WebView configuration screen.
+     */
+    public void toWebViewConfig() {
+        Intent intent = new Intent(getApplicationContext(), WebViewSettingsActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.putExtra("sc_id", sc_id);
+        startActivity(intent);
     }
 
     /**

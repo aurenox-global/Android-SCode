@@ -349,6 +349,8 @@ public class AndroidManifestInjection extends BaseAppCompatActivity {
                 intent.putExtra("code", !source.isEmpty() ? source : "Failed to generate source.");
                 intent.putExtra("sc_id", sc_id);
                 intent.putExtra("scheme", CodeViewerActivity.SCHEME_XML);
+                intent.putExtra("title", "AndroidManifest.xml");
+                intent.putExtra("source_file", "AndroidManifest.xml");
                 startActivity(intent);
             });
         }).start();

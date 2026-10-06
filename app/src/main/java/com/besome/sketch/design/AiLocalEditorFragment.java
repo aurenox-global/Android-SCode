@@ -234,7 +234,7 @@ public class AiLocalEditorFragment extends Fragment {
     }
 
     private void updatePromptHint() {
-        chatInputLayout.setHint("Describe qué quieres: crear pantalla, botón, lógica…");
+        chatInputLayout.setHint(Helper.getResString(R.string.ai_chat_hint));
     }
 
     private void sendChatPrompt() {
@@ -244,7 +244,7 @@ public class AiLocalEditorFragment extends Fragment {
 
         String prompt = chatPromptInput.getText() == null ? "" : chatPromptInput.getText().toString().trim();
         if (prompt.isEmpty()) {
-            AscodeUtil.toastError("Escribe un mensaje primero.");
+            AscodeUtil.toastError(Helper.getResString(R.string.ai_chat_enter_message));
             return;
         }
 
@@ -257,7 +257,7 @@ public class AiLocalEditorFragment extends Fragment {
 
         addChatMessage(true, prompt, true);
         chatPromptInput.setText("");
-        int assistantMessageIndex = addChatMessage(false, "Generando acciones…", false);
+        int assistantMessageIndex = addChatMessage(false, Helper.getResString(R.string.ai_chat_generating), false);
         String effectivePrompt = buildPromptForSelectedRole(prompt);
 
         Runnable runGeneration = () -> {
@@ -296,7 +296,7 @@ public class AiLocalEditorFragment extends Fragment {
                     jsonStreamMessageIndex = -1;
                     String safeResponse = response == null ? "" : response.trim();
                     if (safeResponse.isEmpty()) {
-                        updateChatMessage(assistantMessageIndex, "El agente no devolvió respuesta.", true);
+                        updateChatMessage(assistantMessageIndex, Helper.getResString(R.string.ai_chat_no_response), true);
                         finishAgentRequest();
                         return;
                     }
@@ -308,8 +308,9 @@ public class AiLocalEditorFragment extends Fragment {
                     jsonStreamActive = false;
                     jsonStreamMessageIndex = -1;
                     cancelStreamingAnimation();
-                    String message = throwable == null ? "Unknown error" : throwable.getMessage();
-                    updateChatMessage(assistantMessageIndex, "Error: " + (message == null ? "Unknown error" : message), true);
+                    String unknownError = Helper.getResString(R.string.ai_chat_unknown_error);
+                    String message = throwable == null ? unknownError : throwable.getMessage();
+                    updateChatMessage(assistantMessageIndex, Helper.getResString(R.string.ai_chat_error_prefix) + (message == null ? unknownError : message), true);
                     finishAgentRequest();
                 }
 
@@ -376,19 +377,19 @@ public class AiLocalEditorFragment extends Fragment {
     private boolean validateAiSourceReady(@NonNull LocalAiConfig config) {
         if (config.isCloudProvider()) {
             if (config.getCloudApiKey().isEmpty() && !LocalAiConfig.isCustomProvider(config.getProviderId())) {
-                String issue = "Configure the cloud API key in AI Manager first.";
+                String issue = Helper.getResString(R.string.ai_chat_configure_api_key);
                 AscodeUtil.toastError(issue);
                 addChatMessage(false, issue, true);
                 return false;
             }
             if (config.resolveCloudModel().isEmpty()) {
-                String issue = "Configure the cloud model in AI Manager first.";
+                String issue = Helper.getResString(R.string.ai_chat_configure_model);
                 AscodeUtil.toastError(issue);
                 addChatMessage(false, issue, true);
                 return false;
             }
             if (config.resolveCloudEndpoint().isEmpty()) {
-                String issue = "Configure the cloud endpoint in AI Manager first.";
+                String issue = Helper.getResString(R.string.ai_chat_configure_endpoint);
                 AscodeUtil.toastError(issue);
                 addChatMessage(false, issue, true);
                 return false;
@@ -397,7 +398,7 @@ public class AiLocalEditorFragment extends Fragment {
         }
 
         if (!config.hasModel()) {
-            String issue = "No local model selected. Open AI Manager first.";
+            String issue = Helper.getResString(R.string.ai_chat_no_local_model);
             AscodeUtil.toastError(issue);
             addChatMessage(false, issue, true);
             return false;
@@ -407,8 +408,8 @@ public class AiLocalEditorFragment extends Fragment {
 
     private void updateChatHeader(@NonNull LocalAiConfig config) {
         chatHeaderText.setText(config.isCloudProvider()
-                ? "Model: " + config.resolveCloudModel()
-                : (config.hasModel() ? "Model: " + config.getModelName() : "Model: Not configured"));
+                ? Helper.getResString(R.string.ai_chat_model_prefix) + config.resolveCloudModel()
+                : (config.hasModel() ? Helper.getResString(R.string.ai_chat_model_prefix) + config.getModelName() : Helper.getResString(R.string.ai_chat_model_not_configured)));
     }
 
     private void startNewChat() {
@@ -418,7 +419,7 @@ public class AiLocalEditorFragment extends Fragment {
         cancelStreamingAnimation();
         chatMessages.clear();
         chatMessageAdapter.notifyDataSetChanged();
-        addChatMessage(false, "Nueva conversacion iniciada. Estoy listo para ayudarte.", true);
+        addChatMessage(false, Helper.getResString(R.string.ai_chat_new_conversation), true);
     }
 
     private void setBusy(boolean busy) {
@@ -426,7 +427,7 @@ public class AiLocalEditorFragment extends Fragment {
         chatSendButton.setEnabled(true);
         chatNewChatButton.setEnabled(!busy);
         chatSendButton.setIconResource(busy ? R.drawable.ic_mtrl_stop : R.drawable.ic_mtrl_arrow_up);
-        chatSendButton.setContentDescription(busy ? "Cancel" : "Send");
+        chatSendButton.setContentDescription(busy ? Helper.getResString(R.string.ai_chat_cancel) : Helper.getResString(R.string.ai_chat_send));
     }
 
     private void cancelCurrentRequest() {
@@ -466,7 +467,7 @@ public class AiLocalEditorFragment extends Fragment {
     }
 
     private void processAgentResponse(int messageIndex, String response, String userPrompt) {
-        updateChatMessage(messageIndex, "Procesando acciones del agente…", false);
+        updateChatMessage(messageIndex, Helper.getResString(R.string.ai_chat_processing), false);
         // Resolve UI strings on the caller (main) thread: the worker below must not
         // touch Fragment.getString after a possible detach.
         final String changesAppliedHeader = getString(R.string.ai_changes_applied);
@@ -492,7 +493,7 @@ public class AiLocalEditorFragment extends Fragment {
                     }
                     String shown;
                     if (fallbackText.isEmpty()) {
-                        shown = "El agente no devolvió respuesta.\n\n" + noActionsWarning;
+                        shown = Helper.getResString(R.string.ai_chat_no_response) + "\n\n" + noActionsWarning;
                     } else {
                         // The reply is prose (no agent JSON): nothing was applied, so the
                         // chat must never present it as a successful change.
@@ -510,7 +511,7 @@ public class AiLocalEditorFragment extends Fragment {
                     if (thinkResult.hasThinking && messageIndex >= 0 && messageIndex < chatMessages.size()) {
                         chatMessages.get(messageIndex).thinkingText = thinkResult.thinkingText;
                     }
-                    updateChatMessage(messageIndex, "No hay proyecto abierto para aplicar acciones.", true);
+                    updateChatMessage(messageIndex, Helper.getResString(R.string.ai_chat_no_project), true);
                     finishAgentRequest();
                 });
                 return;
@@ -532,7 +533,7 @@ public class AiLocalEditorFragment extends Fragment {
                         resultText.append("- ").append(line).append('\n');
                     }
                     changesApplied[0] = true;
-                    AscodeUtil.toast("Agente: cambios aplicados al proyecto");
+                    AscodeUtil.toast(Helper.getResString(R.string.ai_chat_changes_toast));
                 }
                 if (!skipped.isEmpty()) {
                     resultText.append(actionsSkippedHeader).append('\n');
@@ -549,7 +550,7 @@ public class AiLocalEditorFragment extends Fragment {
                 }
             } catch (Throwable throwable) {
                 resultText.setLength(0);
-                resultText.append("Error al aplicar acciones: ").append(throwable.getMessage());
+                resultText.append(Helper.getResString(R.string.ai_chat_apply_error_prefix)).append(throwable.getMessage());
             }
 
             final String finalText = resultText.toString();
@@ -653,7 +654,7 @@ public class AiLocalEditorFragment extends Fragment {
 
         copyMessageToClipboard(code);
         Toast.makeText(getContext(),
-                hadCodeBlock ? Helper.getResString(R.string.ai_code_copied_hint) : "Copied to clipboard.",
+                hadCodeBlock ? Helper.getResString(R.string.ai_code_copied_hint) : Helper.getResString(R.string.ai_chat_copied_clipboard),
                 Toast.LENGTH_SHORT).show();
     }
 
@@ -699,28 +700,28 @@ public class AiLocalEditorFragment extends Fragment {
 
     private void exportChatHistory() {
         if (chatMessages.size() <= 1) {
-            AscodeUtil.toastError("No messages to export.");
+            AscodeUtil.toastError(Helper.getResString(R.string.ai_chat_no_messages_export));
             return;
         }
 
         StringBuilder md = new StringBuilder();
-        md.append("# AI Chat Export\n");
-        md.append("**Date:** ").append(new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date())).append("\n");
-        md.append("**Project:** ").append(resolveChatScopeKey()).append("\n\n");
+        md.append(getString(R.string.ai_chat_export_heading)).append("\n");
+        md.append(getString(R.string.ai_chat_export_date)).append(new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date())).append("\n");
+        md.append(getString(R.string.ai_chat_export_project)).append(resolveChatScopeKey()).append("\n\n");
         md.append("---\n\n");
 
         for (ChatMessage msg : chatMessages) {
-            String role = msg.user ? "**You**" : "**AI**";
+            String role = msg.user ? getString(R.string.ai_chat_export_role_you) : getString(R.string.ai_chat_export_role_ai);
             md.append("### ").append(role).append("\n\n");
             md.append(msg.text).append("\n\n");
             if (msg.hasThinking()) {
-                md.append("<details>\n<summary>Thinking</summary>\n\n").append(msg.thinkingText).append("\n\n</details>\n\n");
+                md.append("<details>\n<summary>").append(getString(R.string.ai_chat_export_thinking)).append("</summary>\n\n").append(msg.thinkingText).append("\n\n</details>\n\n");
             }
         }
 
         new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Export conversation")
-                .setItems(new CharSequence[]{"Copy to clipboard", "Save to file"}, (dialog, which) -> {
+                .setTitle(getString(R.string.ai_chat_export_title))
+                .setItems(new CharSequence[]{getString(R.string.ai_chat_copy_to_clipboard), getString(R.string.ai_chat_save_to_file)}, (dialog, which) -> {
                     if (which == 0) {
                         ClipboardManager cm = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
                         cm.setPrimaryClip(ClipData.newPlainText("AI Chat Export", md.toString()));
@@ -733,9 +734,9 @@ public class AiLocalEditorFragment extends Fragment {
                             try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
                                 writer.write(md.toString());
                             }
-                            AscodeUtil.toast("Saved: " + file.getName());
+                            AscodeUtil.toast(getString(R.string.ai_chat_saved_prefix) + file.getName());
                         } catch (Exception e) {
-                            AscodeUtil.toastError("Failed to save: " + e.getMessage());
+                            AscodeUtil.toastError(getString(R.string.ai_chat_save_failed_prefix) + e.getMessage());
                         }
                     }
                 })
@@ -772,7 +773,7 @@ public class AiLocalEditorFragment extends Fragment {
         }
 
         if (chatMessages.isEmpty()) {
-            chatMessages.add(new ChatMessage(false, "Hola. Esta es la vista AI Local dentro del proyecto. Escribe tu mensaje y te respondo con la fuente AI configurada."));
+            chatMessages.add(new ChatMessage(false, getString(R.string.ai_chat_welcome)));
             persistChatHistory();
         }
 
@@ -854,7 +855,7 @@ public class AiLocalEditorFragment extends Fragment {
             params.gravity = isUser ? Gravity.END : Gravity.START;
             holder.bubbleContainer.setLayoutParams(params);
 
-            holder.messageRoleText.setText(isUser ? "Tú" : "IA");
+            holder.messageRoleText.setText(isUser ? holder.itemView.getContext().getString(R.string.ai_chat_role_user) : holder.itemView.getContext().getString(R.string.ai_chat_role_ai));
             holder.messageTimeText.setText(formatMessageTime(message.timestamp));
 
             int backgroundColor;
@@ -884,10 +885,10 @@ public class AiLocalEditorFragment extends Fragment {
                 holder.thinkHeader.setOnClickListener(v -> {
                     if (holder.thinkText.getVisibility() == View.VISIBLE) {
                         holder.thinkText.setVisibility(View.GONE);
-                        holder.thinkHeader.setText("Show reasoning");
+                        holder.thinkHeader.setText(getString(R.string.ai_chat_show_reasoning));
                     } else {
                         holder.thinkText.setVisibility(View.VISIBLE);
-                        holder.thinkHeader.setText("Thinking...");
+                        holder.thinkHeader.setText(getString(R.string.ai_chat_thinking));
                     }
                 });
             } else {

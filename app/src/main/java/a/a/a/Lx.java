@@ -30,6 +30,7 @@ import mod.jbk.editor.manage.library.ExcludeBuiltInLibrariesActivity;
 import mod.pranav.viewbinding.ViewBindingBuilder;
 import com.ascode.android.AscodeApplication;
 import com.ascode.android.utility.FileUtil;
+import com.ascode.android.webview.ProjectWebViewSettings;
 import mod.hey.studios.project.proguard.ProguardHandler;
 
 public class Lx {
@@ -1263,6 +1264,15 @@ public class Lx {
      * @return Initializer of a View to be added to _initialize(Bundle)
      */
     public static String getViewInitializer(String type, String name, boolean isInFragment, boolean viewBinding) {
+        return getViewInitializer(type, name, isInFragment, viewBinding, null);
+    }
+
+    /**
+     * @param webViewSettings per-project WebView configuration; {@code null} keeps the defaults
+     *                        (which reproduce the code generated before the feature existed).
+     * @return Initializer of a View to be added to _initialize(Bundle)
+     */
+    public static String getViewInitializer(String type, String name, boolean isInFragment, boolean viewBinding, ProjectWebViewSettings webViewSettings) {
         String initializer = "";
 
         if (!type.equals("include") && !type.equals("#")) {
@@ -1274,10 +1284,13 @@ public class Lx {
         }
 
         return switch (type) {
-            case "WebView" -> initializer + "\r\n" +
-                    getBindingOrViewName(name, viewBinding) + ".getSettings().setJavaScriptEnabled(true);\r\n" +
-                getBindingOrViewName(name, viewBinding) + ".getSettings().setDomStorageEnabled(true);\r\n" +
-                    getBindingOrViewName(name, viewBinding) + ".getSettings().setSupportZoom(true);";
+            case "WebView" -> {
+                ProjectWebViewSettings settings = webViewSettings != null
+                        ? webViewSettings
+                        : ProjectWebViewSettings.defaults();
+                yield initializer + "\r\n"
+                        + settings.buildSettingsCode(getBindingOrViewName(name, viewBinding), "\r\n");
+            }
             case "MapView" -> initializer + "\r\n" +
                     getBindingOrViewName(name, viewBinding) + ".onCreate(_savedInstanceState);\r\n";
             case "VideoView" -> {

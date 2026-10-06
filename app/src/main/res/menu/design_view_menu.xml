@@ -15,4 +15,12 @@
         android:title="@string/auto_redo"
         app:showAsAction="always" />
 
+    <item
+        android:id="@+id/menu_view_copy_design"
+        android:contentDescription="@string/design_copy_screen_menu"
+        android:icon="@drawable/ic_mtrl_brush"
+        android:orderInCategory="115"
+        android:title="@string/design_copy_screen_menu"
+        app:showAsAction="always" />
+
 </menu>

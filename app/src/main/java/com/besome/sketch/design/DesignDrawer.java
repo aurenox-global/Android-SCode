@@ -75,6 +75,8 @@ public class DesignDrawer extends LinearLayout {
             designActivity.toLogReader();
         } else if (id == R.id.item_flutter_toolchain) {
             designActivity.toFlutterToolchain();
+        } else if (id == R.id.item_webview_config) {
+            designActivity.toWebViewConfig();
         } else if (id == R.id.item_collection_manager) {
             designActivity.toCollectionManager();
         } else {
@@ -130,6 +132,7 @@ public class DesignDrawer extends LinearLayout {
         addDrawerItem(R.id.item_permission_manager, R.drawable.ic_mtrl_shield_check, R.string.text_title_menu_permission, R.string.text_subtitle_menu_permission, content);
         addDrawerItem(R.id.item_appcompat_manager, R.drawable.ic_mtrl_inject, R.string.design_drawer_menu_injection, R.string.design_drawer_menu_injection_subtitle, content);
         addDrawerItem(R.id.item_manifest_manager, R.drawable.ic_mtrl_deployed_code, R.string.design_drawer_menu_androidmanifest, R.string.design_drawer_menu_androidmanifest_subtitle, content);
+        addDrawerItem(R.id.item_webview_config, R.drawable.ic_mtrl_web, R.string.webview_settings_drawer_title, R.string.webview_settings_drawer_description, content);
         addDrawerItem(R.id.item_used_custom_blocks, R.drawable.ic_mtrl_block, R.string.design_drawer_menu_customblocks, R.string.design_drawer_menu_customblocks_subtitle, content);
         addDrawerItem(R.id.item_code_shrinking_manager, R.drawable.ic_mtrl_shield_lock, R.string.design_drawer_menu_proguard, R.string.design_drawer_menu_proguard_subtitle, content);
         addDrawerItem(R.id.item_stringfog_manager, R.drawable.ic_mtrl_regular_expression, R.string.design_drawer_menu_stringfog, R.string.design_drawer_menu_stringfog_subtitle, content);

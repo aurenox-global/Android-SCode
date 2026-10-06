@@ -308,6 +308,11 @@
             android:configChanges="orientation|screenSize" />
 
         <activity
+            android:name=".activities.webview.WebViewSettingsActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/webview_settings_title" />
+
+        <activity
             android:name=".activities.editor.component.ManageCustomComponentActivity"
             android:configChanges="orientation|screenSize"
             android:windowSoftInputMode="stateAlwaysHidden" />

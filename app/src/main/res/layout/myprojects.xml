@@ -142,6 +142,11 @@
                                 android:textStyle="bold" />
                         </LinearLayout>
 
+                        <Space
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_weight="1" />
+
                         <LinearLayout
                             android:id="@+id/hero_compile"
                             android:layout_width="wrap_content"

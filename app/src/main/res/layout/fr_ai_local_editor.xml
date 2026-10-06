@@ -193,7 +193,7 @@
                     android:layout_width="42dp"
                     android:layout_height="42dp"
                     android:layout_marginStart="4dp"
-                    android:contentDescription="Send"
+                    android:contentDescription="@string/ai_chat_send"
                     android:minWidth="0dp"
                     android:minHeight="0dp"
                     app:backgroundTint="@color/web_green"

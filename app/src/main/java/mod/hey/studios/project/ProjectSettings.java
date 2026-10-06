@@ -64,6 +64,55 @@ public class ProjectSettings {
      * Setting for Logic Editor persisted KMP target context
      */
     public static final String SETTING_KMP_EDITOR_TARGET = "kmp_editor_target";
+
+    // ---------------------------------------------------------------------------------------
+    // WebView configuration (per project).
+    //
+    // Every key documented below keeps a default that reproduces the code generated before
+    // these settings existed, so projects without a stored value compile byte-for-byte the
+    // same as always. New keys can simply be added here (plus the screen / code emitter).
+    // ---------------------------------------------------------------------------------------
+
+    /** Whether JavaScript is enabled in the WebView. Default: true. */
+    public static final String SETTING_WEBVIEW_JAVASCRIPT = "webview_javascript";
+    /** Whether DOM storage (localStorage / sessionStorage) is enabled. Default: true. */
+    public static final String SETTING_WEBVIEW_DOM_STORAGE = "webview_dom_storage";
+    /**
+     * Zoom mode. One of {@code off}, {@code only} (integrated zoom, default) or
+     * {@code controls} (integrated zoom + on-screen zoom controls).
+     */
+    public static final String SETTING_WEBVIEW_ZOOM = "webview_zoom";
+    /**
+     * Cache mode. Empty/absent = platform default ({@code WebSettings.LOAD_DEFAULT}). Stored as the
+     * numeric {@code WebSettings} constant (1 = cache else network, 2 = no cache, 3 = cache only).
+     */
+    public static final String SETTING_WEBVIEW_CACHE_MODE = "webview_cache_mode";
+    /**
+     * Whether media may start without a user gesture. Default: true (generated code calls
+     * {@code setMediaPlaybackRequiresUserGesture(false)}).
+     */
+    public static final String SETTING_WEBVIEW_MEDIA_NO_GESTURE = "webview_media_no_gesture";
+    /** Whether the JavaScript Text-to-Speech bridge ({@code AndroidBridge}) is added. Default: true. */
+    public static final String SETTING_WEBVIEW_TTS_BRIDGE = "webview_tts_bridge";
+    /** Default speech rate used by the TTS bridge. Default: 0.95. */
+    public static final String SETTING_WEBVIEW_TTS_RATE = "webview_tts_rate";
+    /** Default language used by the TTS bridge, e.g. {@code es-ES}. Default: es-ES. */
+    public static final String SETTING_WEBVIEW_TTS_LANG = "webview_tts_lang";
+    /** Text zoom percentage. Default: 100 (not emitted, matches the platform default). */
+    public static final String SETTING_WEBVIEW_TEXT_ZOOM = "webview_text_zoom";
+    /** Desktop mode (forces a desktop user agent). Default: false. */
+    public static final String SETTING_WEBVIEW_DESKTOP_MODE = "webview_desktop_mode";
+    /**
+     * File access. Empty/absent = platform default (nothing is emitted). Otherwise {@code true} or
+     * {@code false} to call {@code setAllowFileAccess(...)} explicitly.
+     */
+    public static final String SETTING_WEBVIEW_ALLOW_FILE_ACCESS = "webview_allow_file_access";
+    /**
+     * Mixed content mode. Empty/absent = platform default (nothing is emitted). Otherwise the
+     * numeric {@code WebSettings} constant (0 = always allow, 1 = never allow, 2 = compatibility).
+     */
+    public static final String SETTING_WEBVIEW_MIXED_CONTENT = "webview_mixed_content";
+
     public static final String SETTING_GENERIC_VALUE_TRUE = "true";
     public static final String SETTING_GENERIC_VALUE_FALSE = "false";
     private static final String TAG = "ProjectSettings";
@@ -119,6 +168,32 @@ public class ProjectSettings {
                 return defaultValue;
             }
         } else {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * @return The stored value parsed as a boolean, or {@code defaultValue} when absent/empty.
+     */
+    public boolean getBoolean(String key, boolean defaultValue) {
+        String value = getValue(key, null);
+        if (value == null) {
+            return defaultValue;
+        }
+        return SETTING_GENERIC_VALUE_TRUE.equalsIgnoreCase(value.trim());
+    }
+
+    /**
+     * @return The stored value parsed as an int, or {@code defaultValue} when absent/invalid.
+     */
+    public int getInt(String key, int defaultValue) {
+        String value = getValue(key, null);
+        if (value == null) {
+            return defaultValue;
+        }
+        try {
+            return Integer.parseInt(value.trim());
+        } catch (NumberFormatException e) {
             return defaultValue;
         }
     }

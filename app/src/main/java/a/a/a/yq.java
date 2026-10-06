@@ -32,6 +32,7 @@ import com.ascode.android.AscodeApplication;
 import com.ascode.android.util.library.BuiltInLibraryManager;
 import com.ascode.android.utility.FileUtil;
 import com.ascode.android.utility.DesignShapeAttrs;
+import com.ascode.android.webview.ProjectWebViewSettings;
 import com.ascode.android.xml.XmlBuilder;
 import com.ascode.android.xml.XmlBuilderHelper;
 
@@ -924,7 +925,10 @@ public class yq {
             }
         }
 
-        srcCodeBeans.add(new SrcCodeBean("AndroidManifest.xml", CommandBlock.applyCommands("AndroidManifest.xml", ix.a())));
+        String customManifest = getCustomAndroidManifest();
+        srcCodeBeans.add(new SrcCodeBean("AndroidManifest.xml", customManifest != null
+                ? customManifest
+                : CommandBlock.applyCommands("AndroidManifest.xml", ix.a())));
         srcCodeBeans.add(new SrcCodeBean("styles.xml", getXMLStyle()));
         srcCodeBeans.add(new SrcCodeBean("colors.xml", getXMLColor()));
         srcCodeBeans.add(new SrcCodeBean("strings.xml", getXMLString()));
@@ -939,6 +943,7 @@ public class yq {
         }
 
         String existingCode = FileUtil.readFile(activityJavaPath);
+        ProjectWebViewSettings webViewSettings = new ProjectWebViewSettings(sc_id);
         boolean hasLegacyInlineRequest = hasLegacyWebViewInlineDownloadRequest(existingCode);
 
         boolean hasWebViewInLayout = false;
@@ -955,7 +960,7 @@ public class yq {
             return;
         }
 
-        if (!needsWebViewSourceMigration(existingCode)) {
+        if (!needsWebViewSourceMigration(existingCode, webViewSettings.isTtsBridgeEnabled())) {
             return;
         }
 
@@ -963,8 +968,14 @@ public class yq {
         // setDownloadListener(...) block and injects the safe helper methods,
         // preserving every other user customization in MainActivity.java.
         // Fall back to full regeneration via Jx if the surgical patch isn't possible.
-        if (existingCode.contains("_openWebFileChooser(") && inPlacePatchLegacyWebViewDownload(activityJavaPath, existingCode)) {
-            return;
+        if (existingCode.contains("_openWebFileChooser(")) {
+            boolean downloadPatched = inPlacePatchLegacyWebViewDownload(activityJavaPath, existingCode);
+            String codeForTts = downloadPatched ? FileUtil.readFile(activityJavaPath) : existingCode;
+            boolean ttsPatched = webViewSettings.isTtsBridgeEnabled()
+                    && inPlacePatchLegacyWebViewTts(activityJavaPath, codeForTts);
+            if (downloadPatched || ttsPatched) {
+                return;
+            }
         }
 
         // Regenerate stale WebView activity source so import/export support (blob/data URLs)
@@ -1023,6 +1034,130 @@ public class yq {
 
         // Ensure required imports exist so the patched file still compiles.
         currentCode = ensureWebViewDownloadImports(currentCode);
+
+        FileUtil.writeFile(activityJavaPath, currentCode);
+        return true;
+    }
+
+    /**
+     * Surgically adds the Text-to-Speech JavaScript bridge ({@code AndroidBridge}) to an existing
+     * generated WebView activity, preserving every user customization. Mirrors
+     * {@link #inPlacePatchLegacyWebViewDownload(String, String)} so projects created before TTS
+     * support gain the bridge on the next build instead of being fully regenerated.
+     *
+     * @return {@code true} if the file was patched and written, {@code false} otherwise
+     */
+    private boolean inPlacePatchLegacyWebViewTts(String activityJavaPath, String existingCode) {
+        if (existingCode == null || existingCode.isEmpty()) {
+            return false;
+        }
+        if (existingCode.contains("\"AndroidBridge\"")) {
+            return false;
+        }
+        if (!existingCode.contains("WebView")) {
+            return false;
+        }
+
+        String bridgeRegistration = "addJavascriptInterface(new _TtsBridge(), \"AndroidBridge\");";
+        String currentCode = existingCode;
+        boolean anyPatched = false;
+
+        // 1) Register the bridge next to the existing download bridge JS interface.
+        StringBuilder withBridge = new StringBuilder(currentCode.length() + 256);
+        String[] lines = currentCode.split("\n", -1);
+        for (int i = 0; i < lines.length; i++) {
+            withBridge.append(lines[i]);
+            if (i < lines.length - 1) {
+                withBridge.append('\n');
+            }
+            int blobIndex = lines[i].indexOf(".addJavascriptInterface(new _BlobDownloadBridge(), \"_BlobDownloader\");");
+            if (blobIndex > 0) {
+                withBridge.append('\n').append(lines[i], 0, blobIndex).append('.').append(bridgeRegistration);
+                anyPatched = true;
+            }
+        }
+
+        if (anyPatched) {
+            currentCode = withBridge.toString();
+        } else {
+            // Fallback: register right after each setJavaScriptEnabled(true) call.
+            StringBuilder b2 = new StringBuilder(currentCode.length() + 256);
+            String[] lines2 = currentCode.split("\n", -1);
+            for (int i = 0; i < lines2.length; i++) {
+                b2.append(lines2[i]);
+                if (i < lines2.length - 1) {
+                    b2.append('\n');
+                }
+                int jsIndex = lines2[i].indexOf(".getSettings().setJavaScriptEnabled(true);");
+                if (jsIndex > 0) {
+                    b2.append('\n').append(lines2[i], 0, jsIndex).append('.').append(bridgeRegistration);
+                    anyPatched = true;
+                }
+            }
+            if (anyPatched) {
+                currentCode = b2.toString();
+            }
+        }
+
+        if (!anyPatched) {
+            return false;
+        }
+
+        // 2) Inject the speechSynthesis shim invocation into existing WebChromeClient overrides.
+        if (!currentCode.contains("_injectTtsShim(")) {
+            String shimOverride = "@Override\n"
+                    + "public void onProgressChanged(WebView _webView, int _newProgress) {\n"
+                    + "if (_newProgress >= 100) {\n"
+                    + "_injectTtsShim(_webView);\n"
+                    + "}\n"
+                    + "}\n";
+            String updated = currentCode.replace("new WebChromeClient() {", "new WebChromeClient() {\n" + shimOverride);
+            if (!updated.equals(currentCode)) {
+                currentCode = updated;
+            }
+        }
+
+        // 3) Inject the TTS helper methods + _TtsBridge inner class if missing.
+        if (!currentCode.contains("private class _TtsBridge")) {
+            int classCloseIndex = findFinalClassClosingBrace(currentCode);
+            if (classCloseIndex < 0) {
+                return false;
+            }
+            StringBuilder helpersBuilder = new StringBuilder(8192);
+            Jx.appendWebViewTtsHelpers(helpersBuilder, "\n");
+            currentCode = currentCode.substring(0, classCloseIndex)
+                    + helpersBuilder
+                    + currentCode.substring(classCloseIndex);
+        }
+
+        // 4) Ensure the TTS import exists (the rest come from the generated wildcard imports).
+        if (!currentCode.contains("import android.speech.tts.TextToSpeech;")) {
+            int lastImportEnd = -1;
+            int searchFrom = 0;
+            while (true) {
+                int idx = currentCode.indexOf("\nimport ", searchFrom);
+                if (idx < 0) {
+                    break;
+                }
+                int semi = currentCode.indexOf(';', idx);
+                if (semi < 0) {
+                    break;
+                }
+                lastImportEnd = semi + 1;
+                searchFrom = semi + 1;
+            }
+            if (lastImportEnd < 0) {
+                int packageEnd = currentCode.indexOf(';');
+                if (packageEnd >= 0) {
+                    lastImportEnd = packageEnd + 1;
+                }
+            }
+            if (lastImportEnd >= 0) {
+                currentCode = currentCode.substring(0, lastImportEnd)
+                        + "\nimport android.speech.tts.TextToSpeech;"
+                        + currentCode.substring(lastImportEnd);
+            }
+        }
 
         FileUtil.writeFile(activityJavaPath, currentCode);
         return true;
@@ -1205,7 +1340,7 @@ public class yq {
         return Jx.hasUnsafeWebViewDownloadListener(javaCode);
     }
 
-    private boolean needsWebViewSourceMigration(String javaCode) {
+    private boolean needsWebViewSourceMigration(String javaCode, boolean ttsBridgeEnabled) {
         if (javaCode.isEmpty()) {
             return false;
         }
@@ -1219,6 +1354,13 @@ public class yq {
 
         boolean hasDownloadHelper = javaCode.contains("private void _downloadWebFile(");
         boolean hasLegacyInlineRequest = hasLegacyWebViewInlineDownloadRequest(javaCode);
+
+        // Projects generated before Text-to-Speech support lack the AndroidBridge JavaScript
+        // interface. Force a migration so compiled apps keep talking inside their WebViews.
+        // When the project disabled the TTS bridge this reason no longer applies.
+        if (ttsBridgeEnabled && !javaCode.contains("\"AndroidBridge\"") && !javaCode.contains("AndroidBridge")) {
+            return true;
+        }
 
         boolean hasGeneratedInitialize = javaCode.contains("void initialize(Bundle _savedInstanceState)")
             || javaCode.contains("void _initialize(Bundle _savedInstanceState)");
@@ -1268,6 +1410,32 @@ public class yq {
     }
 
     /**
+     * Path of a user-customized AndroidManifest.xml, saved from the Code Viewer.
+     *
+     * <p>It lives next to the other custom sources under
+     * {@code .AndroidSCode/data/<sc_id>/files/}: just like a Java class or a layout,
+     * a customized manifest takes precedence over the generated one while it exists.
+     */
+    public static String getCustomAndroidManifestPath(String scId) {
+        return FileUtil.getExternalStorageDir() + "/.AndroidSCode/data/" + scId + "/files/AndroidManifest.xml";
+    }
+
+    /**
+     * @return the content of the custom AndroidManifest.xml, or {@code null} when the
+     * project has no user-customized manifest (so the generated one must be used).
+     */
+    public String getCustomAndroidManifest() {
+        String path = getCustomAndroidManifestPath(sc_id);
+        if (FileUtil.isExistFile(path)) {
+            String content = FileUtil.readFile(path);
+            if (content != null && !content.trim().isEmpty()) {
+                return content;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Get generated source code of a file.
      *
      * @return The file's code or an empty String if not found
@@ -1308,6 +1476,13 @@ public class yq {
         }
 
         if (isManifestFile) {
+            // Honor a manifest customized from the Code Viewer. It was saved from an
+            // already-generated (and command-injected) manifest, so it is returned as-is
+            // instead of regenerating and re-applying the command blocks.
+            String customManifest = getCustomAndroidManifest();
+            if (customManifest != null) {
+                return customManifest;
+            }
             ProjectBuilder builder = new ProjectBuilder(AscodeApplication.getContext(), this);
             builder.buildBuiltInLibraryInformation();
             Ix ix = new Ix(N, projectFileManager.b(), builder.getBuiltInLibraryManager());

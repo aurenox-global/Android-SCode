@@ -3,6 +3,8 @@ package com.ascode.android.dialogs;
 import static mod.hey.studios.build.BuildSettings.SETTING_ANDROID_JAR_PATH;
 import static mod.hey.studios.build.BuildSettings.SETTING_CLASSPATH;
 import static mod.hey.studios.build.BuildSettings.SETTING_DEXER;
+import static mod.hey.studios.build.BuildSettings.SETTING_DEXER_D8;
+import static mod.hey.studios.build.BuildSettings.SETTING_DEXER_DX;
 import static mod.hey.studios.build.BuildSettings.SETTING_ENABLE_LOGCAT;
 import static mod.hey.studios.build.BuildSettings.SETTING_ENABLE_KMP_GRADLE_BRIDGE;
 import static mod.hey.studios.build.BuildSettings.SETTING_JAVA_VERSION;
@@ -16,10 +18,13 @@ import static mod.hey.studios.build.BuildSettings.SETTING_NO_HTTP_LEGACY;
 import static mod.hey.studios.build.BuildSettings.SETTING_NO_WARNINGS;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
@@ -99,8 +104,19 @@ public class BuildSettingsBottomSheet extends BottomSheetDialogFragment {
         binding.tilClasspath.getEditText().setText(projectSettings.getValue(SETTING_CLASSPATH, ""));
         binding.tilKmpGradleTimeout.getEditText().setText(projectSettings.getValue(SETTING_KMP_GRADLE_TIMEOUT_MS, "30000"));
 
-        setRadioGroupOptions(binding.rgDexer, new String[]{"Dx", "D8"}, SETTING_DEXER, "Dx");
-        setRadioGroupOptions(binding.rgJavaVersion, getAvailableJavaVersions(), SETTING_JAVA_VERSION, "1.7");
+        setRadioGroupOptions(binding.rgDexer, new String[]{"Dx", "D8"}, SETTING_DEXER, SETTING_DEXER_DX);
+        setRadioGroupOptions(binding.rgJavaVersion, getAvailableJavaVersions(), SETTING_JAVA_VERSION, SETTING_JAVA_VERSION_1_7);
+
+        // The dexer and the Java level are mutually dependent (Java 8+ can only be compiled by
+        // D8). Normalize any legacy/invalid pair that was stored before this fix so the UI and
+        // the persisted model only ever hold a compilable combination.
+        normalizeDexerJavaCombination();
+
+        // Persist the free-form fields as they are edited as well, so that no change is lost
+        // when the sheet is dismissed without pressing Save (tap outside / back / drag down).
+        persistOnTextChange(binding.tilAndroidJar.getEditText(), SETTING_ANDROID_JAR_PATH);
+        persistOnTextChange(binding.tilClasspath.getEditText(), SETTING_CLASSPATH);
+        persistOnTextChange(binding.tilKmpGradleTimeout.getEditText(), SETTING_KMP_GRADLE_TIMEOUT_MS);
 
         setCheckboxValue(binding.cbNoWarnings, SETTING_NO_WARNINGS, true);
         setCheckboxValue(binding.cbNoHttpLegacy, SETTING_NO_HTTP_LEGACY, false);
@@ -155,12 +171,75 @@ public class BuildSettingsBottomSheet extends BottomSheetDialogFragment {
             }
             radioButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (!isChecked) return;
+                // Persist the choice immediately so it survives dismissing the sheet
+                // (tapping outside, back, or dragging it down), not only the Save button.
+                projectSettings.setValue(key, option);
                 if (key.equals(SETTING_JAVA_VERSION)) {
                     handleJavaVersionChange(option);
+                    if (!option.equals(SETTING_JAVA_VERSION_1_7)) {
+                        // Java 8+ cannot be compiled by Dx: keep the pair valid.
+                        selectRadioGroupValue(binding.rgDexer, SETTING_DEXER_D8);
+                    }
+                } else if (key.equals(SETTING_DEXER)
+                        && option.equals(SETTING_DEXER_DX)
+                        && !projectSettings.getValue(SETTING_JAVA_VERSION, SETTING_JAVA_VERSION_1_7)
+                                .equals(SETTING_JAVA_VERSION_1_7)) {
+                    // Dx cannot compile Java 8+ code: fall back to Java 1.7.
+                    selectRadioGroupValue(binding.rgJavaVersion, SETTING_JAVA_VERSION_1_7);
                 }
             });
             radioGroup.addView(radioButton);
         }
+    }
+
+    /**
+     * Checks the radio button of {@code radioGroup} whose label matches {@code value}, which in
+     * turn persists the corresponding setting through its own change listener.
+     */
+    private void selectRadioGroupValue(RadioGroup radioGroup, String value) {
+        for (int i = 0; i < radioGroup.getChildCount(); i++) {
+            View child = radioGroup.getChildAt(i);
+            if (child instanceof RadioButton radioButton && value.contentEquals(radioButton.getText())) {
+                if (!radioButton.isChecked()) {
+                    radioButton.setChecked(true);
+                }
+                return;
+            }
+        }
+    }
+
+    /**
+     * Keeps the mutually dependent dexer/Java pair consistent: Java 8+ requires D8, so an invalid
+     * stored combination (Dx with a Java level above 1.7) is repaired to use D8.
+     */
+    private void normalizeDexerJavaCombination() {
+        String javaVersion = projectSettings.getValue(SETTING_JAVA_VERSION, SETTING_JAVA_VERSION_1_7);
+        String dexer = projectSettings.getValue(SETTING_DEXER, SETTING_DEXER_DX);
+        if (!javaVersion.equals(SETTING_JAVA_VERSION_1_7) && !dexer.equals(SETTING_DEXER_D8)) {
+            projectSettings.setValue(SETTING_DEXER, SETTING_DEXER_D8);
+            selectRadioGroupValue(binding.rgDexer, SETTING_DEXER_D8);
+        }
+    }
+
+    /**
+     * Persists an {@link EditText}'s content on every change, so the value is never lost even if
+     * the sheet is dismissed without pressing Save.
+     */
+    private void persistOnTextChange(EditText editText, String key) {
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                projectSettings.setValue(key, s.toString());
+            }
+        });
     }
 
     private void setCheckboxValue(CheckBox checkBox, String key, boolean defaultValue) {
@@ -168,6 +247,9 @@ public class BuildSettingsBottomSheet extends BottomSheetDialogFragment {
         checkBox.setChecked(value.equals("true"));
 
         checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            // Persist immediately so the state is not lost when the sheet is dismissed
+            // without pressing Save.
+            projectSettings.setValue(key, Boolean.toString(isChecked));
             if (isChecked) {
                 if (key.equals(SETTING_NO_HTTP_LEGACY)) {
                     AscodeUtil.toast(Helper.getResString(R.string.auto4_requestnetwork_hint));

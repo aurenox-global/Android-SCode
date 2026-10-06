@@ -20,12 +20,12 @@
     <color name="web_grad2">#FF00BFA5</color>
     <color name="web_nav_pill">#1F3DDC84</color>
     <color name="web_hero_border">#473DDC84</color>
-    <!-- Hero (compartido) -->
-    <color name="web_hero_text">#FFFFFFFF</color>
-    <color name="web_hero_text_soft">#D9FFFFFF</color>
-    <color name="web_hero_btn">#FFFFFFFF</color>
+    <!-- Hero (variante clara) -->
+    <color name="web_hero_text">#FF17181A</color>
+    <color name="web_hero_text_soft">#B317181A</color>
+    <color name="web_hero_btn">#FF1E9E5A</color>
     <color name="web_hero_btn_text">#FF06281C</color>
-    <color name="web_hero_outline">#B3FFFFFF</color>
-    <color name="web_hero_icon_bg">#47FFFFFF</color>
-    <color name="web_hero_icon_text">#FFFFFFFF</color>
+    <color name="web_hero_outline">#661E9E5A</color>
+    <color name="web_hero_icon_bg">#1F1E9E5A</color>
+    <color name="web_hero_icon_text">#FF1E9E5A</color>
 </resources>

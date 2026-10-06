@@ -35,6 +35,7 @@ firmado**, todo sin salir del teléfono.
 
 ## Características
 
+- **Arreglo al guardar en el Visor de código (v1.0.41)** — con el modo edición activo, guardar `AndroidManifest.xml` ahora sí lo guarda (antes daba *«This source cannot be saved from Code Viewer.»* y no guardaba nada): el cambio se escribe en `.AndroidSCode/data/<scId>/files/AndroidManifest.xml`, ese fichero pasa a ser el manifiesto del proyecto (el generador lo usa con preferencia sobre el generado al vuelo) y los avisos del visor quedan localizados en inglés, español y portugués.
 - **TTS en las apps compiladas (v1.0.40)** — un puente de `WebView` (`AndroidBridge` con `speak`/`stop`) más un shim de `window.speechSynthesis` hacen que cualquier app compilada con WebView pueda hablar igual que en el navegador, con visibilidad de motores TTS en Android 11+ y motor de reserva si falla el predeterminado; además, **ajustes de WebView** por proyecto, **copiar diseño y lógica entre pantallas** con el pincel del editor, **chat de IA** localizado (EN/ES/PT), botón **Compilar** en el inicio, modo claro arreglado y ajustes de compilación (D8/Java 8) que ahora se guardan al instante.
 - **Tema con la paleta de la web (v1.0.39)** — toda la app usa los colores exactos de la web: verde #3DDC84 y teal #00BFA5 sobre azul marino, en Material 3 claro y oscuro, sin morados heredados (FABs, botones y diálogos).
 - **Inicio rediseñado** — tarjeta "Continuar donde lo dejaste", accesos rápidos (nuevo, importar, templates) y tarjetas de proyecto más limpias, con paleta neutra y verde.

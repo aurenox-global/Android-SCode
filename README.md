@@ -35,6 +35,7 @@ your phone.
 
 ## Features
 
+- **Code Viewer save fix (v1.0.41)** — with edit mode on, saving `AndroidManifest.xml` now really saves it (before it showed *"This source cannot be saved from Code Viewer."* and saved nothing): the edit is written to `.AndroidSCode/data/<scId>/files/AndroidManifest.xml`, that file becomes the project's manifest (the generator prefers it over the one assembled on the fly) and the viewer's notices are localised into English, Spanish and Portuguese.
 - **TTS in built apps (v1.0.40)** — a `WebView` bridge (`AndroidBridge` with `speak`/`stop`) plus a `window.speechSynthesis` shim makes any compiled app with a WebView speak, just like in the browser, with TTS engine visibility on Android 11+ and a fallback engine when the default one fails; also per-project **WebView settings**, **copy design & logic between screens** with the editor's brush tool, a localised **AI chat** (EN/ES/PT), a **Build** button on the home hero, a fixed light mode, and build settings (D8/Java 8) saved instantly.
 - **Web-palette theme (v1.0.39)** — the whole app now uses the website's exact colours: #3DDC84 green and #00BFA5 teal on deep navy, in Material 3 light and dark, with no leftover purple accents (FABs, buttons, dialogs).
 - **Redesigned home** — a "continue where you left off" card, quick actions (new, import, templates) and clean project cards, on a neutral + green palette.

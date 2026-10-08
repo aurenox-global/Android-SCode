@@ -225,6 +225,10 @@ public class ProjectBuilder {
      */
     public void compileResources() throws Exception {
         timestampResourceCompilationStarted = System.currentTimeMillis();
+        /* The built-in offline TTS engine (Piper) was removed: a project that once enabled it may
+         * still carry its jars/dex/.so/assets, which inflate the APK and can make R8 run out of
+         * memory on-device. Sweep those leftovers on every build so such projects heal themselves. */
+        com.ascode.android.utility.StaleTtsArtifacts.clean(this);
         ResourceCompiler compiler = new ResourceCompiler(
                 this,
                 aapt2Binary,

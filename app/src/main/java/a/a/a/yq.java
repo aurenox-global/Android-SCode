@@ -1089,17 +1089,18 @@ public class yq {
             anyPatched = true;
         }
 
-        // 2) Inject the speechSynthesis shim invocation into existing WebChromeClient overrides.
-        //    If a client already declares onProgressChanged (even with an empty body), the call is
-        //    added inside that method instead of appending a second override, which would not
-        //    compile. Idempotent: a client already calling _injectTtsShim is left in sync with the
-        //    diagnostics switch by the method itself.
+        // 2) Bullet-proof shim hook: collapse any remaining duplicates and guarantee the shim runs
+        //    from BOTH hooks of every surviving client — an onProgressChanged override (even an
+        //    empty one: the call is added inside it with its own parameter name) and the
+        //    WebViewClient.onPageFinished. Idempotent; works for qualified and unqualified type
+        //    names, so it also catches decompiled / fully-qualified sources. This does not depend on
+        //    a single onProgressChanged surviving in a possibly duplicated chrome client.
         String shimCall = "_injectTtsShim(_webView);";
         String overlayCall = "_injectTtsDiagnosticsOverlay(_webView);";
         boolean diagEnabled = webViewSettings.isTtsDiagnosticsEnabled();
-        String chromeShimmed = Jx.injectTtsShimIntoWebChromeClients(currentCode, "\n", diagEnabled);
-        if (!chromeShimmed.equals(currentCode)) {
-            currentCode = chromeShimmed;
+        String bootstrapMigrated = Jx.migrateWebViewBootstrapTts(currentCode, "\n", diagEnabled);
+        if (!bootstrapMigrated.equals(currentCode)) {
+            currentCode = bootstrapMigrated;
             anyPatched = true;
         }
 
@@ -1114,15 +1115,6 @@ public class yq {
             }
         } else if (currentCode.contains(overlayCall)) {
             currentCode = currentCode.replace("\n" + overlayCall, "");
-            anyPatched = true;
-        }
-
-        // 2c) Redundant hook: when the activity declares its own WebViewClient, install the shim
-        //     from onPageFinished too, so the speech bridge no longer depends on a single
-        //     onProgressChanged surviving in the (possibly duplicated) chrome client. Idempotent.
-        String pageFinishedHooked = Jx.injectTtsShimIntoWebViewClients(currentCode, "\n", diagEnabled);
-        if (!pageFinishedHooked.equals(currentCode)) {
-            currentCode = pageFinishedHooked;
             anyPatched = true;
         }
 

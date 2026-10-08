@@ -77,12 +77,15 @@ public class Jx {
      */
     public static final String WEBVIEW_TTS_DIAG_MARKER_PREFIX = "// ascode-tts-diag=";
 
+        // A type may be written unqualified (`WebChromeClient`) or fully qualified (`android.webkit.WebChromeClient`),
+        // which is the shape produced by decompilers/obfuscated sources (and by project sources that use FQNs).
+        private static final String WEBVIEW_TYPE_QUALIFIER = "(?:[A-Za-z_$][A-Za-z0-9_$]*\\s*\\.\\s*)*";
         private static final Pattern WEBVIEW_DOWNLOAD_LISTENER_PATTERN = Pattern.compile(
-            "((?:[A-Za-z_$][A-Za-z0-9_$]*\\s*\\.\\s*)*[A-Za-z_$][A-Za-z0-9_$]*)\\s*\\.\\s*setDownloadListener\\s*\\(\\s*new\\s+DownloadListener\\s*\\(\\s*\\)\\s*\\{");
+            "((?:[A-Za-z_$][A-Za-z0-9_$]*\\s*\\.\\s*)*[A-Za-z_$][A-Za-z0-9_$]*)\\s*\\.\\s*setDownloadListener\\s*\\(\\s*new\\s+" + WEBVIEW_TYPE_QUALIFIER + "DownloadListener\\s*\\(\\s*\\)\\s*\\{");
         private static final Pattern WEBVIEW_CHROME_CLIENT_PATTERN = Pattern.compile(
-            "((?:[A-Za-z_$][A-Za-z0-9_$]*\\s*\\.\\s*)*[A-Za-z_$][A-Za-z0-9_$]*)\\s*\\.\\s*setWebChromeClient\\s*\\(\\s*new\\s+WebChromeClient\\s*\\(\\s*\\)\\s*\\{");
+            "((?:[A-Za-z_$][A-Za-z0-9_$]*\\s*\\.\\s*)*[A-Za-z_$][A-Za-z0-9_$]*)\\s*\\.\\s*setWebChromeClient\\s*\\(\\s*new\\s+" + WEBVIEW_TYPE_QUALIFIER + "WebChromeClient\\s*\\(\\s*\\)\\s*\\{");
         private static final Pattern WEBVIEW_CLIENT_PATTERN = Pattern.compile(
-            "((?:[A-Za-z_$][A-Za-z0-9_$]*\\s*\\.\\s*)*[A-Za-z_$][A-Za-z0-9_$]*)\\s*\\.\\s*setWebViewClient\\s*\\(\\s*new\\s+WebViewClient\\s*\\(\\s*\\)\\s*\\{");
+            "((?:[A-Za-z_$][A-Za-z0-9_$]*\\s*\\.\\s*)*[A-Za-z_$][A-Za-z0-9_$]*)\\s*\\.\\s*setWebViewClient\\s*\\(\\s*new\\s+" + WEBVIEW_TYPE_QUALIFIER + "WebViewClient\\s*\\(\\s*\\)\\s*\\{");
         private static final Pattern WEBVIEW_JS_INTERFACE_PATTERN = Pattern.compile(
             "((?:[A-Za-z_$][A-Za-z0-9_$]*\\s*\\.\\s*)*[A-Za-z_$][A-Za-z0-9_$]*)\\s*\\.\\s*addJavascriptInterface\\s*\\(\\s*[^;,]+?\\s*,\\s*\"([^\"]+)\"\\s*\\)\\s*;");
     private final ProjectSettings settings;
@@ -1631,6 +1634,32 @@ public class Jx {
         String code = deduplicateAnonymousInvocations(javaCode, WEBVIEW_CHROME_CLIENT_PATTERN, true);
         code = deduplicateAnonymousInvocations(code, WEBVIEW_DOWNLOAD_LISTENER_PATTERN, false);
         code = deduplicateJavascriptInterfaces(code);
+        return code;
+    }
+
+    /**
+     * Bullet-proof WebView bootstrap migration used by the in-place patchers: collapses duplicated
+     * {@code setWebChromeClient}/{@code setDownloadListener}/{@code addJavascriptInterface} calls,
+     * then guarantees the TTS shim is reachable from every surviving hook:
+     * <ul>
+     *     <li>if a surviving {@code onProgressChanged(WebView w, int p)} does not call
+     *     {@code _injectTtsShim(...)}, the call is added inside that method using its own parameter
+     *     name;</li>
+     *     <li>the surviving {@code setWebViewClient(...)} gets {@code _injectTtsShim(<param>)} in its
+     *     {@code onPageFinished(...)} (or a fresh {@code onPageFinished} override).</li>
+     * </ul>
+     * Idempotent: running it twice returns the same text, and it never adds a second call when one
+     * is already present. Works for qualified ({@code android.webkit.WebChromeClient}) and
+     * unqualified type names alike.
+     */
+    public static String migrateWebViewBootstrapTts(String javaCode, String EOL,
+                                                    boolean diagnosticsEnabled) {
+        if (javaCode == null || javaCode.isEmpty()) {
+            return javaCode;
+        }
+        String code = deduplicateWebViewBootstrap(javaCode, EOL);
+        code = injectTtsShimIntoWebChromeClients(code, EOL, diagnosticsEnabled);
+        code = injectTtsShimIntoWebViewClients(code, EOL, diagnosticsEnabled);
         return code;
     }
 

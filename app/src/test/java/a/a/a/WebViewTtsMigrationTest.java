@@ -413,6 +413,56 @@ public class WebViewTtsMigrationTest {
      * three times by the old, non-idempotent migration, and the LAST WebChromeClient has an empty
      * onProgressChanged that used to shadow the one installing the TTS shim.
      */
+    // Fully-qualified / decompiled variants (android.webkit.* names, `public final void` overrides,
+    // `// from class:` comments) — the shape that defeated the unqualified-only patterns.
+    private static final String REAL_CHROME_WITH_SHIM =
+            "this.binding.webview1.setWebChromeClient(new android.webkit.WebChromeClient() { // from class: com.escuelita.MainActivity.1\n"
+                    + "@Override // android.webkit.WebChromeClient\n"
+                    + "public final void onProgressChanged(android.webkit.WebView webView, int i) {\n"
+                    + "if (i >= 100) {\n"
+                    + "com.escuelita.MainActivity.this._injectTtsShim(webView);\n"
+                    + "}\n"
+                    + "}\n"
+                    + "@Override // android.webkit.WebChromeClient\n"
+                    + "public final boolean onShowFileChooser(android.webkit.WebView webView, android.webkit.ValueCallback valueCallback, android.webkit.WebChromeClient.FileChooserParams fileChooserParams) {\n"
+                    + "return com.escuelita.MainActivity.this._openWebFileChooser(valueCallback, fileChooserParams);\n"
+                    + "}\n"
+                    + "});\n";
+
+    private static final String REAL_CHROME_EMPTY =
+            "this.binding.webview1.setWebChromeClient(new android.webkit.WebChromeClient() { // from class: com.escuelita.MainActivity.3\n"
+                    + "@Override // android.webkit.WebChromeClient\n"
+                    + "public final void onProgressChanged(android.webkit.WebView webView, int i) {\n"
+                    + "}\n"
+                    + "@Override // android.webkit.WebChromeClient\n"
+                    + "public final boolean onShowFileChooser(android.webkit.WebView webView, android.webkit.ValueCallback valueCallback, android.webkit.WebChromeClient.FileChooserParams fileChooserParams) {\n"
+                    + "return com.escuelita.MainActivity.this._openWebFileChooser(valueCallback, fileChooserParams);\n"
+                    + "}\n"
+                    + "});\n";
+
+    private static final String REAL_SAFE_DOWNLOAD =
+            "this.binding.webview1.setDownloadListener(new android.webkit.DownloadListener() { // from class: com.escuelita.MainActivity.2\n"
+                    + "@Override // android.webkit.DownloadListener\n"
+                    + "public final void onDownloadStart(java.lang.String str, java.lang.String str2, java.lang.String str3, java.lang.String str4, long j) {\n"
+                    + "try {\n"
+                    + "com.escuelita.MainActivity mainActivity = com.escuelita.MainActivity.this;\n"
+                    + "mainActivity._downloadWebFile(mainActivity.binding.webview1, str, str2, str3, str4);\n"
+                    + "} catch (java.lang.Throwable unused) {\n"
+                    + "com.escuelita.AscodeUtil.a(com.escuelita.MainActivity.this.getApplicationContext(), \"Download failed\");\n"
+                    + "}\n"
+                    + "}\n"
+                    + "});\n";
+
+    private static final String REAL_BLOB_IFACE =
+            "this.binding.webview1.addJavascriptInterface(new com.escuelita.MainActivity._BlobDownloadBridge(), \"_BlobDownloader\");\n";
+
+    private static final String REAL_BRIDGE_IFACE =
+            "this.binding.webview1.addJavascriptInterface(new com.escuelita.MainActivity._TtsBridge(), \"AndroidBridge\");\n";
+
+    private static final String REAL_EMPTY_WEBVIEW_CLIENT =
+            "this.binding.webview1.setWebViewClient(new android.webkit.WebViewClient() { // from class: com.escuelita.MainActivity.5\n"
+                    + "});\n";
+
     private String duplicatedBootstrapSource() {
         return "package com.escuelita;\n"
                 + "import android.app.Activity;\n"
@@ -516,6 +566,108 @@ public class WebViewTtsMigrationTest {
         assertEquals(1, countOccurrences(patched, "_injectTtsShim(_webView)"));
         // Idempotent.
         assertEquals(patched, Jx.injectTtsShimIntoWebChromeClients(patched, "\n", false));
+    }
+
+    // ---------------------------------------------------------------------------------------
+    // Real-world shape: a decompiled / fully-qualified source (android.webkit.* type names,
+    // `public final void` overrides, `// from class:` comments). This is the exact shape that
+    // slipped through the old de-duplication: the patterns only matched unqualified type names,
+    // so findAnonymousInvocations() returned nothing and the duplicate WebChromeClient survived.
+    // ---------------------------------------------------------------------------------------
+
+    private String realDecompiledDuplicatedBootstrapSource() {
+        return "package com.escuelita;\n"
+                + "import android.app.Activity;\n"
+                + "public class MainActivity extends Activity {\n"
+                + "private WebView webview1;\n"
+                + "private static final class _BlobDownloadBridge {}\n"
+                + "private static final class _TtsBridge {}\n"
+                + "private void initialize(android.os.Bundle bundle) {\n"
+                + REAL_CHROME_WITH_SHIM
+                + REAL_BLOB_IFACE
+                + REAL_BRIDGE_IFACE
+                + REAL_SAFE_DOWNLOAD
+                + REAL_BLOB_IFACE
+                + REAL_CHROME_EMPTY
+                + REAL_SAFE_DOWNLOAD
+                + REAL_BLOB_IFACE
+                + REAL_EMPTY_WEBVIEW_CLIENT
+                + "}\n"
+                + "private void _injectTtsShim(android.webkit.WebView _w) {}\n"
+                + "private boolean _openWebFileChooser(android.webkit.ValueCallback<android.net.Uri[]> _cb, android.webkit.WebChromeClient.FileChooserParams _p) { return false; }\n"
+                + "private void _downloadWebFile(android.webkit.WebView _w, java.lang.String _a, java.lang.String _b, java.lang.String _c, java.lang.String _d) {}\n"
+                + "}\n";
+    }
+
+    @Test
+    public void realDecompiledDuplicatedBootstrapIsDetectedAndCollapsed() {
+        String duplicated = realDecompiledDuplicatedBootstrapSource();
+        assertTrue("FQN / decompiled duplicates must be detected",
+                Jx.hasDuplicateWebViewBootstrapCalls(duplicated));
+        assertEquals(2, countOccurrences(duplicated, "setWebChromeClient("));
+        assertEquals(2, countOccurrences(duplicated, "setDownloadListener("));
+        assertEquals(3, countOccurrences(duplicated, "\"_BlobDownloader\""));
+
+        String migrated = Jx.deduplicateWebViewBootstrap(duplicated, "\n");
+
+        assertEquals("exactly one WebChromeClient", 1, countOccurrences(migrated, "setWebChromeClient("));
+        assertEquals("exactly one DownloadListener", 1, countOccurrences(migrated, "setDownloadListener("));
+        assertEquals("one _BlobDownloader registration", 1, countOccurrences(migrated, "\"_BlobDownloader\""));
+        assertEquals("one AndroidBridge registration", 1, countOccurrences(migrated, "\"AndroidBridge\""));
+        // The surviving chrome client is the one that installs the shim (not the empty one).
+        assertTrue("the shim-carrying WebChromeClient must win",
+                migrated.contains("_injectTtsShim(webView)"));
+        assertEquals("only one shim call after de-duplication", 1,
+                countOccurrences(migrated, "_injectTtsShim(webView)"));
+        assertEquals("the empty duplicate must be gone", 1, countOccurrences(migrated, "onProgressChanged("));
+        assertTrue("file chooser support survives", migrated.contains("onShowFileChooser("));
+        assertEquals("the user WebViewClient is preserved", 1, countOccurrences(migrated, "setWebViewClient("));
+        assertFalse("no duplicates left", Jx.hasDuplicateWebViewBootstrapCalls(migrated));
+    }
+
+    @Test
+    public void realDecompiledMigrationIsIdempotent() {
+        String duplicated = realDecompiledDuplicatedBootstrapSource();
+        String once = Jx.migrateWebViewBootstrapTts(Jx.deduplicateWebViewBootstrap(duplicated, "\n"), "\n", false);
+        String twice = Jx.migrateWebViewBootstrapTts(Jx.deduplicateWebViewBootstrap(once, "\n"), "\n", false);
+        assertEquals("migrating twice must be byte-identical", once, twice);
+    }
+
+    @Test
+    public void realDecompiledMigrationAddsShimToSurvivingEmptyProgressAndOnPageFinished() {
+        // FQN chrome client with an EMPTY onProgressChanged + FQN (empty) WebViewClient: the
+        // bullet-proof guarantee must add the shim call to the progress override (using its own
+        // parameter name) and hook it into onPageFinished of the surviving WebViewClient.
+        String source = "package com.escuelita;\n"
+                + "import android.app.Activity;\n"
+                + "public class MainActivity extends Activity {\n"
+                + "private WebView webview1;\n"
+                + "private void initialize(android.os.Bundle bundle) {\n"
+                + REAL_CHROME_EMPTY
+                + REAL_EMPTY_WEBVIEW_CLIENT
+                + "}\n"
+                + "private void _injectTtsShim(android.webkit.WebView _w) {}\n"
+                + "private boolean _openWebFileChooser(android.webkit.ValueCallback<android.net.Uri[]> _cb, android.webkit.WebChromeClient.FileChooserParams _p) { return false; }\n"
+                + "}\n";
+
+        String migrated = Jx.migrateWebViewBootstrapTts(
+                Jx.deduplicateWebViewBootstrap(source, "\n"), "\n", false);
+
+        assertEquals("one onProgressChanged only", 1, countOccurrences(migrated, "onProgressChanged("));
+        assertTrue("the empty progress override must now call the shim with its own parameter name",
+                migrated.contains("_injectTtsShim(webView)"));
+        assertTrue("the WebViewClient must hook the shim from onPageFinished",
+                migrated.contains("public void onPageFinished(WebView _webView, String _url)")
+                        && migrated.contains("_injectTtsShim(_webView)"));
+        // Idempotent.
+        assertEquals(migrated, Jx.migrateWebViewBootstrapTts(migrated, "\n", false));
+    }
+
+    @Test
+    public void realDecompiledMigratedSourceParsesAsJava() {
+        String migrated = Jx.migrateWebViewBootstrapTts(
+                Jx.deduplicateWebViewBootstrap(realDecompiledDuplicatedBootstrapSource(), "\n"), "\n", false);
+        StaticJavaParser.parse(migrated);
     }
 
     @Test

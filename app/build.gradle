@@ -287,6 +287,9 @@ dependencies {
     // Termux sin depender de binarios externos (el parser ar/tar si es propio).
     implementation libs.xz
 
+    // Piper TTS offline: los paquetes de voz se publican como .tar.bz2 (bzip2 + tar).
+    implementation libs.commons.compress
+
     implementation libs.ecj
     implementation libs.stax.api
 

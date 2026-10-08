@@ -1,17 +1,31 @@
 package com.ascode.android.activities.webview;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.besome.sketch.lib.base.BaseAppCompatActivity;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import java.io.File;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import dev.pranav.filepicker.FilePickerCallback;
+import dev.pranav.filepicker.FilePickerDialogFragment;
+import dev.pranav.filepicker.FilePickerOptions;
 import mod.hey.studios.project.ProjectSettings;
 import mod.hey.studios.util.Helper;
 import com.ascode.android.R;
 import com.ascode.android.databinding.ActivityWebviewSettingsBinding;
+import com.ascode.android.piper.PiperCatalog;
+import com.ascode.android.piper.PiperInstaller;
 import com.ascode.android.utility.UI;
 import com.ascode.android.webview.ProjectWebViewSettings;
 
@@ -40,6 +54,10 @@ public class WebViewSettingsActivity extends BaseAppCompatActivity {
     private ActivityWebviewSettingsBinding binding;
     private ProjectSettings settings;
     private String sc_id;
+
+    private final ExecutorService ttsExecutor = Executors.newSingleThreadExecutor();
+    private final Handler ttsHandler = new Handler(Looper.getMainLooper());
+    private boolean ttsBusy;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -73,6 +91,7 @@ public class WebViewSettingsActivity extends BaseAppCompatActivity {
         setupSwitch(binding.swMediaNoGesture, ProjectSettings.SETTING_WEBVIEW_MEDIA_NO_GESTURE, true);
         setupSwitch(binding.swTtsBridge, ProjectSettings.SETTING_WEBVIEW_TTS_BRIDGE, true);
         setupSwitch(binding.swTtsDiagnostics, ProjectSettings.SETTING_WEBVIEW_TTS_DIAGNOSTICS, false);
+        setupSwitch(binding.swTtsPiper, ProjectSettings.SETTING_WEBVIEW_TTS_ENGINE_PIPER, false);
         setupSwitch(binding.swDesktopMode, ProjectSettings.SETTING_WEBVIEW_DESKTOP_MODE, false);
         setupText(binding.etTtsRate, ProjectSettings.SETTING_WEBVIEW_TTS_RATE,
                 ProjectWebViewSettings.DEFAULT_TTS_RATE);
@@ -80,7 +99,217 @@ public class WebViewSettingsActivity extends BaseAppCompatActivity {
                 ProjectWebViewSettings.DEFAULT_TTS_LANG);
         setupText(binding.etTextZoom, ProjectSettings.SETTING_WEBVIEW_TEXT_ZOOM,
                 String.valueOf(ProjectWebViewSettings.DEFAULT_TEXT_ZOOM));
+        setupPiper();
         setupReset();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ttsExecutor.shutdownNow();
+    }
+
+    // ------------------------------------------------------------------
+    // Built-in offline Piper engine
+    // ------------------------------------------------------------------
+
+    private void setupPiper() {
+        List<PiperCatalog.Voice> voices = PiperCatalog.voices();
+        String[] labels = new String[voices.size()];
+        for (int i = 0; i < voices.size(); i++) {
+            PiperCatalog.Voice voice = voices.get(i);
+            labels[i] = voice.lang + " · " + voice.id + " (" + PiperCatalog.humanSize(voice.sizeBytes) + ")";
+        }
+        binding.actTtsVoice.setSimpleItems(labels);
+
+        String stored = settings.getValue(ProjectSettings.SETTING_WEBVIEW_TTS_PIPER_VOICE,
+                PiperCatalog.DEFAULT_VOICE_ID);
+        int index = indexOfVoiceId(voices, stored);
+        if (index < 0) {
+            index = indexOfVoiceId(voices, PiperCatalog.DEFAULT_VOICE_ID);
+        }
+        if (index >= 0) {
+            binding.actTtsVoice.setText(labels[index], false);
+        }
+        binding.actTtsVoice.setOnItemClickListener((parent, view, position, id) -> {
+            if (position >= 0 && position < voices.size()) {
+                settings.setValue(ProjectSettings.SETTING_WEBVIEW_TTS_PIPER_VOICE, voices.get(position).id);
+                updateTtsVoiceUi();
+            }
+        });
+
+        binding.btnTtsDownload.setOnClickListener(v -> startTtsDownload());
+        binding.btnTtsImport.setOnClickListener(v -> startTtsImport());
+        updateTtsVoiceUi();
+    }
+
+    private int indexOfVoiceId(List<PiperCatalog.Voice> voices, String id) {
+        for (int i = 0; i < voices.size(); i++) {
+            if (voices.get(i).id.equals(id)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private PiperCatalog.Voice selectedVoice() {
+        String id = settings.getValue(ProjectSettings.SETTING_WEBVIEW_TTS_PIPER_VOICE,
+                PiperCatalog.DEFAULT_VOICE_ID);
+        PiperCatalog.Voice voice = PiperCatalog.findById(id);
+        return voice != null ? voice : PiperCatalog.defaultVoice();
+    }
+
+    private void updateTtsVoiceUi() {
+        PiperCatalog.Voice voice = selectedVoice();
+        binding.tvTtsLicense.setText(getString(R.string.webview_settings_tts_license, voice.license));
+
+        boolean runtimeInstalled = PiperInstaller.isRuntimeInstalled(sc_id);
+        boolean voiceInstalled = PiperInstaller.isVoiceInstalled(sc_id)
+                && voice.id.equals(PiperInstaller.installedVoiceId(sc_id));
+
+        if (!runtimeInstalled) {
+            long download = PiperCatalog.RUNTIME_AAR_SIZE + PiperCatalog.KOTLIN_STDLIB_SIZE;
+            binding.tvTtsStatus.setText(getString(R.string.webview_settings_tts_status_runtime_missing,
+                    PiperCatalog.humanSize(download)));
+        } else if (voiceInstalled) {
+            binding.tvTtsStatus.setText(getString(R.string.webview_settings_tts_status_installed,
+                    PiperCatalog.humanSize(PiperInstaller.installedVoiceSize(sc_id))));
+        } else {
+            binding.tvTtsStatus.setText(getString(R.string.webview_settings_tts_status_not_installed,
+                    PiperCatalog.humanSize(voice.sizeBytes)));
+        }
+    }
+
+    private void setTtsBusy(boolean busy) {
+        ttsBusy = busy;
+        binding.btnTtsDownload.setEnabled(!busy);
+        binding.btnTtsImport.setEnabled(!busy);
+        binding.actTtsVoice.setEnabled(!busy);
+        binding.swTtsPiper.setEnabled(!busy);
+        if (!busy) {
+            binding.pbTts.setVisibility(View.GONE);
+        }
+    }
+
+    private void startTtsDownload() {
+        if (ttsBusy) {
+            return;
+        }
+        final PiperCatalog.Voice voice = selectedVoice();
+        setTtsBusy(true);
+        binding.pbTts.setVisibility(View.VISIBLE);
+        binding.pbTts.setIndeterminate(true);
+        ttsExecutor.execute(() -> {
+            try {
+                PiperInstaller.installRuntime(sc_id, this::onTtsProgress, false);
+                PiperInstaller.installVoice(sc_id, voice, null, this::onTtsProgress);
+                ttsHandler.post(() -> {
+                    setTtsBusy(false);
+                    Toast.makeText(this, R.string.webview_settings_tts_done, Toast.LENGTH_SHORT).show();
+                    updateTtsVoiceUi();
+                });
+            } catch (Exception e) {
+                ttsHandler.post(() -> {
+                    setTtsBusy(false);
+                    Toast.makeText(this, getString(R.string.webview_settings_tts_error, String.valueOf(e.getMessage())),
+                            Toast.LENGTH_LONG).show();
+                    updateTtsVoiceUi();
+                });
+            }
+        });
+    }
+
+    private void startTtsImport() {
+        if (ttsBusy) {
+            return;
+        }
+        FilePickerOptions options = new FilePickerOptions();
+        options.setTitle(getString(R.string.webview_settings_tts_import_title));
+        options.setExtensions(new String[]{"bz2"});
+        FilePickerCallback callback = new FilePickerCallback() {
+            @Override
+            public void onFileSelected(File file) {
+                PiperCatalog.Voice voice = PiperCatalog.findByFileName(file.getName());
+                if (voice == null) {
+                    Toast.makeText(WebViewSettingsActivity.this,
+                            R.string.webview_settings_tts_import_mismatch, Toast.LENGTH_LONG).show();
+                    return;
+                }
+                settings.setValue(ProjectSettings.SETTING_WEBVIEW_TTS_PIPER_VOICE, voice.id);
+                int index = indexOfVoiceId(PiperCatalog.voices(), voice.id);
+                if (index >= 0) {
+                    PiperCatalog.Voice v = PiperCatalog.voices().get(index);
+                    binding.actTtsVoice.setText(v.lang + " · " + v.id + " ("
+                            + PiperCatalog.humanSize(v.sizeBytes) + ")", false);
+                }
+                installImportedVoice(voice, file);
+            }
+        };
+        FilePickerDialogFragment dialog = new FilePickerDialogFragment(options, callback);
+        dialog.show(getSupportFragmentManager(), "piperVoicePicker");
+    }
+
+    private void installImportedVoice(PiperCatalog.Voice voice, File archive) {
+        setTtsBusy(true);
+        binding.pbTts.setVisibility(View.VISIBLE);
+        binding.pbTts.setIndeterminate(true);
+        ttsExecutor.execute(() -> {
+            try {
+                PiperInstaller.installRuntime(sc_id, this::onTtsProgress, false);
+                PiperInstaller.installVoice(sc_id, voice, archive, this::onTtsProgress);
+                ttsHandler.post(() -> {
+                    setTtsBusy(false);
+                    Toast.makeText(this, R.string.webview_settings_tts_done, Toast.LENGTH_SHORT).show();
+                    updateTtsVoiceUi();
+                });
+            } catch (Exception e) {
+                ttsHandler.post(() -> {
+                    setTtsBusy(false);
+                    Toast.makeText(this, getString(R.string.webview_settings_tts_error, String.valueOf(e.getMessage())),
+                            Toast.LENGTH_LONG).show();
+                    updateTtsVoiceUi();
+                });
+            }
+        });
+    }
+
+    private void onTtsProgress(String stage, long done, long total) {
+        ttsHandler.post(() -> {
+            int pct = total > 0 ? (int) Math.min(100, Math.max(0, done * 100 / total)) : -1;
+            switch (stage) {
+                case "runtime-aar":
+                case "runtime-stdlib":
+                case "voice-download": {
+                    binding.pbTts.setVisibility(View.VISIBLE);
+                    binding.pbTts.setIndeterminate(false);
+                    if (pct >= 0) {
+                        binding.pbTts.setProgressCompat(pct, true);
+                    }
+                    binding.tvTtsStatus.setText(stage.startsWith("voice")
+                            ? getString(R.string.webview_settings_tts_progress_download, Math.max(pct, 0))
+                            : getString(R.string.webview_settings_tts_progress_runtime, Math.max(pct, 0)));
+                    break;
+                }
+                case "runtime-dex":
+                    showIndeterminateTts(R.string.webview_settings_tts_progress_dex);
+                    break;
+                case "voice-verify":
+                case "voice-extract":
+                    showIndeterminateTts(R.string.webview_settings_tts_progress_extract);
+                    break;
+                case "voice-prune":
+                    showIndeterminateTts(R.string.webview_settings_tts_progress_prune);
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
+
+    private void showIndeterminateTts(int stringRes) {
+        binding.pbTts.setVisibility(View.VISIBLE);
+        binding.pbTts.setIndeterminate(true);
+        binding.tvTtsStatus.setText(stringRes);
     }
 
     @Override
@@ -205,6 +434,8 @@ public class WebViewSettingsActivity extends BaseAppCompatActivity {
                 ProjectSettings.SETTING_WEBVIEW_MEDIA_NO_GESTURE,
                 ProjectSettings.SETTING_WEBVIEW_TTS_BRIDGE,
                 ProjectSettings.SETTING_WEBVIEW_TTS_DIAGNOSTICS,
+                ProjectSettings.SETTING_WEBVIEW_TTS_ENGINE_PIPER,
+                ProjectSettings.SETTING_WEBVIEW_TTS_PIPER_VOICE,
                 ProjectSettings.SETTING_WEBVIEW_TTS_RATE,
                 ProjectSettings.SETTING_WEBVIEW_TTS_LANG,
                 ProjectSettings.SETTING_WEBVIEW_TEXT_ZOOM,
@@ -221,6 +452,11 @@ public class WebViewSettingsActivity extends BaseAppCompatActivity {
         binding.swMediaNoGesture.setChecked(true);
         binding.swTtsBridge.setChecked(true);
         binding.swTtsDiagnostics.setChecked(false);
+        binding.swTtsPiper.setChecked(false);
+        binding.actTtsVoice.setText(PiperCatalog.voices().get(0).lang + " · "
+                + PiperCatalog.voices().get(0).id + " ("
+                + PiperCatalog.humanSize(PiperCatalog.voices().get(0).sizeBytes) + ")", false);
+        updateTtsVoiceUi();
         binding.swDesktopMode.setChecked(false);
         binding.etTtsRate.setText(ProjectWebViewSettings.DEFAULT_TTS_RATE);
         binding.etTtsLang.setText(ProjectWebViewSettings.DEFAULT_TTS_LANG);

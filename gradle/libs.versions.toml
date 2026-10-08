@@ -37,6 +37,7 @@ okio = "3.16.0"
 preference = "1.2.1"
 proguardCore = "9.0.2"
 protobufJava = "3.19.2"
+commonsCompress = "1.27.1"
 r8 = "8.11.18"
 recyclerview = "1.4.0"
 securityCrypto = "1.1.0-alpha06"
@@ -123,6 +124,8 @@ stax-api = { module = "javax.xml.stream:stax-api", version.ref = "staxApi" }
 woodstox-core = { module = "com.fasterxml.woodstox:woodstox-core", version.ref = "woodstoxCore" }
 
 xz = { module = "org.tukaani:xz", version.ref = "xz" }
+
+commons-compress = { module = "org.apache.commons:commons-compress", version.ref = "commonsCompress" }
 
 zipalign-java = { module = "com.github.Iyxan23:zipalign-java", version.ref = "zipalignJava" }
 

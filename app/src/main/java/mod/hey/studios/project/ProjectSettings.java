@@ -111,6 +111,12 @@ public class ProjectSettings {
      * behaviour. Requires a voice installed under {@code .AndroidSCode/data/<sc_id>/tts/}.
      */
     public static final String SETTING_WEBVIEW_TTS_ENGINE_PIPER = "webview_tts_engine_piper";
+    /**
+     * Id of the Piper voice selected for this project, e.g. {@code es_MX-ald-medium-int8}. Default:
+     * the catalog's default voice. The voice itself is installed under
+     * {@code .AndroidSCode/data/<sc_id>/tts/}.
+     */
+    public static final String SETTING_WEBVIEW_TTS_PIPER_VOICE = "webview_tts_piper_voice";
     /** Text zoom percentage. Default: 100 (not emitted, matches the platform default). */
     public static final String SETTING_WEBVIEW_TEXT_ZOOM = "webview_text_zoom";
     /** Desktop mode (forces a desktop user agent). Default: false. */

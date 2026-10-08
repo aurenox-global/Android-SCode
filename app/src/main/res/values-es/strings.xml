@@ -1109,6 +1109,7 @@
     <string name="webview_settings_tts_bridge">Activar puente TTS (AndroidBridge)</string>
     <string name="webview_settings_tts_rate">Velocidad por defecto</string>
     <string name="webview_settings_tts_lang">Idioma (p. ej. es-ES)</string>
+    <string name="webview_settings_tts_diagnostics">Diagnóstico TTS (mostrar avisos)</string>
     <string name="webview_settings_text_zoom">Escala de texto (%)</string>
     <string name="webview_settings_desktop_mode">Modo escritorio (user agent)</string>
     <string name="webview_settings_file_access">Acceso a ficheros</string>

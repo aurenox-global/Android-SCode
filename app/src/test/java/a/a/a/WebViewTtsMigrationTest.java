@@ -174,7 +174,77 @@ public class WebViewTtsMigrationTest {
         assertFalse(Jx.hasLegacyWebViewTtsHelper(current));
         // A current helper starts with the version marker (after the leading EOL).
         assertTrue(current.trim().startsWith(Jx.WEBVIEW_TTS_HELPER_BEGIN_MARKER));
-        assertEquals(3, Jx.WEBVIEW_TTS_HELPER_VERSION);
+        assertEquals(4, Jx.WEBVIEW_TTS_HELPER_VERSION);
+    }
+
+    @Test
+    public void currentHelperCarriesAnOffByDefaultDiagnosticsFlag() {
+        StringBuilder sb = new StringBuilder();
+        Jx.appendWebViewTtsHelpers(sb, "\n");
+        String current = sb.toString();
+
+        // The flag exists, defaults to OFF, and records its own value for the migration check.
+        assertTrue(current.contains("private boolean _ttsShowDiagToasts = false;"));
+        assertTrue(current.contains(Jx.WEBVIEW_TTS_DIAG_MARKER_PREFIX + "false"));
+        assertTrue(Jx.hasWebViewTtsDiagnosticsSetting(current, false));
+        assertFalse(Jx.hasWebViewTtsDiagnosticsSetting(current, true));
+
+        // The toast path reuses the diagnostics summary and is throttled on the main thread.
+        assertTrue(current.contains("_ttsMaybeDiagToast"));
+        assertTrue(current.contains("_ttsDiagnostics()"));
+        assertTrue(current.contains("android.widget.Toast.LENGTH_SHORT"));
+        assertTrue(current.contains("android.os.SystemClock.elapsedRealtime()"));
+        assertTrue(current.contains("800L"));
+        assertTrue(current.contains("Looper.getMainLooper()"));
+
+        // The persistent, logcat-visible summary line (tag AscodeTTS).
+        assertTrue(current.contains("DIAG event="));
+        assertTrue(current.contains("\"AscodeTTS\""));
+
+        // The honest "no voice installed" toast must still be emitted alongside the diagnostics.
+        assertTrue(current.contains("_ttsWarnNoVoice"));
+        assertTrue(current.contains("Instalar datos de voz"));
+    }
+
+    @Test
+    public void diagnosticsFlagCanBeBakedOn() {
+        StringBuilder sb = new StringBuilder();
+        Jx.appendWebViewTtsHelpers(sb, "\n", "1.25", "pt-BR", true);
+        String current = sb.toString();
+
+        assertTrue(current.contains("private boolean _ttsShowDiagToasts = true;"));
+        assertTrue(current.contains(Jx.WEBVIEW_TTS_DIAG_MARKER_PREFIX + "true"));
+        assertTrue(Jx.hasWebViewTtsDiagnosticsSetting(current, true));
+        assertFalse(Jx.hasWebViewTtsDiagnosticsSetting(current, false));
+        assertTrue(current.contains("1.25f"));
+        assertTrue(current.contains("new Locale(\"pt\", \"BR\")"));
+        assertTrue(Jx.hasCurrentWebViewTtsHelper(current));
+    }
+
+    @Test
+    public void replacementPreservesDiagnosticsSettingAndRate() {
+        // A v3-shaped helper (current body with the version marker rewritten) must be upgraded to
+        // the v4 helper while keeping the requested rate/language/diagnostics values.
+        StringBuilder sb = new StringBuilder();
+        Jx.appendWebViewTtsHelpers(sb, "\n", "1.1", "en-US", false);
+        String v3 = sb.toString().replace(Jx.WEBVIEW_TTS_HELPER_BEGIN_MARKER, "// <ascode-tts v3>");
+        String file = "package x;\npublic class MainActivity {\n" + v3 + "}\n";
+
+        String migrated = Jx.replaceLegacyWebViewTtsHelper(file, "\n", "1.1", "en-US", true);
+        assertNotNull(migrated);
+        assertTrue(Jx.hasCurrentWebViewTtsHelper(migrated));
+        assertTrue(Jx.hasWebViewTtsDiagnosticsSetting(migrated, true));
+        assertTrue(migrated.contains("private boolean _ttsShowDiagToasts = true;"));
+        assertTrue(migrated.contains("1.1f"));
+        assertTrue(migrated.contains("new Locale(\"en\", \"US\")"));
+    }
+
+    @Test
+    public void ttsDiagnosticsSettingDefaultsOff() {
+        // The pure defaults (no project / never opened the screen) must reproduce the previous
+        // behaviour: diagnostics toasts off.
+        assertFalse(com.ascode.android.webview.ProjectWebViewSettings.defaults()
+                .isTtsDiagnosticsEnabled());
     }
 
     @Test
@@ -198,6 +268,26 @@ public class WebViewTtsMigrationTest {
         assertTrue(out.getParentFile().mkdirs() || out.getParentFile().isDirectory());
         Files.write(out.toPath(), activity.getBytes(StandardCharsets.UTF_8));
         assertTrue(out.isFile());
+
+        // Also emit the diagnostics-enabled variant so the javac check covers the new Toast path.
+        StringBuilder diag = new StringBuilder();
+        Jx.appendWebViewTtsHelpers(diag, "\n", "0.95", "es-ES", true);
+        String diagActivity = "package com.ascode.check;\n"
+                + "import android.app.Activity;\n"
+                + "import android.webkit.*;\n"
+                + "import android.os.*;\n"
+                + "import android.media.*;\n"
+                + "import android.speech.tts.TextToSpeech;\n"
+                + "import java.util.*;\n"
+                + "public class DiagActivity extends Activity {\n"
+                + "private WebView webview1;\n"
+                + diag
+                + "}\n";
+        StaticJavaParser.parse(diagActivity);
+        File diagOut = new File("build/tts-generated-check-diag/com/ascode/check/DiagActivity.java");
+        assertTrue(diagOut.getParentFile().mkdirs() || diagOut.getParentFile().isDirectory());
+        Files.write(diagOut.toPath(), diagActivity.getBytes(StandardCharsets.UTF_8));
+        assertTrue(diagOut.isFile());
     }
 
     private int countOccurrences(String haystack, String needle) {

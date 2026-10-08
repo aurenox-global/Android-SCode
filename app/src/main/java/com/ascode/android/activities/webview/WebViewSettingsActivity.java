@@ -72,6 +72,7 @@ public class WebViewSettingsActivity extends BaseAppCompatActivity {
         setupSwitch(binding.swDomStorage, ProjectSettings.SETTING_WEBVIEW_DOM_STORAGE, true);
         setupSwitch(binding.swMediaNoGesture, ProjectSettings.SETTING_WEBVIEW_MEDIA_NO_GESTURE, true);
         setupSwitch(binding.swTtsBridge, ProjectSettings.SETTING_WEBVIEW_TTS_BRIDGE, true);
+        setupSwitch(binding.swTtsDiagnostics, ProjectSettings.SETTING_WEBVIEW_TTS_DIAGNOSTICS, false);
         setupSwitch(binding.swDesktopMode, ProjectSettings.SETTING_WEBVIEW_DESKTOP_MODE, false);
         setupText(binding.etTtsRate, ProjectSettings.SETTING_WEBVIEW_TTS_RATE,
                 ProjectWebViewSettings.DEFAULT_TTS_RATE);
@@ -203,6 +204,7 @@ public class WebViewSettingsActivity extends BaseAppCompatActivity {
                 ProjectSettings.SETTING_WEBVIEW_CACHE_MODE,
                 ProjectSettings.SETTING_WEBVIEW_MEDIA_NO_GESTURE,
                 ProjectSettings.SETTING_WEBVIEW_TTS_BRIDGE,
+                ProjectSettings.SETTING_WEBVIEW_TTS_DIAGNOSTICS,
                 ProjectSettings.SETTING_WEBVIEW_TTS_RATE,
                 ProjectSettings.SETTING_WEBVIEW_TTS_LANG,
                 ProjectSettings.SETTING_WEBVIEW_TEXT_ZOOM,
@@ -218,6 +220,7 @@ public class WebViewSettingsActivity extends BaseAppCompatActivity {
         binding.swDomStorage.setChecked(true);
         binding.swMediaNoGesture.setChecked(true);
         binding.swTtsBridge.setChecked(true);
+        binding.swTtsDiagnostics.setChecked(false);
         binding.swDesktopMode.setChecked(false);
         binding.etTtsRate.setText(ProjectWebViewSettings.DEFAULT_TTS_RATE);
         binding.etTtsLang.setText(ProjectWebViewSettings.DEFAULT_TTS_LANG);

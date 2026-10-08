@@ -98,6 +98,12 @@ public class ProjectSettings {
     public static final String SETTING_WEBVIEW_TTS_RATE = "webview_tts_rate";
     /** Default language used by the TTS bridge, e.g. {@code es-ES}. Default: es-ES. */
     public static final String SETTING_WEBVIEW_TTS_LANG = "webview_tts_lang";
+    /**
+     * Whether the generated TTS helper shows a short diagnostic Toast on every TTS event (and
+     * writes the same summary to logcat, tag {@code AscodeTTS}). Default: false, so projects that
+     * never touched this value keep the previous behaviour (no toasts, no extra noise).
+     */
+    public static final String SETTING_WEBVIEW_TTS_DIAGNOSTICS = "webview_tts_diagnostics";
     /** Text zoom percentage. Default: 100 (not emitted, matches the platform default). */
     public static final String SETTING_WEBVIEW_TEXT_ZOOM = "webview_text_zoom";
     /** Desktop mode (forces a desktop user agent). Default: false. */

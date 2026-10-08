@@ -109,6 +109,15 @@ public final class ProjectWebViewSettings {
         return lang.isEmpty() ? DEFAULT_TTS_LANG : lang;
     }
 
+    /**
+     * Whether the generated TTS helper should show a short diagnostic Toast (and log a summary
+     * line, tag {@code AscodeTTS}) on every TTS event. Default: false, which keeps the exact
+     * behaviour of apps generated before this setting existed.
+     */
+    public boolean isTtsDiagnosticsEnabled() {
+        return bool(ProjectSettings.SETTING_WEBVIEW_TTS_DIAGNOSTICS, false);
+    }
+
     public int getTextZoom() {
         int zoom = integer(ProjectSettings.SETTING_WEBVIEW_TEXT_ZOOM, DEFAULT_TEXT_ZOOM);
         return zoom <= 0 ? DEFAULT_TEXT_ZOOM : zoom;

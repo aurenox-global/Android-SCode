@@ -1112,6 +1112,7 @@ ex)\"*/*\", \"image/*\", \"audio/*\", \"text/*\""</string>
     <string name="webview_settings_tts_bridge">Enable TTS bridge (AndroidBridge)</string>
     <string name="webview_settings_tts_rate">Default speech rate</string>
     <string name="webview_settings_tts_lang">Language (e.g. es-ES)</string>
+    <string name="webview_settings_tts_diagnostics">TTS diagnostics (show toasts)</string>
     <string name="webview_settings_text_zoom">Text zoom (%)</string>
     <string name="webview_settings_desktop_mode">Desktop mode (user agent)</string>
     <string name="webview_settings_file_access">File access</string>

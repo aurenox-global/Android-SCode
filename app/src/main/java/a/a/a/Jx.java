@@ -42,8 +42,10 @@ public class Jx {
      * {@link #appendWebViewTtsHelpers(StringBuilder, String)}. Bump this whenever the helper
      * changes so {@code yq} can detect projects that still carry an older helper and upgrade it
      * in place on the next build (see {@link #hasCurrentWebViewTtsHelper(String)}).
+     * <p>Version 4 adds the optional per-event diagnostic Toast (see
+     * {@link #WEBVIEW_TTS_DIAG_MARKER_PREFIX}).</p>
      */
-    public static final int WEBVIEW_TTS_HELPER_VERSION = 3;
+    public static final int WEBVIEW_TTS_HELPER_VERSION = 4;
 
     /** Opening marker comment wrapping the versioned WebView TTS helper block. */
     public static final String WEBVIEW_TTS_HELPER_BEGIN_MARKER =
@@ -51,6 +53,14 @@ public class Jx {
 
     /** Closing marker comment wrapping the versioned WebView TTS helper block. */
     public static final String WEBVIEW_TTS_HELPER_END_MARKER = "// </ascode-tts>";
+
+    /**
+     * Comment, appended to the generated diagnostics flag, that records whether the helper was
+     * built with the diagnostic Toast enabled ({@code // ascode-tts-diag=true} / {@code false}).
+     * {@code yq} compares it against the project setting so toggling the switch re-emits the
+     * helper on the next build, even when the helper version itself did not change.
+     */
+    public static final String WEBVIEW_TTS_DIAG_MARKER_PREFIX = "// ascode-tts-diag=";
         private static final Pattern WEBVIEW_DOWNLOAD_LISTENER_PATTERN = Pattern.compile(
             "((?:[A-Za-z_$][A-Za-z0-9_$]*\\s*\\.\\s*)*[A-Za-z_$][A-Za-z0-9_$]*)\\s*\\.\\s*setDownloadListener\\s*\\(\\s*new\\s+DownloadListener\\s*\\(\\s*\\)\\s*\\{");
         private static final Pattern WEBVIEW_CHROME_CLIENT_PATTERN = Pattern.compile(
@@ -566,7 +576,8 @@ public class Jx {
 
             appendWebViewDownloadHelpers(sb, EOL);
             if (webViewSettings.isTtsBridgeEnabled()) {
-                appendWebViewTtsHelpers(sb, EOL, webViewSettings.getTtsRate(), webViewSettings.getTtsLang());
+                appendWebViewTtsHelpers(sb, EOL, webViewSettings.getTtsRate(), webViewSettings.getTtsLang(),
+                        webViewSettings.isTtsDiagnosticsEnabled());
             }
         }
 
@@ -1933,15 +1944,27 @@ public class Jx {
      * inside a WebView, where the platform does not implement {@code window.speechSynthesis}.
      */
     public static void appendWebViewTtsHelpers(StringBuilder sb, String EOL) {
-        appendWebViewTtsHelpers(sb, EOL, ProjectWebViewSettings.DEFAULT_TTS_RATE, ProjectWebViewSettings.DEFAULT_TTS_LANG);
+        appendWebViewTtsHelpers(sb, EOL, ProjectWebViewSettings.DEFAULT_TTS_RATE, ProjectWebViewSettings.DEFAULT_TTS_LANG, false);
     }
 
     /**
      * Same as {@link #appendWebViewTtsHelpers(StringBuilder, String)} but using the project's
      * configured default speech rate and language. With the default values (0.95 / es-ES) the
-     * generated code is identical to the pre-configuration output.
+     * generated code is identical to the pre-configuration output. Diagnostic toasts stay off.
      */
     public static void appendWebViewTtsHelpers(StringBuilder sb, String EOL, String defaultRate, String defaultLang) {
+        appendWebViewTtsHelpers(sb, EOL, defaultRate, defaultLang, false);
+    }
+
+    /**
+     * Same as {@link #appendWebViewTtsHelpers(StringBuilder, String, String, String)} but also
+     * controlling whether the generated helper shows a short diagnostic Toast on every TTS event
+     * (motor, requested language, {@code isLanguageAvailable}, {@code setLanguage} result,
+     * {@code queued}, engine count and the last event). When {@code showDiagnosticsToasts} is
+     * {@code false} the emitted code is identical to the previous helper version.
+     */
+    public static void appendWebViewTtsHelpers(StringBuilder sb, String EOL, String defaultRate, String defaultLang, boolean showDiagnosticsToasts) {
+        String diagLiteral = showDiagnosticsToasts ? "true" : "false";
         String rate = (defaultRate == null || defaultRate.trim().isEmpty())
                 ? ProjectWebViewSettings.DEFAULT_TTS_RATE : defaultRate.trim();
         String lang = (defaultLang == null || defaultLang.trim().isEmpty())
@@ -1978,6 +2001,8 @@ public class Jx {
         sb.append("private String _ttsLastEvent = \"init\";").append(EOL);
         sb.append("private int _ttsLastQueued = Integer.MIN_VALUE;").append(EOL);
         sb.append("private boolean _ttsNoVoiceWarned = false;").append(EOL);
+        sb.append("private boolean _ttsShowDiagToasts = ").append(diagLiteral).append("; ").append(WEBVIEW_TTS_DIAG_MARKER_PREFIX).append(diagLiteral).append(EOL);
+        sb.append("private long _ttsLastDiagToastAt = 0L;").append(EOL);
         sb.append("private android.webkit.WebView _ttsWebView = null;").append(EOL);
         sb.append("private android.media.AudioManager _ttsAudioManager;").append(EOL);
         sb.append("private android.media.AudioManager.OnAudioFocusChangeListener _ttsFocusListener;").append(EOL);
@@ -2364,8 +2389,26 @@ public class Jx {
         sb.append("return _d.toString();").append(EOL);
         sb.append("}").append(EOL);
 
+        sb.append("private void _ttsMaybeDiagToast() {").append(EOL);
+        sb.append("if (!_ttsShowDiagToasts) { return; }").append(EOL);
+        sb.append("long _diagNow = android.os.SystemClock.elapsedRealtime();").append(EOL);
+        sb.append("if (_diagNow - _ttsLastDiagToastAt < 800L) { return; }").append(EOL);
+        sb.append("_ttsLastDiagToastAt = _diagNow;").append(EOL);
+        sb.append("final android.content.Context _diagToastContext = getApplicationContext();").append(EOL);
+        sb.append("new Handler(Looper.getMainLooper()).post(new Runnable() {").append(EOL);
+        sb.append("@Override").append(EOL);
+        sb.append("public void run() {").append(EOL);
+        sb.append("try {").append(EOL);
+        sb.append("android.widget.Toast.makeText(_diagToastContext, _ttsDiagnostics(), android.widget.Toast.LENGTH_SHORT).show();").append(EOL);
+        sb.append("} catch (Throwable ignored) { }").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("});").append(EOL);
+        sb.append("}").append(EOL);
+
         sb.append("private void _ttsEmitDiag(String _event) {").append(EOL);
         sb.append("_ttsLastEvent = _event;").append(EOL);
+        sb.append("android.util.Log.i(\"AscodeTTS\", \"DIAG event=\" + _event + \" \" + _ttsDiagnostics());").append(EOL);
+        sb.append("_ttsMaybeDiagToast();").append(EOL);
         sb.append("final android.webkit.WebView _diagWebView = _ttsWebView;").append(EOL);
         sb.append("if (_diagWebView == null) { return; }").append(EOL);
         sb.append("try {").append(EOL);
@@ -2480,12 +2523,23 @@ public class Jx {
      * @return {@code true} when {@code javaCode} already contains the current version of the
      * WebView TTS helper: its version marker plus the {@code setAudioAttributes} audio-routing
      * support and the language-aware engine selection / JS diagnostics introduced in
-     * {@link #WEBVIEW_TTS_HELPER_VERSION} 3.
+     * {@link #WEBVIEW_TTS_HELPER_VERSION} 4.
      */
     public static boolean hasCurrentWebViewTtsHelper(String javaCode) {
         return javaCode != null
                 && javaCode.contains(WEBVIEW_TTS_HELPER_BEGIN_MARKER)
                 && javaCode.contains("setAudioAttributes");
+    }
+
+    /**
+     * @return {@code true} when {@code javaCode} carries a helper whose baked-in diagnostics flag
+     * equals {@code enabled} (matched through {@link #WEBVIEW_TTS_DIAG_MARKER_PREFIX}). Used by
+     * {@code yq} to re-emit the helper when the project's switch was toggled even though the
+     * helper version did not change.
+     */
+    public static boolean hasWebViewTtsDiagnosticsSetting(String javaCode, boolean enabled) {
+        return javaCode != null
+                && javaCode.contains(WEBVIEW_TTS_DIAG_MARKER_PREFIX + enabled);
     }
 
     /**
@@ -2517,6 +2571,17 @@ public class Jx {
      * @return the upgraded source, or {@code null} when the block could not be located
      */
     public static String replaceLegacyWebViewTtsHelper(String javaCode, String EOL) {
+        return replaceLegacyWebViewTtsHelper(javaCode, EOL,
+                ProjectWebViewSettings.DEFAULT_TTS_RATE, ProjectWebViewSettings.DEFAULT_TTS_LANG, false);
+    }
+
+    /**
+     * Same as {@link #replaceLegacyWebViewTtsHelper(String, String)} but re-emitting the helper
+     * with the project's configured speech rate, language and diagnostic-toast flag, so an upgrade
+     * never silently drops those values.
+     */
+    public static String replaceLegacyWebViewTtsHelper(String javaCode, String EOL, String defaultRate,
+                                                       String defaultLang, boolean showDiagnosticsToasts) {
         if (javaCode == null || javaCode.isEmpty()) {
             return null;
         }
@@ -2541,7 +2606,7 @@ public class Jx {
         int replaceEnd = blockEndIndex + 1;
 
         StringBuilder helpersBuilder = new StringBuilder(8192);
-        appendWebViewTtsHelpers(helpersBuilder, EOL);
+        appendWebViewTtsHelpers(helpersBuilder, EOL, defaultRate, defaultLang, showDiagnosticsToasts);
         String newHelper = helpersBuilder.toString();
         if (newHelper.startsWith(EOL)) {
             newHelper = newHelper.substring(EOL.length());

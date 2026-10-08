@@ -960,7 +960,8 @@ public class yq {
             return;
         }
 
-        if (!needsWebViewSourceMigration(existingCode, webViewSettings.isTtsBridgeEnabled())) {
+        if (!needsWebViewSourceMigration(existingCode, webViewSettings.isTtsBridgeEnabled(),
+                webViewSettings.isTtsDiagnosticsEnabled())) {
             return;
         }
 
@@ -972,7 +973,7 @@ public class yq {
             boolean downloadPatched = inPlacePatchLegacyWebViewDownload(activityJavaPath, existingCode);
             String codeForTts = downloadPatched ? FileUtil.readFile(activityJavaPath) : existingCode;
             boolean ttsPatched = webViewSettings.isTtsBridgeEnabled()
-                    && inPlacePatchLegacyWebViewTts(activityJavaPath, codeForTts);
+                    && inPlacePatchLegacyWebViewTts(activityJavaPath, codeForTts, webViewSettings);
             if (downloadPatched || ttsPatched) {
                 return;
             }
@@ -1047,7 +1048,8 @@ public class yq {
      *
      * @return {@code true} if the file was patched and written, {@code false} otherwise
      */
-    private boolean inPlacePatchLegacyWebViewTts(String activityJavaPath, String existingCode) {
+    private boolean inPlacePatchLegacyWebViewTts(String activityJavaPath, String existingCode,
+                                                 ProjectWebViewSettings webViewSettings) {
         if (existingCode == null || existingCode.isEmpty()) {
             return false;
         }
@@ -1088,13 +1090,20 @@ public class yq {
             }
         }
 
-        // 3) Ensure the CURRENT TTS helper (fields + speechSynthesis shim + _TtsBridge) is present.
-        //    A project patched by an older release still carries a legacy helper: replace that
-        //    contiguous block surgically (preferred over regenerating the whole file, which would
-        //    drop the user's customizations). A project without any helper gets the new one
-        //    injected before the class close.
-        if (Jx.hasLegacyWebViewTtsHelper(currentCode)) {
-            String upgradedCode = Jx.replaceLegacyWebViewTtsHelper(currentCode, "\n");
+        // 3) Ensure the CURRENT TTS helper (fields + speechSynthesis shim + _TtsBridge) is present
+        //    AND baked with the project's current rate/language/diagnostics settings. A project
+        //    patched by an older release still carries a legacy helper: replace that contiguous
+        //    block surgically (preferred over regenerating the whole file, which would drop the
+        //    user's customizations). A project without any helper gets the new one injected before
+        //    the class close. When only the diagnostics switch changed, the version marker still
+        //    matches, so compare the baked-in flag to re-emit the helper.
+        boolean diagnosticsMatch = Jx.hasWebViewTtsDiagnosticsSetting(
+                currentCode, webViewSettings.isTtsDiagnosticsEnabled());
+        if (Jx.hasLegacyWebViewTtsHelper(currentCode)
+                || (currentCode.contains(Jx.WEBVIEW_TTS_HELPER_BEGIN_MARKER) && !diagnosticsMatch)) {
+            String upgradedCode = Jx.replaceLegacyWebViewTtsHelper(currentCode, "\n",
+                    webViewSettings.getTtsRate(), webViewSettings.getTtsLang(),
+                    webViewSettings.isTtsDiagnosticsEnabled());
             if (upgradedCode == null) {
                 // Could not locate the old helper safely: let the caller fall back to full
                 // regeneration instead of risking dropping the user's code.
@@ -1108,7 +1117,8 @@ public class yq {
                 return false;
             }
             StringBuilder helpersBuilder = new StringBuilder(8192);
-            Jx.appendWebViewTtsHelpers(helpersBuilder, "\n");
+            Jx.appendWebViewTtsHelpers(helpersBuilder, "\n", webViewSettings.getTtsRate(),
+                    webViewSettings.getTtsLang(), webViewSettings.isTtsDiagnosticsEnabled());
             currentCode = currentCode.substring(0, classCloseIndex)
                     + helpersBuilder
                     + currentCode.substring(classCloseIndex);
@@ -1373,7 +1383,8 @@ public class yq {
         return Jx.hasUnsafeWebViewDownloadListener(javaCode);
     }
 
-    private boolean needsWebViewSourceMigration(String javaCode, boolean ttsBridgeEnabled) {
+    private boolean needsWebViewSourceMigration(String javaCode, boolean ttsBridgeEnabled,
+                                                boolean ttsDiagnosticsEnabled) {
         if (javaCode.isEmpty()) {
             return false;
         }
@@ -1400,6 +1411,16 @@ public class yq {
         // the next build upgrades the helper in place instead of leaving the app stuck on the
         // old code forever. When the project disabled the TTS bridge this reason no longer applies.
         if (ttsBridgeEnabled && Jx.hasLegacyWebViewTtsHelper(javaCode)) {
+            return true;
+        }
+
+        // The helper is current, but the project's diagnostics switch was toggled after it was
+        // generated: re-emit it so the Toast setting takes effect on the next build. Only applies
+        // to a helper that already carries our version marker (projects without one are handled
+        // by the legacy / missing-helper branches above and below).
+        if (ttsBridgeEnabled
+                && javaCode.contains(Jx.WEBVIEW_TTS_HELPER_BEGIN_MARKER)
+                && !Jx.hasWebViewTtsDiagnosticsSetting(javaCode, ttsDiagnosticsEnabled)) {
             return true;
         }
 

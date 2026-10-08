@@ -961,7 +961,7 @@ public class yq {
         }
 
         if (!needsWebViewSourceMigration(existingCode, webViewSettings.isTtsBridgeEnabled(),
-                webViewSettings.isTtsDiagnosticsEnabled(), webViewSettings.isTtsPiperEnabled())) {
+                webViewSettings.isTtsDiagnosticsEnabled())) {
             return;
         }
 
@@ -1139,7 +1139,7 @@ public class yq {
                 || (currentCode.contains(Jx.WEBVIEW_TTS_HELPER_BEGIN_MARKER) && !diagnosticsMatch)) {
             String upgradedCode = Jx.replaceLegacyWebViewTtsHelper(currentCode, "\n",
                     webViewSettings.getTtsRate(), webViewSettings.getTtsLang(),
-                    webViewSettings.isTtsDiagnosticsEnabled(), webViewSettings.isTtsPiperEnabled());
+                    webViewSettings.isTtsDiagnosticsEnabled());
             if (upgradedCode == null) {
                 // Could not locate the old helper safely: let the caller fall back to full
                 // regeneration instead of risking dropping the user's code.
@@ -1154,8 +1154,7 @@ public class yq {
             }
             StringBuilder helpersBuilder = new StringBuilder(8192);
             Jx.appendWebViewTtsHelpers(helpersBuilder, "\n", webViewSettings.getTtsRate(),
-                    webViewSettings.getTtsLang(), webViewSettings.isTtsDiagnosticsEnabled(),
-                    webViewSettings.isTtsPiperEnabled());
+                    webViewSettings.getTtsLang(), webViewSettings.isTtsDiagnosticsEnabled());
             currentCode = currentCode.substring(0, classCloseIndex)
                     + helpersBuilder
                     + currentCode.substring(classCloseIndex);
@@ -1421,7 +1420,7 @@ public class yq {
     }
 
     private boolean needsWebViewSourceMigration(String javaCode, boolean ttsBridgeEnabled,
-                                                boolean ttsDiagnosticsEnabled, boolean ttsPiperEnabled) {
+                                                boolean ttsDiagnosticsEnabled) {
         if (javaCode.isEmpty()) {
             return false;
         }
@@ -1466,14 +1465,6 @@ public class yq {
         if (ttsBridgeEnabled
                 && javaCode.contains(Jx.WEBVIEW_TTS_HELPER_BEGIN_MARKER)
                 && !Jx.hasWebViewTtsDiagnosticsSetting(javaCode, ttsDiagnosticsEnabled)) {
-            return true;
-        }
-
-        // The helper is current, but the project's offline-Piper switch was toggled after it was
-        // generated: re-emit it so the chosen backend takes effect on the next build.
-        if (ttsBridgeEnabled
-                && javaCode.contains(Jx.WEBVIEW_TTS_HELPER_BEGIN_MARKER)
-                && !Jx.hasWebViewTtsPiperSetting(javaCode, ttsPiperEnabled)) {
             return true;
         }
 

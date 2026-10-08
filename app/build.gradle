@@ -68,7 +68,7 @@ android {
         namespace = "com.ascode.android"
       targetSdk = 35
         minSdk = 26
-        versionCode = 51
+        versionCode = 52
         versionName = "v1.0.42"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -286,9 +286,6 @@ dependencies {
     // Carril C (Fase 7, soporte Flutter): descompresion XZ de los data.tar.xz de los .deb de
     // Termux sin depender de binarios externos (el parser ar/tar si es propio).
     implementation libs.xz
-
-    // Piper TTS offline: los paquetes de voz se publican como .tar.bz2 (bzip2 + tar).
-    implementation libs.commons.compress
 
     implementation libs.ecj
     implementation libs.stax.api

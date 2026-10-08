@@ -60,7 +60,7 @@ public class Jx {
      * {@code window.speechSynthesis} shim guarded only by
      * {@code typeof window.speechSynthesis === 'undefined'}.</p>
      */
-    public static final int WEBVIEW_TTS_HELPER_VERSION = 6;
+    public static final int WEBVIEW_TTS_HELPER_VERSION = 7;
 
     /** Opening marker comment wrapping the versioned WebView TTS helper block. */
     public static final String WEBVIEW_TTS_HELPER_BEGIN_MARKER =
@@ -77,13 +77,6 @@ public class Jx {
      */
     public static final String WEBVIEW_TTS_DIAG_MARKER_PREFIX = "// ascode-tts-diag=";
 
-    /**
-     * Comment appended to the generated {@code _ttsUsePiper} field recording that the helper was
-     * built to prefer the bundled offline Piper voice ({@code // ascode-tts-piper=true}). Absent
-     * means the system engine. {@code yq} compares it against the project setting so toggling the
-     * switch re-emits the helper on the next build, even when the helper version is unchanged.
-     */
-    public static final String WEBVIEW_TTS_PIPER_MARKER_PREFIX = "// ascode-tts-piper=";
         private static final Pattern WEBVIEW_DOWNLOAD_LISTENER_PATTERN = Pattern.compile(
             "((?:[A-Za-z_$][A-Za-z0-9_$]*\\s*\\.\\s*)*[A-Za-z_$][A-Za-z0-9_$]*)\\s*\\.\\s*setDownloadListener\\s*\\(\\s*new\\s+DownloadListener\\s*\\(\\s*\\)\\s*\\{");
         private static final Pattern WEBVIEW_CHROME_CLIENT_PATTERN = Pattern.compile(
@@ -604,7 +597,7 @@ public class Jx {
             appendWebViewDownloadHelpers(sb, EOL);
             if (webViewSettings.isTtsBridgeEnabled()) {
                 appendWebViewTtsHelpers(sb, EOL, webViewSettings.getTtsRate(), webViewSettings.getTtsLang(),
-                        webViewSettings.isTtsDiagnosticsEnabled(), webViewSettings.isTtsPiperEnabled());
+                        webViewSettings.isTtsDiagnosticsEnabled());
             }
         }
 
@@ -2353,19 +2346,6 @@ public class Jx {
      * {@code false} the emitted code is identical to the previous helper version.
      */
     public static void appendWebViewTtsHelpers(StringBuilder sb, String EOL, String defaultRate, String defaultLang, boolean showDiagnosticsToasts) {
-        appendWebViewTtsHelpers(sb, EOL, defaultRate, defaultLang, showDiagnosticsToasts, false);
-    }
-
-    /**
-     * Same as {@link #appendWebViewTtsHelpers(StringBuilder, String, String, String, boolean)} but
-     * also choosing the synthesis backend. When {@code usePiper} is {@code true} the emitted helper
-     * prefers the bundled, fully-offline Piper voice through sherpa-onnx (model under
-     * {@code assets/piper/}, PCM played with {@code AudioTrack}) and degrades to the system
-     * {@code TextToSpeech} engine when the voice is missing or fails to load. With {@code usePiper}
-     * {@code false} the emitted code is byte-for-byte identical to the system-only helper.
-     */
-    public static void appendWebViewTtsHelpers(StringBuilder sb, String EOL, String defaultRate, String defaultLang,
-                                               boolean showDiagnosticsToasts, boolean usePiper) {
         String diagLiteral = showDiagnosticsToasts ? "true" : "false";
         String rate = (defaultRate == null || defaultRate.trim().isEmpty())
                 ? ProjectWebViewSettings.DEFAULT_TTS_RATE : defaultRate.trim();
@@ -2403,14 +2383,11 @@ public class Jx {
         sb.append("private String _ttsLastEvent = \"init\";").append(EOL);
         sb.append("private int _ttsLastQueued = Integer.MIN_VALUE;").append(EOL);
         sb.append("private boolean _ttsNoVoiceWarned = false;").append(EOL);
-        sb.append("private int _ttsBridgeSpeakCalls = 0;").append(EOL);
+        sb.append("private int _ttsBridgeSpeechCalls = 0;").append(EOL);
         sb.append("private int _ttsBridgeStopCalls = 0;").append(EOL);
         sb.append("private String _ttsBridgeLastText = \"\";").append(EOL);
         sb.append("private String _ttsBridgeLastRate = \"\";").append(EOL);
         sb.append("private boolean _ttsShowDiagToasts = ").append(diagLiteral).append("; ").append(WEBVIEW_TTS_DIAG_MARKER_PREFIX).append(diagLiteral).append(EOL);
-        if (usePiper) {
-            sb.append("private boolean _ttsUsePiper = true; ").append(WEBVIEW_TTS_PIPER_MARKER_PREFIX).append("true").append(EOL);
-        }
         sb.append("private long _ttsLastDiagToastAt = 0L;").append(EOL);
         sb.append("private android.webkit.WebView _ttsWebView = null;").append(EOL);
         sb.append("private android.media.AudioManager _ttsAudioManager;").append(EOL);
@@ -2453,18 +2430,6 @@ public class Jx {
         sb.append("android.util.Log.w(\"AscodeTTS\", \"TTS: ningún motor disponible, init ignorado\");").append(EOL);
         sb.append("return;").append(EOL);
         sb.append("}").append(EOL);
-        if (usePiper) {
-            sb.append("if (_ttsUsePiper && _piperInit()) {").append(EOL);
-            sb.append("_ttsReady = true;").append(EOL);
-            sb.append("if (_ttsPendingText != null) {").append(EOL);
-            sb.append("String _piperPendingText = _ttsPendingText;").append(EOL);
-            sb.append("String _piperPendingRate = _ttsPendingRate;").append(EOL);
-            sb.append("_ttsPendingText = null;").append(EOL);
-            sb.append("_speakTtsNow(_piperPendingText, _piperPendingRate);").append(EOL);
-            sb.append("}").append(EOL);
-            sb.append("return;").append(EOL);
-            sb.append("}").append(EOL);
-        }
         sb.append("if (_tts == null) {").append(EOL);
         sb.append("_startTtsEngine(null, false);").append(EOL);
         sb.append("}").append(EOL);
@@ -2706,12 +2671,6 @@ public class Jx {
         sb.append("}").append(EOL);
 
         sb.append("private void _speakTtsNow(String _text, String _rate) {").append(EOL);
-        if (usePiper) {
-            sb.append("if (_ttsUsePiper && _piperReady) {").append(EOL);
-            sb.append("_piperSpeak(_text, _rate);").append(EOL);
-            sb.append("return;").append(EOL);
-            sb.append("}").append(EOL);
-        }
         sb.append("if (_ttsGivingUp) {").append(EOL);
         sb.append("android.util.Log.w(\"AscodeTTS\", \"TTS speak ignorado: ningún motor disponible\");").append(EOL);
         sb.append("return;").append(EOL);
@@ -2799,7 +2758,7 @@ public class Jx {
         sb.append("_d.append(\", last=\").append(_ttsLastEvent);").append(EOL);
         sb.append("_d.append(\", queued=\").append(_ttsLastQueued);").append(EOL);
         sb.append("_d.append(\", noVoiceWarned=\").append(_ttsNoVoiceWarned);").append(EOL);
-        sb.append("_d.append(\", speakCalls=\").append(_ttsBridgeSpeakCalls);").append(EOL);
+        sb.append("_d.append(\", speakCalls=\").append(_ttsBridgeSpeechCalls);").append(EOL);
         sb.append("_d.append(\", stopCalls=\").append(_ttsBridgeStopCalls);").append(EOL);
         sb.append("_d.append(\", lastRate=\").append(_ttsBridgeLastRate);").append(EOL);
         sb.append("_d.append(\", lastText=\").append(_ttsBridgeLastText);").append(EOL);
@@ -2847,9 +2806,6 @@ public class Jx {
 
         sb.append("private void _stopTts() {").append(EOL);
         sb.append("android.util.Log.i(\"AscodeTTS\", \"TTS stop()\");").append(EOL);
-        if (usePiper) {
-            sb.append("if (_ttsUsePiper && _piperReady) { _piperStop(); }").append(EOL);
-        }
         sb.append("_ttsEmitDiag(\"stop\");").append(EOL);
         sb.append("_ttsAbandonAudioFocus();").append(EOL);
         sb.append("if (_tts != null) {").append(EOL);
@@ -2863,9 +2819,6 @@ public class Jx {
 
         sb.append(EOL);
         sb.append(EOL);
-        if (usePiper) {
-            appendWebViewPiperTtsEngine(sb, EOL);
-        }
         sb.append("private void _injectTtsShim(WebView _webView) {").append(EOL);
         sb.append("if (_webView == null) {").append(EOL);
         sb.append("return;").append(EOL);
@@ -2920,7 +2873,7 @@ public class Jx {
         sb.append("@JavascriptInterface").append(EOL);
         sb.append("public void speak(final String _text, final String _rate) {").append(EOL);
         sb.append("android.util.Log.i(\"AscodeTTS\", \"BRIDGE speak len=\" + (_text == null ? 0 : _text.length()) + \" rate=\" + _rate);").append(EOL);
-        sb.append("_ttsBridgeSpeakCalls++; _ttsBridgeLastText = (_text == null) ? \"\" : _text; _ttsBridgeLastRate = (_rate == null) ? \"\" : _rate;").append(EOL);
+        sb.append("_ttsBridgeSpeechCalls++; _ttsBridgeLastText = (_text == null) ? \"\" : _text; _ttsBridgeLastRate = (_rate == null) ? \"\" : _rate;").append(EOL);
         sb.append("new Handler(Looper.getMainLooper()).post(new Runnable() {").append(EOL);
         sb.append("@Override").append(EOL);
         sb.append("public void run() {").append(EOL);
@@ -2979,9 +2932,9 @@ public class Jx {
      * voices, last event) plus the bridge {@code speak()}/{@code stop()} call counters exposed
      * through {@code getDiagnostics()}, and the first captured page JavaScript errors
      * ({@code window.onerror} + {@code console.error}). Its button calls
-     * {@code AndroidBridge.probe()}, which drives the engine directly (bundled Piper when active,
-     * otherwise the system engine) with a fixed phrase, bypassing the page, so a broken engine can
-     * be told apart from a page that never calls the bridge.
+     * {@code AndroidBridge.probe()}, which drives the engine directly (the system engine) with a
+     * fixed phrase, bypassing the page, so a broken engine can be told apart from a page that
+     * never calls the bridge.
      *
      * <p>Only emitted when {@code showDiagnosticsToasts} is {@code true}: with the switch off the
      * generated helper stays behaviourally identical to the previous version.</p>
@@ -3064,20 +3017,6 @@ public class Jx {
     }
 
     /**
-     * @return {@code true} when {@code javaCode}'s baked-in Piper-engine flag equals {@code enabled}
-     * (matched through {@link #WEBVIEW_TTS_PIPER_MARKER_PREFIX}; an absent marker means the system
-     * engine). Used by {@code yq} to re-emit the helper when the project's switch was toggled even
-     * though the helper version did not change.
-     */
-    public static boolean hasWebViewTtsPiperSetting(String javaCode, boolean enabled) {
-        if (javaCode == null) {
-            return false;
-        }
-        boolean bakedOn = javaCode.contains(WEBVIEW_TTS_PIPER_MARKER_PREFIX + "true");
-        return enabled == bakedOn;
-    }
-
-    /**
      * @return {@code true} when {@code javaCode} carries a WebView TTS helper that is not the
      * current version (for example one injected by an older release, which lacks the version
      * marker / {@code setAudioAttributes}), so {@code yq} knows it must upgrade it in place.
@@ -3117,18 +3056,6 @@ public class Jx {
      */
     public static String replaceLegacyWebViewTtsHelper(String javaCode, String EOL, String defaultRate,
                                                        String defaultLang, boolean showDiagnosticsToasts) {
-        return replaceLegacyWebViewTtsHelper(javaCode, EOL, defaultRate, defaultLang, showDiagnosticsToasts, false);
-    }
-
-    /**
-     * Same as {@link #replaceLegacyWebViewTtsHelper(String, String, String, String, boolean)} but
-     * also choosing the synthesis backend (see
-     * {@link #appendWebViewTtsHelpers(StringBuilder, String, String, String, boolean, boolean)}), so
-     * an in-place upgrade never silently drops the offline Piper route either.
-     */
-    public static String replaceLegacyWebViewTtsHelper(String javaCode, String EOL, String defaultRate,
-                                                       String defaultLang, boolean showDiagnosticsToasts,
-                                                       boolean usePiper) {
         if (javaCode == null || javaCode.isEmpty()) {
             return null;
         }
@@ -3153,193 +3080,12 @@ public class Jx {
         int replaceEnd = blockEndIndex + 1;
 
         StringBuilder helpersBuilder = new StringBuilder(8192);
-        appendWebViewTtsHelpers(helpersBuilder, EOL, defaultRate, defaultLang, showDiagnosticsToasts, usePiper);
+        appendWebViewTtsHelpers(helpersBuilder, EOL, defaultRate, defaultLang, showDiagnosticsToasts);
         String newHelper = helpersBuilder.toString();
         if (newHelper.startsWith(EOL)) {
             newHelper = newHelper.substring(EOL.length());
         }
         return javaCode.substring(0, helperStart) + newHelper + javaCode.substring(replaceEnd);
-    }
-
-    /**
-     * Emits the optional, fully-offline Piper engine used by the WebView TTS helper when the
-     * project enabled it. It is additive: the helper still carries the complete system
-     * {@code TextToSpeech} implementation, and this block only makes it <em>prefer</em> the bundled
-     * voice (fields {@code _piper*} + {@code _piperInit()/_piperSpeak()/_piperStop()} invoked
-     * conditionally from {@code _initTts()}, {@code _speakTtsNow()} and {@code _stopTts()}).
-     *
-     * <p>The model is read from {@code assets/piper/model.onnx}, {@code assets/piper/tokens.txt} and
-     * {@code assets/piper/espeak-ng-data/}; sherpa-onnx needs the espeak-ng-data directory as a real
-     * filesystem path, so it is copied into {@code getFilesDir()} on first use. If anything fails
-     * (missing assets, unsupported ABI, synthesis error) the code disables itself and the system
-     * engine takes over.</p>
-     */
-    private static void appendWebViewPiperTtsEngine(StringBuilder sb, String EOL) {
-        sb.append(EOL);
-        sb.append("private com.k2fsa.sherpa.onnx.OfflineTts _piperTts = null;").append(EOL);
-        sb.append("private boolean _piperReady = false;").append(EOL);
-        sb.append("private boolean _piperFailed = false;").append(EOL);
-        sb.append("private boolean _piperDataDirReady = false;").append(EOL);
-        sb.append("private android.media.AudioTrack _piperTrack = null;").append(EOL);
-        sb.append("private final Object _piperLock = new Object();").append(EOL);
-
-        sb.append(EOL);
-        sb.append("private boolean _piperInit() {").append(EOL);
-        sb.append("synchronized (_piperLock) {").append(EOL);
-        sb.append("if (_piperReady) { return true; }").append(EOL);
-        sb.append("if (_piperFailed) { return false; }").append(EOL);
-        sb.append("try {").append(EOL);
-        sb.append("String _piperDataDir = _piperEnsureDataDir();").append(EOL);
-        sb.append("com.k2fsa.sherpa.onnx.OfflineTtsVitsModelConfig _piperVits = new com.k2fsa.sherpa.onnx.OfflineTtsVitsModelConfig();").append(EOL);
-        sb.append("_piperVits.setModel(\"piper/model.onnx\");").append(EOL);
-        sb.append("_piperVits.setTokens(\"piper/tokens.txt\");").append(EOL);
-        sb.append("_piperVits.setDataDir(_piperDataDir);").append(EOL);
-        sb.append("com.k2fsa.sherpa.onnx.OfflineTtsModelConfig _piperModel = new com.k2fsa.sherpa.onnx.OfflineTtsModelConfig();").append(EOL);
-        sb.append("_piperModel.setVits(_piperVits);").append(EOL);
-        sb.append("_piperModel.setNumThreads(2);").append(EOL);
-        sb.append("_piperModel.setDebug(false);").append(EOL);
-        sb.append("_piperModel.setProvider(\"cpu\");").append(EOL);
-        sb.append("com.k2fsa.sherpa.onnx.OfflineTtsConfig _piperConfig = new com.k2fsa.sherpa.onnx.OfflineTtsConfig();").append(EOL);
-        sb.append("_piperConfig.setModel(_piperModel);").append(EOL);
-        sb.append("_piperConfig.setMaxNumSentences(1);").append(EOL);
-        sb.append("_piperTts = new com.k2fsa.sherpa.onnx.OfflineTts(getAssets(), _piperConfig);").append(EOL);
-        sb.append("_piperReady = true;").append(EOL);
-        sb.append("android.util.Log.i(\"AscodeTTS\", \"PIPER listo sampleRate=\" + _piperTts.sampleRate());").append(EOL);
-        sb.append("_ttsEmitDiag(\"piperReady\");").append(EOL);
-        sb.append("return true;").append(EOL);
-        sb.append("} catch (Throwable _piperInitError) {").append(EOL);
-        sb.append("_piperFailed = true;").append(EOL);
-        sb.append("_piperTts = null;").append(EOL);
-        sb.append("android.util.Log.w(\"AscodeTTS\", \"PIPER no disponible, uso el motor del sistema: \" + _piperInitError);").append(EOL);
-        sb.append("_ttsEmitDiag(\"piperUnavailable\");").append(EOL);
-        sb.append("return false;").append(EOL);
-        sb.append("}").append(EOL);
-        sb.append("}").append(EOL);
-        sb.append("}").append(EOL);
-
-        sb.append(EOL);
-        sb.append("private String _piperEnsureDataDir() throws java.io.IOException {").append(EOL);
-        sb.append("java.io.File _piperDir = new java.io.File(getFilesDir(), \"piper\");").append(EOL);
-        sb.append("java.io.File _piperEspeak = new java.io.File(_piperDir, \"espeak-ng-data\");").append(EOL);
-        sb.append("if (!_piperDataDirReady || !_piperEspeak.isDirectory()) {").append(EOL);
-        sb.append("_piperCopyAssetDir(\"piper/espeak-ng-data\", _piperEspeak);").append(EOL);
-        sb.append("_piperDataDirReady = true;").append(EOL);
-        sb.append("}").append(EOL);
-        sb.append("return _piperEspeak.getAbsolutePath();").append(EOL);
-        sb.append("}").append(EOL);
-
-        sb.append(EOL);
-        sb.append("private void _piperCopyAssetDir(String _assetPath, java.io.File _piperDest) throws java.io.IOException {").append(EOL);
-        sb.append("String[] _piperChildren = getAssets().list(_assetPath);").append(EOL);
-        sb.append("if (_piperChildren == null || _piperChildren.length == 0) {").append(EOL);
-        sb.append("java.io.File _piperParent = _piperDest.getParentFile();").append(EOL);
-        sb.append("if (_piperParent != null) { _piperParent.mkdirs(); }").append(EOL);
-        sb.append("java.io.InputStream _piperIn = getAssets().open(_assetPath);").append(EOL);
-        sb.append("try {").append(EOL);
-        sb.append("java.io.FileOutputStream _piperOut = new java.io.FileOutputStream(_piperDest);").append(EOL);
-        sb.append("try {").append(EOL);
-        sb.append("byte[] _piperBuf = new byte[16384];").append(EOL);
-        sb.append("int _piperRead; while ((_piperRead = _piperIn.read(_piperBuf)) > 0) { _piperOut.write(_piperBuf, 0, _piperRead); }").append(EOL);
-        sb.append("} finally { _piperOut.close(); }").append(EOL);
-        sb.append("} finally { _piperIn.close(); }").append(EOL);
-        sb.append("return;").append(EOL);
-        sb.append("}").append(EOL);
-        sb.append("_piperDest.mkdirs();").append(EOL);
-        sb.append("for (String _piperChild : _piperChildren) { _piperCopyAssetDir(_assetPath + \"/\" + _piperChild, new java.io.File(_piperDest, _piperChild)); }").append(EOL);
-        sb.append("}").append(EOL);
-
-        sb.append(EOL);
-        sb.append("private void _piperSpeak(final String _text, final String _rate) {").append(EOL);
-        sb.append("final String _piperText = (_text == null) ? \"\" : _text;").append(EOL);
-        sb.append("if (_piperText.trim().isEmpty()) { return; }").append(EOL);
-        sb.append("float _piperRate = 1.0f;").append(EOL);
-        sb.append("try { _piperRate = Float.parseFloat(_rate); } catch (Throwable _piperRateError) { _piperRate = 1.0f; }").append(EOL);
-        sb.append("if (_piperRate <= 0f) { _piperRate = 1.0f; }").append(EOL);
-        sb.append("if (_piperRate > 2f) { _piperRate = 2f; }").append(EOL);
-        sb.append("final float _piperFinalRate = _piperRate;").append(EOL);
-        sb.append("_ttsRequestAudioFocus();").append(EOL);
-        sb.append("new Thread(new Runnable() {").append(EOL);
-        sb.append("@Override").append(EOL);
-        sb.append("public void run() {").append(EOL);
-        sb.append("try {").append(EOL);
-        sb.append("if (_piperTts == null && !_piperInit()) { _piperFallbackToSystem(_piperText, _rate); return; }").append(EOL);
-        sb.append("long _piperStart = android.os.SystemClock.elapsedRealtime();").append(EOL);
-        sb.append("com.k2fsa.sherpa.onnx.GeneratedAudio _piperAudio = _piperTts.generate(_piperText, 0, _piperFinalRate);").append(EOL);
-        sb.append("float[] _piperSamples = _piperAudio.getSamples();").append(EOL);
-        sb.append("int _piperSampleRate = _piperAudio.getSampleRate();").append(EOL);
-        sb.append("android.util.Log.i(\"AscodeTTS\", \"PIPER synth ms=\" + (android.os.SystemClock.elapsedRealtime() - _piperStart) + \" samples=\" + _piperSamples.length + \" rate=\" + _piperSampleRate);").append(EOL);
-        sb.append("_ttsEmitDiag(\"piperSynth\");").append(EOL);
-        sb.append("_piperPlay(_piperSamples, _piperSampleRate);").append(EOL);
-        sb.append("} catch (Throwable _piperSpeakError) {").append(EOL);
-        sb.append("android.util.Log.e(\"AscodeTTS\", \"PIPER synth error: \" + _piperSpeakError);").append(EOL);
-        sb.append("_piperFailed = true;").append(EOL);
-        sb.append("_piperFallbackToSystem(_piperText, _rate);").append(EOL);
-        sb.append("}").append(EOL);
-        sb.append("}").append(EOL);
-        sb.append("}, \"ascode-piper-tts\").start();").append(EOL);
-        sb.append("}").append(EOL);
-
-        sb.append(EOL);
-        sb.append("private void _piperFallbackToSystem(final String _text, final String _rate) {").append(EOL);
-        sb.append("new Handler(Looper.getMainLooper()).post(new Runnable() {").append(EOL);
-        sb.append("@Override").append(EOL);
-        sb.append("public void run() {").append(EOL);
-        sb.append("_ttsUsePiper = false;").append(EOL);
-        sb.append("_initTts();").append(EOL);
-        sb.append("if (_ttsReady) { _speakTtsNow(_text, _rate); }").append(EOL);
-        sb.append("}").append(EOL);
-        sb.append("})").append(EOL);
-        sb.append(";}").append(EOL);
-
-        sb.append(EOL);
-        sb.append("private void _piperPlay(float[] _piperSamples, int _piperSampleRate) {").append(EOL);
-        sb.append("try {").append(EOL);
-        sb.append("short[] _piperPcm = new short[_piperSamples.length];").append(EOL);
-        sb.append("for (int _piperI = 0; _piperI < _piperSamples.length; _piperI++) {").append(EOL);
-        sb.append("float _piperValue = _piperSamples[_piperI];").append(EOL);
-        sb.append("if (_piperValue > 1f) { _piperValue = 1f; } else if (_piperValue < -1f) { _piperValue = -1f; }").append(EOL);
-        sb.append("_piperPcm[_piperI] = (short) (_piperValue * 32767f);").append(EOL);
-        sb.append("}").append(EOL);
-        sb.append("int _piperBytes = _piperPcm.length * 2;").append(EOL);
-        sb.append("int _piperMinBuf = android.media.AudioTrack.getMinBufferSize(_piperSampleRate, android.media.AudioFormat.CHANNEL_OUT_MONO, android.media.AudioFormat.ENCODING_PCM_16BIT);").append(EOL);
-        sb.append("android.media.AudioTrack _piperNewTrack;").append(EOL);
-        sb.append("if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {").append(EOL);
-        sb.append("_piperNewTrack = new android.media.AudioTrack.Builder()").append(EOL);
-        sb.append(".setAudioAttributes(new android.media.AudioAttributes.Builder()").append(EOL);
-        sb.append(".setUsage(android.media.AudioAttributes.USAGE_MEDIA)").append(EOL);
-        sb.append(".setContentType(android.media.AudioAttributes.CONTENT_TYPE_SPEECH).build())").append(EOL);
-        sb.append(".setAudioFormat(new android.media.AudioFormat.Builder()").append(EOL);
-        sb.append(".setEncoding(android.media.AudioFormat.ENCODING_PCM_16BIT)").append(EOL);
-        sb.append(".setSampleRate(_piperSampleRate)").append(EOL);
-        sb.append(".setChannelMask(android.media.AudioFormat.CHANNEL_OUT_MONO).build())").append(EOL);
-        sb.append(".setBufferSizeInBytes(Math.max(_piperBytes, _piperMinBuf))").append(EOL);
-        sb.append(".setTransferMode(android.media.AudioTrack.MODE_STATIC).build();").append(EOL);
-        sb.append("} else {").append(EOL);
-        sb.append("_piperNewTrack = new android.media.AudioTrack(android.media.AudioManager.STREAM_MUSIC, _piperSampleRate, android.media.AudioFormat.CHANNEL_OUT_MONO, android.media.AudioFormat.ENCODING_PCM_16BIT, Math.max(_piperBytes, _piperMinBuf), android.media.AudioTrack.MODE_STATIC);").append(EOL);
-        sb.append("}").append(EOL);
-        sb.append("_piperStop();").append(EOL);
-        sb.append("_piperTrack = _piperNewTrack;").append(EOL);
-        sb.append("_piperNewTrack.write(_piperPcm, 0, _piperPcm.length);").append(EOL);
-        sb.append("_piperNewTrack.play();").append(EOL);
-        sb.append("android.util.Log.i(\"AscodeTTS\", \"PIPER play session=\" + _piperNewTrack.getAudioSessionId() + \" durMs=\" + (_piperPcm.length * 1000L / Math.max(1, _piperSampleRate)));").append(EOL);
-        sb.append("_ttsEmitDiag(\"piperPlay\");").append(EOL);
-        sb.append("Thread.sleep(_piperPcm.length * 1000L / Math.max(1, _piperSampleRate));").append(EOL);
-        sb.append("} catch (Throwable _piperPlayError) {").append(EOL);
-        sb.append("android.util.Log.e(\"AscodeTTS\", \"PIPER play error: \" + _piperPlayError);").append(EOL);
-        sb.append("}").append(EOL);
-        sb.append("}").append(EOL);
-
-        sb.append(EOL);
-        sb.append("private void _piperStop() {").append(EOL);
-        sb.append("try {").append(EOL);
-        sb.append("if (_piperTrack != null) {").append(EOL);
-        sb.append("try { _piperTrack.stop(); } catch (Throwable _piperStopError) { }").append(EOL);
-        sb.append("try { _piperTrack.release(); } catch (Throwable _piperReleaseError) { }").append(EOL);
-        sb.append("}").append(EOL);
-        sb.append("} catch (Throwable ignored) { }").append(EOL);
-        sb.append("_piperTrack = null;").append(EOL);
-        sb.append("}").append(EOL);
-        sb.append(EOL);
     }
 
     /**

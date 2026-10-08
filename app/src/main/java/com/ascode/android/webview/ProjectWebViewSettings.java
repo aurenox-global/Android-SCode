@@ -118,21 +118,6 @@ public final class ProjectWebViewSettings {
         return bool(ProjectSettings.SETTING_WEBVIEW_TTS_DIAGNOSTICS, false);
     }
 
-    /**
-     * Whether the generated TTS helper should synthesize with the bundled offline Piper voice
-     * (sherpa-onnx + AudioTrack) instead of the device's {@code TextToSpeech} engine. Default:
-     * {@code false}, which keeps the exact behaviour of apps generated before this setting
-     * existed. When enabled but the voice is missing at runtime, the generated code falls back to
-     * the system engine.
-     */
-    public boolean isTtsPiperEnabled() {
-        // The built-in offline Piper engine was retired at the owner's request: the WebView settings
-        // screen no longer offers it and no project may activate it, so compiled apps go back to
-        // the plain "as in the browser" behaviour (AndroidBridge + window.speechSynthesis shim).
-        // The implementation is kept dormant in case it is ever wanted again.
-        return false;
-    }
-
     public int getTextZoom() {
         int zoom = integer(ProjectSettings.SETTING_WEBVIEW_TEXT_ZOOM, DEFAULT_TEXT_ZOOM);
         return zoom <= 0 ? DEFAULT_TEXT_ZOOM : zoom;

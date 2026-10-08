@@ -677,6 +677,171 @@ public class WebViewTtsMigrationTest {
         StaticJavaParser.parse(migrated);
     }
 
+    // ---------------------------------------------------------------------------------------
+    // Migration trigger: the exact shape decompiled from the user's real APK (two qualified
+    // setWebChromeClient, three addJavascriptInterface("_BlobDownloader"), two setDownloadListener,
+    // one setWebViewClient). needsWebViewSourceMigration() must return true so the build collapses
+    // the duplicates instead of leaving the empty-onProgressChanged chrome client shadowing the shim.
+    // ---------------------------------------------------------------------------------------
+
+    @Test
+    public void duplicateBootstrapForcesWebViewSourceMigrationTrigger() {
+        String duplicated = realDecompiledDuplicatedBootstrapSource();
+        assertTrue("the qualified duplicates must be detected",
+                Jx.hasDuplicateWebViewBootstrapCalls(duplicated));
+        assertTrue("with the TTS bridge enabled the duplicated source must force a migration",
+                yq.needsWebViewSourceMigration(duplicated, true, false));
+        assertTrue("duplicates force a migration regardless of the TTS switch",
+                yq.needsWebViewSourceMigration(duplicated, false, false));
+        assertTrue("with the diagnostics switch on the trigger still fires",
+                yq.needsWebViewSourceMigration(duplicated, true, true));
+
+        // A clean, single bootstrap does not trip the duplicate trigger.
+        String clean = "webview1.setWebChromeClient(new WebChromeClient() {\n});\n"
+                + BLOB_IFACE + BRIDGE_IFACE + SAFE_DOWNLOAD;
+        assertFalse(Jx.hasDuplicateWebViewBootstrapCalls(clean));
+    }
+
+    @Test
+    public void realDecompiledFullMigrationCollapsesAndHooksBothSurvivingClients() {
+        String duplicated = realDecompiledDuplicatedBootstrapSource();
+        String migrated = Jx.migrateWebViewBootstrapTts(duplicated, "\n", false);
+
+        assertEquals("exactly one setWebChromeClient", 1,
+                countOccurrences(migrated, "setWebChromeClient("));
+        assertEquals("exactly one setDownloadListener", 1,
+                countOccurrences(migrated, "setDownloadListener("));
+        assertEquals("one _BlobDownloader registration", 1,
+                countOccurrences(migrated, "\"_BlobDownloader\""));
+        assertEquals("one AndroidBridge registration", 1,
+                countOccurrences(migrated, "\"AndroidBridge\""));
+        assertEquals("exactly one onProgressChanged", 1,
+                countOccurrences(migrated, "onProgressChanged("));
+
+        // The surviving chrome client is the one that installs the shim (not the empty duplicate).
+        assertTrue("the shim-carrying WebChromeClient must win",
+                migrated.contains("_injectTtsShim(webView)"));
+        // The surviving WebViewClient hooks the shim from onPageFinished.
+        assertTrue("onPageFinished must exist on the surviving WebViewClient",
+                migrated.contains("public void onPageFinished(WebView _webView, String _url)"));
+        assertTrue("onPageFinished must call the shim",
+                migrated.contains("_injectTtsShim(_webView)"));
+        // The user WebViewClient is preserved and file-chooser support survives.
+        assertEquals("the user WebViewClient is preserved", 1,
+                countOccurrences(migrated, "setWebViewClient("));
+        assertTrue("file chooser support survives", migrated.contains("onShowFileChooser("));
+        assertFalse("no duplicates left", Jx.hasDuplicateWebViewBootstrapCalls(migrated));
+
+        // Idempotent. Migrating twice is byte-identical.
+        assertEquals("migrating twice must be byte-identical",
+                migrated, Jx.migrateWebViewBootstrapTts(migrated, "\n", false));
+    }
+
+    /**
+     * Full, compilable-shape activity mirroring the user's real decompiled APK: the exact
+     * {@code initialize()} bootstrap with qualified type names, plus the current helper methods so
+     * the migrated result can be compiled with {@code javac} against {@code android.jar}.
+     */
+    private String realDecompiledCompilableActivity() {
+        StringBuilder helpers = new StringBuilder();
+        Jx.appendWebViewTtsHelpers(helpers, "\n");
+        Jx.appendWebViewDownloadHelpers(helpers, "\n");
+        StringBuilder imports = new StringBuilder();
+        imports.append("import android.speech.tts.TextToSpeech;\n");
+        for (String imp : Jx.WEBVIEW_DOWNLOAD_HELPER_REQUIRED_IMPORTS) {
+            imports.append("import ").append(imp).append(";\n");
+        }
+        return "package com.escuelita;\n"
+                + "import android.app.Activity;\n"
+                + "import android.webkit.*;\n"
+                + "import android.media.*;\n"
+                + "import android.os.*;\n"
+                + "import java.util.*;\n"
+                + imports
+                + "public class MainActivity extends Activity {\n"
+                + "static class Binding { android.webkit.WebView webview1; }\n"
+                + "Binding binding = new Binding();\n"
+                + helpers
+                + "private void initialize(android.os.Bundle bundle) {\n"
+                + REAL_CHROME_WITH_SHIM
+                + REAL_BLOB_IFACE
+                + REAL_BRIDGE_IFACE
+                + REAL_SAFE_DOWNLOAD
+                + REAL_BLOB_IFACE
+                + REAL_CHROME_EMPTY
+                + REAL_SAFE_DOWNLOAD
+                + REAL_BLOB_IFACE
+                + REAL_EMPTY_WEBVIEW_CLIENT
+                + "}\n"
+                + "private boolean _openWebFileChooser(android.webkit.ValueCallback _cb, android.webkit.WebChromeClient.FileChooserParams _p) { return false; }\n"
+                + "}\n"
+                + "class AscodeUtil {"
+                + " static void a(android.content.Context _c, String _m) {}"
+                + " static void showMessage(android.content.Context _c, String _m) {}"
+                + " }\n";
+    }
+
+    @Test
+    public void dumpBootstrapEvidenceTEMP() throws Exception {
+        String duplicated = realDecompiledDuplicatedBootstrapSource();
+        String migrated = Jx.migrateWebViewBootstrapTts(duplicated, "\n", false);
+        String twice = Jx.migrateWebViewBootstrapTts(migrated, "\n", false);
+        StringBuilder sb = new StringBuilder();
+        sb.append("[BEFORE] hasDuplicate=").append(Jx.hasDuplicateWebViewBootstrapCalls(duplicated));
+        sb.append(" needsMigration(tts=true)=").append(yq.needsWebViewSourceMigration(duplicated, true, false));
+        sb.append(" needsMigration(tts=false)=").append(yq.needsWebViewSourceMigration(duplicated, false, false)).append("\n");
+        sb.append("[BEFORE] chrome=").append(countOccurrences(duplicated, "setWebChromeClient("));
+        sb.append(" download=").append(countOccurrences(duplicated, "setDownloadListener("));
+        sb.append(" blob=").append(countOccurrences(duplicated, "\"_BlobDownloader\""));
+        sb.append(" bridge=").append(countOccurrences(duplicated, "\"AndroidBridge\""));
+        sb.append(" webviewClient=").append(countOccurrences(duplicated, "setWebViewClient("));
+        sb.append(" onProgress=").append(countOccurrences(duplicated, "onProgressChanged(")).append("\n");
+        sb.append("[AFTER ] chrome=").append(countOccurrences(migrated, "setWebChromeClient("));
+        sb.append(" download=").append(countOccurrences(migrated, "setDownloadListener("));
+        sb.append(" blob=").append(countOccurrences(migrated, "\"_BlobDownloader\""));
+        sb.append(" bridge=").append(countOccurrences(migrated, "\"AndroidBridge\""));
+        sb.append(" webviewClient=").append(countOccurrences(migrated, "setWebViewClient("));
+        sb.append(" onProgress=").append(countOccurrences(migrated, "onProgressChanged(")).append("\n");
+        sb.append("[AFTER ] hasDuplicate=").append(Jx.hasDuplicateWebViewBootstrapCalls(migrated)).append("\n");
+        sb.append("[AFTER ] chrome carries shim=").append(migrated.contains("_injectTtsShim(webView)")).append("\n");
+        sb.append("[AFTER ] onPageFinished has shim=").append(migrated.contains("_injectTtsShim(_webView)")).append("\n");
+        sb.append("[AFTER ] idempotent(second pass identical)=").append(migrated.equals(twice)).append("\n");
+        Files.write(new File("build/webview-bootstrap-evidence.txt").toPath(),
+                sb.toString().getBytes(StandardCharsets.UTF_8));
+    }
+
+    @Test
+    public void realDecompiledMigratedActivityCompilesAgainstAndroidJar() throws Exception {
+        javax.tools.JavaCompiler compiler = javax.tools.ToolProvider.getSystemJavaCompiler();
+        org.junit.Assume.assumeTrue("a JDK with javac is required", compiler != null);
+
+        File androidJar = extractBundledAndroidJar();
+        org.junit.Assume.assumeTrue("bundled android.jar.zip is required", androidJar != null);
+
+        String source = realDecompiledCompilableActivity();
+        assertTrue("the real shape must be flagged as duplicated",
+                Jx.hasDuplicateWebViewBootstrapCalls(source));
+
+        String migrated = Jx.migrateWebViewBootstrapTts(source, "\n", false);
+        StaticJavaParser.parse(migrated);
+
+        File srcDir = new File("build/tts-real-javac/src/com/escuelita");
+        assertTrue(srcDir.mkdirs() || srcDir.isDirectory());
+        File javaFile = new File(srcDir, "MainActivity.java");
+        Files.write(javaFile.toPath(), migrated.getBytes(StandardCharsets.UTF_8));
+
+        File classesDir = new File("build/tts-real-javac/classes");
+        assertTrue(classesDir.mkdirs() || classesDir.isDirectory());
+        java.io.ByteArrayOutputStream diagnostics = new java.io.ByteArrayOutputStream();
+        int result = compiler.run(null, null, diagnostics,
+                "-classpath", androidJar.getAbsolutePath(),
+                "-d", classesDir.getAbsolutePath(),
+                "-proc:none",
+                javaFile.getAbsolutePath());
+        assertEquals("the migrated real-shaped source must compile:\n"
+                + diagnostics.toString(StandardCharsets.UTF_8), 0, result);
+    }
+
     /**
      * Emits the migrated duplicated activity (with the current helpers) and compiles it with
      * {@code javac} against {@code android.jar} extracted from the bundled asset, so the migration

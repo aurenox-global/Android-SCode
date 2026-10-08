@@ -1407,11 +1407,13 @@ public class yq {
         return fallbackPath.isEmpty() ? defaultPath : fallbackPath;
     }
 
-    private boolean hasLegacyWebViewInlineDownloadRequest(String javaCode) {
+    private static boolean hasLegacyWebViewInlineDownloadRequest(String javaCode) {
         return Jx.hasUnsafeWebViewDownloadListener(javaCode);
     }
 
-    private boolean needsWebViewSourceMigration(String javaCode, boolean ttsBridgeEnabled,
+    // Package-private static (no instance state): directly unit-testable so the migration trigger
+    // for duplicated WebView bootstrap calls is covered without booting the whole IDE.
+    static boolean needsWebViewSourceMigration(String javaCode, boolean ttsBridgeEnabled,
                                                 boolean ttsDiagnosticsEnabled) {
         if (javaCode.isEmpty()) {
             return false;
@@ -1439,6 +1441,16 @@ public class yq {
         // interface. Force a migration so compiled apps keep talking inside their WebViews.
         // When the project disabled the TTS bridge this reason no longer applies.
         if (ttsBridgeEnabled && !javaCode.contains("\"AndroidBridge\"") && !javaCode.contains("AndroidBridge")) {
+            return true;
+        }
+
+        // Projects built by earlier, non-idempotent migrations may carry duplicated WebView
+        // bootstrap calls (two setWebChromeClient, several setDownloadListener, repeated
+        // addJavascriptInterface...). The last duplicate wins, and when it is the one with an empty
+        // onProgressChanged it silently disables the TTS shim/overlay injection. Force a migration
+        // so the build collapses them and re-hooks the injection, even if the helper itself is
+        // already current.
+        if (Jx.hasDuplicateWebViewBootstrapCalls(javaCode)) {
             return true;
         }
 

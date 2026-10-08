@@ -67,23 +67,21 @@ public class WebViewTtsMigrationTest {
         String migrated = Jx.replaceLegacyWebViewTtsHelper(legacy, "\n");
         assertNotNull("migration must locate the legacy helper block", migrated);
 
-        // Required audio routing from the v2 helper.
-        assertTrue(migrated.contains("setAudioAttributes"));
-        assertTrue(migrated.contains("USAGE_MEDIA"));
-        assertTrue(migrated.contains("CONTENT_TYPE_SPEECH"));
-        assertTrue(migrated.contains("STREAM_MUSIC"));
-        assertTrue(migrated.contains("KEY_PARAM_VOLUME"));
-        assertTrue(migrated.contains("requestAudioFocus"));
+        // v6: the system engine path is back to the v1.0.40 behaviour (no audio-routing extras),
+        // which is the one confirmed to sound on real devices.
+        assertFalse("no setAudioAttributes in the system path", migrated.contains("setAudioAttributes"));
+        assertFalse("no KEY_PARAM_STREAM", migrated.contains("KEY_PARAM_STREAM"));
+        assertFalse("no KEY_PARAM_VOLUME", migrated.contains("KEY_PARAM_VOLUME"));
+        assertTrue("speak uses a null params bundle like v1.0.40",
+                migrated.contains("TextToSpeech.QUEUE_FLUSH, null, _utteranceId"));
 
         // Version markers are present.
         assertTrue(migrated.contains(Jx.WEBVIEW_TTS_HELPER_BEGIN_MARKER));
         assertTrue(migrated.contains(Jx.WEBVIEW_TTS_HELPER_END_MARKER));
 
-        // The new shim (installs speechSynthesis only when the native voices are unusable).
-        assertTrue(migrated.contains("getVoices"));
+        // The shim is installed only when the native speechSynthesis is missing (v1.0.40 guard).
         assertTrue(migrated.contains("_shimNeeded"));
-        // The old shim installed only when speechSynthesis was undefined: it must be gone.
-        assertFalse(migrated.contains("window.speechSynthesis==='undefined'"));
+        assertTrue(migrated.contains("(typeof window.speechSynthesis==='undefined')"));
 
         // After migration the file is detected as current and no longer as legacy.
         assertTrue(Jx.hasCurrentWebViewTtsHelper(migrated));
@@ -174,7 +172,7 @@ public class WebViewTtsMigrationTest {
         assertFalse(Jx.hasLegacyWebViewTtsHelper(current));
         // A current helper starts with the version marker (after the leading EOL).
         assertTrue(current.trim().startsWith(Jx.WEBVIEW_TTS_HELPER_BEGIN_MARKER));
-        assertEquals(5, Jx.WEBVIEW_TTS_HELPER_VERSION);
+        assertEquals(6, Jx.WEBVIEW_TTS_HELPER_VERSION);
     }
 
     @Test

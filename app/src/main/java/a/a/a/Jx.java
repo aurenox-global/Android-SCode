@@ -50,8 +50,14 @@ public class Jx {
      * &quot;Probar voz&quot; button that drives the engine directly (see
      * {@link #appendWebViewTtsDiagnosticsOverlay(StringBuilder, String)}). With the switch off the
      * emitted helper keeps the exact previous behaviour.</p>
+     * <p>Version 6 restores the <em>system</em> engine path to the v1.0.40 behaviour, the one
+     * confirmed to sound on real devices: {@code speak(text, QUEUE_FLUSH, null, id)} with no
+     * {@code Bundle}/{@code KEY_PARAM_STREAM}/{@code KEY_PARAM_VOLUME}, no
+     * {@code setAudioAttributes} and no {@code requestAudioFocus}, and the
+     * {@code window.speechSynthesis} shim guarded only by
+     * {@code typeof window.speechSynthesis === 'undefined'}.</p>
      */
-    public static final int WEBVIEW_TTS_HELPER_VERSION = 5;
+    public static final int WEBVIEW_TTS_HELPER_VERSION = 6;
 
     /** Opening marker comment wrapping the versioned WebView TTS helper block. */
     public static final String WEBVIEW_TTS_HELPER_BEGIN_MARKER =
@@ -2299,15 +2305,6 @@ public class Jx {
         sb.append("android.util.Log.i(\"AscodeTTS\", \"TTS onStop id=\" + _utteranceId + \" interrupted=\" + _interrupted);").append(EOL);
         sb.append("}").append(EOL);
         sb.append("});").append(EOL);
-        sb.append("try {").append(EOL);
-        sb.append("_tts.setAudioAttributes(new android.media.AudioAttributes.Builder()").append(EOL);
-        sb.append(".setUsage(android.media.AudioAttributes.USAGE_MEDIA)").append(EOL);
-        sb.append(".setContentType(android.media.AudioAttributes.CONTENT_TYPE_SPEECH)").append(EOL);
-        sb.append(".build());").append(EOL);
-        sb.append("android.util.Log.i(\"AscodeTTS\", \"TTS setAudioAttributes USAGE_MEDIA/CONTENT_TYPE_SPEECH OK\");").append(EOL);
-        sb.append("} catch (Throwable _ttsAudioAttrsError) {").append(EOL);
-        sb.append("android.util.Log.e(\"AscodeTTS\", \"TTS setAudioAttributes error: \" + _ttsAudioAttrsError);").append(EOL);
-        sb.append("}").append(EOL);
         sb.append("Locale _ttsLocale = ").append(localeCode).append(";").append(EOL);
         sb.append("int _langResult;").append(EOL);
         sb.append("if (_languageSupported) {").append(EOL);
@@ -2377,12 +2374,7 @@ public class Jx {
         sb.append("String _utteranceId = \"ascode_tts_\" + (++_ttsUtteranceSeq);").append(EOL);
         sb.append("try {").append(EOL);
         sb.append("_tts.setSpeechRate(_speechRate);").append(EOL);
-        sb.append("android.os.Bundle _ttsParams = new android.os.Bundle();").append(EOL);
-        sb.append("_ttsParams.putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, android.media.AudioManager.STREAM_MUSIC);").append(EOL);
-        sb.append("_ttsParams.putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, 1.0f);").append(EOL);
-        sb.append("_ttsParams.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, _utteranceId);").append(EOL);
-        sb.append("_ttsRequestAudioFocus();").append(EOL);
-        sb.append("int _ttsQueued = _tts.speak(_speakText, TextToSpeech.QUEUE_FLUSH, _ttsParams, _utteranceId);").append(EOL);
+        sb.append("int _ttsQueued = _tts.speak(_speakText, TextToSpeech.QUEUE_FLUSH, null, _utteranceId);").append(EOL);
         sb.append("_ttsLastQueued = _ttsQueued;").append(EOL);
         sb.append("android.util.Log.i(\"AscodeTTS\", \"TTS speak id=\" + _utteranceId + \" rate=\" + _speechRate + \" queued=\" + _ttsQueued + \" len=\" + _speakText.length());").append(EOL);
         sb.append("_ttsEmitDiag(\"speak\");").append(EOL);
@@ -2520,8 +2512,7 @@ public class Jx {
         sb.append("+ \"window.__ascodeTtsShim=true;\"").append(EOL);
         sb.append("+ \"function _Utterance(t){this.text=(t===undefined||t===null)?'':String(t);this.lang='").append(lang).append("';this.rate=").append(rate).append(";this.pitch=1;this.volume=1;this.voice=null;this.onstart=null;this.onend=null;this.onerror=null;}\"").append(EOL);
         sb.append("+ \"if(typeof window.SpeechSynthesisUtterance==='undefined'){window.SpeechSynthesisUtterance=_Utterance;}\"").append(EOL);
-        sb.append("+ \"var _native=window.speechSynthesis;var _shimNeeded=true;\"").append(EOL);
-        sb.append("+ \"try{if(_native&&typeof _native.speak==='function'&&typeof _native.getVoices==='function'){var _nv=_native.getVoices();if(_nv&&_nv.length>0){_shimNeeded=false;}}}catch(e){_shimNeeded=true;}\"").append(EOL);
+        sb.append("+ \"var _shimNeeded=(typeof window.speechSynthesis==='undefined');\"").append(EOL);
         sb.append("+ \"if(_shimNeeded){\"").append(EOL);
         sb.append("+ \"var _s={speaking:false,paused:false,onvoiceschanged:null,voices:[{name:'AndroidBridge TTS',lang:'").append(lang).append("',default:true,localService:true,voiceURI:'AndroidBridge'}],\"").append(EOL);
         sb.append("+ \"getVoices:function(){return this.voices;},\"").append(EOL);
@@ -2687,14 +2678,12 @@ public class Jx {
 
     /**
      * @return {@code true} when {@code javaCode} already contains the current version of the
-     * WebView TTS helper: its version marker plus the {@code setAudioAttributes} audio-routing
-     * support and the language-aware engine selection / JS diagnostics introduced in
-     * {@link #WEBVIEW_TTS_HELPER_VERSION} 4.
+     * WebView TTS helper: it carries the version marker of the current
+     * {@link #WEBVIEW_TTS_HELPER_VERSION}.
      */
     public static boolean hasCurrentWebViewTtsHelper(String javaCode) {
         return javaCode != null
-                && javaCode.contains(WEBVIEW_TTS_HELPER_BEGIN_MARKER)
-                && javaCode.contains("setAudioAttributes");
+                && javaCode.contains(WEBVIEW_TTS_HELPER_BEGIN_MARKER);
     }
 
     /**

@@ -1519,10 +1519,39 @@ public class yq {
         if (FileUtil.isExistFile(path)) {
             String content = FileUtil.readFile(path);
             if (content != null && !content.trim().isEmpty()) {
-                return content;
+                return ensureTtsVisibility(content);
             }
         }
         return null;
+    }
+
+    /**
+     * Android 11+ (API 30+) package visibility: a user-customized AndroidManifest.xml (saved from
+     * the Code Viewer) replaces the generated one, and the generated one is where the TTS_SERVICE
+     * {@code <queries>} declaration is written ({@code Ix}). Without that declaration
+     * {@code TextToSpeech.getEngines()} returns an empty list and {@code onInit} can fail with
+     * ERROR, so compiled apps (Sketchware TTS component or the WebView {@code AndroidBridge}) stay
+     * mute on Android 11+. This makes sure the declaration is present in custom manifests too,
+     * leaving every other line untouched and staying idempotent across builds.
+     */
+    static String ensureTtsVisibility(String manifest) {
+        if (manifest == null || manifest.contains("android.intent.action.TTS_SERVICE")) {
+            return manifest;
+        }
+        String block = "    <queries>\n"
+                + "        <intent>\n"
+                + "            <action android:name=\"android.intent.action.TTS_SERVICE\" />\n"
+                + "        </intent>\n"
+                + "    </queries>\n";
+        int appIndex = manifest.indexOf("<application");
+        if (appIndex >= 0) {
+            return manifest.substring(0, appIndex) + block + manifest.substring(appIndex);
+        }
+        int endIndex = manifest.lastIndexOf("</manifest>");
+        if (endIndex >= 0) {
+            return manifest.substring(0, endIndex) + block + manifest.substring(endIndex);
+        }
+        return manifest;
     }
 
     /**

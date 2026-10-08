@@ -225,6 +225,10 @@ public class ProjectBuilder {
      */
     public void compileResources() throws Exception {
         timestampResourceCompilationStarted = System.currentTimeMillis();
+        /* Offline Piper TTS (etapa 1): when the project enabled it and a voice is installed, stage
+         * the voice assets, the sherpa-onnx .so per ABI and the runtime classes/dex before AAPT2
+         * links assets. No-op otherwise, so untouched projects build exactly as before. */
+        com.ascode.android.piper.PiperTtsPackaging.prepareIfEnabled(this);
         ResourceCompiler compiler = new ResourceCompiler(
                 this,
                 aapt2Binary,

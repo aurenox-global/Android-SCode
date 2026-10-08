@@ -290,6 +290,66 @@ public class WebViewTtsMigrationTest {
         assertTrue(diagOut.isFile());
     }
 
+    @Test
+    public void piperRouteIsOptInAndBakesItsMarker() {
+        StringBuilder off = new StringBuilder();
+        Jx.appendWebViewTtsHelpers(off, "\n");
+        String systemOnly = off.toString();
+        // Off by default: no marker, no sherpa reference at all (keeps the system-only output).
+        assertFalse(systemOnly.contains(Jx.WEBVIEW_TTS_PIPER_MARKER_PREFIX));
+        assertFalse(systemOnly.contains("com.k2fsa.sherpa.onnx"));
+        assertTrue(Jx.hasWebViewTtsPiperSetting(systemOnly, false));
+        assertFalse(Jx.hasWebViewTtsPiperSetting(systemOnly, true));
+
+        StringBuilder on = new StringBuilder();
+        Jx.appendWebViewTtsHelpers(on, "\n", "0.95", "es-ES", false, true);
+        String piper = on.toString();
+        assertTrue(piper.contains(Jx.WEBVIEW_TTS_PIPER_MARKER_PREFIX + "true"));
+        assertTrue(Jx.hasWebViewTtsPiperSetting(piper, true));
+        assertFalse(Jx.hasWebViewTtsPiperSetting(piper, false));
+        assertTrue(Jx.hasCurrentWebViewTtsHelper(piper));
+
+        // sherpa-onnx synthesis + AudioTrack playback + offline assets + system fallback.
+        assertTrue(piper.contains("com.k2fsa.sherpa.onnx.OfflineTts"));
+        assertTrue(piper.contains("com.k2fsa.sherpa.onnx.OfflineTtsVitsModelConfig"));
+        assertTrue(piper.contains("piper/model.onnx"));
+        assertTrue(piper.contains("piper/tokens.txt"));
+        assertTrue(piper.contains("piper/espeak-ng-data"));
+        assertTrue(piper.contains("android.media.AudioTrack"));
+        assertTrue(piper.contains("_piperFallbackToSystem"));
+        assertTrue(piper.contains("_piperInit"));
+        assertTrue(piper.contains("_piperSpeak"));
+
+        // The JavaScript-facing API is unchanged: same bridge class, methods and shim.
+        assertTrue(piper.contains("private class _TtsBridge"));
+        assertTrue(piper.contains("window.AndroidBridge"));
+        assertTrue(piper.contains("public void speak(final String _text, final String _rate)"));
+        assertTrue(piper.contains("window.speechSynthesis"));
+        assertTrue(piper.contains("TextToSpeech _tts;"));
+    }
+
+    @Test
+    public void emitsPiperActivityForBytecodeCheck() throws Exception {
+        StringBuilder sb = new StringBuilder();
+        Jx.appendWebViewTtsHelpers(sb, "\n", "0.95", "es-ES", false, true);
+        String activity = "package com.ascode.check;\n"
+                + "import android.app.Activity;\n"
+                + "import android.webkit.*;\n"
+                + "import android.os.*;\n"
+                + "import android.media.*;\n"
+                + "import android.speech.tts.TextToSpeech;\n"
+                + "import java.util.*;\n"
+                + "public class PiperActivity extends Activity {\n"
+                + "private WebView webview1;\n"
+                + sb
+                + "}\n";
+        StaticJavaParser.parse(activity);
+        File out = new File("build/tts-generated-check-piper/com/ascode/check/PiperActivity.java");
+        assertTrue(out.getParentFile().mkdirs() || out.getParentFile().isDirectory());
+        Files.write(out.toPath(), activity.getBytes(StandardCharsets.UTF_8));
+        assertTrue(out.isFile());
+    }
+
     private int countOccurrences(String haystack, String needle) {
         int count = 0;
         int idx = 0;

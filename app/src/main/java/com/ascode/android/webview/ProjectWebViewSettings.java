@@ -118,6 +118,17 @@ public final class ProjectWebViewSettings {
         return bool(ProjectSettings.SETTING_WEBVIEW_TTS_DIAGNOSTICS, false);
     }
 
+    /**
+     * Whether the generated TTS helper should synthesize with the bundled offline Piper voice
+     * (sherpa-onnx + AudioTrack) instead of the device's {@code TextToSpeech} engine. Default:
+     * {@code false}, which keeps the exact behaviour of apps generated before this setting
+     * existed. When enabled but the voice is missing at runtime, the generated code falls back to
+     * the system engine.
+     */
+    public boolean isTtsPiperEnabled() {
+        return bool(ProjectSettings.SETTING_WEBVIEW_TTS_ENGINE_PIPER, false);
+    }
+
     public int getTextZoom() {
         int zoom = integer(ProjectSettings.SETTING_WEBVIEW_TEXT_ZOOM, DEFAULT_TEXT_ZOOM);
         return zoom <= 0 ? DEFAULT_TEXT_ZOOM : zoom;

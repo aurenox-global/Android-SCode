@@ -104,6 +104,13 @@ public class ProjectSettings {
      * never touched this value keep the previous behaviour (no toasts, no extra noise).
      */
     public static final String SETTING_WEBVIEW_TTS_DIAGNOSTICS = "webview_tts_diagnostics";
+    /**
+     * Whether the generated TTS helper synthesizes with the bundled offline Piper voice
+     * (sherpa-onnx) instead of the device's {@code android.speech.tts.TextToSpeech} engine.
+     * Default: false (system engine), so projects that never touched this value keep the previous
+     * behaviour. Requires a voice installed under {@code .AndroidSCode/data/<sc_id>/tts/}.
+     */
+    public static final String SETTING_WEBVIEW_TTS_ENGINE_PIPER = "webview_tts_engine_piper";
     /** Text zoom percentage. Default: 100 (not emitted, matches the platform default). */
     public static final String SETTING_WEBVIEW_TEXT_ZOOM = "webview_text_zoom";
     /** Desktop mode (forces a desktop user agent). Default: false. */

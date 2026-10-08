@@ -35,7 +35,6 @@ firmado**, todo sin salir del teléfono.
 
 ## Características
 
-- **El TTS del WebView vuelve a sonar, y voz interna opcional (v1.0.42)** — el motor del sistema recupera el comportamiento de la **v1.0.40** (el que funcionaba): `speak()` sin parámetros extra, sin atributos de audio ni foco añadidos, y el shim original de `window.speechSynthesis`. Nuevo **motor de voz interno opcional (Piper, offline)**: descarga o importa una voz (Español/Inglés, `es_MX` por defecto) y la app habla aunque el móvil no tenga voces; apagado por defecto. Se mantienen el diagnóstico TTS (apagado por defecto), el visor de código que guarda de verdad el `AndroidManifest.xml` y las mejoras de diseño/pantallas.
 - **TTS en las apps compiladas (v1.0.40)** — un puente de `WebView` (`AndroidBridge` con `speak`/`stop`) más un shim de `window.speechSynthesis` hacen que cualquier app compilada con WebView pueda hablar igual que en el navegador, con visibilidad de motores TTS en Android 11+ y motor de reserva si falla el predeterminado; además, **ajustes de WebView** por proyecto, **copiar diseño y lógica entre pantallas** con el pincel del editor, **chat de IA** localizado (EN/ES/PT), botón **Compilar** en el inicio, modo claro arreglado y ajustes de compilación (D8/Java 8) que ahora se guardan al instante.
 - **Inicio rediseñado** — tarjeta "Continuar donde lo dejaste", accesos rápidos (nuevo, importar, templates) y tarjetas de proyecto más limpias, con paleta neutra y verde.
 - **Multi-idioma** — inglés, español y portugués de Brasil, con selector en **Ajustes → Idioma**.

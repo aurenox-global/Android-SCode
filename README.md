@@ -35,7 +35,6 @@ your phone.
 
 ## Features
 
-- **WebView TTS is audible again, plus an optional offline voice (v1.0.42)** — the system engine goes back to the **v1.0.40** behaviour (the one that worked on real devices): `speak()` with a null params bundle, no extra audio attributes/focus, and the original `window.speechSynthesis` shim guard. New **optional built-in offline voice (Piper)**: download or import a voice (Spanish/English, `es_MX` by default) and the built app speaks even when the phone has no TTS voices; off by default. The TTS diagnostics (off by default), the code viewer that really saves `AndroidManifest.xml` and the screen/design improvements stay in.
 - **TTS in built apps (v1.0.40)** — a `WebView` bridge (`AndroidBridge` with `speak`/`stop`) plus a `window.speechSynthesis` shim makes any compiled app with a WebView speak, just like in the browser, with TTS engine visibility on Android 11+ and a fallback engine when the default one fails; also per-project **WebView settings**, **copy design & logic between screens** with the editor's brush tool, a localised **AI chat** (EN/ES/PT), a **Build** button on the home hero, a fixed light mode, and build settings (D8/Java 8) saved instantly.
 - **Redesigned home** — a "continue where you left off" card, quick actions (new, import, templates) and clean project cards, on a neutral + green palette.
 - **Multi-language** — English, Spanish and Brazilian Portuguese, switchable from **Settings → Language**.

@@ -44,8 +44,14 @@ public class Jx {
      * in place on the next build (see {@link #hasCurrentWebViewTtsHelper(String)}).
      * <p>Version 4 adds the optional per-event diagnostic Toast (see
      * {@link #WEBVIEW_TTS_DIAG_MARKER_PREFIX}).</p>
+     * <p>Version 5 adds the on-screen diagnostics overlay injected by the IDE when the project
+     * enabled the diagnostics switch: bridge/shim state, {@code speak()}/{@code stop()} call
+     * counters exposed through {@code getDiagnostics()}, captured page JavaScript errors and a
+     * &quot;Probar voz&quot; button that drives the engine directly (see
+     * {@link #appendWebViewTtsDiagnosticsOverlay(StringBuilder, String)}). With the switch off the
+     * emitted helper keeps the exact previous behaviour.</p>
      */
-    public static final int WEBVIEW_TTS_HELPER_VERSION = 4;
+    public static final int WEBVIEW_TTS_HELPER_VERSION = 5;
 
     /** Opening marker comment wrapping the versioned WebView TTS helper block. */
     public static final String WEBVIEW_TTS_HELPER_BEGIN_MARKER =
@@ -1310,6 +1316,9 @@ public class Jx {
                 chromeClient.append("public void onProgressChanged(WebView _webView, int _newProgress) {").append(EOL);
                 chromeClient.append("if (_newProgress >= 100) {").append(EOL);
                 chromeClient.append("_injectTtsShim(_webView);").append(EOL);
+                if (webViewSettings.isTtsDiagnosticsEnabled()) {
+                    chromeClient.append("_injectTtsDiagnosticsOverlay(_webView);").append(EOL);
+                }
                 chromeClient.append("}").append(EOL);
                 chromeClient.append("}").append(EOL);
             }
@@ -2022,6 +2031,10 @@ public class Jx {
         sb.append("private String _ttsLastEvent = \"init\";").append(EOL);
         sb.append("private int _ttsLastQueued = Integer.MIN_VALUE;").append(EOL);
         sb.append("private boolean _ttsNoVoiceWarned = false;").append(EOL);
+        sb.append("private int _ttsBridgeSpeakCalls = 0;").append(EOL);
+        sb.append("private int _ttsBridgeStopCalls = 0;").append(EOL);
+        sb.append("private String _ttsBridgeLastText = \"\";").append(EOL);
+        sb.append("private String _ttsBridgeLastRate = \"\";").append(EOL);
         sb.append("private boolean _ttsShowDiagToasts = ").append(diagLiteral).append("; ").append(WEBVIEW_TTS_DIAG_MARKER_PREFIX).append(diagLiteral).append(EOL);
         if (usePiper) {
             sb.append("private boolean _ttsUsePiper = true; ").append(WEBVIEW_TTS_PIPER_MARKER_PREFIX).append("true").append(EOL);
@@ -2428,6 +2441,10 @@ public class Jx {
         sb.append("_d.append(\", last=\").append(_ttsLastEvent);").append(EOL);
         sb.append("_d.append(\", queued=\").append(_ttsLastQueued);").append(EOL);
         sb.append("_d.append(\", noVoiceWarned=\").append(_ttsNoVoiceWarned);").append(EOL);
+        sb.append("_d.append(\", speakCalls=\").append(_ttsBridgeSpeakCalls);").append(EOL);
+        sb.append("_d.append(\", stopCalls=\").append(_ttsBridgeStopCalls);").append(EOL);
+        sb.append("_d.append(\", lastRate=\").append(_ttsBridgeLastRate);").append(EOL);
+        sb.append("_d.append(\", lastText=\").append(_ttsBridgeLastText);").append(EOL);
         sb.append("return _d.toString();").append(EOL);
         sb.append("}").append(EOL);
 
@@ -2520,6 +2537,9 @@ public class Jx {
         sb.append("+ \"cancel:function(){this.speaking=false;try{var _b2=window.AndroidBridge;if(_b2&&typeof _b2.stop==='function'){_b2.stop();}}catch(e){}},\"").append(EOL);
         sb.append("+ \"pause:function(){this.paused=true;},resume:function(){this.paused=false;}};\"").append(EOL);
         sb.append("+ \"window.speechSynthesis=_s;\"").append(EOL);
+        if (showDiagnosticsToasts) {
+            sb.append("+ \"window.__ascodeTtsShimInstalled=true;\"").append(EOL);
+        }
         sb.append("+ \"try{if(typeof _s.onvoiceschanged==='function'){setTimeout(function(){try{_s.onvoiceschanged();}catch(e){}},350);}}catch(e){}\"").append(EOL);
         sb.append("+ \"}\"").append(EOL);
         sb.append("+ \"})();\";").append(EOL);
@@ -2530,6 +2550,10 @@ public class Jx {
         sb.append("}").append(EOL);
         sb.append("}").append(EOL);
 
+        if (showDiagnosticsToasts) {
+            appendWebViewTtsDiagnosticsOverlay(sb, EOL);
+        }
+
         sb.append(EOL);
         sb.append("private class _TtsBridge {").append(EOL);
         sb.append("@JavascriptInterface").append(EOL);
@@ -2539,6 +2563,7 @@ public class Jx {
         sb.append("@JavascriptInterface").append(EOL);
         sb.append("public void speak(final String _text, final String _rate) {").append(EOL);
         sb.append("android.util.Log.i(\"AscodeTTS\", \"BRIDGE speak len=\" + (_text == null ? 0 : _text.length()) + \" rate=\" + _rate);").append(EOL);
+        sb.append("_ttsBridgeSpeakCalls++; _ttsBridgeLastText = (_text == null) ? \"\" : _text; _ttsBridgeLastRate = (_rate == null) ? \"\" : _rate;").append(EOL);
         sb.append("new Handler(Looper.getMainLooper()).post(new Runnable() {").append(EOL);
         sb.append("@Override").append(EOL);
         sb.append("public void run() {").append(EOL);
@@ -2557,6 +2582,7 @@ public class Jx {
         sb.append("@JavascriptInterface").append(EOL);
         sb.append("public void stop() {").append(EOL);
         sb.append("android.util.Log.i(\"AscodeTTS\", \"BRIDGE stop()\");").append(EOL);
+        sb.append("_ttsBridgeStopCalls++;").append(EOL);
         sb.append("new Handler(Looper.getMainLooper()).post(new Runnable() {").append(EOL);
         sb.append("@Override").append(EOL);
         sb.append("public void run() {").append(EOL);
@@ -2564,8 +2590,99 @@ public class Jx {
         sb.append("}").append(EOL);
         sb.append("});").append(EOL);
         sb.append("}").append(EOL);
+        sb.append("@JavascriptInterface").append(EOL);
+        sb.append("public void probe() {").append(EOL);
+        sb.append("android.util.Log.i(\"AscodeTTS\", \"BRIDGE probe()\");").append(EOL);
+        sb.append("new Handler(Looper.getMainLooper()).post(new Runnable() {").append(EOL);
+        sb.append("@Override").append(EOL);
+        sb.append("public void run() {").append(EOL);
+        sb.append("_initTts();").append(EOL);
+        sb.append("if (_ttsReady) {").append(EOL);
+        sb.append("_speakTtsNow(\"Hola, prueba de voz\", _ttsPendingRate);").append(EOL);
+        sb.append("} else if (_ttsGivingUp) {").append(EOL);
+        sb.append("android.util.Log.w(\"AscodeTTS\", \"BRIDGE probe ignorado: ningún motor disponible\");").append(EOL);
+        sb.append("} else {").append(EOL);
+        sb.append("_ttsPendingText = \"Hola, prueba de voz\";").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("});").append(EOL);
+        sb.append("}").append(EOL);
         sb.append("}").append(EOL);
         sb.append(WEBVIEW_TTS_HELPER_END_MARKER).append(EOL);
+    }
+
+    /**
+     * Emits the optional on-screen diagnostics overlay used when the project enabled the TTS
+     * diagnostics switch. The IDE injects it after each page load (see
+     * {@code _injectTtsDiagnosticsOverlay(WebView)}); it renders a small, semi-transparent,
+     * non-interactive panel at the top of the page (only its &quot;Probar voz&quot; button
+     * receives touches) showing whether {@code window.AndroidBridge} exists and the
+     * {@code typeof speak}/{@code stop} the HTML would see, the shim state, the Java diagnostics
+     * (engine, language, {@code isLanguageAvailable}, {@code setLanguage} result, {@code queued},
+     * voices, last event) plus the bridge {@code speak()}/{@code stop()} call counters exposed
+     * through {@code getDiagnostics()}, and the first captured page JavaScript errors
+     * ({@code window.onerror} + {@code console.error}). Its button calls
+     * {@code AndroidBridge.probe()}, which drives the engine directly (bundled Piper when active,
+     * otherwise the system engine) with a fixed phrase, bypassing the page, so a broken engine can
+     * be told apart from a page that never calls the bridge.
+     *
+     * <p>Only emitted when {@code showDiagnosticsToasts} is {@code true}: with the switch off the
+     * generated helper stays behaviourally identical to the previous version.</p>
+     */
+    private static void appendWebViewTtsDiagnosticsOverlay(StringBuilder sb, String EOL) {
+        sb.append(EOL);
+        sb.append("private void _injectTtsDiagnosticsOverlay(WebView _webView) {").append(EOL);
+        sb.append("if (_webView == null) {").append(EOL);
+        sb.append("return;").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("if (!_ttsShowDiagToasts) {").append(EOL);
+        sb.append("return;").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("_ttsWebView = _webView;").append(EOL);
+        sb.append("android.util.Log.i(\"AscodeTTS\", \"OVERLAY inject on \" + _webView.getUrl());").append(EOL);
+        sb.append("String _overlayJs = \"(function(){\"").append(EOL);
+        sb.append("+ \"if(window.__ascodeTtsOverlayInjected){if(window.__ascodeTtsOverlayEnsure){window.__ascodeTtsOverlayEnsure();}return;}\"").append(EOL);
+        sb.append("+ \"window.__ascodeTtsOverlayInjected=true;\"").append(EOL);
+        sb.append("+ \"var _ID='__ascodeTtsOverlay';var _MAX=3;var _errs=[];var _diag='';var _evt='init';var _panel=null;\"").append(EOL);
+        sb.append("+ \"function _txt(id,value){var _n=document.getElementById(_ID+id);if(_n){_n.textContent=value;}}\"").append(EOL);
+        sb.append("+ \"function _pushError(msg){try{_errs.push(String(msg));if(_errs.length>_MAX){_errs.shift();}_update();}catch(_e){}}\"").append(EOL);
+        sb.append("+ \"try{var _prevOnError=window.onerror;window.onerror=function(_m,_u,_l,_c,_e){_pushError('error: '+_m+' @'+_l+':'+_c);if(typeof _prevOnError==='function'){try{_prevOnError(_m,_u,_l,_c,_e);}catch(_x){}}return false;};}catch(_e){}\"").append(EOL);
+        sb.append("+ \"try{var _prevConsoleError=console.error;console.error=function(){try{_pushError('console: '+Array.prototype.join.call(arguments,' '));}catch(_e){}if(typeof _prevConsoleError==='function'){_prevConsoleError.apply(console,arguments);}};}catch(_e){}\"").append(EOL);
+        sb.append("+ \"window.__ascodeTtsDiag=function(_json){try{if(_json&&_json.event){_evt=_json.event;}}catch(_e){}_update();};\"").append(EOL);
+        sb.append("+ \"function _mk(tag,styles){var _n=document.createElement(tag);if(styles){for(var _k in styles){try{_n.style[_k]=styles[_k];}catch(_e){}}}return _n;}\"").append(EOL);
+        sb.append("+ \"function _build(){if(_panel&&_panel.parentNode){return;}\"").append(EOL);
+        sb.append("+ \"_panel=_mk('div',{position:'fixed',left:'4px',right:'4px',top:'4px',zIndex:'2147483647',background:'rgba(0,0,0,0.60)',color:'#ffffff',fontFamily:'monospace',fontSize:'10px',lineHeight:'1.3',padding:'5px 7px',borderRadius:'6px',pointerEvents:'none',whiteSpace:'pre-wrap',wordBreak:'break-word',textShadow:'0 1px 2px #000000'});\"").append(EOL);
+        sb.append("+ \"_panel.id=_ID;\"").append(EOL);
+        sb.append("+ \"var _title=_mk('div',{fontWeight:'bold',color:'#88ffff'});_title.textContent='TTS diag (IDE)';_panel.appendChild(_title);\"").append(EOL);
+        sb.append("+ \"var _l1=_mk('div');_l1.id=_ID+'b';_panel.appendChild(_l1);\"").append(EOL);
+        sb.append("+ \"var _l2=_mk('div');_l2.id=_ID+'s';_panel.appendChild(_l2);\"").append(EOL);
+        sb.append("+ \"var _l3=_mk('div');_l3.id=_ID+'c';_panel.appendChild(_l3);\"").append(EOL);
+        sb.append("+ \"var _l4=_mk('div');_l4.id=_ID+'j';_panel.appendChild(_l4);\"").append(EOL);
+        sb.append("+ \"var _l5=_mk('div',{color:'#ff9999'});_l5.id=_ID+'e';_panel.appendChild(_l5);\"").append(EOL);
+        sb.append("+ \"var _btn=_mk('button',{pointerEvents:'auto',marginTop:'4px',fontSize:'10px',padding:'2px 8px'});_btn.id=_ID+'p';_btn.textContent='Probar voz';\"").append(EOL);
+        sb.append("+ \"_btn.onclick=function(){try{window.AndroidBridge.probe();}catch(_e){_pushError('probe: '+_e);}};\"").append(EOL);
+        sb.append("+ \"_panel.appendChild(_btn);if(document.body){document.body.appendChild(_panel);}}\"").append(EOL);
+        sb.append("+ \"function _update(){_build();\"").append(EOL);
+        sb.append("+ \"var _b=window.AndroidBridge;var _has=!!_b;\"").append(EOL);
+        sb.append("+ \"_txt('b','AndroidBridge: '+(_has?'SI':'NO')+' | typeof speak: '+(_has?(typeof _b.speak):'n/a')+' | typeof stop: '+(_has?(typeof _b.stop):'n/a'));\"").append(EOL);
+        sb.append("+ \"var _inst=!!window.__ascodeTtsShimInstalled;var _synth=_inst?'shim (IDE)':(typeof window.speechSynthesis==='undefined'?'ninguno':'nativo');\"").append(EOL);
+        sb.append("+ \"_txt('s','__ascodeTtsShim: '+(window.__ascodeTtsShim?'si':'no')+' | speechSynthesis: '+_synth);\"").append(EOL);
+        sb.append("+ \"if(_b&&typeof _b.getDiagnostics==='function'){try{_diag=String(_b.getDiagnostics());}catch(_e){_diag='getDiagnostics error: '+_e;}}\"").append(EOL);
+        sb.append("+ \"_txt('j','java: '+_diag);\"").append(EOL);
+        sb.append("+ \"var _sc=/speakCalls=([^,]*)/.exec(_diag);var _stc=/stopCalls=([^,]*)/.exec(_diag);var _lr=/lastRate=([^,]*)/.exec(_diag);var _lt=/lastText=(.*)$/.exec(_diag);\"").append(EOL);
+        sb.append("+ \"_txt('c','speak='+(_sc?_sc[1]:'?')+' stop='+(_stc?_stc[1]:'?')+' rate='+(_lr?_lr[1]:'?')+' text='+(_lt?_lt[1]:''));\"").append(EOL);
+        sb.append("+ \"_txt('e','last event: '+_evt+(_errs.length?(' | err: '+_errs.join(' ; ')):' | err: (ninguno)'));}\"").append(EOL);
+        sb.append("+ \"window.__ascodeTtsOverlayEnsure=function(){if(!document.getElementById(_ID)){_panel=null;_build();_update();}};\"").append(EOL);
+        sb.append("+ \"if(document.body){_update();}else{document.addEventListener('DOMContentLoaded',function(){_update();});}\"").append(EOL);
+        sb.append("+ \"setInterval(function(){if(!document.getElementById(_ID)){_panel=null;_build();_update();}else{_update();}},1000);\"").append(EOL);
+        sb.append("+ \"})();\";").append(EOL);
+        sb.append("if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {").append(EOL);
+        sb.append("_webView.evaluateJavascript(_overlayJs, null);").append(EOL);
+        sb.append("} else {").append(EOL);
+        sb.append("_webView.loadUrl(\"javascript:\" + _overlayJs);").append(EOL);
+        sb.append("}").append(EOL);
+        sb.append("_ttsEmitDiag(\"overlay\");").append(EOL);
+        sb.append("}").append(EOL);
     }
 
     /**

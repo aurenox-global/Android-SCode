@@ -1077,17 +1077,36 @@ public class yq {
         }
 
         // 2) Inject the speechSynthesis shim invocation into existing WebChromeClient overrides.
+        String shimCall = "_injectTtsShim(_webView);";
+        String overlayCall = "_injectTtsDiagnosticsOverlay(_webView);";
+        boolean diagEnabled = webViewSettings.isTtsDiagnosticsEnabled();
         if (!currentCode.contains("_injectTtsShim(")) {
             String shimOverride = "@Override\n"
                     + "public void onProgressChanged(WebView _webView, int _newProgress) {\n"
                     + "if (_newProgress >= 100) {\n"
-                    + "_injectTtsShim(_webView);\n"
+                    + shimCall + "\n"
+                    + (diagEnabled ? overlayCall + "\n" : "")
                     + "}\n"
                     + "}\n";
             String updated = currentCode.replace("new WebChromeClient() {", "new WebChromeClient() {\n" + shimOverride);
             if (!updated.equals(currentCode)) {
                 currentCode = updated;
+                anyPatched = true;
             }
+        }
+
+        // 2b) Keep the overlay invocation in sync with the current diagnostics switch. A project
+        //     built by an earlier release already has the shim call (without the overlay one), and
+        //     a project whose switch was turned off must not keep a call to a method the helper no
+        //     longer emits (that would not compile).
+        if (diagEnabled) {
+            if (currentCode.contains(shimCall) && !currentCode.contains(overlayCall)) {
+                currentCode = currentCode.replace(shimCall, shimCall + "\n" + overlayCall);
+                anyPatched = true;
+            }
+        } else if (currentCode.contains(overlayCall)) {
+            currentCode = currentCode.replace("\n" + overlayCall, "");
+            anyPatched = true;
         }
 
         // 3) Ensure the CURRENT TTS helper (fields + speechSynthesis shim + _TtsBridge) is present

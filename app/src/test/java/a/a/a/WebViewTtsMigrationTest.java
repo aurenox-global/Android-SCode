@@ -174,7 +174,7 @@ public class WebViewTtsMigrationTest {
         assertFalse(Jx.hasLegacyWebViewTtsHelper(current));
         // A current helper starts with the version marker (after the leading EOL).
         assertTrue(current.trim().startsWith(Jx.WEBVIEW_TTS_HELPER_BEGIN_MARKER));
-        assertEquals(4, Jx.WEBVIEW_TTS_HELPER_VERSION);
+        assertEquals(5, Jx.WEBVIEW_TTS_HELPER_VERSION);
     }
 
     @Test
@@ -219,6 +219,70 @@ public class WebViewTtsMigrationTest {
         assertTrue(current.contains("1.25f"));
         assertTrue(current.contains("new Locale(\"pt\", \"BR\")"));
         assertTrue(Jx.hasCurrentWebViewTtsHelper(current));
+    }
+
+    @Test
+    public void overlayIsEmittedOnlyWhenDiagnosticsSwitchIsOn() {
+        StringBuilder off = new StringBuilder();
+        Jx.appendWebViewTtsHelpers(off, "\n", "0.95", "es-ES", false);
+        String offCode = off.toString();
+        // With the switch off the overlay is not emitted at all: behaviour matches the old helper.
+        assertFalse(offCode.contains("_injectTtsDiagnosticsOverlay"));
+        assertFalse(offCode.contains("__ascodeTtsOverlay"));
+        assertFalse(offCode.contains("__ascodeTtsShimInstalled"));
+        assertFalse(offCode.contains("Probar voz"));
+
+        StringBuilder on = new StringBuilder();
+        Jx.appendWebViewTtsHelpers(on, "\n", "0.95", "es-ES", true);
+        String onCode = on.toString();
+        // The overlay method, the JS UI and the shim-installed marker are all present.
+        assertTrue(onCode.contains("_injectTtsDiagnosticsOverlay(WebView _webView)"));
+        assertTrue(onCode.contains("__ascodeTtsOverlay"));
+        assertTrue(onCode.contains("window.__ascodeTtsShimInstalled=true;"));
+        assertTrue(onCode.contains("Probar voz"));
+        assertTrue(onCode.contains("evaluateJavascript(_overlayJs, null)"));
+        // It reports the bridge identity, the shim state and hooks the page error channels.
+        assertTrue(onCode.contains("typeof _b.speak"));
+        assertTrue(onCode.contains("window.onerror"));
+        assertTrue(onCode.contains("console.error"));
+        assertTrue(onCode.contains("getDiagnostics"));
+        assertTrue(onCode.contains("_ttsEmitDiag(\"overlay\")"));
+        // Its button drives the engine directly through the bridge probe.
+        assertTrue(onCode.contains("window.AndroidBridge.probe()"));
+        assertTrue(onCode.contains("public void probe()"));
+        assertTrue(onCode.contains("Hola, prueba de voz"));
+    }
+
+    @Test
+    public void bridgeExposesSpeakAndStopCountersThroughDiagnostics() {
+        StringBuilder sb = new StringBuilder();
+        Jx.appendWebViewTtsHelpers(sb, "\n", "0.95", "es-ES", true);
+        String current = sb.toString();
+
+        // Counters live on the Java side and are surfaced through getDiagnostics().
+        assertTrue(current.contains("private int _ttsBridgeSpeakCalls = 0;"));
+        assertTrue(current.contains("private int _ttsBridgeStopCalls = 0;"));
+        assertTrue(current.contains("_ttsBridgeSpeakCalls++"));
+        assertTrue(current.contains("_ttsBridgeStopCalls++"));
+        assertTrue(current.contains("speakCalls="));
+        assertTrue(current.contains("stopCalls="));
+        assertTrue(current.contains("lastRate="));
+        assertTrue(current.contains("lastText="));
+        assertTrue(current.contains("return _ttsDiagnostics();"));
+    }
+
+    @Test
+    public void diagnosticsOffHelperStaysBehaviourallyIdentical() {
+        // The off path must keep the JavaScript API and every event the old helper exposed.
+        StringBuilder off = new StringBuilder();
+        Jx.appendWebViewTtsHelpers(off, "\n", "0.95", "es-ES", false);
+        String code = off.toString();
+        assertTrue(code.contains("private class _TtsBridge"));
+        assertTrue(code.contains("window.AndroidBridge"));
+        assertTrue(code.contains("public void speak(final String _text, final String _rate)"));
+        assertTrue(code.contains("window.speechSynthesis"));
+        assertTrue(code.contains("getDiagnostics"));
+        assertFalse(code.contains("_injectTtsDiagnosticsOverlay"));
     }
 
     @Test
@@ -348,6 +412,28 @@ public class WebViewTtsMigrationTest {
         assertTrue(out.getParentFile().mkdirs() || out.getParentFile().isDirectory());
         Files.write(out.toPath(), activity.getBytes(StandardCharsets.UTF_8));
         assertTrue(out.isFile());
+
+        // Piper + diagnostics overlay together: the combination the user will actually build.
+        StringBuilder combo = new StringBuilder();
+        Jx.appendWebViewTtsHelpers(combo, "\n", "0.95", "es-ES", true, true);
+        String comboActivity = "package com.ascode.check;\n"
+                + "import android.app.Activity;\n"
+                + "import android.webkit.*;\n"
+                + "import android.os.*;\n"
+                + "import android.media.*;\n"
+                + "import android.speech.tts.TextToSpeech;\n"
+                + "import java.util.*;\n"
+                + "public class PiperDiagActivity extends Activity {\n"
+                + "private WebView webview1;\n"
+                + combo
+                + "}\n";
+        StaticJavaParser.parse(comboActivity);
+        assertTrue(comboActivity.contains("_injectTtsDiagnosticsOverlay"));
+        assertTrue(comboActivity.contains("com.k2fsa.sherpa.onnx"));
+        File comboOut = new File("build/tts-generated-check-piper-diag/com/ascode/check/PiperDiagActivity.java");
+        assertTrue(comboOut.getParentFile().mkdirs() || comboOut.getParentFile().isDirectory());
+        Files.write(comboOut.toPath(), comboActivity.getBytes(StandardCharsets.UTF_8));
+        assertTrue(comboOut.isFile());
     }
 
     private int countOccurrences(String haystack, String needle) {

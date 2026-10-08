@@ -126,7 +126,11 @@ public final class ProjectWebViewSettings {
      * the system engine.
      */
     public boolean isTtsPiperEnabled() {
-        return bool(ProjectSettings.SETTING_WEBVIEW_TTS_ENGINE_PIPER, false);
+        // The built-in offline Piper engine was retired at the owner's request: the WebView settings
+        // screen no longer offers it and no project may activate it, so compiled apps go back to
+        // the plain "as in the browser" behaviour (AndroidBridge + window.speechSynthesis shim).
+        // The implementation is kept dormant in case it is ever wanted again.
+        return false;
     }
 
     public int getTextZoom() {

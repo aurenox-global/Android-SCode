@@ -100,7 +100,31 @@ public class WebViewSettingsActivity extends BaseAppCompatActivity {
         setupText(binding.etTextZoom, ProjectSettings.SETTING_WEBVIEW_TEXT_ZOOM,
                 String.valueOf(ProjectWebViewSettings.DEFAULT_TEXT_ZOOM));
         setupPiper();
+        hidePiperSection();
         setupReset();
+    }
+
+    /**
+     * The built-in offline Piper engine was retired at the owner's request: its whole section is
+     * hidden from this screen and {@link ProjectWebViewSettings#isTtsPiperEnabled()} always returns
+     * false, so no project can enable it and nothing extra is ever packaged into compiled apps.
+     */
+    private void hidePiperSection() {
+        int[] piperViews = new int[]{
+                R.id.sw_tts_piper,
+                R.id.til_tts_voice,
+                R.id.tv_tts_license,
+                R.id.pb_tts,
+                R.id.tv_tts_status,
+                R.id.btn_tts_download,
+                R.id.btn_tts_import,
+        };
+        for (int id : piperViews) {
+            View view = findViewById(id);
+            if (view != null) {
+                view.setVisibility(View.GONE);
+            }
+        }
     }
 
     @Override

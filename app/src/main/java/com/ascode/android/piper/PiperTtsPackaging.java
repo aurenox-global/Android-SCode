@@ -34,6 +34,10 @@ public final class PiperTtsPackaging {
         try {
             String scId = builder.yq.sc_id;
             if (!new ProjectWebViewSettings(scId).isTtsPiperEnabled()) {
+                // The offline Piper engine was retired: make sure nothing it staged earlier is left
+                // inside the project. Its jars/dex used to be copied into the project's persistent
+                // classpath/dex folders, which made R8 run out of memory on-device when shrinking.
+                cleanupStagedArtifacts(builder);
                 return;
             }
 
@@ -88,5 +92,78 @@ public final class PiperTtsPackaging {
         } catch (Throwable t) {
             Log.w(TAG, "Piper: fallo al empaquetar, sigo con el motor del sistema: " + t);
         }
+    }
+
+    /**
+     * Removes everything a previous build may have staged inside the project for the offline Piper
+     * engine: its jars (project classpath), its pre-dexed {@code .dex} (project dex folder), its
+     * {@code .so} (project native libs) and its assets folder. Runs on every build while the engine
+     * is disabled, so a project that once enabled it goes back to a clean, R8-friendly state.
+     */
+    public static void cleanupStagedArtifacts(ProjectBuilder builder) {
+        try {
+            String scId = builder.yq.sc_id;
+
+            File classpathDir = new File(
+                    new File(Environment.getExternalStorageDirectory(), ".AndroidSCode/data/" + scId),
+                    "files/classpath");
+            deleteMatching(classpathDir, name -> {
+                String lower = name.toLowerCase();
+                return lower.endsWith(".jar")
+                        && (lower.contains("sherpa") || lower.contains("kotlin-stdlib") || lower.contains("piper"));
+            });
+
+            File dexDir = new File(builder.yq.binDirectoryPath, "dex");
+            deleteMatching(dexDir, name -> name.toLowerCase().contains("piper"));
+
+            File nativeLibsDir = new File(builder.fpu.getPathNativelibs(scId));
+            File[] abiDirs = nativeLibsDir.listFiles();
+            if (abiDirs != null) {
+                for (File abiDir : abiDirs) {
+                    if (abiDir.isDirectory()) {
+                        File so = new File(abiDir, PiperTtsRuntime.SO_NAME);
+                        if (so.isFile() && so.delete()) {
+                            Log.i(TAG, "Piper: eliminado " + so);
+                        }
+                    }
+                }
+            }
+
+            File assetsPiper = new File(builder.yq.assetsPath, PiperTtsRuntime.ASSETS_SUBDIR);
+            if (assetsPiper.exists()) {
+                deleteRecursively(assetsPiper);
+                Log.i(TAG, "Piper: eliminados los assets de " + assetsPiper);
+            }
+        } catch (Throwable t) {
+            Log.w(TAG, "Piper: fallo al limpiar restos: " + t);
+        }
+    }
+
+    private static void deleteMatching(File dir, NameFilter filter) {
+        File[] files = dir.listFiles();
+        if (files == null) {
+            return;
+        }
+        for (File file : files) {
+            if (file.isFile() && filter.matches(file.getName()) && file.delete()) {
+                Log.i(TAG, "Piper: eliminado " + file);
+            }
+        }
+    }
+
+    private static void deleteRecursively(File file) {
+        if (file.isDirectory()) {
+            File[] children = file.listFiles();
+            if (children != null) {
+                for (File child : children) {
+                    deleteRecursively(child);
+                }
+            }
+        }
+        file.delete();
+    }
+
+    private interface NameFilter {
+        boolean matches(String name);
     }
 }

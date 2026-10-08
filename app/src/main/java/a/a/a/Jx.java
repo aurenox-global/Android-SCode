@@ -13,7 +13,10 @@ import com.besome.sketch.editor.manage.library.material3.Material3LibraryManager
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -85,6 +88,10 @@ public class Jx {
             "((?:[A-Za-z_$][A-Za-z0-9_$]*\\s*\\.\\s*)*[A-Za-z_$][A-Za-z0-9_$]*)\\s*\\.\\s*setDownloadListener\\s*\\(\\s*new\\s+DownloadListener\\s*\\(\\s*\\)\\s*\\{");
         private static final Pattern WEBVIEW_CHROME_CLIENT_PATTERN = Pattern.compile(
             "((?:[A-Za-z_$][A-Za-z0-9_$]*\\s*\\.\\s*)*[A-Za-z_$][A-Za-z0-9_$]*)\\s*\\.\\s*setWebChromeClient\\s*\\(\\s*new\\s+WebChromeClient\\s*\\(\\s*\\)\\s*\\{");
+        private static final Pattern WEBVIEW_CLIENT_PATTERN = Pattern.compile(
+            "((?:[A-Za-z_$][A-Za-z0-9_$]*\\s*\\.\\s*)*[A-Za-z_$][A-Za-z0-9_$]*)\\s*\\.\\s*setWebViewClient\\s*\\(\\s*new\\s+WebViewClient\\s*\\(\\s*\\)\\s*\\{");
+        private static final Pattern WEBVIEW_JS_INTERFACE_PATTERN = Pattern.compile(
+            "((?:[A-Za-z_$][A-Za-z0-9_$]*\\s*\\.\\s*)*[A-Za-z_$][A-Za-z0-9_$]*)\\s*\\.\\s*addJavascriptInterface\\s*\\(\\s*[^;,]+?\\s*,\\s*\"([^\"]+)\"\\s*\\)\\s*;");
     private final ProjectSettings settings;
     private final PermissionManager permissionManager;
     private final String packageName;
@@ -1584,6 +1591,365 @@ public class Jx {
                 + "public boolean onShowFileChooser(WebView _webView, ValueCallback<Uri[]> _filePathCallback, FileChooserParams _fileChooserParams) {" + EOL
                 + "return _openWebFileChooser(_filePathCallback, _fileChooserParams);" + EOL
                 + "}" + EOL;
+    }
+
+    /**
+     * One matched WebView bootstrap invocation (an anonymous {@code WebChromeClient},
+     * {@code DownloadListener} or {@code WebViewClient}) with the offsets needed to rewrite it.
+     */
+    private static final class WebViewInvocation {
+        int start;
+        int braceOpen;
+        int bodyEnd;
+        int end;
+        String receiver;
+        String body;
+    }
+
+    /**
+     * @return {@code true} when {@code javaCode} carries duplicated WebView bootstrap calls: more
+     * than one {@code setWebChromeClient}/{@code setDownloadListener} on the same WebView, or the
+     * same {@code addJavascriptInterface} name registered twice. Earlier non-idempotent migrations
+     * appended a fresh copy of the bootstrap on every build, and the <em>last</em> call wins at
+     * runtime: a duplicated {@code WebChromeClient} with an empty {@code onProgressChanged} used to
+     * shadow the one installing the TTS shim / diagnostics overlay.
+     */
+    public static boolean hasDuplicateWebViewBootstrapCalls(String javaCode) {
+        if (javaCode == null || javaCode.isEmpty()) {
+            return false;
+        }
+        return hasDuplicateAnonymousInvocations(javaCode, WEBVIEW_CHROME_CLIENT_PATTERN)
+                || hasDuplicateAnonymousInvocations(javaCode, WEBVIEW_DOWNLOAD_LISTENER_PATTERN)
+                || hasDuplicateJavascriptInterfaces(javaCode);
+    }
+
+    /**
+     * Collapses duplicated WebView bootstrap calls so the file keeps exactly one
+     * {@code setWebChromeClient}, one {@code setDownloadListener} and one
+     * {@code addJavascriptInterface} per interface name and receiver. When several duplicates
+     * exist the one that carries the TTS shim / file-chooser / safe download body wins, so the
+     * shim never gets shadowed by an empty override. Idempotent: running it twice returns the
+     * same text.
+     */
+    public static String deduplicateWebViewBootstrap(String javaCode, String EOL) {
+        if (javaCode == null || javaCode.isEmpty()) {
+            return javaCode;
+        }
+        String code = deduplicateAnonymousInvocations(javaCode, WEBVIEW_CHROME_CLIENT_PATTERN, true);
+        code = deduplicateAnonymousInvocations(code, WEBVIEW_DOWNLOAD_LISTENER_PATTERN, false);
+        code = deduplicateJavascriptInterfaces(code);
+        return code;
+    }
+
+    private static boolean hasDuplicateAnonymousInvocations(String javaCode, Pattern pattern) {
+        ArrayList<WebViewInvocation> invocations = findAnonymousInvocations(javaCode, pattern);
+        HashSet<String> seen = new HashSet<>();
+        for (WebViewInvocation invocation : invocations) {
+            if (!seen.add(invocation.receiver)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean hasDuplicateJavascriptInterfaces(String javaCode) {
+        Matcher matcher = WEBVIEW_JS_INTERFACE_PATTERN.matcher(javaCode);
+        HashSet<String> seen = new HashSet<>();
+        while (matcher.find()) {
+            String key = normalizeWebViewExpression(matcher.group(1)) + "|" + matcher.group(2);
+            if (!seen.add(key)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static ArrayList<WebViewInvocation> findAnonymousInvocations(String source, Pattern pattern) {
+        ArrayList<WebViewInvocation> found = new ArrayList<>();
+        Matcher matcher = pattern.matcher(source);
+        int searchFrom = 0;
+        while (matcher.find(searchFrom)) {
+            int braceOpen = findAnonymousClassBraceOpen(source, matcher.end());
+            if (braceOpen < 0) {
+                searchFrom = matcher.end();
+                continue;
+            }
+            int afterBody = findMatchingBraceEnd(source, braceOpen);
+            if (afterBody < 0) {
+                searchFrom = matcher.end();
+                continue;
+            }
+            int invocationEnd = findAnonymousListenerInvocationEnd(source, afterBody);
+            if (invocationEnd < 0) {
+                searchFrom = matcher.end();
+                continue;
+            }
+            WebViewInvocation invocation = new WebViewInvocation();
+            invocation.start = matcher.start();
+            invocation.braceOpen = braceOpen;
+            invocation.bodyEnd = afterBody;
+            invocation.end = invocationEnd;
+            invocation.receiver = normalizeWebViewExpression(matcher.group(1));
+            invocation.body = source.substring(braceOpen, afterBody);
+            found.add(invocation);
+            searchFrom = invocationEnd;
+        }
+        return found;
+    }
+
+    private static String deduplicateAnonymousInvocations(String source, Pattern pattern, boolean preferTtsShim) {
+        ArrayList<WebViewInvocation> invocations = findAnonymousInvocations(source, pattern);
+        if (invocations.size() < 2) {
+            return source;
+        }
+        LinkedHashMap<String, WebViewInvocation> winners = new LinkedHashMap<>();
+        for (WebViewInvocation invocation : invocations) {
+            WebViewInvocation current = winners.get(invocation.receiver);
+            if (current == null
+                    || scoreInvocation(invocation, preferTtsShim) > scoreInvocation(current, preferTtsShim)) {
+                winners.put(invocation.receiver, invocation);
+            }
+        }
+        ArrayList<int[]> removals = new ArrayList<>();
+        for (WebViewInvocation invocation : invocations) {
+            if (winners.get(invocation.receiver) != invocation) {
+                removals.add(new int[]{invocation.start, invocation.end});
+            }
+        }
+        return removeFullLineSpans(source, removals);
+    }
+
+    private static String deduplicateJavascriptInterfaces(String source) {
+        Matcher matcher = WEBVIEW_JS_INTERFACE_PATTERN.matcher(source);
+        ArrayList<int[]> removals = new ArrayList<>();
+        HashSet<String> seen = new HashSet<>();
+        while (matcher.find()) {
+            String key = normalizeWebViewExpression(matcher.group(1)) + "|" + matcher.group(2);
+            if (seen.add(key)) {
+                continue;
+            }
+            removals.add(new int[]{matcher.start(), matcher.end()});
+        }
+        return removeFullLineSpans(source, removals);
+    }
+
+    private static int scoreInvocation(WebViewInvocation invocation, boolean preferTtsShim) {
+        int score = 0;
+        if (invocation.body.contains("onShowFileChooser(")) {
+            score += 2;
+        }
+        if (invocation.body.contains("_downloadWebFile(")) {
+            score += 4;
+        }
+        if (preferTtsShim && invocation.body.contains("_injectTtsShim(")) {
+            score += 8;
+        }
+        if (invocation.body.contains("onProgressChanged(")) {
+            score += 1;
+        }
+        return score;
+    }
+
+    private static String removeFullLineSpans(String source, ArrayList<int[]> spans) {
+        if (spans.isEmpty()) {
+            return source;
+        }
+        spans.sort(new Comparator<int[]>() {
+            @Override
+            public int compare(int[] a, int[] b) {
+                return Integer.compare(a[0], b[0]);
+            }
+        });
+        StringBuilder sb = new StringBuilder(source);
+        for (int i = spans.size() - 1; i >= 0; i--) {
+            int[] span = spans.get(i);
+            int start = lineStart(sb, span[0]);
+            boolean wholeLine = true;
+            for (int p = start; p < span[0]; p++) {
+                char c = sb.charAt(p);
+                if (c != ' ' && c != '\t' && c != '\r') {
+                    wholeLine = false;
+                    break;
+                }
+            }
+            int from = wholeLine ? start : span[0];
+            int end = span[1];
+            if (wholeLine) {
+                while (end < sb.length()) {
+                    char c = sb.charAt(end);
+                    if (c == ' ' || c == '\t' || c == '\r') {
+                        end++;
+                        continue;
+                    }
+                    if (c == '\n') {
+                        end++;
+                    }
+                    break;
+                }
+            }
+            sb.delete(from, end);
+        }
+        return sb.toString();
+    }
+
+    private static int lineStart(CharSequence source, int index) {
+        int cursor = index;
+        while (cursor > 0 && source.charAt(cursor - 1) != '\n') {
+            cursor--;
+        }
+        return cursor;
+    }
+
+    /**
+     * Ensures every {@code setWebChromeClient(new WebChromeClient() { ... })} invocation installs
+     * the TTS shim on progress completion (plus the diagnostics overlay when enabled), so a single
+     * empty {@code onProgressChanged} can no longer shadow the hook. Idempotent: a client that
+     * already calls {@code _injectTtsShim(...)} is only brought in sync with the overlay switch.
+     */
+    public static String injectTtsShimIntoWebChromeClients(String javaCode, String EOL,
+                                                           boolean diagnosticsEnabled) {
+        if (javaCode == null || javaCode.isEmpty()) {
+            return javaCode;
+        }
+        ArrayList<WebViewInvocation> invocations = findAnonymousInvocations(javaCode, WEBVIEW_CHROME_CLIENT_PATTERN);
+        if (invocations.isEmpty()) {
+            return javaCode;
+        }
+        String code = javaCode;
+        for (int i = invocations.size() - 1; i >= 0; i--) {
+            WebViewInvocation invocation = invocations.get(i);
+            String body = code.substring(invocation.braceOpen, invocation.bodyEnd);
+            if (!body.contains("_injectTtsShim(")) {
+                String injected;
+                if (body.contains("onProgressChanged(")) {
+                    injected = insertGuardedShimIntoProgressMethod(code, invocation, EOL, diagnosticsEnabled);
+                } else {
+                    injected = insertTtsShimOverride(code, invocation.braceOpen, EOL, diagnosticsEnabled);
+                }
+                if (injected != null) {
+                    code = injected;
+                }
+            } else if (diagnosticsEnabled && !body.contains("_injectTtsDiagnosticsOverlay(")) {
+                code = addOverlayAfterShim(code, invocation, EOL);
+            }
+        }
+        return code;
+    }
+
+    /**
+     * Injects the TTS shim (plus overlay when enabled) into an existing
+     * {@code setWebViewClient(new WebViewClient() { ... })}, inside its {@code onPageFinished}
+     * override or by adding one, so the shim does not depend on {@code onProgressChanged} alone.
+     * Only touches a project that already declares a WebView client. Idempotent.
+     */
+    public static String injectTtsShimIntoWebViewClients(String javaCode, String EOL,
+                                                         boolean diagnosticsEnabled) {
+        if (javaCode == null || javaCode.isEmpty()) {
+            return javaCode;
+        }
+        ArrayList<WebViewInvocation> invocations = findAnonymousInvocations(javaCode, WEBVIEW_CLIENT_PATTERN);
+        if (invocations.isEmpty()) {
+            return javaCode;
+        }
+        String code = javaCode;
+        for (int i = invocations.size() - 1; i >= 0; i--) {
+            WebViewInvocation invocation = invocations.get(i);
+            String body = code.substring(invocation.braceOpen, invocation.bodyEnd);
+            if (body.contains("_injectTtsShim(")) {
+                continue;
+            }
+            String injected;
+            if (body.contains("onPageFinished(")) {
+                injected = insertShimIntoPageFinished(code, invocation, EOL, diagnosticsEnabled);
+            } else {
+                injected = insertPageFinishedOverride(code, invocation.braceOpen, EOL, diagnosticsEnabled);
+            }
+            if (injected != null) {
+                code = injected;
+            }
+        }
+        return code;
+    }
+
+    private static String insertGuardedShimIntoProgressMethod(String source, WebViewInvocation invocation,
+                                                              String EOL, boolean diagnosticsEnabled) {
+        String body = source.substring(invocation.braceOpen, invocation.bodyEnd);
+        Matcher matcher = Pattern.compile(
+                "onProgressChanged\\s*\\(\\s*(?:android\\.webkit\\.)?WebView\\s+([A-Za-z_$][A-Za-z0-9_$]*)\\s*,\\s*int\\s+([A-Za-z_$][A-Za-z0-9_$]*)")
+                .matcher(body);
+        if (!matcher.find()) {
+            return null;
+        }
+        String webViewParam = matcher.group(1);
+        String progressParam = matcher.group(2);
+        int methodBrace = source.indexOf('{', invocation.braceOpen + matcher.end());
+        if (methodBrace < 0 || methodBrace >= invocation.bodyEnd) {
+            return null;
+        }
+        String guarded = EOL
+                + "if (" + progressParam + " >= 100) {" + EOL
+                + "_injectTtsShim(" + webViewParam + ");" + EOL
+                + (diagnosticsEnabled ? "_injectTtsDiagnosticsOverlay(" + webViewParam + ");" + EOL : "")
+                + "}";
+        return source.substring(0, methodBrace + 1) + guarded + source.substring(methodBrace + 1);
+    }
+
+    private static String insertTtsShimOverride(String source, int braceOpen, String EOL,
+                                                boolean diagnosticsEnabled) {
+        String override = EOL
+                + "@Override" + EOL
+                + "public void onProgressChanged(WebView _webView, int _newProgress) {" + EOL
+                + "if (_newProgress >= 100) {" + EOL
+                + "_injectTtsShim(_webView);" + EOL
+                + (diagnosticsEnabled ? "_injectTtsDiagnosticsOverlay(_webView);" + EOL : "")
+                + "}"
+                + "}";
+        return source.substring(0, braceOpen + 1) + override + source.substring(braceOpen + 1);
+    }
+
+    private static String addOverlayAfterShim(String source, WebViewInvocation invocation, String EOL) {
+        String body = source.substring(invocation.braceOpen, invocation.bodyEnd);
+        Matcher matcher = Pattern.compile("_injectTtsShim\\s*\\(\\s*([A-Za-z_$][A-Za-z0-9_$]*)\\s*\\)\\s*;")
+                .matcher(body);
+        if (!matcher.find()) {
+            return source;
+        }
+        int end = invocation.braceOpen + matcher.end();
+        return source.substring(0, end)
+                + EOL + "_injectTtsDiagnosticsOverlay(" + matcher.group(1) + ");"
+                + source.substring(end);
+    }
+
+    private static String insertShimIntoPageFinished(String source, WebViewInvocation invocation,
+                                                     String EOL, boolean diagnosticsEnabled) {
+        String body = source.substring(invocation.braceOpen, invocation.bodyEnd);
+        Matcher matcher = Pattern.compile(
+                "onPageFinished\\s*\\(\\s*(?:android\\.webkit\\.)?WebView\\s+([A-Za-z_$][A-Za-z0-9_$]*)")
+                .matcher(body);
+        if (!matcher.find()) {
+            return null;
+        }
+        String webViewParam = matcher.group(1);
+        int methodBrace = source.indexOf('{', invocation.braceOpen + matcher.end());
+        if (methodBrace < 0 || methodBrace >= invocation.bodyEnd) {
+            return null;
+        }
+        String call = EOL
+                + "_injectTtsShim(" + webViewParam + ");"
+                + (diagnosticsEnabled ? EOL + "_injectTtsDiagnosticsOverlay(" + webViewParam + ");" : "");
+        return source.substring(0, methodBrace + 1) + call + source.substring(methodBrace + 1);
+    }
+
+    private static String insertPageFinishedOverride(String source, int braceOpen, String EOL,
+                                                     boolean diagnosticsEnabled) {
+        String override = EOL
+                + "@Override" + EOL
+                + "public void onPageFinished(WebView _webView, String _url) {" + EOL
+                + "super.onPageFinished(_webView, _url);" + EOL
+                + "_injectTtsShim(_webView);" + EOL
+                + (diagnosticsEnabled ? "_injectTtsDiagnosticsOverlay(_webView);" + EOL : "")
+                + "}";
+        return source.substring(0, braceOpen + 1) + override + source.substring(braceOpen + 1);
     }
 
     private static String normalizeWebViewExpression(String expression) {

@@ -1003,7 +1003,11 @@ public class yq {
         }
 
         String EOL = "\n";
-        String currentCode = existingCode;
+        // Collapse duplicated WebView bootstrap calls (setWebChromeClient / setDownloadListener /
+        // addJavascriptInterface) left behind by earlier, non-idempotent migrations, then apply the
+        // surgical download / file-chooser patches. Idempotent: a clean file is returned unchanged.
+        String currentCode = Jx.deduplicateWebViewBootstrap(existingCode, EOL);
+        boolean bootstrapDeduplicated = !currentCode.equals(existingCode);
         String downloadPatchedCode = Jx.replaceUnsafeWebViewDownloadListeners(currentCode, EOL);
         boolean downloadListenerPatched = !downloadPatchedCode.equals(currentCode);
         currentCode = downloadPatchedCode;
@@ -1015,7 +1019,7 @@ public class yq {
         boolean webChromeClientPatched = !chromePatchedCode.equals(currentCode);
         currentCode = chromePatchedCode;
 
-        boolean anyPatched = downloadListenerPatched || webChromeClientPatched;
+        boolean anyPatched = bootstrapDeduplicated || downloadListenerPatched || webChromeClientPatched;
 
         if (!anyPatched) {
             return false;
@@ -1058,8 +1062,17 @@ public class yq {
         }
 
         String bridgeRegistration = "addJavascriptInterface(new _TtsBridge(), \"AndroidBridge\");";
-        String currentCode = existingCode;
         boolean anyPatched = false;
+
+        // 0) Collapse duplicated WebView bootstrap calls left behind by earlier, non-idempotent
+        //    migrations (several setWebChromeClient/setDownloadListener/addJavascriptInterface on
+        //    the same WebView). At runtime the LAST call of each kind wins, and a duplicated
+        //    WebChromeClient with an empty onProgressChanged used to shadow the one installing the
+        //    TTS shim, so neither the shim nor the diagnostics overlay ever ran. Idempotent.
+        String currentCode = Jx.deduplicateWebViewBootstrap(existingCode, "\n");
+        if (!currentCode.equals(existingCode)) {
+            anyPatched = true;
+        }
 
         boolean bridgeRegistered = currentCode.contains("\"AndroidBridge\"")
                 || currentCode.contains("AndroidBridge");
@@ -1077,22 +1090,17 @@ public class yq {
         }
 
         // 2) Inject the speechSynthesis shim invocation into existing WebChromeClient overrides.
+        //    If a client already declares onProgressChanged (even with an empty body), the call is
+        //    added inside that method instead of appending a second override, which would not
+        //    compile. Idempotent: a client already calling _injectTtsShim is left in sync with the
+        //    diagnostics switch by the method itself.
         String shimCall = "_injectTtsShim(_webView);";
         String overlayCall = "_injectTtsDiagnosticsOverlay(_webView);";
         boolean diagEnabled = webViewSettings.isTtsDiagnosticsEnabled();
-        if (!currentCode.contains("_injectTtsShim(")) {
-            String shimOverride = "@Override\n"
-                    + "public void onProgressChanged(WebView _webView, int _newProgress) {\n"
-                    + "if (_newProgress >= 100) {\n"
-                    + shimCall + "\n"
-                    + (diagEnabled ? overlayCall + "\n" : "")
-                    + "}\n"
-                    + "}\n";
-            String updated = currentCode.replace("new WebChromeClient() {", "new WebChromeClient() {\n" + shimOverride);
-            if (!updated.equals(currentCode)) {
-                currentCode = updated;
-                anyPatched = true;
-            }
+        String chromeShimmed = Jx.injectTtsShimIntoWebChromeClients(currentCode, "\n", diagEnabled);
+        if (!chromeShimmed.equals(currentCode)) {
+            currentCode = chromeShimmed;
+            anyPatched = true;
         }
 
         // 2b) Keep the overlay invocation in sync with the current diagnostics switch. A project
@@ -1106,6 +1114,15 @@ public class yq {
             }
         } else if (currentCode.contains(overlayCall)) {
             currentCode = currentCode.replace("\n" + overlayCall, "");
+            anyPatched = true;
+        }
+
+        // 2c) Redundant hook: when the activity declares its own WebViewClient, install the shim
+        //     from onPageFinished too, so the speech bridge no longer depends on a single
+        //     onProgressChanged surviving in the (possibly duplicated) chrome client. Idempotent.
+        String pageFinishedHooked = Jx.injectTtsShimIntoWebViewClients(currentCode, "\n", diagEnabled);
+        if (!pageFinishedHooked.equals(currentCode)) {
+            currentCode = pageFinishedHooked;
             anyPatched = true;
         }
 
@@ -1418,6 +1435,14 @@ public class yq {
 
         boolean hasDownloadHelper = javaCode.contains("private void _downloadWebFile(");
         boolean hasLegacyInlineRequest = hasLegacyWebViewInlineDownloadRequest(javaCode);
+
+        // A project whose generated activity accumulated duplicate WebView bootstrap calls
+        // (setWebChromeClient / setDownloadListener / addJavascriptInterface repeated by earlier
+        // non-idempotent migrations) must be migrated so they are collapsed: the last duplicate
+        // wins at runtime and could shadow the TTS/diagnostics hooks.
+        if (Jx.hasDuplicateWebViewBootstrapCalls(javaCode)) {
+            return true;
+        }
 
         // Projects generated before Text-to-Speech support lack the AndroidBridge JavaScript
         // interface. Force a migration so compiled apps keep talking inside their WebViews.

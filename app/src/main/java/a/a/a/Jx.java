@@ -36,6 +36,21 @@ public class Jx {
 
     public static final String EOL = "\r\n";
     public static final Pattern WIDGET_NAME_PATTERN = Pattern.compile("\\w*\\..*\\.");
+
+    /**
+     * Version of the WebView Text-to-Speech helper block emitted by
+     * {@link #appendWebViewTtsHelpers(StringBuilder, String)}. Bump this whenever the helper
+     * changes so {@code yq} can detect projects that still carry an older helper and upgrade it
+     * in place on the next build (see {@link #hasCurrentWebViewTtsHelper(String)}).
+     */
+    public static final int WEBVIEW_TTS_HELPER_VERSION = 2;
+
+    /** Opening marker comment wrapping the versioned WebView TTS helper block. */
+    public static final String WEBVIEW_TTS_HELPER_BEGIN_MARKER =
+            "// <ascode-tts v" + WEBVIEW_TTS_HELPER_VERSION + ">";
+
+    /** Closing marker comment wrapping the versioned WebView TTS helper block. */
+    public static final String WEBVIEW_TTS_HELPER_END_MARKER = "// </ascode-tts>";
         private static final Pattern WEBVIEW_DOWNLOAD_LISTENER_PATTERN = Pattern.compile(
             "((?:[A-Za-z_$][A-Za-z0-9_$]*\\s*\\.\\s*)*[A-Za-z_$][A-Za-z0-9_$]*)\\s*\\.\\s*setDownloadListener\\s*\\(\\s*new\\s+DownloadListener\\s*\\(\\s*\\)\\s*\\{");
         private static final Pattern WEBVIEW_CHROME_CLIENT_PATTERN = Pattern.compile(
@@ -1944,6 +1959,7 @@ public class Jx {
                 + (langParts.length > 1 ? ", \"" + langParts[1] + "\"" : "") + ")";
 
         sb.append(EOL);
+        sb.append(WEBVIEW_TTS_HELPER_BEGIN_MARKER).append(EOL);
         sb.append("private TextToSpeech _tts;").append(EOL);
         sb.append("private boolean _ttsReady = false;").append(EOL);
         sb.append("private String _ttsPendingText = null;").append(EOL);
@@ -2311,5 +2327,151 @@ public class Jx {
         sb.append("});").append(EOL);
         sb.append("}").append(EOL);
         sb.append("}").append(EOL);
+        sb.append(WEBVIEW_TTS_HELPER_END_MARKER).append(EOL);
+    }
+
+    /**
+     * @return {@code true} when {@code javaCode} already contains the current version of the
+     * WebView TTS helper: its version marker plus the {@code setAudioAttributes} audio-routing
+     * support introduced in {@link #WEBVIEW_TTS_HELPER_VERSION} 2.
+     */
+    public static boolean hasCurrentWebViewTtsHelper(String javaCode) {
+        return javaCode != null
+                && javaCode.contains(WEBVIEW_TTS_HELPER_BEGIN_MARKER)
+                && javaCode.contains("setAudioAttributes");
+    }
+
+    /**
+     * @return {@code true} when {@code javaCode} carries a WebView TTS helper that is not the
+     * current version (for example one injected by an older release, which lacks the version
+     * marker / {@code setAudioAttributes}), so {@code yq} knows it must upgrade it in place.
+     */
+    public static boolean hasLegacyWebViewTtsHelper(String javaCode) {
+        if (javaCode == null || javaCode.isEmpty() || hasCurrentWebViewTtsHelper(javaCode)) {
+            return false;
+        }
+        return javaCode.contains("\"AndroidBridge\"")
+                || javaCode.contains("private class _TtsBridge")
+                || javaCode.contains("TextToSpeech _tts;");
+    }
+
+    /**
+     * Replaces an outdated WebView TTS helper block (fields + speechSynthesis shim +
+     * {@code _TtsBridge}) found in {@code javaCode} with the current one emitted by
+     * {@link #appendWebViewTtsHelpers(StringBuilder, String)}, leaving every other line of the
+     * file untouched. Used by {@code yq} to upgrade projects that were patched by an older
+     * release, as a surgical alternative to regenerating the whole activity (which would drop the
+     * user's customizations).
+     * <p>
+     * The legacy block starts at the helper's first field declaration ({@code TextToSpeech _tts;})
+     * and ends at the closing brace of the {@code _TtsBridge} inner class, so any code that follows
+     * the helper (such as {@code onActivityResult}) is preserved.
+     *
+     * @return the upgraded source, or {@code null} when the block could not be located
+     */
+    public static String replaceLegacyWebViewTtsHelper(String javaCode, String EOL) {
+        if (javaCode == null || javaCode.isEmpty()) {
+            return null;
+        }
+        int helperFieldIndex = javaCode.indexOf("TextToSpeech _tts;");
+        if (helperFieldIndex < 0) {
+            return null;
+        }
+        int helperStart = javaCode.lastIndexOf('\n', helperFieldIndex) + 1;
+
+        int bridgeClassIndex = javaCode.indexOf("class _TtsBridge");
+        if (bridgeClassIndex < 0) {
+            return null;
+        }
+        int braceOpenIndex = javaCode.indexOf('{', bridgeClassIndex);
+        if (braceOpenIndex < 0) {
+            return null;
+        }
+        int blockEndIndex = findMatchingBrace(javaCode, braceOpenIndex);
+        if (blockEndIndex < 0) {
+            return null;
+        }
+        int replaceEnd = blockEndIndex + 1;
+
+        StringBuilder helpersBuilder = new StringBuilder(8192);
+        appendWebViewTtsHelpers(helpersBuilder, EOL);
+        String newHelper = helpersBuilder.toString();
+        if (newHelper.startsWith(EOL)) {
+            newHelper = newHelper.substring(EOL.length());
+        }
+        return javaCode.substring(0, helperStart) + newHelper + javaCode.substring(replaceEnd);
+    }
+
+    /**
+     * Returns the index of the closing brace matching the {@code '{'} at {@code openBraceIndex},
+     * ignoring braces inside strings, characters and comments. Returns {@code -1} when unbalanced.
+     */
+    private static int findMatchingBrace(String source, int openBraceIndex) {
+        int len = source.length();
+        int depth = 0;
+        boolean opened = false;
+        boolean inString = false;
+        boolean inChar = false;
+        boolean inLineComment = false;
+        boolean inBlockComment = false;
+        for (int i = openBraceIndex; i < len; i++) {
+            char c = source.charAt(i);
+            char next = i + 1 < len ? source.charAt(i + 1) : '\0';
+            if (inLineComment) {
+                if (c == '\n') inLineComment = false;
+                continue;
+            }
+            if (inBlockComment) {
+                if (c == '*' && next == '/') {
+                    inBlockComment = false;
+                    i++;
+                }
+                continue;
+            }
+            if (inString) {
+                if (c == '\\' && next != '\0') {
+                    i++;
+                } else if (c == '"') {
+                    inString = false;
+                }
+                continue;
+            }
+            if (inChar) {
+                if (c == '\\' && next != '\0') {
+                    i++;
+                } else if (c == '\'') {
+                    inChar = false;
+                }
+                continue;
+            }
+            if (c == '/' && next == '/') {
+                inLineComment = true;
+                i++;
+                continue;
+            }
+            if (c == '/' && next == '*') {
+                inBlockComment = true;
+                i++;
+                continue;
+            }
+            if (c == '"') {
+                inString = true;
+                continue;
+            }
+            if (c == '\'') {
+                inChar = true;
+                continue;
+            }
+            if (c == '{') {
+                depth++;
+                opened = true;
+            } else if (c == '}') {
+                depth--;
+                if (opened && depth == 0) {
+                    return i;
+                }
+            }
+        }
+        return -1;
     }
 }

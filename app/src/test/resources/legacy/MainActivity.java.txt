@@ -1,0 +1,330 @@
+package com.escuelita;
+
+import android.webkit.*;
+import android.media.*;
+import android.os.*;
+import java.util.*;
+import android.speech.tts.TextToSpeech;
+
+public class MainActivity extends AppCompatActivity {
+    private WebView webview1;
+
+    private void initializeLogic() {
+        webview1.loadUrl("file:///android_asset/index.html");
+    }
+
+private TextToSpeech _tts;
+private boolean _ttsReady = false;
+private String _ttsPendingText = null;
+private String _ttsPendingRate = "0.95";
+private int _ttsUtteranceSeq = 0;
+private String _ttsEngine = null;
+private final java.util.ArrayList<String> _ttsTriedEngines = new java.util.ArrayList<String>();
+private boolean _ttsGivingUp = false;
+private java.util.List<String> _ttsEnginePkgs = null;
+
+private void _initTts() {
+if (_ttsReady) {
+return;
+}
+if (_ttsGivingUp) {
+android.util.Log.w("AscodeTTS", "TTS: ningún motor disponible, init ignorado");
+return;
+}
+if (_tts == null) {
+_startTtsEngine(_ttsEngine);
+}
+}
+
+private void _startTtsEngine(final String _enginePkg) {
+android.util.Log.i("AscodeTTS", "TTS intentando motor=" + (_enginePkg == null ? "(por defecto)" : _enginePkg));
+try {
+TextToSpeech.OnInitListener _listener = new TextToSpeech.OnInitListener() {
+@Override
+public void onInit(int _status) {
+android.util.Log.i("AscodeTTS", "TTS onInit status=" + _status + " motor=" + (_enginePkg == null ? "(por defecto)" : _enginePkg));
+if (_status == TextToSpeech.SUCCESS) {
+_ttsEngine = _enginePkg;
+_onTtsReady();
+} else {
+android.util.Log.e("AscodeTTS", "TTS onInit FAILED status=" + _status + " motor=" + (_enginePkg == null ? "(por defecto)" : _enginePkg));
+_ttsFallbackAfterFailure(_enginePkg);
+}
+}
+};
+if (_enginePkg == null) {
+_tts = new TextToSpeech(getApplicationContext(), _listener);
+} else {
+_tts = new TextToSpeech(getApplicationContext(), _listener, _enginePkg);
+}
+} catch (Throwable _ttsCreateError) {
+android.util.Log.e("AscodeTTS", "TTS constructor error motor=" + _enginePkg + ": " + _ttsCreateError);
+_ttsFallbackAfterFailure(_enginePkg);
+}
+}
+
+private void _ttsFallbackAfterFailure(String _failedPkg) {
+String _failedName = _failedPkg;
+if (_failedName == null && _tts != null) {
+try {
+_failedName = _tts.getDefaultEngine();
+} catch (Throwable ignored) {
+}
+}
+if (_failedName != null) {
+if (!_ttsTriedEngines.contains(_failedName)) {
+_ttsTriedEngines.add(_failedName);
+}
+} else if (!_ttsTriedEngines.contains("<default>")) {
+_ttsTriedEngines.add("<default>");
+}
+_ttsRememberEngines();
+try {
+if (_tts != null) {
+_tts.shutdown();
+}
+} catch (Throwable ignored) {
+}
+_tts = null;
+_ttsReady = false;
+String _next = _ttsNextEngine();
+if (_next == null) {
+_ttsGivingUp = true;
+android.util.Log.e("AscodeTTS", "TTS: ningún motor disponible");
+_ttsPendingText = null;
+return;
+}
+android.util.Log.w("AscodeTTS", "TTS fallback: reintentando con motor=" + _next);
+_startTtsEngine(_next);
+}
+
+private void _ttsRememberEngines() {
+if (_ttsEnginePkgs != null) {
+return;
+}
+java.util.ArrayList<String> _pkgs = new java.util.ArrayList<String>();
+try {
+if (_tts != null) {
+java.util.List<TextToSpeech.EngineInfo> _engines = _tts.getEngines();
+if (_engines != null) {
+for (TextToSpeech.EngineInfo _info : _engines) {
+if (_info != null && _info.name != null && !_pkgs.contains(_info.name)) {
+_pkgs.add(_info.name);
+}
+}
+}
+}
+} catch (Throwable _enginesError) {
+android.util.Log.e("AscodeTTS", "TTS getEngines error: " + _enginesError);
+}
+if (_pkgs.isEmpty()) {
+try {
+java.util.List<android.content.pm.ResolveInfo> _ris = getPackageManager().queryIntentServices(new android.content.Intent("android.intent.action.TTS_SERVICE"), 0);
+if (_ris != null) {
+for (android.content.pm.ResolveInfo _ri : _ris) {
+if (_ri != null && _ri.serviceInfo != null && _ri.serviceInfo.packageName != null && !_pkgs.contains(_ri.serviceInfo.packageName)) {
+_pkgs.add(_ri.serviceInfo.packageName);
+}
+}
+}
+} catch (Throwable _pmError) {
+android.util.Log.e("AscodeTTS", "TTS queryIntentServices error: " + _pmError);
+}
+}
+_ttsEnginePkgs = _pkgs;
+android.util.Log.i("AscodeTTS", "TTS motores instalados=" + _ttsEnginePkgs);
+}
+
+private String _ttsNextEngine() {
+_ttsRememberEngines();
+String _google = "com.google.android.tts";
+if (_ttsEnginePkgs.contains(_google) && !_ttsTriedEngines.contains(_google)) {
+return _google;
+}
+for (String _pkg : _ttsEnginePkgs) {
+if (_pkg != null && !_ttsTriedEngines.contains(_pkg)) {
+return _pkg;
+}
+}
+return null;
+}
+private boolean _ttsEngineInstalled(String _pkg) {
+_ttsRememberEngines();
+return _ttsEnginePkgs.contains(_pkg);
+}
+private void _onTtsReady() {
+if (_tts == null) {
+return;
+}
+if (_ttsTriedEngines.isEmpty()) {
+android.util.Log.i("AscodeTTS", "TTS activo engine=" + (_ttsEngine == null ? "(por defecto)" : _ttsEngine));
+} else {
+android.util.Log.i("AscodeTTS", "TTS fallback engine=" + (_ttsEngine == null ? "(por defecto)" : _ttsEngine) + " OK");
+}
+try {
+_tts.setOnUtteranceProgressListener(new android.speech.tts.UtteranceProgressListener() {
+@Override
+public void onStart(String _utteranceId) {
+android.util.Log.i("AscodeTTS", "TTS onStart id=" + _utteranceId);
+}
+@Override
+public void onDone(String _utteranceId) {
+android.util.Log.i("AscodeTTS", "TTS onDone id=" + _utteranceId);
+}
+@Override
+public void onError(String _utteranceId) {
+android.util.Log.e("AscodeTTS", "TTS onError id=" + _utteranceId);
+}
+@Override
+public void onStop(String _utteranceId, boolean _interrupted) {
+android.util.Log.i("AscodeTTS", "TTS onStop id=" + _utteranceId + " interrupted=" + _interrupted);
+}
+});
+Locale _ttsLocale = new Locale("es", "ES");
+int _ttsAvail = _tts.isLanguageAvailable(_ttsLocale);
+android.util.Log.i("AscodeTTS", "TTS isLanguageAvailable(es-ES)=" + _ttsAvail);
+int _langResult;
+if (_ttsAvail == TextToSpeech.LANG_AVAILABLE || _ttsAvail == TextToSpeech.LANG_COUNTRY_AVAILABLE || _ttsAvail == TextToSpeech.LANG_COUNTRY_VAR_AVAILABLE) {
+_langResult = _tts.setLanguage(_ttsLocale);
+} else {
+Locale _ttsFallback = Locale.getDefault();
+android.util.Log.w("AscodeTTS", "TTS es-ES no disponible (" + _ttsAvail + "), fallback a " + _ttsFallback);
+_langResult = _tts.setLanguage(_ttsFallback);
+if (_langResult == TextToSpeech.LANG_MISSING_DATA || _langResult == TextToSpeech.LANG_NOT_SUPPORTED) {
+_langResult = _tts.setLanguage(Locale.US);
+android.util.Log.w("AscodeTTS", "TTS fallback final Locale.US result=" + _langResult);
+}
+}
+android.util.Log.i("AscodeTTS", "TTS setLanguage result=" + _langResult);
+int _ttsRateResult = _tts.setSpeechRate(0.95f);
+int _ttsPitchResult = _tts.setPitch(1.0f);
+android.util.Log.i("AscodeTTS", "TTS setSpeechRate=0.95 -> " + _ttsRateResult + ", setPitch=1.0 -> " + _ttsPitchResult);
+} catch (Throwable _ttsInitError) {
+android.util.Log.e("AscodeTTS", "TTS init error: " + _ttsInitError);
+}
+_ttsReady = true;
+if (_ttsPendingText != null) {
+String _pendingText = _ttsPendingText;
+String _pendingRate = _ttsPendingRate;
+_ttsPendingText = null;
+_speakTtsNow(_pendingText, _pendingRate);
+}
+}
+private void _speakTtsNow(String _text, String _rate) {
+if (_ttsGivingUp) {
+android.util.Log.w("AscodeTTS", "TTS speak ignorado: ningún motor disponible");
+return;
+}
+if (_tts == null || !_ttsReady) {
+android.util.Log.w("AscodeTTS", "TTS speak skipped ready=" + _ttsReady + " tts=" + (_tts != null));
+return;
+}
+float _speechRate = 0.95f;
+try {
+_speechRate = Float.parseFloat(_rate);
+} catch (Throwable _rateError) {
+android.util.Log.w("AscodeTTS", "TTS rate parse failed for '" + _rate + "', usando 0.95");
+}
+if (_speechRate <= 0f) {
+_speechRate = 0.95f;
+}
+if (_speechRate > 2f) {
+_speechRate = 2f;
+}
+String _speakText = (_text == null) ? "" : _text;
+if (_speakText.trim().isEmpty()) {
+android.util.Log.i("AscodeTTS", "TTS speak skipped: texto vacio");
+return;
+}
+String _utteranceId = "ascode_tts_" + (++_ttsUtteranceSeq);
+try {
+_tts.setSpeechRate(_speechRate);
+int _ttsQueued = _tts.speak(_speakText, TextToSpeech.QUEUE_FLUSH, null, _utteranceId);
+android.util.Log.i("AscodeTTS", "TTS speak id=" + _utteranceId + " rate=" + _speechRate + " queued=" + _ttsQueued + " len=" + _speakText.length());
+} catch (Throwable _ttsSpeakError) {
+android.util.Log.e("AscodeTTS", "TTS speak error: " + _ttsSpeakError);
+}
+}
+
+private void _stopTts() {
+android.util.Log.i("AscodeTTS", "TTS stop()");
+if (_tts != null) {
+try {
+_tts.stop();
+} catch (Throwable _ttsStopError) {
+android.util.Log.e("AscodeTTS", "TTS stop error: " + _ttsStopError);
+}
+}
+}
+
+private void _injectTtsShim(WebView _webView) {
+if (_webView == null) {
+return;
+}
+android.util.Log.i("AscodeTTS", "SHIM inject on " + _webView.getUrl());
+String _shim = "(function(){"
++ "if(window.__ascodeTtsShim){return;}"
++ "window.__ascodeTtsShim=true;"
++ "function _Utterance(t){this.text=(t===undefined||t===null)?'':String(t);this.lang='es-ES';this.rate=0.95;this.pitch=1;this.volume=1;this.voice=null;this.onstart=null;this.onend=null;this.onerror=null;}"
++ "if(typeof window.SpeechSynthesisUtterance==='undefined'){window.SpeechSynthesisUtterance=_Utterance;}"
++ "if(typeof window.speechSynthesis==='undefined'){"
++ "var _s={speaking:false,paused:false,onvoiceschanged:null,voices:[],"
++ "getVoices:function(){return this.voices;},"
++ "speak:function(u){"
++ "var t=(u&&typeof u==='object')?u.text:u;t=(t===undefined||t===null)?'':String(t);"
++ "var r=(u&&typeof u==='object'&&u.rate)?String(u.rate):'0.95';"
++ "this.speaking=true;"
++ "try{if(typeof u.onstart==='function')u.onstart();}catch(e){}"
++ "try{var _b=window.AndroidBridge;if(_b&&typeof _b.speak==='function'){_b.speak(t,r);}}catch(e){}"
++ "var _self=this;var _dur=Math.min(28000,Math.max(900,t.length*65));"
++ "setTimeout(function(){_self.speaking=false;try{if(typeof u.onend==='function')u.onend();}catch(e){}}, _dur);"
++ "},"
++ "cancel:function(){this.speaking=false;try{var _b2=window.AndroidBridge;if(_b2&&typeof _b2.stop==='function'){_b2.stop();}}catch(e){}},"
++ "pause:function(){this.paused=true;},resume:function(){this.paused=false;}};"
++ "window.speechSynthesis=_s;"
++ "}"
++ "})();";
+if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+_webView.evaluateJavascript(_shim, null);
+} else {
+_webView.loadUrl("javascript:" + _shim);
+}
+}
+
+private class _TtsBridge {
+@JavascriptInterface
+public void speak(final String _text, final String _rate) {
+android.util.Log.i("AscodeTTS", "BRIDGE speak len=" + (_text == null ? 0 : _text.length()) + " rate=" + _rate);
+new Handler(Looper.getMainLooper()).post(new Runnable() {
+@Override
+public void run() {
+_initTts();
+if (_ttsReady) {
+_speakTtsNow(_text, _rate);
+} else if (_ttsGivingUp) {
+android.util.Log.w("AscodeTTS", "BRIDGE speak ignorado: ningún motor disponible");
+} else {
+_ttsPendingText = _text;
+_ttsPendingRate = _rate;
+}
+}
+});
+}
+@JavascriptInterface
+public void stop() {
+android.util.Log.i("AscodeTTS", "BRIDGE stop()");
+new Handler(Looper.getMainLooper()).post(new Runnable() {
+@Override
+public void run() {
+_stopTts();
+}
+});
+}
+}
+
+
+    protected void onActivityResult(int _requestCode, int _resultCode, android.content.Intent _data) {
+        super.onActivityResult(_requestCode, _resultCode, _data);
+        // USER CODE THAT MUST SURVIVE THE MIGRATION
+    }
+}

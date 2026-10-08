@@ -1051,9 +1051,6 @@ public class yq {
         if (existingCode == null || existingCode.isEmpty()) {
             return false;
         }
-        if (existingCode.contains("\"AndroidBridge\"")) {
-            return false;
-        }
         if (!existingCode.contains("WebView")) {
             return false;
         }
@@ -1062,45 +1059,19 @@ public class yq {
         String currentCode = existingCode;
         boolean anyPatched = false;
 
-        // 1) Register the bridge next to the existing download bridge JS interface.
-        StringBuilder withBridge = new StringBuilder(currentCode.length() + 256);
-        String[] lines = currentCode.split("\n", -1);
-        for (int i = 0; i < lines.length; i++) {
-            withBridge.append(lines[i]);
-            if (i < lines.length - 1) {
-                withBridge.append('\n');
-            }
-            int blobIndex = lines[i].indexOf(".addJavascriptInterface(new _BlobDownloadBridge(), \"_BlobDownloader\");");
-            if (blobIndex > 0) {
-                withBridge.append('\n').append(lines[i], 0, blobIndex).append('.').append(bridgeRegistration);
-                anyPatched = true;
-            }
-        }
+        boolean bridgeRegistered = currentCode.contains("\"AndroidBridge\"")
+                || currentCode.contains("AndroidBridge");
 
-        if (anyPatched) {
-            currentCode = withBridge.toString();
-        } else {
-            // Fallback: register right after each setJavaScriptEnabled(true) call.
-            StringBuilder b2 = new StringBuilder(currentCode.length() + 256);
-            String[] lines2 = currentCode.split("\n", -1);
-            for (int i = 0; i < lines2.length; i++) {
-                b2.append(lines2[i]);
-                if (i < lines2.length - 1) {
-                    b2.append('\n');
-                }
-                int jsIndex = lines2[i].indexOf(".getSettings().setJavaScriptEnabled(true);");
-                if (jsIndex > 0) {
-                    b2.append('\n').append(lines2[i], 0, jsIndex).append('.').append(bridgeRegistration);
-                    anyPatched = true;
-                }
+        // 1) Register the bridge next to the existing download bridge JS interface. Skipped when
+        //    the project already registers AndroidBridge, so upgrading the helper below never
+        //    adds a duplicate addJavascriptInterface(...) call.
+        if (!bridgeRegistered) {
+            String registeredCode = registerLegacyTtsBridge(currentCode, bridgeRegistration);
+            if (registeredCode == null) {
+                return false;
             }
-            if (anyPatched) {
-                currentCode = b2.toString();
-            }
-        }
-
-        if (!anyPatched) {
-            return false;
+            currentCode = registeredCode;
+            anyPatched = true;
         }
 
         // 2) Inject the speechSynthesis shim invocation into existing WebChromeClient overrides.
@@ -1117,8 +1088,21 @@ public class yq {
             }
         }
 
-        // 3) Inject the TTS helper methods + _TtsBridge inner class if missing.
-        if (!currentCode.contains("private class _TtsBridge")) {
+        // 3) Ensure the CURRENT TTS helper (fields + speechSynthesis shim + _TtsBridge) is present.
+        //    A project patched by an older release still carries a legacy helper: replace that
+        //    contiguous block surgically (preferred over regenerating the whole file, which would
+        //    drop the user's customizations). A project without any helper gets the new one
+        //    injected before the class close.
+        if (Jx.hasLegacyWebViewTtsHelper(currentCode)) {
+            String upgradedCode = Jx.replaceLegacyWebViewTtsHelper(currentCode, "\n");
+            if (upgradedCode == null) {
+                // Could not locate the old helper safely: let the caller fall back to full
+                // regeneration instead of risking dropping the user's code.
+                return false;
+            }
+            currentCode = upgradedCode;
+            anyPatched = true;
+        } else if (!currentCode.contains("private class _TtsBridge")) {
             int classCloseIndex = findFinalClassClosingBrace(currentCode);
             if (classCloseIndex < 0) {
                 return false;
@@ -1128,6 +1112,7 @@ public class yq {
             currentCode = currentCode.substring(0, classCloseIndex)
                     + helpersBuilder
                     + currentCode.substring(classCloseIndex);
+            anyPatched = true;
         }
 
         // 4) Ensure the TTS import exists (the rest come from the generated wildcard imports).
@@ -1159,8 +1144,56 @@ public class yq {
             }
         }
 
+        if (!anyPatched) {
+            return false;
+        }
+
         FileUtil.writeFile(activityJavaPath, currentCode);
         return true;
+    }
+
+    /**
+     * Registers the TTS {@code AndroidBridge} JavaScript interface in a legacy activity: next to
+     * the blob-download bridge when present, or right after {@code setJavaScriptEnabled(true)}
+     * otherwise.
+     *
+     * @return the patched source, or {@code null} when no anchor was found
+     */
+    private String registerLegacyTtsBridge(String currentCode, String bridgeRegistration) {
+        StringBuilder withBridge = new StringBuilder(currentCode.length() + 256);
+        String[] lines = currentCode.split("\n", -1);
+        boolean anyPatched = false;
+        for (int i = 0; i < lines.length; i++) {
+            withBridge.append(lines[i]);
+            if (i < lines.length - 1) {
+                withBridge.append('\n');
+            }
+            int blobIndex = lines[i].indexOf(".addJavascriptInterface(new _BlobDownloadBridge(), \"_BlobDownloader\");");
+            if (blobIndex > 0) {
+                withBridge.append('\n').append(lines[i], 0, blobIndex).append('.').append(bridgeRegistration);
+                anyPatched = true;
+            }
+        }
+
+        if (anyPatched) {
+            return withBridge.toString();
+        }
+
+        // Fallback: register right after each setJavaScriptEnabled(true) call.
+        StringBuilder b2 = new StringBuilder(currentCode.length() + 256);
+        String[] lines2 = currentCode.split("\n", -1);
+        for (int i = 0; i < lines2.length; i++) {
+            b2.append(lines2[i]);
+            if (i < lines2.length - 1) {
+                b2.append('\n');
+            }
+            int jsIndex = lines2[i].indexOf(".getSettings().setJavaScriptEnabled(true);");
+            if (jsIndex > 0) {
+                b2.append('\n').append(lines2[i], 0, jsIndex).append('.').append(bridgeRegistration);
+                anyPatched = true;
+            }
+        }
+        return anyPatched ? b2.toString() : null;
     }
 
     /**
@@ -1359,6 +1392,14 @@ public class yq {
         // interface. Force a migration so compiled apps keep talking inside their WebViews.
         // When the project disabled the TTS bridge this reason no longer applies.
         if (ttsBridgeEnabled && !javaCode.contains("\"AndroidBridge\"") && !javaCode.contains("AndroidBridge")) {
+            return true;
+        }
+
+        // The bridge is registered, but the embedded helper may be outdated (e.g. a project
+        // patched by an older release that still ships the legacy helper). Force a migration so
+        // the next build upgrades the helper in place instead of leaving the app stuck on the
+        // old code forever. When the project disabled the TTS bridge this reason no longer applies.
+        if (ttsBridgeEnabled && Jx.hasLegacyWebViewTtsHelper(javaCode)) {
             return true;
         }
 

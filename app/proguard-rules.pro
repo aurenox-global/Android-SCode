@@ -188,6 +188,12 @@
 -dontwarn com.ctc.wstx.shaded.msv_core.driver.textui.Driver
 -dontwarn com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 -dontwarn com.fasterxml.jackson.dataformat.yaml.YAMLMapper
+# commons-compress (TTS Piper, .tar.bz2) referencia codecs opcionales zstd/brotli que no empaquetamos;
+# R8 los detectaba como clases ausentes y abortaba assembleRelease (reglas generadas por AGP).
+-dontwarn com.github.luben.zstd.ZstdInputStream
+-dontwarn com.github.luben.zstd.ZstdOutputStream
+-dontwarn org.brotli.dec.BrotliInputStream
+-dontwarn java.lang.reflect.AnnotatedType
 -dontwarn com.google.api.client.http.GenericUrl
 -dontwarn com.google.api.client.http.HttpHeaders
 -dontwarn com.google.api.client.http.HttpRequest

@@ -52,6 +52,8 @@ public class PiperTtsRuntimeTest {
         File runtime = tmp.newFolder("piper_runtime");
         write(new File(runtime, "arm64-v8a/libsherpa-onnx-jni.so"), "arm64-so");
         write(new File(runtime, "armeabi-v7a/libsherpa-onnx-jni.so"), "v7a-so");
+        write(new File(runtime, "x86/libsherpa-onnx-jni.so"), "x86-so");
+        write(new File(runtime, "x86_64/libsherpa-onnx-jni.so"), "x86_64-so");
         write(new File(runtime, "sherpa-classes.jar"), "jar");
         write(new File(runtime, "kotlin-stdlib.jar"), "jar");
         write(new File(runtime, "sherpa-runtime.dex"), "dex");
@@ -91,7 +93,8 @@ public class PiperTtsRuntimeTest {
     }
 
     @Test
-    public void stagesNativeLibsPerAbiThatExists() throws Exception {
+    public void stagesOnlyThePhoneAbisByDefault() throws Exception {
+        // The runtime ships all four ABIs; only arm64-v8a and armeabi-v7a must reach the project.
         File runtime = buildRuntimeDir();
         File nativeLibs = tmp.newFolder("native_libs");
 
@@ -100,7 +103,43 @@ public class PiperTtsRuntimeTest {
         assertEquals(List.of("arm64-v8a", "armeabi-v7a"), abis);
         assertTrue(new File(nativeLibs, "arm64-v8a/libsherpa-onnx-jni.so").isFile());
         assertTrue(new File(nativeLibs, "armeabi-v7a/libsherpa-onnx-jni.so").isFile());
+        assertFalse(new File(nativeLibs, "x86").exists());
         assertFalse(new File(nativeLibs, "x86_64").exists());
+    }
+
+    @Test
+    public void stagesTheProjectsOwnAbisOnTopOfTheDefaults() throws Exception {
+        File runtime = buildRuntimeDir();
+        File nativeLibs = tmp.newFolder("native_libs");
+
+        List<String> abis = PiperTtsRuntime.stageNativeLibs(runtime, nativeLibs, List.of("x86_64"));
+
+        assertEquals(List.of("arm64-v8a", "armeabi-v7a", "x86_64"), abis);
+        assertTrue(new File(nativeLibs, "x86_64/libsherpa-onnx-jni.so").isFile());
+        assertFalse(new File(nativeLibs, "x86").exists());
+    }
+
+    @Test
+    public void packagingAbisUsesPhoneDefaultsAndUnionsProjectTargets() throws Exception {
+        assertEquals(List.of("arm64-v8a", "armeabi-v7a"), PiperTtsRuntime.packagingAbis(null));
+        assertEquals(List.of("arm64-v8a", "armeabi-v7a"),
+                PiperTtsRuntime.packagingAbis(java.util.Collections.emptyList()));
+        assertEquals(List.of("arm64-v8a", "armeabi-v7a", "x86_64"),
+                PiperTtsRuntime.packagingAbis(List.of("x86_64")));
+        // The project's own target must not duplicate a default and must ignore blanks.
+        assertEquals(List.of("arm64-v8a", "armeabi-v7a"),
+                PiperTtsRuntime.packagingAbis(List.of("arm64-v8a", " ")));
+    }
+
+    @Test
+    public void projectOwnAbisSeesForeignNativeCodeButNotPipersOwn() throws Exception {
+        File nativeLibs = tmp.newFolder("native_libs");
+        assertTrue(PiperTtsRuntime.projectOwnAbis(nativeLibs).isEmpty());
+
+        write(new File(nativeLibs, "x86_64/libother.so"), "other");
+        write(new File(nativeLibs, "arm64-v8a/" + PiperTtsRuntime.SO_NAME), "piper");
+
+        assertEquals(List.of("x86_64"), PiperTtsRuntime.projectOwnAbis(nativeLibs));
     }
 
     @Test

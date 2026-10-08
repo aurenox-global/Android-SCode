@@ -53,7 +53,11 @@ public final class PiperTtsPackaging {
             PiperTtsRuntime.stageAssets(voiceDir, new File(builder.yq.assetsPath));
 
             File nativeLibsDir = new File(builder.fpu.getPathNativelibs(scId));
-            List<String> abis = PiperTtsRuntime.stageNativeLibs(runtimeDir, nativeLibsDir);
+            // Only the phone ABIs ship by default (arm64-v8a + armeabi-v7a). If the project already
+            // targets another ABI with its own native code (e.g. an x86_64 .so), package Piper for
+            // it too so the generated app keeps working on those devices.
+            List<String> projectAbis = PiperTtsRuntime.projectOwnAbis(nativeLibsDir);
+            List<String> abis = PiperTtsRuntime.stageNativeLibs(runtimeDir, nativeLibsDir, projectAbis);
 
             File classpathDir = new File(
                     new File(Environment.getExternalStorageDirectory(), ".AndroidSCode/data/" + scId),
@@ -78,7 +82,9 @@ public final class PiperTtsPackaging {
                 }
             }
 
-            Log.i(TAG, "Piper empaquetado: abis=" + abis + " assets=piper/ voz=" + voiceDir.getName());
+            Log.i(TAG, "Piper empaquetado: abis=" + abis
+                    + (projectAbis.isEmpty() ? "" : " (abis del proyecto=" + projectAbis + ")")
+                    + " assets=piper/ voz=" + voiceDir.getName());
         } catch (Throwable t) {
             Log.w(TAG, "Piper: fallo al empaquetar, sigo con el motor del sistema: " + t);
         }

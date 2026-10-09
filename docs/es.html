@@ -11,7 +11,7 @@
   /* últimas actualizaciones (bloque compacto) */
   ul.updates { list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 8px; }
   ul.updates li {
-    display: flex; gap: 12px; align-items: baseline;
+    display: flex; flex-wrap: wrap; gap: 12px; align-items: baseline;
     background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
     padding: 10px 14px; font-size: 0.93rem; color: var(--text-dim);
   }
@@ -1219,5 +1219,90 @@
   </div>
 </footer>
 
+<script>
+/* --- «Leer más»: pliega los textos largos de las tarjetas --- */
+(function () {
+  const LABELS = { es: ["Leer más", "Leer menos"], en: ["Read more", "Read less"] };
+  const TARGETS = [
+    { sel: ".card p", lines: 3 },
+    { sel: "ul.updates li > span:not(.ver)", lines: 3 }
+  ];
+  function lang() {
+    const l = (document.documentElement.lang || "es").slice(0, 2);
+    return LABELS[l] ? l : "es";
+  }
+  function lineHeight(el) {
+    const cs = getComputedStyle(el);
+    let lh = parseFloat(cs.lineHeight);
+    if (!lh || isNaN(lh)) lh = parseFloat(cs.fontSize) * 1.6;
+    return lh;
+  }
+  function measure(el) {
+    const st = el.__rm; if (!st) return;
+    const clampH = Math.round(lineHeight(el) * st.lines);
+    const full = el.scrollHeight;
+    const expanded = el.classList.contains("rm-open");
+    if (full <= clampH + 6 && !expanded) {
+      el.classList.remove("rm-clip", "rm-fade", "rm-open");
+      el.style.maxHeight = "";
+      st.btn.hidden = true;
+      return;
+    }
+    el.classList.add("rm-clip");
+    st.btn.hidden = false;
+    if (expanded) {
+      el.style.maxHeight = full + "px";
+      el.classList.remove("rm-fade");
+    } else {
+      el.style.maxHeight = clampH + "px";
+      el.classList.add("rm-fade");
+    }
+  }
+  function label(el) {
+    const st = el.__rm; if (!st) return;
+    const lab = LABELS[lang()];
+    const open = el.classList.contains("rm-open");
+    st.btn.querySelector(".rm-txt").textContent = open ? lab[1] : lab[0];
+    st.btn.setAttribute("aria-expanded", open ? "true" : "false");
+    const title = el.closest(".card") && el.closest(".card").querySelector("h3");
+    const t = title ? title.textContent.trim() : "";
+    st.btn.setAttribute("aria-label", t ? (open ? lab[1] : lab[0]) + " — " + t : (open ? lab[1] : lab[0]));
+  }
+  function toggle(el) {
+    const st = el.__rm; if (!st) return;
+    if (el.classList.contains("rm-open")) {
+      const clampH = Math.round(lineHeight(el) * st.lines);
+      el.classList.remove("rm-open");
+      el.style.maxHeight = clampH + "px";
+      el.classList.add("rm-fade");
+    } else {
+      el.style.maxHeight = el.scrollHeight + "px";
+      el.classList.add("rm-open");
+      el.classList.remove("rm-fade");
+    }
+    label(el);
+  }
+  function enhance() {
+    TARGETS.forEach((t) => {
+      document.querySelectorAll(t.sel).forEach((el) => {
+        if (!el.__rm) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "rm-btn";
+          btn.innerHTML = '<span class="rm-txt"></span><span class="rm-ic">▾</span>';
+          el.__rm = { btn, lines: t.lines };
+          el.classList.add("rm-clip");
+          el.parentNode.insertBefore(btn, el.nextSibling);
+          btn.addEventListener("click", () => toggle(el));
+        }
+        measure(el);
+        label(el);
+      });
+    });
+  }
+  window.addEventListener("load", enhance);
+  enhance();
+})();
+</script>
 </body>
 </html>

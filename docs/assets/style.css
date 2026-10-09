@@ -199,6 +199,28 @@ h2 .hash { color: var(--sw-blue); font-family: var(--mono); margin-right: 8px; }
 p.sub { color: var(--text-dim); margin: 0 0 26px; max-width: 70ch; }
 h3 { font-size: 1.06rem; margin: 0 0 6px; }
 
+/* --- texto más ligero dentro de las tarjetas --- */
+.card p, ul.updates li { font-weight: 300; }
+.card h3 { font-weight: 600; }
+
+/* --- «Leer más»: pliega los textos largos de las tarjetas --- */
+.rm-clip { overflow: hidden; transition: max-height 0.42s cubic-bezier(0.4, 0, 0.2, 1); }
+.rm-clip.rm-fade {
+  -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 1.7em), transparent);
+  mask-image: linear-gradient(180deg, #000 calc(100% - 1.7em), transparent);
+}
+.rm-btn {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 9px; padding: 0; border: 0;
+  background: transparent; color: var(--sw-blue-light); font: inherit; font-size: 0.85rem;
+  font-weight: 600; letter-spacing: 0.2px; cursor: pointer;
+}
+.rm-btn[hidden] { display: none; }
+.rm-btn:hover { text-decoration: underline; }
+.rm-btn:focus-visible { outline: 2px solid var(--sw-cyan); outline-offset: 2px; border-radius: 6px; }
+.rm-btn .rm-ic { font-size: 0.62rem; line-height: 1; transition: transform 0.3s ease; }
+.rm-btn[aria-expanded="true"] .rm-ic { transform: rotate(180deg); }
+ul.updates li > .rm-btn { flex: 1 1 100%; margin-top: 2px; }
+
 .grid { display: grid; gap: 16px; }
 .grid.c2 { grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); }
 .grid.c3 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
@@ -209,7 +231,7 @@ h3 { font-size: 1.06rem; margin: 0 0 6px; }
   border-radius: var(--radius);
   padding: 20px;
 }
-.card p { margin: 6px 0 0; color: var(--text-dim); font-size: 0.94rem; }
+.card p { margin: 6px 0 0; color: var(--text-dim); font-size: 0.94rem; font-weight: 300; letter-spacing: 0.1px; }
 .card .ico {
   width: 38px; height: 38px;
   border-radius: 10px;

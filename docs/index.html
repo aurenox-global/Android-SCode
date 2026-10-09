@@ -99,7 +99,7 @@
     background:rgba(61,220,132,.12);color:var(--green);margin-bottom:12px;font-weight:700
   }
   .card h3{margin:0 0 6px;font-size:16.5px}
-  .card p{margin:0;color:var(--muted);font-size:14.5px}
+  .card p{margin:0;color:var(--muted);font-size:14.5px;font-weight:300;letter-spacing:.1px}
 
   .download{
     background:linear-gradient(160deg,rgba(61,220,132,.12),rgba(0,191,165,.06));
@@ -124,8 +124,8 @@
   /* latest updates */
   .updates{list-style:none;padding:0;margin:18px 0 0;display:grid;gap:8px}
   .updates li{
-    display:flex;gap:12px;align-items:baseline;background:linear-gradient(180deg,var(--card),#111A2C);
-    border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:14.5px;color:var(--muted)
+    display:flex;flex-wrap:wrap;gap:12px;align-items:baseline;background:linear-gradient(180deg,var(--card),#111A2C);
+    border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:14.5px;color:var(--muted);font-weight:300;letter-spacing:.1px
   }
   .updates .ver{
     flex:0 0 auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;font-weight:700;
@@ -133,6 +133,27 @@
   }
   .updates-more{display:inline-block;margin-top:14px;font-size:13.5px}
   @media (max-width:520px){ .updates li{font-size:13.5px;padding:9px 12px;gap:9px} }
+
+  /* --- texto más ligero dentro de las tarjetas --- */
+  .card p, .updates li{font-weight:300}
+  .card h3{font-weight:650}
+
+  /* --- «Leer más / Read more»: plegado suave de textos largos --- */
+  .rm-clip{overflow:hidden;transition:max-height .42s cubic-bezier(.4,0,.2,1)}
+  .rm-clip.rm-fade{
+    -webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 1.7em),transparent);
+    mask-image:linear-gradient(180deg,#000 calc(100% - 1.7em),transparent)
+  }
+  .rm-btn{
+    display:inline-flex;align-items:center;gap:6px;margin-top:9px;padding:0;border:0;background:transparent;
+    color:var(--green);font:inherit;font-size:13.5px;font-weight:600;letter-spacing:.2px;cursor:pointer
+  }
+  .rm-btn[hidden]{display:none}
+  .rm-btn:hover{text-decoration:underline}
+  .rm-btn:focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:6px}
+  .rm-btn .rm-ic{font-size:10px;line-height:1;transition:transform .3s ease}
+  .rm-btn[aria-expanded="true"] .rm-ic{transform:rotate(180deg)}
+  .updates li>.rm-btn{flex:1 1 100%;margin-top:2px}
 </style>
 </head>
 <body>
@@ -334,9 +355,91 @@ function setLang(lang){
   document.getElementById("btn-es").setAttribute("aria-pressed", String(lang === "es"));
   document.getElementById("btn-en").setAttribute("aria-pressed", String(lang === "en"));
   try { localStorage.setItem("ascode-lang", lang); } catch (e) {}
+  rmEnhance();
 }
 document.getElementById("btn-es").addEventListener("click", () => setLang("es"));
 document.getElementById("btn-en").addEventListener("click", () => setLang("en"));
+
+/* --- «Leer más / Read more»: pliega los textos largos de las tarjetas --- */
+const RM_LABELS = { es: ["Leer más", "Leer menos"], en: ["Read more", "Read less"] };
+const RM_TARGETS = [
+  { sel: ".card p", lines: 3 },
+  { sel: "ul.updates li > span:not(.ver)", lines: 3 }
+];
+function rmLang() {
+  const l = (document.documentElement.lang || "es").slice(0, 2);
+  return RM_LABELS[l] ? l : "es";
+}
+function rmLineHeight(el) {
+  const cs = getComputedStyle(el);
+  let lh = parseFloat(cs.lineHeight);
+  if (!lh || isNaN(lh)) lh = parseFloat(cs.fontSize) * 1.6;
+  return lh;
+}
+function rmMeasure(el) {
+  const st = el.__rm; if (!st) return;
+  const clampH = Math.round(rmLineHeight(el) * st.lines);
+  const full = el.scrollHeight;
+  const expanded = el.classList.contains("rm-open");
+  if (full <= clampH + 6 && !expanded) {
+    el.classList.remove("rm-clip", "rm-fade", "rm-open");
+    el.style.maxHeight = "";
+    st.btn.hidden = true;
+    return;
+  }
+  el.classList.add("rm-clip");
+  st.btn.hidden = false;
+  if (expanded) {
+    el.style.maxHeight = full + "px";
+    el.classList.remove("rm-fade");
+  } else {
+    el.style.maxHeight = clampH + "px";
+    el.classList.add("rm-fade");
+  }
+}
+function rmLabel(el) {
+  const st = el.__rm; if (!st) return;
+  const lab = RM_LABELS[rmLang()];
+  const open = el.classList.contains("rm-open");
+  st.btn.querySelector(".rm-txt").textContent = open ? lab[1] : lab[0];
+  st.btn.setAttribute("aria-expanded", open ? "true" : "false");
+  const title = el.closest(".card") && el.closest(".card").querySelector("h3");
+  const t = title ? title.textContent.trim() : "";
+  st.btn.setAttribute("aria-label", t ? (open ? lab[1] : lab[0]) + " — " + t : (open ? lab[1] : lab[0]));
+}
+function rmToggle(el) {
+  const st = el.__rm; if (!st) return;
+  if (el.classList.contains("rm-open")) {
+    const clampH = Math.round(rmLineHeight(el) * st.lines);
+    el.classList.remove("rm-open");
+    el.style.maxHeight = clampH + "px";
+    el.classList.add("rm-fade");
+  } else {
+    el.style.maxHeight = el.scrollHeight + "px";
+    el.classList.add("rm-open");
+    el.classList.remove("rm-fade");
+  }
+  rmLabel(el);
+}
+function rmEnhance() {
+  RM_TARGETS.forEach((t) => {
+    document.querySelectorAll(t.sel).forEach((el) => {
+      if (!el.__rm) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "rm-btn";
+        btn.innerHTML = '<span class="rm-txt"></span><span class="rm-ic">▾</span>';
+        el.__rm = { btn, lines: t.lines };
+        el.classList.add("rm-clip");
+        el.parentNode.insertBefore(btn, el.nextSibling);
+        btn.addEventListener("click", () => rmToggle(el));
+      }
+      rmMeasure(el);
+      rmLabel(el);
+    });
+  });
+}
+window.addEventListener("load", rmEnhance);
 (function init(){
   let saved = null;
   try { saved = localStorage.getItem("ascode-lang"); } catch (e) {}

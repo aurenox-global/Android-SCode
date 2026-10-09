@@ -406,22 +406,24 @@ footer {
 footer a { color: var(--sw-blue-light); }
 
 @media (max-width: 720px) {
-  /* El header se reparte en dos filas: marca + ES/EN arriba,
-     y los enlaces en una segunda fila que se puede envolver.
-     Nada queda recortado ni superpuesto. */
-  .top-inner { flex-wrap: wrap; row-gap: 8px; }
+  /* Cabecera compacta en móvil: fila 1 con la marca a la izquierda y el
+     conmutador ES/EN a la derecha; fila 2 con los enlaces ajustados para
+     ocupar poco alto. Sin huecos vacíos y sin recortes. */
+  .top-inner { flex-wrap: wrap; row-gap: 3px; padding: 7px 16px; gap: 10px; }
   .brand { order: 1; min-width: 0; }
-  .brand span { overflow: hidden; text-overflow: ellipsis; }
+  .brand img { width: 26px; height: 26px; }
+  .brand span { font-size: 0.95rem; overflow: hidden; text-overflow: ellipsis; }
   .lang { order: 2; margin-left: auto; flex: 0 0 auto; }
+  .lang a { padding: 4px 9px; font-size: 0.78rem; }
   nav.main {
     order: 3;
     flex: 1 1 100%;
     min-width: 0;
     margin-left: 0;
     justify-content: flex-start;
-    gap: 4px 4px;
+    gap: 2px 2px;
   }
-  nav.main a { font-size: 0.82rem; padding: 5px 9px; white-space: nowrap; }
+  nav.main a { font-size: 0.75rem; padding: 3px 6px; border-radius: 6px; line-height: 1.25; white-space: nowrap; }
   .hero { padding: 46px 0 34px; }
   section { padding: 46px 0; }
   .log { padding-left: 18px; }

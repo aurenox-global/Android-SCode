@@ -94,14 +94,29 @@ public class yq {
     public final String projectMyscPath;
     public final String projectName;
     public final String packageName;
-    public final String applicationName;
-    public final int colorAccent;
-    public final int colorPrimary;
-    public final int colorPrimaryDark;
-    public final int colorControlHighlight;
-    public final int colorControlNormal;
-    public final String versionCode;
-    public final String versionName;
+    /**
+     * Application name (Project Settings' "Application name"). Not final on purpose: it is re-read
+     * from the project metadata at build time, see {@link #a(iC, hC, eC, ExportType)}.
+     */
+    public String applicationName;
+    /**
+     * Project theme colours. Not final on purpose: they are re-read from the project metadata at
+     * build time (see {@link #a(iC, hC, eC, ExportType)}), so a colour changed in Project Settings
+     * reaches the generated colors.xml/styles.xml on the very next build.
+     */
+    public int colorAccent;
+    public int colorPrimary;
+    public int colorPrimaryDark;
+    public int colorControlHighlight;
+    public int colorControlNormal;
+    /**
+     * Project's version code. Not final on purpose: it is re-read from the project metadata at
+     * build time (see {@link #a(iC, hC, eC, ExportType)}), because this {@code yq} instance can be
+     * built long before the build starts (the Design editor creates it on activity start).
+     */
+    public String versionCode;
+    /** Project's version name. Not final, see {@link #versionCode}. */
+    public String versionName;
     /**
      * Package name of current project,
      * but "folders" separated with slashes (/) instead of periods (.),
@@ -184,7 +199,13 @@ public class yq {
      */
     public final String importedSoundsPath;
     public final HashMap<String, Object> metadata;
-    private final Material3LibraryManager material3LibraryManager;
+    /**
+     * Material3/MaterialComponents state. Not final on purpose: it is re-resolved at build time
+     * (see {@link #a(iC, hC, eC, ExportType)}) because this {@code yq} can be created on activity
+     * start and reused later; a Material3/AppCompat toggle changed in between used to be ignored by
+     * {@link #getXMLStyle()}, leaving the generated theme (and top bar) on the old setting.
+     */
+    private Material3LibraryManager material3LibraryManager;
     private final oB fileUtil;
     private final Context context;
     public jq N;
@@ -499,6 +520,28 @@ public class yq {
         ProjectLibraryBean firebase = projectLibraryManager.d();
         ProjectLibraryBean googleMaps = projectLibraryManager.e();
         this.exportingType = exportingType;
+        /* Version must reflect what Project Settings holds *now*, not what was read when this yq
+         * was constructed. The Design editor builds from a yq created on activity start, so a
+         * Version code/name changed in Project Settings afterwards was silently ignored and the
+         * rebuilt APK kept the previous value ("no sube la version"). Re-read the on-disk project
+         * metadata here, right before the build writes the manifest/APK. */
+        HashMap<String, Object> freshProjectData = lC.b(sc_id);
+        if (freshProjectData != null) {
+            versionCode = yB.c(freshProjectData, "sc_ver_code");
+            versionName = yB.c(freshProjectData, "sc_ver_name");
+            applicationName = yB.c(freshProjectData, "my_app_name");
+            colorAccent = yB.a(freshProjectData, ProjectFile.COLOR_ACCENT, getDefaultColor(ProjectFile.COLOR_ACCENT));
+            colorPrimary = yB.a(freshProjectData, ProjectFile.COLOR_PRIMARY, getDefaultColor(ProjectFile.COLOR_PRIMARY));
+            colorPrimaryDark = yB.a(freshProjectData, ProjectFile.COLOR_PRIMARY_DARK, getDefaultColor(ProjectFile.COLOR_PRIMARY_DARK));
+            colorControlHighlight = yB.a(freshProjectData, ProjectFile.COLOR_CONTROL_HIGHLIGHT, getDefaultColor(ProjectFile.COLOR_CONTROL_HIGHLIGHT));
+            colorControlNormal = yB.a(freshProjectData, ProjectFile.COLOR_CONTROL_NORMAL, getDefaultColor(ProjectFile.COLOR_CONTROL_NORMAL));
+        }
+        /* Re-resolve the Material3/AppCompat state too: the library store may have changed since
+         * this yq was constructed, and getXMLStyle() decisions (Material3 vs MaterialComponents
+         * vs legacy theme, and the NoActionBar top bar) come from here. Without this the generated
+         * theme could keep the old Material setting forever (the layout, which resolves its own
+         * Material3LibraryManager, would then disagree with the theme). */
+        material3LibraryManager = new Material3LibraryManager(sc_id);
         N = new jq();
         N.packageName = packageName;
         N.projectName = applicationName;
@@ -701,10 +744,53 @@ public class yq {
     }
 
     /**
+     * Deletes the previously generated AndroidManifest.xml and value resources (styles.xml,
+     * colors.xml, strings.xml) so the next build can only regenerate them from the current project
+     * settings and screen options - never reuse a stale copy. Idempotent / safe when absent.
+     */
+    private void invalidateGeneratedManifestAndValues() {
+        FileUtil.deleteFile(androidManifestPath);
+        String valuesPath = resDirectoryPath + File.separator + "values";
+        FileUtil.deleteFile(valuesPath + File.separator + "styles.xml");
+        FileUtil.deleteFile(valuesPath + File.separator + "colors.xml");
+        FileUtil.deleteFile(valuesPath + File.separator + "strings.xml");
+    }
+
+    /**
+     * A human-readable fingerprint of everything the generated manifest/theme/version depend on:
+     * project version, application name, theme colours, Material3/AppCompat state and every screen's
+     * activity options (Toolbar, FullScreen, Drawer, FAB, ...). Logged on every build so a stuck
+     * version or top bar can be diagnosed from the Compile log without guessing.
+     */
+    public String generatedSettingsFingerprint(hC projectFileManager) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("version=").append(versionCode).append('/').append(versionName);
+        sb.append(", appName=").append(applicationName);
+        sb.append(", colors=").append(Integer.toHexString(colorPrimary)).append('/').append(Integer.toHexString(colorPrimaryDark));
+        sb.append(", m3=").append(material3LibraryManager.isMaterial3Enabled());
+        sb.append(", appcompat=").append(N != null && N.g);
+        if (projectFileManager != null) {
+            for (ProjectFileBean file : projectFileManager.b()) {
+                sb.append(", ").append(file.fileName).append("=0x").append(Integer.toHexString(file.options));
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
      * Generates the project's files, such as layouts, Java files, but also build.gradle and secrets.xml.
      */
     public void b(hC projectFileManager, eC projectDataManger, iC projectLibraryManager, BuiltInLibraryManager builtInLibraryManager) {
+        /* Never let a stale generated manifest/theme survive a build. The generated
+         * AndroidManifest.xml and value resources (styles/colors/strings) are always derived from
+         * the CURRENT project version, theme and screen options, so any previous copy is deleted
+         * before regeneration. This is what guarantees that changing the project Version
+         * (versionCode/versionName) or a screen's Toolbar toggle takes effect on the very next
+         * build, incremental ones included. */
+        invalidateGeneratedManifestAndValues();
+
         ArrayList<SrcCodeBean> srcCodeBeans = a(projectFileManager, projectDataManger, builtInLibraryManager);
+        Log.d("yq", "Generated settings fingerprint: " + generatedSettingsFingerprint(projectFileManager));
         if (N.u) {
             XmlBuilder pathsTag = new XmlBuilder("paths");
             pathsTag.addAttribute("xmlns", "android", "http://schemas.android.com/apk/res/android");
@@ -926,9 +1012,21 @@ public class yq {
         }
 
         String customManifest = getCustomAndroidManifest();
-        srcCodeBeans.add(new SrcCodeBean("AndroidManifest.xml", customManifest != null
-                ? customManifest
-                : CommandBlock.applyCommands("AndroidManifest.xml", ix.a())));
+        /* Keep exactly ONE source of truth for the version: the manifest must never carry a stale
+         * android:versionCode/android:versionName, because aapt2 ignores --version-code/--version-name
+         * whenever the linked manifest already declares them. The build always passes the fresh values
+         * (ResourceCompiler reads yq.versionCode/versionName, refreshed at build time above), so strip
+         * any version attribute a user-customized manifest may have saved. */
+        String generatedManifest = CommandBlock.applyCommands("AndroidManifest.xml", ix.a());
+        /* A manifest customized from the Code Viewer is preferred verbatim, but that silently dropped
+         * the per-activity theme the generator derives from the design (most importantly the screen's
+         * Toolbar toggle, which turns into @style/NoActionBar for projects without AppCompat). Without
+         * this the built app kept its action bar even after the Toolbar was unchecked. Re-apply the
+         * generated activity themes onto the custom manifest so the design toggles stay honoured. */
+        String manifestXml = customManifest != null
+                ? applyGeneratedActivityThemes(customManifest, generatedManifest)
+                : generatedManifest;
+        srcCodeBeans.add(new SrcCodeBean("AndroidManifest.xml", stripManifestVersionAttributes(manifestXml)));
         srcCodeBeans.add(new SrcCodeBean("styles.xml", getXMLStyle()));
         srcCodeBeans.add(new SrcCodeBean("colors.xml", getXMLColor()));
         srcCodeBeans.add(new SrcCodeBean("strings.xml", getXMLString()));
@@ -1615,18 +1713,18 @@ public class yq {
         }
 
         if (isManifestFile) {
-            // Honor a manifest customized from the Code Viewer. It was saved from an
-            // already-generated (and command-injected) manifest, so it is returned as-is
-            // instead of regenerating and re-applying the command blocks.
-            String customManifest = getCustomAndroidManifest();
-            if (customManifest != null) {
-                return customManifest;
-            }
             ProjectBuilder builder = new ProjectBuilder(AscodeApplication.getContext(), this);
             builder.buildBuiltInLibraryInformation();
             Ix ix = new Ix(N, projectFileManager.b(), builder.getBuiltInLibraryManager());
             ix.setYq(this);
-            return CommandBlock.applyCommands("AndroidManifest.xml", ix.a());
+            String generatedManifest = CommandBlock.applyCommands("AndroidManifest.xml", ix.a());
+            // A manifest customized from the Code Viewer is preferred, but it must still get the
+            // per-activity theme the generator derives from the design (screen options such as the
+            // Toolbar toggle), otherwise the viewer and the build would disagree.
+            String customManifest = getCustomAndroidManifest();
+            return customManifest != null
+                    ? applyGeneratedActivityThemes(customManifest, generatedManifest)
+                    : generatedManifest;
         }
 
         for (ProjectFileBean file : files) {
@@ -1668,6 +1766,92 @@ public class yq {
         return CommandBlock.applyCommands("colors.xml", colorsFileBuilder.toCode());
     }
 
+    /**
+     * Removes {@code android:versionCode}/{@code android:versionName} from a manifest, if present, so
+     * the single source of truth is the version aapt2 receives from Project Settings at build time.
+     * Needed because aapt2 ignores {@code --version-code}/{@code --version-name} when the linked
+     * manifest already declares them (verified against aapt2). Idempotent.
+     */
+    private static final java.util.regex.Pattern MANIFEST_ACTIVITY_TAG =
+            java.util.regex.Pattern.compile("<activity(?![\\w-])[^>]*>");
+    private static final java.util.regex.Pattern MANIFEST_ACTIVITY_NAME =
+            java.util.regex.Pattern.compile("android:name=\"([^\"]+)\"");
+    private static final java.util.regex.Pattern MANIFEST_ACTIVITY_THEME =
+            java.util.regex.Pattern.compile("\\s*android:theme=\"([^\"]*)\"");
+    /** Themes the generator itself may put on an activity, so only those get removed again when the
+     * generator no longer wants a theme; a theme a user injected is never touched. */
+    private static final java.util.Set<String> GENERATED_ACTIVITY_THEMES = java.util.Set.of(
+            "@style/NoActionBar", "@style/NoStatusBar", "@style/FullScreen", "@style/AppTheme.FullScreen");
+
+    /**
+     * Re-applies the per-activity themes the generator computed (see {@link Ix#a()}) onto a
+     * user-customized AndroidManifest.xml. The custom manifest is otherwise used verbatim, so any
+     * screen option that only affects the activity theme - most notably the Toolbar toggle, which
+     * becomes {@code @style/NoActionBar} for projects without AppCompat - was ignored at build time
+     * and the built app kept its action bar. Activities are matched by their
+     * {@code android:name=".JavaName"}: the generated theme is added or replaced, and a
+     * generator-produced theme is removed again when the generator no longer wants one.
+     */
+    private String applyGeneratedActivityThemes(String customManifest, String generatedManifest) {
+        java.util.Map<String, String> generatedThemes = new java.util.LinkedHashMap<>();
+        java.util.regex.Matcher generatedMatcher = MANIFEST_ACTIVITY_TAG.matcher(generatedManifest);
+        while (generatedMatcher.find()) {
+            String tag = generatedMatcher.group();
+            java.util.regex.Matcher nameMatcher = MANIFEST_ACTIVITY_NAME.matcher(tag);
+            if (!nameMatcher.find()) {
+                continue;
+            }
+            java.util.regex.Matcher themeMatcher = MANIFEST_ACTIVITY_THEME.matcher(tag);
+            generatedThemes.put(nameMatcher.group(1), themeMatcher.find() ? themeMatcher.group(1) : null);
+        }
+
+        java.util.regex.Matcher customMatcher = MANIFEST_ACTIVITY_TAG.matcher(customManifest);
+        StringBuffer result = new StringBuffer();
+        while (customMatcher.find()) {
+            String tag = customMatcher.group();
+            java.util.regex.Matcher nameMatcher = MANIFEST_ACTIVITY_NAME.matcher(tag);
+            if (!nameMatcher.find() || !generatedThemes.containsKey(nameMatcher.group(1))) {
+                continue;
+            }
+            String desired = generatedThemes.get(nameMatcher.group(1));
+            java.util.regex.Matcher themeMatcher = MANIFEST_ACTIVITY_THEME.matcher(tag);
+            String existing = themeMatcher.find() ? themeMatcher.group(1) : null;
+            String themeLess = MANIFEST_ACTIVITY_THEME.matcher(tag).replaceFirst("");
+            String replacement;
+            if (desired != null) {
+                replacement = addManifestThemeAttribute(themeLess, desired);
+            } else if (existing != null && GENERATED_ACTIVITY_THEMES.contains(existing)) {
+                replacement = themeLess;
+            } else {
+                replacement = tag;
+            }
+            customMatcher.appendReplacement(result, java.util.regex.Matcher.quoteReplacement(replacement));
+        }
+        customMatcher.appendTail(result);
+        return result.toString();
+    }
+
+    private static String addManifestThemeAttribute(String activityTag, String theme) {
+        int closing = activityTag.lastIndexOf('>');
+        if (closing < 0) {
+            return activityTag;
+        }
+        int insertAt = closing > 0 && activityTag.charAt(closing - 1) == '/' ? closing - 1 : closing;
+        StringBuilder builder = new StringBuilder(activityTag);
+        // Leading space: XML requires whitespace between attributes.
+        builder.insert(insertAt, " android:theme=\"" + theme + "\" ");
+        return builder.toString();
+    }
+
+    private String stripManifestVersionAttributes(String manifest) {
+        if (manifest == null || manifest.trim().isEmpty()) {
+            return manifest;
+        }
+        return manifest
+                .replaceAll("\\s+android:versionCode=\"[^\"]*\"", "")
+                .replaceAll("\\s+android:versionName=\"[^\"]*\"", "");
+    }
+
     public String getXMLStyle() {
         String filePath = wq.b(sc_id) + "/files/resource/values/styles.xml";
         if (FileUtil.isExistFile(filePath) && exportingType == ExportType.SOURCE_CODE_VIEWING) {
@@ -1679,11 +1863,68 @@ public class yq {
             stylesFileBuilder.addItemToStyle("AppTheme", "android:statusBarColor", "@android:color/transparent");
             stylesFileBuilder.addItemToStyle("AppTheme", "android:navigationBarColor", "@android:color/transparent");
             stylesFileBuilder.addItemToStyle("AppTheme", "android:windowLightStatusBar", "?attr/isLightTheme");
+            /* Ronda: pasar los colores del proyecto al tema Material3. Sin esto, el Toolbar
+             * (android:background="?attr/colorPrimary") cae al morado por defecto de Material3
+             * en vez del color del proyecto (la "barra" salia morada/lila en vez de azul). */
+            stylesFileBuilder.addItemToStyle("AppTheme", "colorPrimary", "@color/colorPrimary");
+            stylesFileBuilder.addItemToStyle("AppTheme", "colorPrimaryContainer", "@color/colorPrimary");
+            stylesFileBuilder.addItemToStyle("AppTheme", "colorOnPrimary", "@android:color/white");
+            stylesFileBuilder.addItemToStyle("AppTheme", "colorOnPrimaryContainer", "@android:color/white");
+            stylesFileBuilder.addItemToStyle("AppTheme", "colorPrimaryDark", "@color/colorPrimaryDark");
+            stylesFileBuilder.addItemToStyle("AppTheme", "colorAccent", "@color/colorAccent");
+            stylesFileBuilder.addItemToStyle("AppTheme", "colorSecondary", "@color/colorAccent");
+            stylesFileBuilder.addItemToStyle("AppTheme", "colorSecondaryContainer", "@color/colorAccent");
+            /* M3: the top bar is an elevated *surface*. Material3's Widget.Material3.Toolbar /
+             * Widget.Material3.AppBarLayout take their background from colorSurface, whose baseline
+             * value is the light lilac #FEF7FF, and Widget.Material3.Toolbar's title is colorOnSurface
+             * (via ?attr/textAppearanceTitleLarge). Pin the whole surface family (and the "on" colors)
+             * to the project color so the toolbar/top bar comes out colorPrimary with a readable title.
+             *
+             * IMPORTANT: only attributes that actually exist in the linked resource table may be
+             * emitted here. AAPT2 rejects any @style item whose attr is not declared by the linked
+             * libraries (android.jar + the built-in libraries of the project, e.g. material). The
+             * Material3 bundle that ships with this IDE does NOT declare `colorSurfaceTint`, so
+             * emitting it aborts the resource link with:
+             *   style attribute 'attr/colorSurfaceTint' (aka <pkg>:attr/colorSurfaceTint) not found.
+             * The remaining attributes below were verified against the bundled material-1.13.0
+             * resources and a full aapt2 compile+link (all built-in libraries + this exact
+             * styles.xml) succeeds. Do NOT add colourSurfaceTint back; if you add another attribute
+             * here, verify it exists in the bundled library resources first. */
+            stylesFileBuilder.addItemToStyle("AppTheme", "colorSurface", "@color/colorPrimary");
+            stylesFileBuilder.addItemToStyle("AppTheme", "colorSurfaceVariant", "@color/colorPrimary");
+            stylesFileBuilder.addItemToStyle("AppTheme", "colorSurfaceContainer", "@color/colorPrimary");
+            stylesFileBuilder.addItemToStyle("AppTheme", "colorSurfaceContainerLow", "@color/colorPrimary");
+            stylesFileBuilder.addItemToStyle("AppTheme", "colorSurfaceContainerLowest", "@color/colorPrimary");
+            stylesFileBuilder.addItemToStyle("AppTheme", "colorSurfaceContainerHigh", "@color/colorPrimary");
+            stylesFileBuilder.addItemToStyle("AppTheme", "colorSurfaceContainerHighest", "@color/colorPrimary");
+            stylesFileBuilder.addItemToStyle("AppTheme", "colorSurfaceInverse", "@color/colorPrimary");
+            stylesFileBuilder.addItemToStyle("AppTheme", "colorSurfaceBright", "@color/colorPrimary");
+            stylesFileBuilder.addItemToStyle("AppTheme", "colorSurfaceDim", "@color/colorPrimary");
+            stylesFileBuilder.addItemToStyle("AppTheme", "colorOnSurface", "@android:color/white");
+            stylesFileBuilder.addItemToStyle("AppTheme", "colorOnSurfaceVariant", "@android:color/white");
+            stylesFileBuilder.addItemToStyle("AppTheme", "colorOnSurfaceInverse", "@android:color/white");
+            stylesFileBuilder.addItemToStyle("AppTheme", "android:colorBackground", "@color/colorPrimary");
             stylesFileBuilder.addStyle("AppTheme.FullScreen", "AppTheme");
             stylesFileBuilder.addItemToStyle("AppTheme.FullScreen", "android:windowFullscreen", "true");
             stylesFileBuilder.addItemToStyle("AppTheme.FullScreen", "android:windowContentOverlay", "@null");
             stylesFileBuilder.addStyle("AppTheme.AppBarOverlay", "ThemeOverlay.Material3");
+            /* A bare ThemeOverlay.Material3 re-declares M3's baseline color scheme, and the
+             * AppBarLayout is themed with this overlay. That made the Toolbar's ?attr/colorPrimary
+             * (set as its background by AppCompatInjection) resolve back to M3's default purple/lilac
+             * *inside* the AppBar subtree, ignoring the colors pinned on AppTheme. Re-pin the project
+             * colors inside the overlay itself. */
+            stylesFileBuilder.addItemToStyle("AppTheme.AppBarOverlay", "colorPrimary", "@color/colorPrimary");
+            stylesFileBuilder.addItemToStyle("AppTheme.AppBarOverlay", "colorPrimaryContainer", "@color/colorPrimary");
+            stylesFileBuilder.addItemToStyle("AppTheme.AppBarOverlay", "colorOnPrimary", "@android:color/white");
+            stylesFileBuilder.addItemToStyle("AppTheme.AppBarOverlay", "colorSurface", "@color/colorPrimary");
+            stylesFileBuilder.addItemToStyle("AppTheme.AppBarOverlay", "colorSurfaceContainer", "@color/colorPrimary");
+            stylesFileBuilder.addItemToStyle("AppTheme.AppBarOverlay", "colorOnSurface", "@android:color/white");
+            stylesFileBuilder.addItemToStyle("AppTheme.AppBarOverlay", "colorOnSurfaceVariant", "@android:color/white");
             stylesFileBuilder.addStyle("AppTheme.PopupOverlay", "ThemeOverlay.Material3");
+            stylesFileBuilder.addItemToStyle("AppTheme.PopupOverlay", "colorPrimary", "@color/colorPrimary");
+            stylesFileBuilder.addItemToStyle("AppTheme.PopupOverlay", "colorOnPrimary", "@android:color/white");
+            stylesFileBuilder.addItemToStyle("AppTheme.PopupOverlay", "colorSurface", "@color/colorPrimary");
+            stylesFileBuilder.addItemToStyle("AppTheme.PopupOverlay", "colorOnSurface", "@android:color/white");
             stylesFileBuilder.addStyle("AppTheme.DebugActivity", "AppTheme");
             stylesFileBuilder.addItemToStyle("AppTheme.DebugActivity", "windowActionBar", "true");
             stylesFileBuilder.addItemToStyle("AppTheme.DebugActivity", "windowNoTitle", "false");
@@ -1700,13 +1941,28 @@ public class yq {
             stylesFileBuilder.addItemToStyle("AppTheme", "colorAccent", "@color/colorAccent");
             stylesFileBuilder.addItemToStyle("AppTheme", "colorControlHighlight", "@color/colorControlHighlight");
             stylesFileBuilder.addItemToStyle("AppTheme", "colorControlNormal", "@color/colorControlNormal");
+            /* Same top-bar problem as the Material3 branch: surface-based appbar colors and the
+             * "on surface" title color are not the project color by default, so pin them too. */
+            stylesFileBuilder.addItemToStyle("AppTheme", "colorSurface", "@color/colorPrimary");
+            stylesFileBuilder.addItemToStyle("AppTheme", "colorSurfaceVariant", "@color/colorPrimary");
+            stylesFileBuilder.addItemToStyle("AppTheme", "colorSecondary", "@color/colorAccent");
+            stylesFileBuilder.addItemToStyle("AppTheme", "colorOnSurface", "@android:color/white");
+            stylesFileBuilder.addItemToStyle("AppTheme", "colorOnSurfaceVariant", "@android:color/white");
 
             stylesFileBuilder.addStyle("AppTheme.FullScreen", "AppTheme");
             stylesFileBuilder.addItemToStyle("AppTheme.FullScreen", "android:windowFullscreen", "true");
             stylesFileBuilder.addItemToStyle("AppTheme.FullScreen", "android:windowContentOverlay", "@null");
 
             stylesFileBuilder.addStyle("AppTheme.AppBarOverlay", "ThemeOverlay.MaterialComponents.Dark.ActionBar");
+            stylesFileBuilder.addItemToStyle("AppTheme.AppBarOverlay", "colorPrimary", "@color/colorPrimary");
+            stylesFileBuilder.addItemToStyle("AppTheme.AppBarOverlay", "colorOnPrimary", "@android:color/white");
+            stylesFileBuilder.addItemToStyle("AppTheme.AppBarOverlay", "colorSurface", "@color/colorPrimary");
+            stylesFileBuilder.addItemToStyle("AppTheme.AppBarOverlay", "colorOnSurface", "@android:color/white");
             stylesFileBuilder.addStyle("AppTheme.PopupOverlay", "ThemeOverlay.MaterialComponents.Light");
+            stylesFileBuilder.addItemToStyle("AppTheme.PopupOverlay", "colorPrimary", "@color/colorPrimary");
+            stylesFileBuilder.addItemToStyle("AppTheme.PopupOverlay", "colorOnPrimary", "@android:color/white");
+            stylesFileBuilder.addItemToStyle("AppTheme.PopupOverlay", "colorSurface", "@color/colorPrimary");
+            stylesFileBuilder.addItemToStyle("AppTheme.PopupOverlay", "colorOnSurface", "@android:color/white");
 
             stylesFileBuilder.addStyle("AppTheme.DebugActivity", "AppTheme");
             stylesFileBuilder.addItemToStyle("AppTheme.DebugActivity", "actionBarStyle", "@style/ThemeOverlay.MaterialComponents.ActionBar.Primary");

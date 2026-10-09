@@ -616,15 +616,22 @@ public class BuiltInLibraries {
     public static void maybeExtractAndroidJar(@NonNull BuildProgressReceiver... receivers) {
         String androidJarArchiveName = "android.jar.zip";
         String androidJarPath = new File(EXTRACTED_COMPILE_ASSETS_PATH, androidJarArchiveName).getAbsolutePath();
-        if (ProjectBuilder.hasFileChanged("libs" + File.separator + androidJarArchiveName, androidJarPath)) {
-            for (BuildProgressReceiver receiver : receivers) {
-                receiver.onProgress("Extracting built-in android.jar...", 7);
-            }
-            /* Delete android.jar */
-            new oB().c(EXTRACTED_COMPILE_ASSETS_PATH.getAbsolutePath() + File.separator + "android.jar");
-            /* Extract android.jar.zip to android.jar */
-            new KB().a(androidJarPath, EXTRACTED_COMPILE_ASSETS_PATH.getAbsolutePath());
+        /* Force a full refresh on every build. The previous size-only check
+           (ProjectBuilder.hasFileChanged) could leave a stale stub android.jar in place when its
+           length happened to match the shipped asset, so it was never replaced. A stub
+           android.jar makes ECJ write CLASS-retention annotations (RuntimeVisible becomes
+           RuntimeInvisible), which silently breaks android.webkit.JavascriptInterface: the
+           WebView bridge arrives empty at runtime and compiled apps stay mute. Re-copying the
+           archive and re-extracting the jar from scratch guarantees the correct metadata. */
+        oB fileUtil = new oB();
+        fileUtil.a(AscodeApplication.getContext(), "libs" + File.separator + androidJarArchiveName, androidJarPath);
+        for (BuildProgressReceiver receiver : receivers) {
+            receiver.onProgress("Extracting built-in android.jar...", 7);
         }
+        /* Delete android.jar */
+        new oB().c(EXTRACTED_COMPILE_ASSETS_PATH.getAbsolutePath() + File.separator + "android.jar");
+        /* Extract android.jar.zip to android.jar */
+        new KB().a(androidJarPath, EXTRACTED_COMPILE_ASSETS_PATH.getAbsolutePath());
     }
 
     public static void maybeExtractCoreLambdaStubsJar() {

@@ -68,6 +68,7 @@ import mod.hey.studios.project.proguard.ProguardHandler;
 import mod.hey.studios.util.SystemLogPrinter;
 import mod.jbk.build.BuildProgressReceiver;
 import mod.jbk.build.BuiltInLibraries;
+import mod.jbk.build.compiler.AnnotationPromoter;
 import mod.jbk.build.compiler.dex.DexCompiler;
 import mod.jbk.build.compiler.resource.ResourceCompiler;
 import mod.jbk.util.LogUtil;
@@ -274,6 +275,18 @@ public class ProjectBuilder {
     public void createDexFilesFromClasses() throws Exception {
         FileUtil.makeDir(yq.binDirectoryPath + File.separator + "dex");
         if (isR8BuildEnabled()) return;
+
+        /* Promote AFTER the shrinker for the ProGuard path: the DEX below is built from the shrinker's
+         * own classes (proguardClassesPath), and if that step re-emitted @JavascriptInterface as a
+         * runtime-INvisible annotation the WebView bridge would be dropped and the app would run mute.
+         * The R8 path produces DEX directly (see runR8()) and promotes its input instead. */
+        if (isShrinkBuildEnabled()) {
+            try {
+                AnnotationPromoter.promoteJar(new File(yq.proguardClassesPath));
+            } catch (Throwable t) {
+                LogUtil.e(TAG, "Annotation promotion of shrunk classes failed (non-fatal)", t);
+            }
+        }
 
         if (isD8Enabled()) {
             long savedTimeMillis = System.currentTimeMillis();
@@ -789,6 +802,16 @@ public class ProjectBuilder {
             if (main.globalErrorsCount <= 0) {
                 LogUtil.d(TAG, "System.err of Eclipse compiler: " + errOutputStream.getOut());
                 LogUtil.d(TAG, "Compiling Java files took " + (System.currentTimeMillis() - savedTimeMillis) + " ms");
+
+                /* The Java -> JavaScript bridge is broken if @android.webkit.JavascriptInterface
+                 * is stored as a compile-time-only (RuntimeInvisible) annotation: the WebView then
+                 * never exposes the bridge methods and the built app runs mute. Force it back to
+                 * RuntimeVisible before dexing/proguarding. Non-fatal on purpose. */
+                try {
+                    AnnotationPromoter.promote(new File(yq.compiledClassesPath));
+                } catch (Throwable t) {
+                    LogUtil.e(TAG, "Annotation promotion failed (non-fatal)", t);
+                }
             } else {
                 LogUtil.e(TAG, "Failed to compile Java files");
                 throw new zy(errOutputStream.getOut());
@@ -1045,11 +1068,34 @@ public class ProjectBuilder {
         }
         sb.append("\n");
         sb.append("-keep class ").append(yq.packageName).append(".R { *; }").append('\n');
+        /*
+         * Always carry the JavaScript-bridge keeps, whatever default rules file the installation
+         * had. @android.webkit.JavascriptInterface is what makes window.<name> reachable from the
+         * WebView; if the shrinker drops the annotation (or rewrites it as RuntimeInvisible) the
+         * compiled app runs mute. `*Annotation*` already covers the Runtime*Annotations attributes,
+         * but they are spelled out explicitly so the intent survives future edits of the other
+         * rules files. These lines are regenerated on every build (unlike the user-editable
+         * android-proguard-rules.pro) and apply to both the classic ProGuard and the R8 path.
+         */
+        sb.append("\n# JavaScript bridge: never let shrinking strip or hide the annotation\n");
+        sb.append("-keepattributes *Annotation*, RuntimeVisibleAnnotations, RuntimeInvisibleAnnotations, ")
+                .append("RuntimeVisibleParameterAnnotations, RuntimeInvisibleParameterAnnotations, AnnotationDefault\n");
+        sb.append("-keepclassmembers class * { @android.webkit.JavascriptInterface <methods>; }\n");
         return sb.toString();
     }
 
     public void runR8() throws IOException {
         long savedTimeMillis = System.currentTimeMillis();
+
+        /* Re-assert the JavaScript bridge annotation on the classes R8 is about to consume. R8
+         * builds the final DEX itself, so this is the only place left to guarantee the annotation
+         * reaches the output as RuntimeVisible (the keep rules below also preserve it). Non-fatal
+         * on purpose. */
+        try {
+            AnnotationPromoter.promote(new File(yq.compiledClassesPath));
+        } catch (Throwable t) {
+            LogUtil.e(TAG, "Annotation promotion before R8 failed (non-fatal)", t);
+        }
 
         ArrayList<String> config = new ArrayList<>();
         /* R8 base rules: the classic keeps WITHOUT -dontoptimize, so R8 may optimize */

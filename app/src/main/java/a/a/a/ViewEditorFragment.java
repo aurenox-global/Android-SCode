@@ -158,6 +158,11 @@ public class ViewEditorFragment extends qA {
         this.projectFileBean = projectFileBean;
         isFabEnabled = projectFileBean.hasActivityOption(ProjectFileBean.OPTION_ACTIVITY_FAB);
         viewEditor.initialize(sc_id, projectFileBean);
+        /* The Visual editor applies the Toolbar/StatusBar placement from onLayout (only when
+         * isLayoutChanged is set), so an already-laid-out editor must be asked to lay out again.
+         * Without this, re-initialising the fragment after editing a screen option changed the
+         * internal state but the preview kept the old layout until the project was reopened. */
+        viewEditor.requestLayout();
         viewEditor.h();
         viewProperty.a(sc_id, this.projectFileBean);
         e();

@@ -205,6 +205,12 @@ public class DesignActivity extends BaseAppCompatActivity implements View.OnClic
         if (result.getResultCode() == RESULT_OK) {
             refresh();
         }
+        /* The View Manager persists the edited screens on a delayed background task (and finishes the
+         * activity from there, often before that task runs), so it may hand back RESULT_CANCELED and
+         * the store still holds the old screen options when we get here. Re-check shortly after, once
+         * the manager has written the new ProjectFileBean, so the preview reflects the new
+         * Toolbar/StatusBar/Drawer/FAB toggles without having to reopen the project. */
+        new Handler(Looper.getMainLooper()).postDelayed(this::syncViewPreviewWithStoredOptions, 1300L);
     });
     private BuildTask currentBuildTask;
     private final BroadcastReceiver buildCancelReceiver = new BroadcastReceiver() {
@@ -264,12 +270,28 @@ public class DesignActivity extends BaseAppCompatActivity implements View.OnClic
             if (!ProjectFileBean.DEFAULT_XML_NAME.equals(xmlFileName) && jC.b(sc_id).b(xmlFileName) == null) {
                 projectFile = getDefaultProjectFile();
                 xmlFileName = ProjectFileBean.DEFAULT_XML_NAME;
+            } else {
+                /* Re-resolve the current screen from the project store on every refresh. The View
+                 * Manager ("Edit screen") replaces the stored ProjectFileBean when a screen option
+                 * changes (Toolbar / StatusBar / Drawer / FAB), so the cached reference kept the old
+                 * options and the design preview stayed out of sync - e.g. the Toolbar toggle only
+                 * showed after leaving and reopening the project. jC.b(sc_id) is the live, cached
+                 * project-file manager, so its bean always carries the latest options. */
+                ProjectFileBean current = jC.b(sc_id).b(xmlFileName);
+                if (current != null) {
+                    projectFile = current;
+                }
             }
             fileName.setText(xmlFileName);
         } else {
             if (!ProjectFileBean.DEFAULT_JAVA_NAME.equals(currentJavaFileName) && jC.b(sc_id).a(currentJavaFileName) == null) {
                 projectFile = getDefaultProjectFile();
                 currentJavaFileName = ProjectFileBean.DEFAULT_JAVA_NAME;
+            } else {
+                ProjectFileBean current = jC.b(sc_id).a(currentJavaFileName);
+                if (current != null) {
+                    projectFile = current;
+                }
             }
             fileName.setText(currentJavaFileName);
         }
@@ -287,6 +309,35 @@ public class DesignActivity extends BaseAppCompatActivity implements View.OnClic
             }
             viewTabAdapter.initialize(projectFile);
         }
+    }
+
+    /**
+     * Re-syncs the Visual editor preview with the screen options stored for the current file.
+     * <p>
+     * Returning to the View tab (or coming back after editing the screen in the View Manager) does
+     * not rebuild the {@link ViewEditorFragment} by itself, so the preview kept the previous
+     * Toolbar/StatusBar/Drawer/FAB state until the project was reopened. The stored bean is the
+     * single source of truth (the View Manager replaces it when a screen option changes), so when it
+     * differs from the bean the preview is currently showing, re-initialise the editor with it.
+     */
+    private void syncViewPreviewWithStoredOptions() {
+        if (viewTabAdapter == null) {
+            return;
+        }
+        if (projectFile == null) {
+            projectFile = getDefaultProjectFile();
+        }
+        ProjectFileBean stored = jC.b(sc_id).b(projectFile.getXmlName());
+        if (stored == null) {
+            return;
+        }
+        projectFile = stored;
+        /* Always rebuild the preview from the stored bean. A change could not be detected reliably by
+         * comparing option bits: the project-file manager may reuse/mutate the same ProjectFileBean
+         * instance, leaving the cached reference with the new options while the editor still shows the
+         * old placement (the editor only reads the options in initialize()). Re-initialising is cheap
+         * and guarantees the preview matches the Toolbar/StatusBar/Drawer/FAB toggles. */
+        refreshViewTabAdapter();
     }
 
     private void refreshEventTabAdapter() {
@@ -691,6 +742,7 @@ public class DesignActivity extends BaseAppCompatActivity implements View.OnClic
                         viewTabAdapter.showHidePropertyView(true);
                         xmlLayoutOrientation.setImageResource(R.drawable.ic_mtrl_screen);
                     }
+                    syncViewPreviewWithStoredOptions();
                 } else if (position == 1) {
                     bottomMenu.findItem(7).setVisible(false);
                     if (viewTabAdapter != null) {
@@ -812,6 +864,13 @@ public class DesignActivity extends BaseAppCompatActivity implements View.OnClic
         if (!isStoragePermissionGranted()) {
             finish();
         }
+
+        /* Re-sync the Visual editor with the screen options stored for the current file. Returning
+         * from the View Manager (or any child screen) does not reliably deliver RESULT_OK - the
+         * manager persists on a delayed background task and finishes from there - so refresh() is not
+         * guaranteed to run. Without this the design preview kept showing the previous
+         * Toolbar/StatusBar/Drawer/FAB state until the project was reopened. */
+        syncViewPreviewWithStoredOptions();
 
         long freeMegabytes = GB.c();
         if (freeMegabytes < 100L && freeMegabytes > 0L) {

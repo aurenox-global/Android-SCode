@@ -1,6 +1,8 @@
 package com.besome.sketch.tools;
 
 import android.annotation.SuppressLint;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
@@ -107,10 +109,29 @@ public class CompileLogActivity extends BaseAppCompatActivity {
         });
 
         binding.formatButton.setOnClickListener(v -> options.show());
+        binding.copyButton.setOnClickListener(v -> copyCompileLogToClipboard());
 
         applyLogViewerPreferences();
 
         setErrorText();
+    }
+
+    /**
+     * Copies the whole compile log currently shown to the clipboard and confirms with a Toast.
+     */
+    private void copyCompileLogToClipboard() {
+        try {
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            if (clipboard == null) {
+                AscodeUtil.toastError("Couldn't copy the compile log.");
+                return;
+            }
+            CharSequence log = binding.tvCompileLog.getText();
+            clipboard.setPrimaryClip(ClipData.newPlainText("Compile log", log == null ? "" : log));
+            AscodeUtil.toast("Compile log copied.");
+        } catch (Throwable throwable) {
+            AscodeUtil.toastError("Couldn't copy the compile log.");
+        }
     }
 
     private void setErrorText() {

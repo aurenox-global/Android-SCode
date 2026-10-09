@@ -172,6 +172,9 @@
 -dontwarn com.google.errorprone.**
 -dontwarn javax.xml.stream.**
 -dontwarn org.codehaus.stax2.**
+# ASM (used by mod.jbk.build.compiler.AnnotationPromoter) references optional JDK-only APIs
+# that do not exist on Android; the code paths are never reached on device.
+-dontwarn org.objectweb.asm.**
 
 # --- Reglas generadas por R8 (app/build/outputs/mapping/release/missing_rules.txt) ---
 # Son referencias a clases que no existen en Android (log4j JMS/mail, tink HTTP,
@@ -522,3 +525,14 @@
 # com.android.tools.r8.threading completo (5 clases minusculas): nombres + miembros de la factory y, sobre
 # todo, los <init> de los proveedores, para que la reflexion encuentre lo que busca.
 -keep class com.android.tools.r8.threading.** { *; }
+
+# --- Ronda 10c: D8/Dx embebido — NO minificar el R8/D8 que compila los proyectos ---
+# El R8/D8 embebido (com.android.tools:r8) resuelve partes de sí mismo por REFLEXION con nombres
+# en String (proveedores de threading y otros). Al minificar el APK del IDE, el propio R8 renombra
+# com.android.tools.r8.** (p. ej. a com.android.tools.r8.internal.<X>), de modo que esas busquedas
+# por nombre fallan y D8 revienta al compilar EN EL DISPOSITIVO. La Ronda 10b cubrio solo el
+# subpaquete threading; aqui se conserva TODO el arbol r8 (nombres + miembros) para que D8 funcione
+# en release, que es lo que permite elegir Dexer=D8 + Java 1.8 sin que caiga a Dx.
+-keep class com.android.tools.r8.** { *; }
+-keepnames class com.android.tools.r8.** { *; }
+-dontwarn com.android.tools.r8.**

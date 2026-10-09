@@ -9,12 +9,17 @@
 <link rel="stylesheet" href="assets/style.css">
 <style>
   /* últimas actualizaciones (bloque compacto) */
-  ul.updates { list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 8px; }
+  ul.updates { list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 8px; min-width: 0; }
   ul.updates li {
     display: flex; flex-wrap: wrap; gap: 12px; align-items: baseline;
     background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
     padding: 10px 14px; font-size: 0.93rem; color: var(--text-dim);
+    min-width: 0; max-width: 100%;
   }
+  /* El texto de cada release debe poder encogerse y partirse: sin esto, una
+     palabra larga empuja el ancho mínimo del grid por encima del viewport y el
+     wrapper/botón del «Leer más» desborda por la derecha (scroll/hueco). */
+  ul.updates li > span:not(.ver) { min-width: 0; overflow-wrap: anywhere; word-break: break-word; }
   ul.updates .ver {
     flex: 0 0 auto; font-family: var(--mono); font-size: 0.78rem; font-weight: 700;
     color: var(--sw-blue-light); background: rgba(0, 141, 205, 0.14);

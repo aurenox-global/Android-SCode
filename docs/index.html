@@ -40,7 +40,7 @@
     position:sticky;top:0;z-index:20;backdrop-filter:blur(10px);
     background:rgba(11,18,32,.78);border-bottom:1px solid var(--line);
   }
-  .bar{max-width:var(--max);margin:0 auto;padding:12px 18px;display:flex;align-items:center;gap:14px}
+  .bar{max-width:var(--max);margin:0 auto;padding:12px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;row-gap:8px}
   .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.2px}
   .brand .logo{width:34px;height:34px;flex:0 0 34px}
   .brand span{white-space:nowrap}
@@ -57,6 +57,16 @@
     nav a.hide-sm{display:none}
     .bar{padding:10px 14px}
     .brand span{font-size:15px}
+  }
+  /* En móviles estrechos el header se reparte en dos filas limpias:
+     fila 1 la marca, fila 2 los enlaces y el conmutador ES/EN a la derecha.
+     Así nada queda recortado ni superpuesto (ES y EN). */
+  @media (max-width:600px){
+    .brand{flex:1 1 100%;min-width:0}
+    .brand span{overflow:hidden;text-overflow:ellipsis}
+    nav{flex:1 1 100%;min-width:0;margin-left:0;justify-content:space-between;column-gap:10px}
+    nav a{white-space:nowrap}
+    .lang{flex:0 0 auto;margin-left:auto}
   }
 
   /* hero */

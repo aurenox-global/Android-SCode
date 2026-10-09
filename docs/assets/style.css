@@ -406,7 +406,22 @@ footer {
 footer a { color: var(--sw-blue-light); }
 
 @media (max-width: 720px) {
-  nav.main { display: none; }
+  /* El header se reparte en dos filas: marca + ES/EN arriba,
+     y los enlaces en una segunda fila que se puede envolver.
+     Nada queda recortado ni superpuesto. */
+  .top-inner { flex-wrap: wrap; row-gap: 8px; }
+  .brand { order: 1; min-width: 0; }
+  .brand span { overflow: hidden; text-overflow: ellipsis; }
+  .lang { order: 2; margin-left: auto; flex: 0 0 auto; }
+  nav.main {
+    order: 3;
+    flex: 1 1 100%;
+    min-width: 0;
+    margin-left: 0;
+    justify-content: flex-start;
+    gap: 4px 4px;
+  }
+  nav.main a { font-size: 0.82rem; padding: 5px 9px; white-space: nowrap; }
   .hero { padding: 46px 0 34px; }
   section { padding: 46px 0; }
   .log { padding-left: 18px; }
